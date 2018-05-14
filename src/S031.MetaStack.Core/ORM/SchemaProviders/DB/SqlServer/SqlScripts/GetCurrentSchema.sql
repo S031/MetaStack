@@ -1,0 +1,1 @@
+Select schema_name()

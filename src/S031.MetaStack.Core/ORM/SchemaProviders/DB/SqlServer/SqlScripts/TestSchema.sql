@@ -1,0 +1,1 @@
+Select Name From sys.schemas Where name = 'SysCat'

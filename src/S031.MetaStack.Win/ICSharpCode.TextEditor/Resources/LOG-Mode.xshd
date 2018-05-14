@@ -1,0 +1,15 @@
+﻿<?xml version="1.0"?>
+<!-- syntaxdefinition for LOG -->
+<SyntaxDefinition name = "LOG" extensions = ".LOG">
+  <Digits name = "Digits" bold = "false" italic = "false" color = "DarkBlue"/>
+  <RuleSets>
+    <RuleSet ignorecase="true">
+      <KeyWords name = "Errors" bold = "true" italic = "false" color = "Red">
+        <Key word = "{ОШИБКА}" />
+      </KeyWords>
+      <KeyWords name = "Warnings" bold="true" italic="false" color="Magenta">
+        <Key word = "{ВНИМАНИЕ}"/>
+      </KeyWords>
+    </RuleSet>
+  </RuleSets>
+</SyntaxDefinition>

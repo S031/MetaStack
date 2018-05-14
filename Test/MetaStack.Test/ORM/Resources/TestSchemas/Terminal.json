@@ -1,0 +1,161 @@
+﻿{
+  "DirectAccess": "ForAll",
+  "Name": "Терминалы",
+  "ObjectName": {
+    "AreaName": "dbo",
+    "ObjectName": "Terminal"
+  },
+  "DbObjectName": {
+    "AreaName": "dbo",
+    "ObjectName": "Terminals"
+  },
+  "PrimaryKey": {
+    "KeyName": "PK_TERMINALS",
+    "KeyMembers": [
+      {
+        "FieldName": "ID"
+      }
+    ]
+  },
+  "Attributes": [
+    {
+      "AttribName": "ID",
+      "Position": 1,
+      "ServerDataType": "int",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "DataSize": {
+        "Size": 4,
+        "Precision": 10
+      },
+      "Identity": {
+        "IsIdentity": true,
+        "Seed": 1,
+        "Increment": 1
+      },
+      "DataType": "int",
+      "Width": 10,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "TerminalKey",
+      "Position": 2,
+      "ServerDataType": "varchar",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "CollationName": "Cyrillic_General_CI_AS",
+      "DataSize": {
+        "Size": 30
+      },
+      "Identity": {},
+      "DataType": "string",
+      "Width": 30,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "Name",
+      "Position": 3,
+      "ServerDataType": "varchar",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "CollationName": "Cyrillic_General_CI_AS",
+      "DataSize": {
+        "Size": 60
+      },
+      "Identity": {},
+      "DataType": "string",
+      "Width": 60,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "DateBegin",
+      "Position": 4,
+      "ServerDataType": "datetime",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "DataSize": {
+        "Size": 8,
+        "Scale": 3,
+        "Precision": 23
+      },
+      "Identity": {},
+      "DataType": "dateTime",
+      "Width": 23,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "DateEnd",
+      "Position": 5,
+      "ServerDataType": "datetime",
+      "IsNullable": true,
+      "NullOption": "NULL",
+      "DataSize": {
+        "Size": 8,
+        "Scale": 3,
+        "Precision": 23
+      },
+      "Identity": {},
+      "DataType": "dateTime",
+      "Width": 23,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "Config",
+      "Position": 6,
+      "ServerDataType": "varchar",
+      "IsNullable": true,
+      "NullOption": "NULL",
+      "CollationName": "Cyrillic_General_CI_AS",
+      "DataSize": {
+        "Size": -1
+      },
+      "Identity": {},
+      "DataType": "string",
+      "Width": -1,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    }
+  ],
+  "Indexes": [
+    {
+      "IndexName": "XAK1Terminals",
+      "IsUnique": true,
+      "KeyMembers": [
+        {
+          "FieldName": "TerminalKey",
+          "Position": 1
+        }
+      ]
+    }
+  ],
+  "ForeignKeys": []
+}

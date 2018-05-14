@@ -1,0 +1,36 @@
+﻿S031.MetaStack.Common.Logging.LogLevel.Critical = "{CRITICAL}";
+S031.MetaStack.Common.Logging.LogLevel.Error = "{ERROR}";
+S031.MetaStack.Common.Logging.LogLevel.Warning = "{WARNING}";
+S031.MetaStack.Common.Logging.LogLevel.Info = "{INFO}";
+S031.MetaStack.Common.Logging.LogLevel.Debug = "{DEBUG}";
+S031.MetaStack.Common.Logging.LogLevel.Trace = "{TRACE}";
+S031.MetaStack.Common.Logging.LogLevel.None = "";
+
+S031.MetaStack.Common.PasswordGenerator.Generate.1=Password length can not be less than 6 characters
+S031.MetaStack.Common.PasswordGenerator.Generate.2=For specified conditions (PasswordGeneratorOptions), the password length can not be less than {0} characters
+
+S031.MetaStack.Core.App.AppHost.1=The config.json configuration file was not found
+
+S031.MetaStack.Core.Data.writeData.1=The length of the data array must be equal to the length of the array of field names
+
+S031.MetaStack.Core.Data.DbProviderFactories.GetFactory.1=The {0} type does not have a static "Instance" field that returns an instance of DbProviderFactory
+S031.MetaStack.Core.Data.DbProviderFactories.GetFactory.2=The type derived from DbProviderFactory was not found in {0}
+S031.MetaStack.Core.Data.DbProviderFactories.GetFactory.3=An assembly containing definitions for {0} was not found
+S031.MetaStack.Core.Data.DbProviderFactories.GetFactory.4=No library containing definitions for {0}
+
+S031.MetaStack.Core.Data.MdbContext.array2List.1=Parameter a must implements IEnumerable<> interface
+S031.MetaStack.Core.Data.MdbContext.array2List.2=IEnumerable <{0}> argument type not supported
+S031.MetaStack.Core.Data.MdbContext.Commit.1=Can't call Commit method without transaction
+
+S031.MetaStack.Services.TCPServerService.Accept.1=The minimum message length can not be less than 32 bytes
+S031.MetaStack.Core.SysCat.SysCatManager.getSchema.1=Object schema '{0}' not found in database
+S031.MetaStack.Core.SysCat.SysCatManager.getSchema.2=Object schema '{0}' with the SyncState={1} not found in database
+
+S031.MetaStack.Core.ORM.JMXSchema.ctor.1=Not found the schema of the object '{0}'
+S031.MetaStack.Core.ORM.JMXSchema.ParseXml.1=Missing required element '{0}'
+
+S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.1=One or more attribute is required in the schema
+S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.2=For an object type attribute, you must specify a schema
+S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.3=The FieldName '{0}' specified in the {1} is not in the attribute list
+S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.4=The field '{0}' has an invalid data type
+S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.5=A primary key is required for a table '{0}' that includes columns of type 'object'

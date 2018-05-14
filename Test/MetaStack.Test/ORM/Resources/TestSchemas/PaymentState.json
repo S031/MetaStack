@@ -1,0 +1,99 @@
+﻿{
+  "DirectAccess": "ForAll",
+  "Name": "Виды состояний платежа",
+  "ObjectName": {
+    "AreaName": "dbo",
+    "ObjectName": "PaymentState"
+  },
+  "DbObjectName": {
+    "AreaName": "dbo",
+    "ObjectName": "PaymentStates"
+  },
+  "PrimaryKey": {
+    "KeyName": "XPKPaymentStates",
+    "KeyMembers": [
+      {
+        "FieldName": "ID"
+      }
+    ]
+  },
+  "Attributes": [
+    {
+      "AttribName": "ID",
+      "Position": 1,
+      "ServerDataType": "int",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "DataSize": {
+        "Size": 4,
+        "Precision": 10
+      },
+      "Identity": {
+        "IsIdentity": true,
+        "Seed": 1,
+        "Increment": 1
+      },
+      "DataType": "int",
+      "Width": 10,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "StateCode",
+      "Position": 2,
+      "ServerDataType": "varchar",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "CollationName": "Cyrillic_General_CI_AS",
+      "DataSize": {
+        "Size": 30
+      },
+      "Identity": {},
+      "DataType": "string",
+      "Width": 30,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "Name",
+      "Position": 3,
+      "ServerDataType": "varchar",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "CollationName": "Cyrillic_General_CI_AS",
+      "DataSize": {
+        "Size": 120
+      },
+      "Identity": {},
+      "DataType": "string",
+      "Width": 120,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    }
+  ],
+  "Indexes": [
+    {
+      "IndexName": "XIE1PaymentStates",
+      "IsUnique": true,
+      "KeyMembers": [
+        {
+          "FieldName": "StateCode",
+          "Position": 1
+        }
+      ]
+    }
+  ],
+  "ForeignKeys": []
+}

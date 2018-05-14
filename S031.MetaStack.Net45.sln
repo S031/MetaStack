@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2026
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S031.MetaStack.WinForms", "src\S031.MetaStack.Win\S031.MetaStack.WinForms\S031.MetaStack.WinForms.csproj", "{487C0CDC-53A2-4DDA-8BF0-A2DBB04BD587}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S031.MetaStack.Common.Net45", "src\S031.MetaStack.Common\S031.MetaStack.Common.Net45.csproj", "{F9D7F21B-5D2F-4458-A84F-B5E39A493835}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{487C0CDC-53A2-4DDA-8BF0-A2DBB04BD587}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{487C0CDC-53A2-4DDA-8BF0-A2DBB04BD587}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{487C0CDC-53A2-4DDA-8BF0-A2DBB04BD587}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{487C0CDC-53A2-4DDA-8BF0-A2DBB04BD587}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9D7F21B-5D2F-4458-A84F-B5E39A493835}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9D7F21B-5D2F-4458-A84F-B5E39A493835}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9D7F21B-5D2F-4458-A84F-B5E39A493835}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9D7F21B-5D2F-4458-A84F-B5E39A493835}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DB5B3B1D-7ECA-4AA5-9DE0-9751DE72A8BC}
+	EndGlobalSection
+EndGlobal

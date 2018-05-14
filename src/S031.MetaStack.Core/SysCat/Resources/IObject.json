@@ -1,0 +1,38 @@
+﻿{
+  "ClassIName": "Object",
+  "ClassType": "Abstract",
+  "Namwe": "Объект",
+  "TableName": null,
+  "Methods": [
+    {"MethodName": "Read", "ActionID": "sys_read" }
+  ],
+  "Attributes": [
+    {
+      "AttribName": "ID",
+      "Name": "Идентификатор",
+      "IsPK": 1,
+      "IsFK": 0,
+      "NullOption": "NOT NULL",
+      "NullIfDefault": 0,
+      "DataType": "varchar",
+      "Width": 20,
+      "ClientDataType": "string",
+      "IsObject": false,
+      "IsArray": false,
+      "Identity": 0,
+      "ReadOnly": 1,
+      "Enabled": 1,
+      "ClientDefault": "",
+      "ServerDefault": "",
+      "ListItems": "",
+      "ListData": "",
+      "Format": "",
+      "Mask": ""
+    }
+  ],
+  "PrimaryKey": {
+    "Name": "PK_OBJECTS",
+    "Members": [ "ID" ]
+  }
+
+}

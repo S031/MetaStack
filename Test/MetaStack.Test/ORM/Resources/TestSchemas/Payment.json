@@ -1,0 +1,286 @@
+﻿{
+  "DirectAccess": "ForAll",
+  "Name": "Платежи",
+  "ObjectName": {
+    "AreaName": "dbo",
+    "ObjectName": "Payment"
+  },
+  "DbObjectName": {
+    "ObjectName": "Payments"
+  },
+  "PrimaryKey": {
+    "KeyName": "XPKPayments",
+    "KeyMembers": [
+      {
+        "FieldName": "ID"
+      }
+    ]
+  },
+  "Attributes": [
+    {
+      "AttribName": "ID",
+      "Position": 1,
+      "ServerDataType": "int",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "DataSize": {
+        "Size": 4,
+        "Precision": 10
+      },
+      "Identity": {},
+      "DataType": "int",
+      "Width": 10,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "TerminalID",
+      "Position": 2,
+      "ServerDataType": "int",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "DataSize": {
+        "Size": 4,
+        "Precision": 10
+      },
+      "Identity": {},
+      "DataType": "int",
+      "Width": 10,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "ContactID",
+      "Position": 3,
+      "ServerDataType": "int",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "DataSize": {
+        "Size": 4,
+        "Precision": 10
+      },
+      "Identity": {},
+      "DataType": "int",
+      "Width": 10,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "PaymentDate",
+      "Position": 4,
+      "ServerDataType": "datetime",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "DataSize": {
+        "Size": 8,
+        "Scale": 3,
+        "Precision": 23
+      },
+      "Identity": {},
+      "DataType": "dateTime",
+      "Width": 23,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "Amount",
+      "Position": 5,
+      "ServerDataType": "decimal",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "DataSize": {
+        "Size": 9,
+        "Scale": 2,
+        "Precision": 16
+      },
+      "Identity": {},
+      "DataType": "decimal",
+      "Width": 9,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "OrderNumber",
+      "Position": 6,
+      "ServerDataType": "varchar",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "CollationName": "Cyrillic_General_CI_AS",
+      "DataSize": {
+        "Size": 60
+      },
+      "Identity": {},
+      "DataType": "string",
+      "Width": 60,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "Description",
+      "Position": 7,
+      "ServerDataType": "varchar",
+      "IsNullable": true,
+      "NullOption": "NULL",
+      "CollationName": "Cyrillic_General_CI_AS",
+      "DataSize": {
+        "Size": 60
+      },
+      "Identity": {},
+      "DataType": "string",
+      "Width": 60,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "Currency",
+      "Position": 8,
+      "ServerDataType": "varchar",
+      "IsNullable": true,
+      "NullOption": "NULL",
+      "CollationName": "Cyrillic_General_CI_AS",
+      "DataSize": {
+        "Size": 3
+      },
+      "Identity": {},
+      "DataType": "string",
+      "Width": 3,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "PayForm",
+      "Position": 9,
+      "ServerDataType": "varchar",
+      "IsNullable": true,
+      "NullOption": "NULL",
+      "CollationName": "Cyrillic_General_CI_AS",
+      "DataSize": {
+        "Size": 30
+      },
+      "Identity": {},
+      "DataType": "string",
+      "Width": 30,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "CurrentState",
+      "Position": 10,
+      "ServerDataType": "int",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "DataSize": {
+        "Size": 4,
+        "Precision": 10
+      },
+      "Identity": {},
+      "DataType": "int",
+      "Width": 10,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    }
+  ],
+  "Indexes": [
+    {
+      "IndexName": "XIE1Payments",
+      "KeyMembers": [
+        {
+          "FieldName": "PaymentDate",
+          "Position": 1
+        }
+      ]
+    },
+    {
+      "IndexName": "XIE2Payments",
+      "KeyMembers": [
+        {
+          "FieldName": "OrderNumber",
+          "Position": 1
+        }
+      ]
+    },
+    {
+      "IndexName": "XIE3Payments",
+      "KeyMembers": [
+        {
+          "FieldName": "TerminalID",
+          "Position": 1
+        },
+        {
+          "FieldName": "ContactID",
+          "Position": 2
+        }
+      ]
+    }
+  ],
+  "ForeignKeys": [
+    {
+      "KeyName": "FK_PAYMENTS_TERMINAL2CUSTOMERS",
+      "CheckOption": true,
+      "RefDbObjectName": {
+        "AreaName": "dbo",
+        "ObjectName": "Terminal2Customers"
+      },
+      "KeyMembers": [
+        {
+          "FieldName": "TerminalID",
+          "Position": 1
+        },
+        {
+          "FieldName": "ContactID",
+          "Position": 2
+        }
+      ],
+      "RefKeyMembers": [
+        {
+          "FieldName": "TerminalID",
+          "Position": 1
+        },
+        {
+          "FieldName": "ContactID",
+          "Position": 2
+        }
+      ]
+    }
+  ]
+}

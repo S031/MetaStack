@@ -1,0 +1,186 @@
+﻿{
+  "DirectAccess": "ForAll",
+  "Name": "Контакты",
+  "ObjectName": {
+    "AreaName": "dbo",
+    "ObjectName": "Contact"
+  },
+  "DbObjectName": {
+    "AreaName": "dbo",
+    "ObjectName": "Contacts"
+  },
+  "PrimaryKey": {
+    "KeyName": "XPKContacts",
+    "KeyMembers": [
+      {
+        "FieldName": "ID"
+      }
+    ]
+  },
+  "Attributes": [
+    {
+      "AttribName": "ID",
+      "Position": 1,
+      "ServerDataType": "int",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "DataSize": {
+        "Size": 4,
+        "Precision": 10
+      },
+      "Identity": {
+        "IsIdentity": true,
+        "Seed": 1,
+        "Increment": 1
+      },
+      "DataType": "int",
+      "Width": 10,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "CusomerID",
+      "Position": 2,
+      "ServerDataType": "int",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "DataSize": {
+        "Size": 4,
+        "Precision": 10
+      },
+      "Identity": {},
+      "DataType": "int",
+      "Width": 10,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "ContactType",
+      "Position": 3,
+      "ServerDataType": "varchar",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "CollationName": "Cyrillic_General_CI_AS",
+      "DataSize": {
+        "Size": 30
+      },
+      "Identity": {},
+      "DataType": "string",
+      "Width": 30,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "Value",
+      "Position": 4,
+      "ServerDataType": "varchar",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "CollationName": "Cyrillic_General_CI_AS",
+      "DataSize": {
+        "Size": 30
+      },
+      "Identity": {},
+      "DataType": "string",
+      "Width": 30,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "DateBegin",
+      "Position": 5,
+      "ServerDataType": "datetime",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "DataSize": {
+        "Size": 8,
+        "Scale": 3,
+        "Precision": 23
+      },
+      "Identity": {},
+      "DataType": "dateTime",
+      "Width": 23,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "DateEnd",
+      "Position": 6,
+      "ServerDataType": "datetime",
+      "IsNullable": true,
+      "NullOption": "NULL",
+      "DataSize": {
+        "Size": 8,
+        "Scale": 3,
+        "Precision": 23
+      },
+      "Identity": {},
+      "DataType": "dateTime",
+      "Width": 23,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    }
+  ],
+  "Indexes": [
+    {
+      "IndexName": "XAK1Contacts",
+      "IsUnique": true,
+      "KeyMembers": [
+        {
+          "FieldName": "CusomerID",
+          "Position": 1
+        },
+        {
+          "FieldName": "ContactType",
+          "Position": 2
+        }
+      ]
+    }
+  ],
+  "ForeignKeys": [
+    {
+      "KeyName": "FK_CONTACTS_CUSTOMER",
+      "CheckOption": true,
+      "RefDbObjectName": {
+        "AreaName": "dbo",
+        "ObjectName": "Customers"
+      },
+      "KeyMembers": [
+        {
+          "FieldName": "CusomerID",
+          "Position": 1
+        }
+      ],
+      "RefKeyMembers": [
+        {
+          "FieldName": "ID",
+          "Position": 1
+        }
+      ]
+    }
+  ]
+}

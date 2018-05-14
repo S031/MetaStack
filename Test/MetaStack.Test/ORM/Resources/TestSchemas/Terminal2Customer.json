@@ -1,0 +1,142 @@
+﻿{
+  "DirectAccess": "ForAll",
+  "Name": "Связь заказчиков и терминалов",
+  "ObjectName": {
+    "AreaName": "dbo",
+    "ObjectName": "Terminal2Customer"
+  },
+  "DbObjectName": {
+    "AreaName": "dbo",
+    "ObjectName": "Terminal2Customers"
+  },
+  "PrimaryKey": {
+    "KeyName": "XPKTerminal2Customers",
+    "KeyMembers": [
+      {
+        "FieldName": "TerminalID"
+      },
+      {
+        "FieldName": "ContactID"
+      }
+    ]
+  },
+  "Attributes": [
+    {
+      "AttribName": "TerminalID",
+      "Position": 1,
+      "ServerDataType": "int",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "DataSize": {
+        "Size": 4,
+        "Precision": 10
+      },
+      "Identity": {},
+      "DataType": "int",
+      "Width": 10,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "ContactID",
+      "Position": 2,
+      "ServerDataType": "int",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "DataSize": {
+        "Size": 4,
+        "Precision": 10
+      },
+      "Identity": {},
+      "DataType": "int",
+      "Width": 10,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "CustomerKey",
+      "Position": 3,
+      "ServerDataType": "varchar",
+      "IsNullable": true,
+      "NullOption": "NULL",
+      "CollationName": "Cyrillic_General_CI_AS",
+      "DataSize": {
+        "Size": 60
+      },
+      "Identity": {},
+      "DataType": "string",
+      "Width": 60,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    }
+  ],
+  "Indexes": [
+    {
+      "IndexName": "XIE1Terminal2Customers",
+      "KeyMembers": [
+        {
+          "FieldName": "TerminalID",
+          "Position": 1
+        },
+        {
+          "FieldName": "CustomerKey",
+          "Position": 2
+        }
+      ]
+    }
+  ],
+  "ForeignKeys": [
+    {
+      "KeyName": "FK_TERMINAL2CUSTOMERS__TERMINALS",
+      "CheckOption": true,
+      "RefDbObjectName": {
+        "AreaName": "dbo",
+        "ObjectName": "Terminals"
+      },
+      "KeyMembers": [
+        {
+          "FieldName": "TerminalID",
+          "Position": 1
+        }
+      ],
+      "RefKeyMembers": [
+        {
+          "FieldName": "ID",
+          "Position": 1
+        }
+      ]
+    },
+    {
+      "KeyName": "FK_TERMINAL2CUSTOMER_CONTACTS",
+      "CheckOption": true,
+      "RefDbObjectName": {
+        "AreaName": "dbo",
+        "ObjectName": "Contacts"
+      },
+      "KeyMembers": [
+        {
+          "FieldName": "ContactID",
+          "Position": 1
+        }
+      ],
+      "RefKeyMembers": [
+        {
+          "FieldName": "ID",
+          "Position": 1
+        }
+      ]
+    }
+  ]
+}

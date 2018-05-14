@@ -1,0 +1,99 @@
+﻿{
+  "DirectAccess": "ForAll",
+  "Name": "Коды ошибок",
+  "ObjectName": {
+    "AreaName": "dbo",
+    "ObjectName": "ErrorCode"
+  },
+  "DbObjectName": {
+    "AreaName": "dbo",
+    "ObjectName": "ErrorCodes"
+  },
+  "PrimaryKey": {
+    "KeyName": "XPKErrorCodes",
+    "KeyMembers": [
+      {
+        "FieldName": "ID"
+      }
+    ]
+  },
+  "Attributes": [
+    {
+      "AttribName": "ID",
+      "Position": 1,
+      "ServerDataType": "int",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "DataSize": {
+        "Size": 4,
+        "Precision": 10
+      },
+      "Identity": {
+        "IsIdentity": true,
+        "Seed": 1,
+        "Increment": 1
+      },
+      "DataType": "int",
+      "Width": 10,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "ErrorCode",
+      "Position": 2,
+      "ServerDataType": "varchar",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "CollationName": "Cyrillic_General_CI_AS",
+      "DataSize": {
+        "Size": 30
+      },
+      "Identity": {},
+      "DataType": "string",
+      "Width": 30,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "Description",
+      "Position": 3,
+      "ServerDataType": "varchar",
+      "IsNullable": true,
+      "NullOption": "NULL",
+      "CollationName": "Cyrillic_General_CI_AS",
+      "DataSize": {
+        "Size": -1
+      },
+      "Identity": {},
+      "DataType": "string",
+      "Width": -1,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    }
+  ],
+  "Indexes": [
+    {
+      "IndexName": "XAK1ErrorCodes",
+      "IsUnique": true,
+      "KeyMembers": [
+        {
+          "FieldName": "ErrorCode",
+          "Position": 1
+        }
+      ]
+    }
+  ],
+  "ForeignKeys": []
+}

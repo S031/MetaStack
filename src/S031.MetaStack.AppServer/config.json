@@ -1,0 +1,69 @@
+﻿{
+  "appSettings": {
+    "auditEnabled": true,
+    "language": "ru-RU"
+  },
+  "ApplicationLogSettings": {
+    /* Cache size before flushing to disk */
+    "CacheSize": 100,
+    /* Set the mask for grouping by date
+      For example:
+      yyyy-MM-dd - every day a new folder
+      yyyy-MM - every month 
+    */
+    "DateFolderMask": "yyyy-MM-dd",
+    /* Min log level for output may be:
+		  Trace = 0,
+		  Debug = 1,
+		  Information = 2,
+		  Warning = 3,
+		  Error = 4,
+		  Critical = 5,
+		  None = 6
+      default value is LogLevels.Information
+      use LogLevels.Debug for development and testing cycles
+    */
+    "LogLevel": "Debug",
+    /* Log level for forced flush */
+    "LevelToFlush": "Critical"
+  },
+  "connectionStrings": {
+    "bankLocal": {
+      "providerName": "System.Data.SqLClient",
+      "connectionString": "Data Source=SERGEY-SQL2016;Initial Catalog=Bank;User ID=Sa;Password=_92b1A7C8"
+    }
+  },
+  "pluginManagerConfiguration": {
+    "InterfacesList": [
+      {
+        "name": "IAppService",
+        "assemblyName": "S031.MetaStack.Core",
+        "typeName": "S031.MetaStack.Core.App.IAppService"
+      },
+      {
+        "name": "IAppEvaluator",
+        "assemblyName": "S031.MetaStack.Core",
+        "typeName": "S031.MetaStack.Core.App.IAppEvaluator"
+      }
+    ]
+  },
+  "IAppServiceConfiguration": {
+    "ImplementationList": [
+      {
+        "name": "S031_MetaStack_TCPServer_Service_1",
+        "assemblyName": "S031.MetaStack.Services",
+        "typeName": "S031.MetaStack.Services.TCPServerService",
+        "delay": 60000,
+        "userName": "",
+        "password": "",
+        /* If empty log to default application log (see ApplicationLogSettings)*/
+        "logName": "S031.MetaStack.Services.TCPServerService",
+        /* Not used if logName is empty*/
+        "logSettings": {
+          "CacheSize": 100,
+          "DateFolderMask": "yyyy-MM-dd"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+﻿{
+  "appSettings": {
+    "auditEnabled": true
+  },
+  "connectionStrings": {
+    "bankLocal": {
+      "providerName": "System.Data.SqlClient",
+      "connectionString": "Data Source=SVOSTRIKOV-DIRT;Initial Catalog=Bank;Integrated security=true"
+    }
+  }
+}

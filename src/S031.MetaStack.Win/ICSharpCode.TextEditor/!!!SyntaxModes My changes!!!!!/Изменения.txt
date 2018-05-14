@@ -1,0 +1,11 @@
+0. Сделать копии *.xshd
+1. \src\Libraries\ICSharpCode.TextEditor
+	Редактор с поддержкой синтаксиса
+	изменены файлы \Project\Resources\SyntaxModes.xml
+	изменен \Project\Resources\VBNET-Mode.xshd (поддержка объектов Newbank и VBScript)
+	добавлен \Project\Resources\SQL-Mode.xshd (поддержка сиснтаксиса MS SQL)
+	добавлен \Project\Resources\LOG-Mode.xshd (поддержка выделения ключевых слов в log протоколе)
+	Build Action - Embeded Resource
+	NET Framework version 4
+	Output Bin path
+	Номер версии

@@ -1,0 +1,7 @@
+<Playlist Version="1.0">
+	<Add Test="CommonTest.Data.DataPackageTest.parseTest" />
+	<Add Test="CommonTest.Data.DataPackageTest.ctorTest" />
+	<Add Test="CommonTest.Data.DataPackageTest.byteArrayTest" />
+	<Add Test="CommonTest.Data.DataPackageTest.speedTest" />
+	<Add Test="CommonTest.Data.DataPackageTest.headerTest" />
+</Playlist>

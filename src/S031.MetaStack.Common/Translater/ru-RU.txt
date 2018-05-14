@@ -1,0 +1,37 @@
+﻿S031.MetaStack.Common.Logging.LogLevel.Critical = "{КАТАСТРОФА}";
+S031.MetaStack.Common.Logging.LogLevel.Error = "{ОШИБКА}";
+S031.MetaStack.Common.Logging.LogLevel.Warning = "{ВНИМАНИЕ}";
+S031.MetaStack.Common.Logging.LogLevel.Info = "{СООБЩЕНИЕ}";
+S031.MetaStack.Common.Logging.LogLevel.Debug = "{ОТЛАДКА}";
+S031.MetaStack.Common.Logging.LogLevel.Trace = "{ТРАССИРОВКА}";
+S031.MetaStack.Common.Logging.LogLevel.None = "";
+
+S031.MetaStack.Common.PasswordGenerator.Generate.1=Длинна пароля не может быть менее 6 символов
+S031.MetaStack.Common.PasswordGenerator.Generate.2=Для заданных условий (PasswordGeneratorOptions) длинна пароля не может быть менее {0} символов
+
+S031.MetaStack.Core.App.AppHost.1=Не найден файл конфигурации приложения config.json
+
+S031.MetaStack.Core.Data.writeData.1=Длинна массива данных должна быть равна длинне массива наименований полей
+
+S031.MetaStack.Core.Data.DbProviderFactories.GetFactory.1=Тип {0} не имеет статического поля Instance, возвращающего экземпляр DbProviderFactory
+S031.MetaStack.Core.Data.DbProviderFactories.GetFactory.2=В {0} не найден тип производный от DbProviderFactory
+S031.MetaStack.Core.Data.DbProviderFactories.GetFactory.3=Не найдена сборка содержащая определения для {0}
+S031.MetaStack.Core.Data.DbProviderFactories.GetFactory.4=Не найдена билиотека содержащая определения для {0}
+
+S031.MetaStack.Core.Data.MdbContext.array2List.1=Параметр должен реализовывать интерфейс IEnumerable<>
+S031.MetaStack.Core.Data.MdbContext.array2List.2=Тип аргумента IEnumerable<{0}> не поддерживается
+S031.MetaStack.Core.Data.MdbContext.Commit.1=Невозможно вызвать Commit метод вне активной транзакции
+
+S031.MetaStack.Services.TCPServerService.Accept.1=Минимальная длинна сообщения не может быть мнее  32 бйт
+S031.MetaStack.Core.SysCat.SysCatManager.getSchema.1=Схема объекта '{0}' не найдена в базе данных
+S031.MetaStack.Core.SysCat.SysCatManager.getSchema.2=Схема объекта '{0}' с кодом синхронизации {1} не найдена в базе данных
+
+S031.MetaStack.Core.ORM.JMXSchema.ctor.1=Не найдена схема объекта '{0}'
+S031.MetaStack.Core.ORM.JMXSchema.ParseXml.1=Отсутствует обязательный элемент: '{0}'
+
+S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.1=One or more attribute is required in the schema
+S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.2=For an object type attribute, you must specify a schema
+S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.3=Имя поля (FieldName:{0}), указанное в {1} отсутствует в списке атрибутов
+S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.4=Тип данных поля '{0}' указан неверно
+S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.5=Требуется первичный ключ для таблицы '{0}', включающей столбцы типа 'object'
+

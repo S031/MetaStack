@@ -1,0 +1,188 @@
+﻿{
+  "DirectAccess": "ForAll",
+  "Name": "Входящие запросы",
+  "ObjectName": {
+    "AreaName": "dbo",
+    "ObjectName": "Request"
+  },
+  "DbObjectName": {
+    "AreaName": "dbo",
+    "ObjectName": "Requests"
+  },
+  "PrimaryKey": {
+    "KeyName": "XPKRequests",
+    "KeyMembers": [
+      {
+        "FieldName": "ID"
+      }
+    ]
+  },
+  "Attributes": [
+    {
+      "AttribName": "ID",
+      "Position": 1,
+      "ServerDataType": "int",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "DataSize": {
+        "Size": 4,
+        "Precision": 10
+      },
+      "Identity": {
+        "IsIdentity": true,
+        "Seed": 1,
+        "Increment": 1
+      },
+      "DataType": "int",
+      "Width": 10,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "RequestCode",
+      "Position": 2,
+      "ServerDataType": "varchar",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "CollationName": "Cyrillic_General_CI_AS",
+      "DataSize": {
+        "Size": 30
+      },
+      "Identity": {},
+      "DataType": "string",
+      "Width": 30,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "RequestTime",
+      "Position": 3,
+      "ServerDataType": "datetime",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "DataSize": {
+        "Size": 8,
+        "Scale": 3,
+        "Precision": 23
+      },
+      "Identity": {},
+      "DataType": "dateTime",
+      "Width": 23,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "RequestParameters",
+      "Position": 4,
+      "ServerDataType": "json",
+      "IsNullable": true,
+      "NullOption": "NULL",
+      "CollationName": "Cyrillic_General_CI_AS",
+      "DataSize": {
+        "Size": -1
+      },
+      "Identity": {},
+      "DataType": "string",
+      "Width": -1,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "IP",
+      "Position": 5,
+      "ServerDataType": "varchar",
+      "IsNullable": true,
+      "NullOption": "NULL",
+      "CollationName": "Cyrillic_General_CI_AS",
+      "DataSize": {
+        "Size": 30
+      },
+      "Identity": {},
+      "DataType": "string",
+      "Width": 30,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "Token",
+      "Position": 6,
+      "ServerDataType": "varchar",
+      "IsNullable": true,
+      "NullOption": "NULL",
+      "CollationName": "Cyrillic_General_CI_AS",
+      "DataSize": {
+        "Size": 60
+      },
+      "Identity": {},
+      "DataType": "string",
+      "Width": 60,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "StatusCode",
+      "Position": 7,
+      "ServerDataType": "varchar",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "CollationName": "Cyrillic_General_CI_AS",
+      "DataSize": {
+        "Size": 30
+      },
+      "Identity": {},
+      "DataType": "string",
+      "Width": 30,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    }
+  ],
+  "Indexes": [
+    {
+      "IndexName": "XIE1Requests",
+      "KeyMembers": [
+        {
+          "FieldName": "RequestTime",
+          "Position": 1
+        }
+      ]
+    },
+    {
+      "IndexName": "XIE2Requests",
+      "KeyMembers": [
+        {
+          "FieldName": "StatusCode",
+          "Position": 1
+        }
+      ]
+    }
+  ],
+  "ForeignKeys": []
+}
