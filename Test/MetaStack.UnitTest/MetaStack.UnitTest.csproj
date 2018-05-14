@@ -12,14 +12,29 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="1.2.1" />
-    <PackageReference Include="MSTest.TestFramework" Version="1.2.1" />
+    <PackageReference Include="MSTest.TestAdapter" Version="1.3.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="1.3.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\S031.MetaStack.Common\S031.MetaStack.Common.csproj" />
     <ProjectReference Include="..\..\src\S031.MetaStack.Core\S031.MetaStack.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="ORM\Resources\TestSchemas.Designer.cs">
+      <DependentUpon>TestSchemas.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="ORM\Resources\TestSchemas.resx">
+      <LastGenOutput>TestSchemas.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

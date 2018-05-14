@@ -1,0 +1,138 @@
+﻿{
+  "ID": 1,
+  "UID": "cbd1225b-c21c-4cd0-8bed-9719aa4c09e7",
+  "Name": "Orders",
+  "DirectAccess": "ForAll",
+  "DbObjectType": "Table",
+  "ObjectName": {
+    "AreaName": "dbo",
+    "ObjectName": "Order"
+  },
+  "DbObjectName": {
+    "AreaName": "dbo",
+    "ObjectName": "Orders"
+  },
+  "PrimaryKey": {
+    "KeyName": "XPKOrders",
+    "KeyMembers": [
+      {
+        "FieldName": "ID",
+        "Position": 1
+      }
+    ]
+  },
+  "Attributes": [
+    {
+      "ID": 1,
+      "UID": "3aa204ed-5802-48a9-ada0-a3b483a4877e",
+      "AttribName": "ID",
+      "Position": 1,
+      "ServerDataType": "int",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "IsPK": true,
+      "DataSize": {},
+      "Identity": {
+        "IsIdentity": true,
+        "Seed": 1,
+        "Increment": 1
+      },
+      "Name": "ИД",
+      "Caption": "ИД",
+      "DataType": "int",
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": [],
+      "FieldName": "ID"
+    },
+    {
+      "ID": 2,
+      "UID": "02efe8ee-a3e0-45af-a32e-f4ef94031377",
+      "AttribName": "MarketName",
+      "Position": 2,
+      "ServerDataType": "varchar",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "DataSize": {
+        "Size": 40
+      },
+      "Identity": {},
+      "Name": "Market Name",
+      "Caption": "Market Name",
+      "DataType": "string",
+      "Width": 30,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": [],
+      "FieldName": "MarketName"
+    },
+    {
+      "ID": 3,
+      "UID": "5153cb1d-6ee2-4969-ae4e-d18322b7299f",
+      "AttribName": "RequestTime",
+      "Position": 3,
+      "ServerDataType": "datetime",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "DefaultConstraint": {
+        "ConstraintName": "DF_RequestTime_Orders",
+        "Definition": "GETDATE()"
+      },
+      "DataSize": {},
+      "Identity": {},
+      "Name": "Время запроса",
+      "Caption": "Время запроса",
+      "DataType": "dateTime",
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": [],
+      "FieldName": "RequestTime"
+    },
+    {
+      "ID": 4,
+      "UID": "10ad4573-2098-4e51-8cdd-8927342a064e",
+      "AttribName": "RequestResult",
+      "Position": 4,
+      "ServerDataType": "varchar",
+      "IsNullable": true,
+      "NullOption": "NULL",
+      "DataSize": {
+        "Size": 256
+      },
+      "Identity": {},
+      "Name": "Результат запроса",
+      "Caption": "Результат запроса",
+      "DataType": "string",
+      "Width": 256,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": [],
+      "FieldName": "RequestResult"
+    }
+  ],
+  "Indexes": [
+    {
+      "UID": "00000000-0000-0000-0000-000000000000",
+      "IndexName": "XIE2Orders",
+      "KeyMembers": [
+        {
+          "FieldName": "MarketName",
+          "Position": 1
+        }
+      ]
+    }
+  ],
+  "ForeignKeys": []
+}

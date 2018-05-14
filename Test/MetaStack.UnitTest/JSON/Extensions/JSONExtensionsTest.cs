@@ -44,8 +44,6 @@ namespace MetaStack.UnitTest
 			_logger.Flush();
 		}
 
-
-
 		[TestMethod]
 		public void ParseXML()
 		{

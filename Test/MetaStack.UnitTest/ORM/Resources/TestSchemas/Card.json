@@ -1,0 +1,245 @@
+﻿{
+  "Name": "Платежные карты",
+  "ObjectName": {
+    "AreaName": "dbo",
+    "ObjectName": "Card"
+  },
+  "DbObjectName": {
+    "AreaName": "dbo",
+    "ObjectName": "Cards"
+  },
+  "Attributes": [
+    {
+      "ID": 1,
+      "AttribName": "ID",
+      "FieldName": "ID",
+      "Position": 1,
+      "ServerDataType": "int",
+      "DataType": "int",
+      "DataSize": {
+        "Size": 4,
+        "Scale": 0,
+        "Precision": 10
+      },
+      "IsNullable": false,
+      "NullOption": "NOT NULL",
+      "DefaultConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      },
+      "CheckConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      },
+      "Identity": {
+        "IsIdentity": true,
+        "Seed": 1,
+        "Increment": 1
+      }
+    },
+    {
+      "ID": 2,
+      "AttribName": "ContactID",
+      "FieldName": "ContactID",
+      "Position": 2,
+      "ServerDataType": "int",
+      "DataType": "int",
+      "DataSize": {
+        "Size": 4,
+        "Scale": 0,
+        "Precision": 10
+      },
+      "IsNullable": false,
+      "NullOption": "NOT NULL",
+      "DefaultConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      },
+      "CheckConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      }
+    },
+    {
+      "ID": 3,
+      "AttribName": "PAN",
+      "FieldName": "PAN",
+      "Position": 3,
+      "ServerDataType": "varchar",
+      "DataType": "string",
+      "DataSize": {
+        "Size": 30,
+        "Scale": 0,
+        "Precision": 0
+      },
+      "CollationName": "Cyrillic_General_CI_AS",
+      "IsNullable": false,
+      "NullOption": "NOT NULL",
+      "DefaultConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      },
+      "CheckConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      }
+    },
+    {
+      "ID": 4,
+      "AttribName": "ExpDate",
+      "FieldName": "ExpDate",
+      "Position": 4,
+      "ServerDataType": "varchar",
+      "DataType": "string",
+      "DataSize": {
+        "Size": 4,
+        "Scale": 0,
+        "Precision": 0
+      },
+      "CollationName": "Cyrillic_General_CI_AS",
+      "IsNullable": false,
+      "NullOption": "NOT NULL",
+      "DefaultConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      },
+      "CheckConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      }
+    },
+    {
+      "ID": 5,
+      "AttribName": "CardHolder",
+      "FieldName": "CardHolder",
+      "Position": 5,
+      "ServerDataType": "varchar",
+      "DataType": "string",
+      "DataSize": {
+        "Size": 60,
+        "Scale": 0,
+        "Precision": 0
+      },
+      "CollationName": "Cyrillic_General_CI_AS",
+      "IsNullable": false,
+      "NullOption": "NOT NULL",
+      "DefaultConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      },
+      "CheckConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      }
+    },
+    {
+      "ID": 6,
+      "AttribName": "CVV",
+      "FieldName": "CVV",
+      "Position": 6,
+      "ServerDataType": "varchar",
+      "DataType": "string",
+      "DataSize": {
+        "Size": 4,
+        "Scale": 0,
+        "Precision": 0
+      },
+      "CollationName": "Cyrillic_General_CI_AS",
+      "IsNullable": false,
+      "NullOption": "NOT NULL",
+      "DefaultConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      },
+      "CheckConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      }
+    },
+    {
+      "ID": 7,
+      "AttribName": "CardState",
+      "FieldName": "CardState",
+      "Position": 7,
+      "ServerDataType": "varchar",
+      "DataType": "string",
+      "DataSize": {
+        "Size": 30,
+        "Scale": 0,
+        "Precision": 0
+      },
+      "CollationName": "Cyrillic_General_CI_AS",
+      "IsNullable": false,
+      "NullOption": "NOT NULL",
+      "DefaultConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      },
+      "CheckConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      }
+    }
+  ],
+  "PrimaryKey": {
+    "KeyName": "XPKCards",
+    "KeyMembers": [
+      {
+        "FieldName": "ID",
+        "IsDescending": false
+      }
+    ]
+  },
+  "ForeignKeys": [
+    {
+      "KeyName": "FK_CARDS_CONTACTS",
+      "CheckOption": true,
+      "DeleteRefAction": "",
+      "UpdateRefAction": "",
+      "RefDbObjectName": {
+        "AreaName": "dbo",
+        "ObjectName": "Contacts"
+      },
+      "KeyMembers": [
+        {
+          "FieldName": "ContactID",
+          "Position": 1
+        }
+      ],
+      "RefKeyMembers": [
+        {
+          "FieldName": "ID",
+          "Position": 1
+        }
+      ]
+    }
+  ],
+  "Indexes": [
+    {
+      "IndexName": "XAK1Cards",
+      "IsUnique": true,
+      "ClusteredOption": 0,
+      "KeyMembers": [
+        {
+          "FieldName": "PAN",
+          "Position": 1,
+          "IsDescending": false,
+          "IsIncluded": false
+        }
+      ]
+    },
+    {
+      "IndexName": "XIE1Cards",
+      "IsUnique": false,
+      "ClusteredOption": 0,
+      "KeyMembers": [
+        {
+          "FieldName": "ContactID",
+          "Position": 1,
+          "IsDescending": false,
+          "IsIncluded": false
+        }
+      ]
+    }
+  ]
+}

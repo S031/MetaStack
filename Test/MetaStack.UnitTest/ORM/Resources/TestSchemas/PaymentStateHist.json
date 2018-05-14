@@ -1,0 +1,236 @@
+﻿{
+  "DirectAccess": "ForAll",
+  "Name": "История состояний платежей",
+  "ObjectName": {
+    "AreaName": "dbo",
+    "ObjectName": "PaymentStateHist"
+  },
+  "DbObjectName": {
+    "AreaName": "dbo",
+    "ObjectName": "PaymentStateHists"
+  },
+  "PrimaryKey": {
+    "KeyName": "XPKPaymentStateHists",
+    "KeyMembers": [
+      {
+        "FieldName": "ID"
+      }
+    ]
+  },
+  "Attributes": [
+    {
+      "AttribName": "ID",
+      "Position": 1,
+      "ServerDataType": "int",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "DataSize": {
+        "Size": 4,
+        "Precision": 10
+      },
+      "Identity": {},
+      "DataType": "int",
+      "Width": 10,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "PaymentID",
+      "Position": 2,
+      "ServerDataType": "int",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "DataSize": {
+        "Size": 4,
+        "Precision": 10
+      },
+      "Identity": {},
+      "DataType": "int",
+      "Width": 10,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "StateID",
+      "Position": 3,
+      "ServerDataType": "int",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "DataSize": {
+        "Size": 4,
+        "Precision": 10
+      },
+      "Identity": {},
+      "DataType": "int",
+      "Width": 10,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "RequestID",
+      "Position": 4,
+      "ServerDataType": "int",
+      "IsNullable": true,
+      "NullOption": "NULL",
+      "DataSize": {
+        "Size": 4,
+        "Precision": 10
+      },
+      "Identity": {},
+      "DataType": "int",
+      "Width": 10,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "ErrorID",
+      "Position": 5,
+      "ServerDataType": "int",
+      "IsNullable": true,
+      "NullOption": "NULL",
+      "DataSize": {
+        "Size": 4,
+        "Precision": 10
+      },
+      "Identity": {},
+      "DataType": "int",
+      "Width": 10,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "SetTime",
+      "Position": 6,
+      "ServerDataType": "datetime",
+      "IsNullable": true,
+      "NullOption": "NULL",
+      "DataSize": {
+        "Size": 8,
+        "Scale": 3,
+        "Precision": 23
+      },
+      "Identity": {},
+      "DataType": "dateTime",
+      "Width": 23,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    }
+  ],
+  "Indexes": [
+    {
+      "IndexName": "XIE1PaymentStateHists",
+      "KeyMembers": [
+        {
+          "FieldName": "RequestID",
+          "Position": 1
+        }
+      ]
+    }
+  ],
+  "ForeignKeys": [
+    {
+      "KeyName": "FK_PAYMENTSTATEHISTS_ERRORCODE",
+      "CheckOption": true,
+      "RefDbObjectName": {
+        "AreaName": "dbo",
+        "ObjectName": "ErrorCodes"
+      },
+      "KeyMembers": [
+        {
+          "FieldName": "ErrorID",
+          "Position": 1
+        }
+      ],
+      "RefKeyMembers": [
+        {
+          "FieldName": "ID",
+          "Position": 1
+        }
+      ]
+    },
+    {
+      "KeyName": "FK_PAYMENTSTATEHISTS_PAYMENTS",
+      "CheckOption": true,
+      "RefDbObjectName": {
+        "AreaName": "dbo",
+        "ObjectName": "Payments"
+      },
+      "KeyMembers": [
+        {
+          "FieldName": "PaymentID",
+          "Position": 1
+        }
+      ],
+      "RefKeyMembers": [
+        {
+          "FieldName": "ID",
+          "Position": 1
+        }
+      ]
+    },
+    {
+      "KeyName": "FK_PAYMENTSTATEHISTS_PAYMENTSTATES",
+      "CheckOption": true,
+      "RefDbObjectName": {
+        "AreaName": "dbo",
+        "ObjectName": "PaymentStates"
+      },
+      "KeyMembers": [
+        {
+          "FieldName": "StateID",
+          "Position": 1
+        }
+      ],
+      "RefKeyMembers": [
+        {
+          "FieldName": "ID",
+          "Position": 1
+        }
+      ]
+    },
+    {
+      "KeyName": "FK_PAYMENTSTATEHISTS_REQUESTS",
+      "CheckOption": true,
+      "RefDbObjectName": {
+        "AreaName": "dbo",
+        "ObjectName": "Requests"
+      },
+      "KeyMembers": [
+        {
+          "FieldName": "RequestID",
+          "Position": 1
+        }
+      ],
+      "RefKeyMembers": [
+        {
+          "FieldName": "ID",
+          "Position": 1
+        }
+      ]
+    }
+  ]
+}

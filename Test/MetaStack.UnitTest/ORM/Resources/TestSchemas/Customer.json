@@ -1,0 +1,68 @@
+﻿{
+  "DirectAccess": "ForAll",
+  "Name": "Заказчики",
+  "ObjectName": {
+    "AreaName": "dbo",
+    "ObjectName": "Customer"
+  },
+  "DbObjectName": {
+    "AreaName": "dbo",
+    "ObjectName": "Customers"
+  },
+  "PrimaryKey": {
+    "KeyName": "XPKCustomers",
+    "KeyMembers": [
+      {
+        "FieldName": "ID"
+      }
+    ]
+  },
+  "Attributes": [
+    {
+      "AttribName": "ID",
+      "Position": 1,
+      "ServerDataType": "int",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "DataSize": {
+        "Size": 4,
+        "Precision": 10
+      },
+      "Identity": {
+        "IsIdentity": true,
+        "Seed": 1,
+        "Increment": 1
+      },
+      "DataType": "int",
+      "Width": 10,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    },
+    {
+      "AttribName": "Name",
+      "Position": 2,
+      "ServerDataType": "varchar",
+      "NullOption": "NOT NULL",
+      "Required": true,
+      "CollationName": "Cyrillic_General_CI_AS",
+      "DataSize": {
+        "Size": 60
+      },
+      "Identity": {},
+      "DataType": "string",
+      "Width": 60,
+      "Locate": true,
+      "Visible": true,
+      "Enabled": true,
+      "DisplayWidth": 10,
+      "ListItems": [],
+      "ListData": []
+    }
+  ],
+  "Indexes": [],
+  "ForeignKeys": []
+}
