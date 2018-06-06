@@ -17,6 +17,7 @@ using System.Linq;
 
 namespace MetaStack.UnitTest.ORM
 {
+	[TestClass]
 	public class ORMDBTest
 	{
 		string _cn;
@@ -43,7 +44,7 @@ namespace MetaStack.UnitTest.ORM
 		/// DBSchemaProviderTest, obtain <see cref="JMXSchemaProviderDB"/> and create SysCat if not exists
 		/// </summary>
 		[TestMethod]
-		void Test1()
+		public void Test1()
 		{
 			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -61,7 +62,7 @@ namespace MetaStack.UnitTest.ORM
 		/// Create test schemas from <see cref="Resources.TestSchemas"/>
 		/// </summary>
 		[TestMethod]
-		void Test2()
+		public void Test2()
 		{
 			//SaveSchemaTestAsync().GetAwaiter().GetResult();
 		}
@@ -80,12 +81,12 @@ namespace MetaStack.UnitTest.ORM
 		/// Create database objects from saved schemas
 		/// </summary>
 		[TestMethod]
-		void Test3()
+		public void Test3()
 		{
 			SyncSchemaTestAsync().GetAwaiter().GetResult();
 		}
 
-		async Task SyncSchemaTestAsync()
+		public async Task SyncSchemaTestAsync()
 		{
 			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -99,7 +100,7 @@ namespace MetaStack.UnitTest.ORM
 		}
 
 		[TestMethod]
-		void Test3_1()
+		public void Test3_1()
 		{
 			ChangeSchemaTestAsync().GetAwaiter().GetResult();
 		}
@@ -121,7 +122,7 @@ namespace MetaStack.UnitTest.ORM
 		/// Delete database objects created with <see cref="Test3"/>
 		/// </summary>
 		[TestMethod]
-		void Test4()
+		public void Test4()
 		{
 			DropSchemaTestAsync().GetAwaiter().GetResult();
 		}
@@ -142,7 +143,7 @@ namespace MetaStack.UnitTest.ORM
 		/// Delete SysCat from database
 		/// </summary>
 		[TestMethod]
-		void Test5()
+		public void Test5()
 		{
 			DropDBSchemaTestAsync().GetAwaiter().GetResult();
 		}
@@ -155,7 +156,7 @@ namespace MetaStack.UnitTest.ORM
 			}
 		}
 		[TestMethod]
-		void speedGetHashCodeTest()
+		public void speedGetHashCodeTest()
 		{
 			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -191,7 +192,7 @@ namespace MetaStack.UnitTest.ORM
 		}
 
 		[TestMethod]
-		void saveTestData()
+		public void saveTestData()
 		{
 			//foreach (var s in GetTestSchemas())
 			//	System.IO.File.WriteAllText($"d:\\testData\\{s.ObjectName}.json", s.ToString());

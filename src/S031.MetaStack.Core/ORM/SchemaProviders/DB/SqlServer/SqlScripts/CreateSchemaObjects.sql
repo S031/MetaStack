@@ -6,7 +6,7 @@ create table SysCat.SysAreas (
 	SchemaOwner			varchar(30)		not null,
 	SchemaVersion		varchar(30)		not null,
 	SchemaConfig		varchar(max)	null
-		constraint CKC_SCHEMACONFIG_SYSAREAS check(SchemaConfig is null or isjson(SchemaConfig) = 1),
+		/*constraint CKC_SCHEMACONFIG_SYSAREAS check(SchemaConfig is null or isjson(SchemaConfig) = 1)*/,
 	IsDefault			bit				not null,
 	UpdateTime			datetime		not null
 		 CONSTRAINT [DF_UpdateTime_SysAreas]  DEFAULT (getdate()),
@@ -56,7 +56,7 @@ create table SysCat.SysSchemas(
 	ObjectType			as cast(json_value(ObjectSchema, '$.DbObjectType') as varchar(30)) persisted not null,
 	ObjectName			as cast(json_value(ObjectSchema, '$.ObjectName.ObjectName') as varchar(60)) persisted not null,
 	ObjectSchema		varchar(max)		not null
-		constraint CKC_OBJECTSCHEMA_SYSSCHEMAS check(isjson(ObjectSchema) = (1)),
+		/*constraint CKC_OBJECTSCHEMA_SYSSCHEMAS check(isjson(ObjectSchema) = (1))*/,
 	DbObjectName		as cast(json_value(ObjectSchema, '$.DbObjectName.ObjectName') as varchar(60)) persisted not null,
 	UpdateTime			datetime			not null
 		 CONSTRAINT [DF_UpdateTime_SysSchemas]  DEFAULT (getdate()),
@@ -197,7 +197,7 @@ create view SysCat.V_SysSchemas as
 	from [SysCat].[SysAreas] A
 	inner join [SysCat].[SysSchemas] S On A.ID = S.[SysAreaID]
 --go
-CREATE PROCEDURE  [SysCat].[Get_TableSchema]
+/*CREATE PROCEDURE  [SysCat].[Get_TableSchema]
 	@table_name sysname
 AS
 BEGIN
@@ -364,6 +364,7 @@ END
 ELSE
 	SELECT ''
 END
+*/
 --go
 CREATE PROCEDURE  [SysCat].[Get_TableSchema_xml]
 	@table_name sysname
@@ -708,7 +709,7 @@ BEGIN
 		SELECT ''
 END
 --GO
-CREATE PROCEDURE  [SysCat].[Get_TableSchema_ansi]
+CREATE PROCEDURE  [SysCat].[Get_TableSchema]
 	@table_name sysname
 AS
 BEGIN
