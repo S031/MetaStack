@@ -6,6 +6,7 @@ using System;
 using S031.MetaStack.Core.Data;
 using System.Text;
 using System.Net.Sockets;
+using System.IO;
 
 namespace MetaStack.Test.Services
 {
@@ -14,6 +15,23 @@ namespace MetaStack.Test.Services
 		public TCPServerServicesTest()
 		{
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
+		}
+		[Fact]
+		void speedTest2()
+		{
+			using (FileLog l = new FileLog("TCPServerServicesTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			{
+				var p = getTestPackage();
+				l.Debug($"Input message: {p.ToString(TsExportFormat.JSON)}");
+				using (var client = new AppClient())
+				{
+					client.Open();
+					for (int i = 0; i < 2000; i++)
+						p = client.SendAndWaitForResponse1(p);
+					l.Debug(p.ToString(TsExportFormat.JSON));
+					l.Debug($"Output message: {p.ToString(TsExportFormat.JSON)}");
+				}
+			}
 		}
 
 		[Fact]
@@ -92,6 +110,61 @@ namespace MetaStack.Test.Services
 			public int ID { get; set; }
 			public string Name { get; set; }
 			public Dictionary<string, object> ItemList { get; set; }
+		}
+
+		public sealed class AppClient : IDisposable
+		{
+			private string m_ip = "localhost";
+			private int m_port = 8001;
+			private TcpClient m_tcpClient;
+
+			private Stream stream;
+			//private StreamWriter writer;
+			//private StreamReader reader;
+
+			public DataPackage SendAndWaitForResponse1(DataPackage input)
+			{
+				var data = input.ToArray();
+				stream.Write(BitConverter.GetBytes(data.Length), 0, 4);
+				stream.Write(data, 0, data.Length);
+				stream.Flush();
+				var buffer = new byte[4096];
+
+				int bytesRead;
+
+				List<byte> a = new List<byte>(1024);
+				while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) != 0)
+				{
+					for (int i = 0; i < bytesRead; i++)
+					{
+						a.Add(buffer[i]);
+					}
+				}
+				return new DataPackage(a.ToArray());
+			}
+
+			public void Open()
+			{
+				m_tcpClient = new TcpClient(m_ip, m_port);
+				stream = m_tcpClient.GetStream();
+				//writer = new StreamWriter(stream);
+				//reader = new StreamReader(stream);
+			}
+
+			void Close()
+			{
+				m_tcpClient.Client.Dispose();
+				//reader.Dispose();
+				//writer.Dispose();
+				stream.Dispose();
+			}
+
+			public void Dispose()
+			{
+				Close();
+			}
+
+			//Plus Dispose implementation
 		}
 	}
 }
