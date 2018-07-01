@@ -53,22 +53,31 @@ namespace MetaStack.Test.Services
 			using (var client = new TcpClient())
 			{
 				var stream = ConnectAndSend1(client, data);
+				return resieveMessage(stream);
 
-				var buffer = new byte[4096];
+				//var buffer = new byte[4096];
 
-				int bytesRead;
+				//int bytesRead;
 
-				List<byte> a = new List<byte>(1024);
-				while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) != 0)
-				{
-					//a.AddRange(buffer);
-					for (int i = 0; i < bytesRead; i++)
-					{
-						a.Add(buffer[i]);
-					}
+				//List<byte> a = new List<byte>(1024);
+				//while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) != 0)
+				//{
+				//	//a.AddRange(buffer);
+				//	for (int i = 0; i < bytesRead; i++)
+				//	{
+				//		a.Add(buffer[i]);
+				//	}
 
-				}
-				return new DataPackage(a.ToArray());
+				//}
+				//return new DataPackage(a.ToArray());
+				//using (var br = new System.IO.BinaryReader(stream))
+				//{
+				//	var streamSize = br.ReadInt32();
+
+				//	var res = br.ReadBytes(streamSize);
+				//	var result = new DataPackage(res);
+				//	return result;
+				//}
 			}
 		}
 		private NetworkStream ConnectAndSend1(TcpClient client, byte[] data)
@@ -79,6 +88,41 @@ namespace MetaStack.Test.Services
 			stream.Write(data, 0, data.Length);
 			return stream;
 		}
+		DataPackage resieveMessage(NetworkStream stream)
+		{
+			byte[] buffer = new byte[4096];
+			var bytesRead = 0;
+
+			// First, we need to know how much data to read. We've got a 4-byte fixed-size header to handle that.
+			// It's unlikely we'd read the header in multiple ReadAsync calls (it's only 4 bytes :)), but it's good practice anyway.
+			var headerRead = 0;
+			while (headerRead < 4 && (bytesRead = stream.Read(buffer, headerRead, 4 - headerRead)) > 0)
+			{
+				headerRead += bytesRead;
+			}
+
+			//if (headerRead < 4)
+			//	// the minimum message length can not be less than 32 bytes
+			//	throw new FormatException(Translater.GetString("S031.MetaStack.Services.TCPServerService.Accept.1"));
+
+			var bytesRemaining = BitConverter.ToInt32(buffer, 0);
+			//if (bytesRemaining < 32)
+			//	// the minimum message length can not be less than 32 bytes
+			//	throw new FormatException(Translater.GetString("S031.MetaStack.Services.TCPServerService.Accept.1"));
+
+			List<byte> l = new List<byte>();
+			while (bytesRemaining > 0 && (bytesRead = stream.Read(buffer, 0, Math.Min(bytesRemaining, buffer.Length))) != 0)
+			{
+				//l.AddRange(buffer);
+				for (int i = 0; i < bytesRead; i++)
+				{
+					l.Add(buffer[i]);
+				}
+				bytesRemaining -= bytesRead;
+			}
+			return new DataPackage(l.ToArray());
+		}
+
 		DataPackage getTestPackage()
 		{
 			var p = new DataPackage(new string[] { "Col1.int", "Col2.string.255", "Col3.datetime.10", "Col4.Guid.34", "Col5.object" });

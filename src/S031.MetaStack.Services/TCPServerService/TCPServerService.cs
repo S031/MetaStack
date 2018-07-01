@@ -159,6 +159,7 @@ namespace S031.MetaStack.Services
 					p = DataPackage.CreateErrorPackage(e);
 				}
 				byte[] data = p.ToArray();
+				await stream.WriteAsync(BitConverter.GetBytes(data.Length), 0, 4);
 				await stream.WriteAsync(data, 0, data.Length);
 
 				// If ReadAsync returns zero, it means the connection was closed from the other side. If it doesn't, we have to close it ourselves.
@@ -168,7 +169,25 @@ namespace S031.MetaStack.Services
 		}
 		async Task<DataPackage> processMessage(DataPackage inputMessage)
 		{
-			return inputMessage;
+			var p = new DataPackage(new string[] { "Col1.int", "Col2.string.255", "Col3.datetime.10", "Col4.Guid.34", "Col5.object" });
+			p.Headers.Add("Username", "Сергей");
+			p.Headers.Add("Password", "1234567T");
+			p.Headers.Add("Sign", UnicodeEncoding.UTF8.GetBytes("Сергей"));
+			p.UpdateHeaders();
+			int i = 0;
+			for (i = 0; i < 1000; i++)
+			{
+				p.AddNew();
+				p["Col1"] = i;
+				p["Col2"] = $"Строка # {i}";
+				p["Col3"] = DateTime.Now.AddDays(i);
+				p["Col4"] = Guid.NewGuid();
+				//без сериализации работает в 1.5 раза быстрееp
+				p["Col5"] = null;
+				//p["Col5"] = new testClass() { ID = i, Name = (string)p["Col2"] };
+				p.Update();
+			}
+			return p;
 		}
 		async Task<(DataPackage dataPackage, bool closeChannel)> getMessage(NetworkStream stream)
 		{
@@ -195,7 +214,7 @@ namespace S031.MetaStack.Services
 			int totalBytes = bytesRemaining;
 
 			List<byte> l = new List<byte>();
-			while (bytesRemaining > 0 && (bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) != 0)
+			while (bytesRemaining > 0 && (bytesRead = await stream.ReadAsync(buffer, 0, Math.Min(bytesRemaining, buffer.Length))) != 0)
 			{
 				//l.AddRange(buffer);
 				for (int i = 0; i < bytesRead; i++)
