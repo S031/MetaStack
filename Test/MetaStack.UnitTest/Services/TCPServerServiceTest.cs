@@ -1,4 +1,4 @@
-﻿using Xunit;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using S031.MetaStack.Common.Logging;
 using S031.MetaStack.Core;
 using System.Collections.Generic;
@@ -9,16 +9,17 @@ using System.Net.Sockets;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace MetaStack.Test.Services
+namespace MetaStack.UnitTest.Services
 {
+	[TestClass]
 	public class TCPServerServicesTest
 	{
 		public TCPServerServicesTest()
 		{
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
 		}
-		[Fact]
-		void speedTest4ConnectedSocket()
+		[TestMethod]
+		public void speedTest4ConnectedSocket()
 		{
 			using (FileLog l = new FileLog("TCPServerServicesTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -39,8 +40,8 @@ namespace MetaStack.Test.Services
 			}
 		}
 
-		[Fact]
-		void speedTest4Mixed()
+		[TestMethod]
+		public void speedTest4Mixed()
 		{
 			using (FileLog l = new FileLog("TCPServerServicesTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -88,8 +89,8 @@ namespace MetaStack.Test.Services
 			stream.Write(BitConverter.GetBytes(0), 0, 4);
 		}
 
-		[Fact]
-		void speedTestForDisconnectedSocket()
+		[TestMethod]
+		public void speedTestForDisconnectedSocket()
 		{
 			using (FileLog l = new FileLog("TCPServerServicesTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -127,77 +128,11 @@ namespace MetaStack.Test.Services
 				p["Col2"] = $"Строка # {i}";
 				p["Col3"] = DateTime.Now.AddDays(i);
 				p["Col4"] = Guid.NewGuid();
-				//без сериализации работает в 1.5 раза быстрееp
 				p["Col5"] = null;
 				//p["Col5"] = new testClass() { ID = i, Name = (string)p["Col2"] };
 				p.Update();
 			}
 			return p;
-		}
-		private class testClass
-		{
-			public testClass()
-			{
-				ItemList = new Dictionary<string, object>();
-			}
-			public int ID { get; set; }
-			public string Name { get; set; }
-			public Dictionary<string, object> ItemList { get; set; }
-		}
-
-		public sealed class AppClient : IDisposable
-		{
-			private TcpClient _client;
-			private Stream _stream;
-
-			public DataPackage SendAndWaitForResponse(DataPackage input)
-			{
-				var data = input.ToArray();
-				send(data);
-				return resieve();
-			}
-			private void send(byte[] data)
-			{
-				_stream.Write(BitConverter.GetBytes(data.Length), 0, 4);
-				_stream.Write(data, 0, data.Length);
-			}
-			DataPackage resieve()
-			{
-				byte[] buffer = new byte[4096];
-				var bytesRead = 0;
-
-				var headerRead = 0;
-				while (headerRead < 4 && (bytesRead = _stream.Read(buffer, headerRead, 4 - headerRead)) > 0)
-				{
-					headerRead += bytesRead;
-				}
-
-				var bytesRemaining = BitConverter.ToInt32(buffer, 0);
-
-				List<byte> l = new List<byte>();
-				while (bytesRemaining > 0 && (bytesRead = _stream.Read(buffer, 0, Math.Min(bytesRemaining, buffer.Length))) != 0)
-				{
-					for (int i = 0; i < bytesRead; i++)
-					{
-						l.Add(buffer[i]);
-					}
-					bytesRemaining -= bytesRead;
-				}
-				return new DataPackage(l.ToArray());
-			}
-
-			public AppClient(string ip, int port)
-			{
-				_client = new TcpClient(ip, port);
-				_stream = _client.GetStream();
-			}
-			public void Dispose()
-			{
-				_stream.Close();
-				_client.Client.Dispose();
-			}
-
-			//Plus Dispose implementation
 		}
 	}
 }
