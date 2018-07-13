@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP2_0
+﻿#if NETCOREAPP
 using S031.MetaStack.Core.Data;
 #else
 using S031.MetaStack.WinForms.Data;
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-#if NETCOREAPP2_0
+#if NETCOREAPP
 namespace S031.MetaStack.Core
 #else
 namespace S031.MetaStack.WinForms

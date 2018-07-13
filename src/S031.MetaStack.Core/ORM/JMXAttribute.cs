@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Newtonsoft.Json.Converters;
-#if NETCOREAPP2_0
+#if NETCOREAPP
 using S031.MetaStack.Core.Data;
 namespace S031.MetaStack.Core.ORM
 #else

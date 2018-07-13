@@ -25,9 +25,9 @@ namespace MetaStack.UnitTest.Data
 					f = DbProviderFactories.GetFactory("System.Data.SqlClient");
 				}
 				l.Debug($"SpeedTest 2 Finish {i} count result {f}");
-				l.Debug("GetFactoryProviderNames:");
-				foreach (string s in DbProviderFactories.GetFactoryProviderNames())
-					l.Debug(s);
+				//l.Debug("GetFactoryProviderNames:");
+				//foreach (string s in DbProviderFactories.GetFactoryProviderNames())
+				//	l.Debug(s);
 
 			}
 		}

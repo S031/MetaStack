@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Data;
 using S031.MetaStack.Common;
-#if NETCOREAPP2_0
+#if NETCOREAPP
 using S031.MetaStack.Core.Json;
 #else
 using S031.MetaStack.WinForms.Json;
@@ -13,7 +13,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 
-#if NETCOREAPP2_0
+#if NETCOREAPP
 namespace S031.MetaStack.Core.Data
 #else
 namespace S031.MetaStack.WinForms.Data

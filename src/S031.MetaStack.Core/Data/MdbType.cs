@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-#if NETCOREAPP2_0
+#if NETCOREAPP
 namespace S031.MetaStack.Core.Data
 #else
 namespace S031.MetaStack.WinForms.Data

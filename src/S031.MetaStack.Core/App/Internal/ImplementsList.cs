@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-#if NETCOREAPP2_0
+#if NETCOREAPP
 using Microsoft.Extensions.DependencyModel;
 
 namespace S031.MetaStack.Core
@@ -53,7 +53,7 @@ namespace S031.MetaStack.WinForms
 		}
 		private static IEnumerable<Assembly> getAssemblies()
 		{
-#if NETCOREAPP2_0
+#if NETCOREAPP
 			foreach (var a in DependencyContext.Default.CompileLibraries
 				.Select<CompilationLibrary, Assembly>(l => TryLoad(l.Name)).Where(ass=>ass != null))
 				yield return a;

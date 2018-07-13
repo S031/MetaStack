@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <OutputPath>bin\Debug\netcoreapp2.0\</OutputPath>
   </PropertyGroup>
 
@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)src\S031.MetaStack.AppServer\bin\$(ConfigurationName)\netcoreapp2.0&quot; /Y" />
+    <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)src\S031.MetaStack.AppServer\bin\$(ConfigurationName)\netcoreapp2.1&quot; /Y" />
   </Target>
 
 </Project>
