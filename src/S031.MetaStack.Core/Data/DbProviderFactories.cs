@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace S031.MetaStack.Core.Data
 {
-	public static class DbProviderFactoriesOld
+	public static class DbProviderFactories
 	{
 		static readonly object _objForLock = new object();
 		static readonly Dictionary<string, DbProviderFactory> _factories = new Dictionary<string, DbProviderFactory>(StringComparer.CurrentCultureIgnoreCase);

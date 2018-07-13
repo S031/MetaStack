@@ -12,6 +12,7 @@ using S031.MetaStack.WinForms.Json;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
+using MessagePack;
 
 #if NETCOREAPP
 namespace S031.MetaStack.Core.Data
@@ -105,7 +106,7 @@ namespace S031.MetaStack.WinForms.Data
 			{typeof(byte[]), new DataTypeInfo(){ID = MdbType.byteArray, WriteDelegate = (bw, obj) => {  bw.Write((byte)MdbType.byteArray); WriteByteArray(bw, (byte[])obj); }, ReadDelegate = ReadByteArray}},
 			{typeof(char[]), new DataTypeInfo(){ID = MdbType.charArray, WriteDelegate = (bw, obj) => {  bw.Write((byte)MdbType.charArray);WriteCharArray(bw, (char[])obj); }, ReadDelegate = ReadCharArray}},
 			{typeof(Guid), new DataTypeInfo(){ID = MdbType.guid, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.guid); WriteByteArray(bw, ((Guid)obj).ToByteArray()); }, ReadDelegate = br => new Guid(ReadByteArray(br))}},
-			{typeof(object), new DataTypeInfo(){ID = MdbType.@object, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.@object); bw.Write(JSONExtensions.SerializeObject(obj)); }, ReadDelegate = br => JSONExtensions.DeserializeObject(br.ReadString())}}
+			{typeof(object), new DataTypeInfo(){ID = MdbType.@object, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.@object); WriteByteArray(bw, MessagePackSerializer.Typeless.Serialize(obj)); }, ReadDelegate = br => MessagePackSerializer.Typeless.Deserialize(ReadByteArray(br))}}
 		};
 
 		MemoryStream _ms;
@@ -471,7 +472,7 @@ namespace S031.MetaStack.WinForms.Data
 					else if (t.MdbType == MdbType.charArray)
 						len += ((char[])value).Length;
 					else if (t.MdbType == MdbType.@object)
-						len += JSONExtensions.SerializeObject(value).Length;
+						len += MessagePackSerializer.Typeless.Serialize(value).Length;
 					else
 						len += t.Size;
 				}

@@ -22,12 +22,12 @@ namespace MetaStack.UnitTest.Data
 				int i = 0;
 				for (i = 0; i < 1000000; i++)
 				{
-					f = DbProviderFactories.GetFactory("System.Data.SqlClient");
+					f = S031.MetaStack.Core.Data.DbProviderFactories.GetFactory("System.Data.SqlClient");
 				}
 				l.Debug($"SpeedTest 2 Finish {i} count result {f}");
-				//l.Debug("GetFactoryProviderNames:");
-				//foreach (string s in DbProviderFactories.GetFactoryProviderNames())
-				//	l.Debug(s);
+				l.Debug("GetFactoryProviderNames:");
+				foreach (string s in S031.MetaStack.Core.Data.DbProviderFactories.GetFactoryProviderNames())
+					l.Debug(s);
 
 			}
 		}

@@ -75,8 +75,8 @@ namespace MetaStack.Test.Data
 					p["Col3"] = DateTime.Now.AddDays(i);
 					p["Col4"] = Guid.NewGuid();
 					//без сериализации работает в 1.5 раза быстрееp
-					p["Col5"] = null;
-					//p["Col5"] = new testClass();
+					//p["Col5"] = null;
+					p["Col5"] = new testClass();
 					p.Update();
 				}
 				l.Debug($"SpeedTest Finish {i} rows added");
