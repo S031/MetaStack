@@ -106,7 +106,9 @@ namespace S031.MetaStack.WinForms.Data
 			{typeof(byte[]), new DataTypeInfo(){ID = MdbType.byteArray, WriteDelegate = (bw, obj) => {  bw.Write((byte)MdbType.byteArray); WriteByteArray(bw, (byte[])obj); }, ReadDelegate = ReadByteArray}},
 			{typeof(char[]), new DataTypeInfo(){ID = MdbType.charArray, WriteDelegate = (bw, obj) => {  bw.Write((byte)MdbType.charArray);WriteCharArray(bw, (char[])obj); }, ReadDelegate = ReadCharArray}},
 			{typeof(Guid), new DataTypeInfo(){ID = MdbType.guid, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.guid); WriteByteArray(bw, ((Guid)obj).ToByteArray()); }, ReadDelegate = br => new Guid(ReadByteArray(br))}},
-			{typeof(object), new DataTypeInfo(){ID = MdbType.@object, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.@object); WriteByteArray(bw, MessagePackSerializer.Typeless.Serialize(obj)); }, ReadDelegate = br => MessagePackSerializer.Typeless.Deserialize(ReadByteArray(br))}}
+			{typeof(object), new DataTypeInfo(){ID = MdbType.@object, WriteDelegate = (bw, obj) => {
+				bw.Write((byte)MdbType.@object); WriteByteArray(bw, MessagePackSerializer.Typeless.Serialize(obj)); },
+				ReadDelegate = br => MessagePackSerializer.Typeless.Deserialize(ReadByteArray(br))}}
 		};
 
 		MemoryStream _ms;
@@ -843,7 +845,8 @@ namespace S031.MetaStack.WinForms.Data
 						else if (tp == typeof(byte[]))
 							dr[colName] = Convert.ToBase64String((byte[])v);
 						else
-							dr[colName] = JValue.FromObject(v);
+							dr[colName] = JSONExtensions.SerializeObject(v);
+						//dr[colName] = JValue.FromObject(v);
 					}
 				}
 				rows.Add(dr);
