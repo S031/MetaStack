@@ -37,12 +37,10 @@ namespace S031.MetaStack.Services
 				_log = new FileLogger(_nameof, options.LogSettings);
 				isLocalLog = true;
 			}
-			_listener = new TcpListener(IPAddress.Any, 8001);
+			_listener = TcpListener.Create(8001);
 			_listener.Start();
 			await listen(_listener, _token);
 			_log.Debug($"AppService {_nameof} successfully started");
-			// Require new thread for non blocked run
-			//await Task.Factory.StartNew(async () => await Listen());
 		}
 
 
