@@ -91,7 +91,7 @@ namespace S031.MetaStack.Common.Logging
 						FileMode.Append, FileAccess.Write, FileShare.None,
 						bufferSize: 4096, useAsync: false))
 					{
-#if NETCOREAPP2_0
+#if NETCOREAPP
 						StringBuilder sb = new StringBuilder();
 						for (; _queue.TryDequeue(out string message);)
 						{
@@ -146,7 +146,7 @@ namespace S031.MetaStack.Common.Logging
 						FileMode.Append, FileAccess.Write, FileShare.Write,
 						bufferSize: 4096, useAsync: false))
 					{
-#if NETCOREAPP2_0
+#if NETCOREAPP
 						string message;
 						for (; _queue.TryDequeue(out message);)
 						{

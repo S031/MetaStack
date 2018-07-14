@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-#if NETCOREAPP2_0
+#if NETCOREAPP
 namespace S031.MetaStack.Core.ORM
 #else
 namespace S031.MetaStack.WinForms.ORM

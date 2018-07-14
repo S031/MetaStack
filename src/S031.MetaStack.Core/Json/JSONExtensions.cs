@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 using S031.MetaStack.Common;
 using Newtonsoft.Json;
 
-#if NETCOREAPP2_0
+#if NETCOREAPP
 namespace S031.MetaStack.Core.Json
 #else
 namespace S031.MetaStack.WinForms.Json

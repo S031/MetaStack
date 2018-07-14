@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System;
 using System.Text;
 using S031.MetaStack.Core.Data;
+using MessagePack;
+using S031.MetaStack.Core.Json;
 
 namespace MetaStack.Test.Data
 {
@@ -73,8 +75,8 @@ namespace MetaStack.Test.Data
 					p["Col3"] = DateTime.Now.AddDays(i);
 					p["Col4"] = Guid.NewGuid();
 					//без сериализации работает в 1.5 раза быстрееp
-					p["Col5"] = null;
-					//p["Col5"] = new testClass();
+					//p["Col5"] = null;
+					p["Col5"] = new testClass();
 					p.Update();
 				}
 				l.Debug($"SpeedTest Finish {i} rows added");
@@ -250,6 +252,33 @@ namespace MetaStack.Test.Data
 				l.Debug($"writeDataTest source {i} rows added");
 				var t = p.ToDataTable();
 				DisplayData(t, l);				
+			}
+		}
+
+		[Fact]
+		void serializationSpeedTest()
+		{
+			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			{
+				l.Debug("SpeedTest MessagePackSerializer Start");
+				int i = 0;
+				for (i = 0; i < 1000000; i++)
+				{
+					testClass test = new testClass() { ID = i, Name = $"Item {i}" };
+					test.ItemList.Add("Item {i}", i);
+					var data = MessagePackSerializer.Typeless.Serialize(test);
+					test = (testClass)MessagePackSerializer.Typeless.Deserialize(data);
+				}
+				l.Debug("SpeedTest MessagePackSerializer Finish");
+				l.Debug("SpeedTest JSONSerializer Start");
+				for (i = 0; i < 1000000; i++)
+				{
+					testClass test = new testClass() { ID = i, Name = $"Item {i}" };
+					test.ItemList.Add("Item {i}", i);
+					var data = JSONExtensions.SerializeObject(test);
+					JSONExtensions.DeserializeObject(data);
+				}
+				l.Debug("SpeedTest JSOSerializer Finish");
 			}
 		}
 		private class testClass

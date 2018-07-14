@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-#if NETCOREAPP2_0
+#if NETCOREAPP
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
@@ -156,7 +156,7 @@ namespace S031.MetaStack.WinForms.ORM
             schemaJson.NullTest(nameof(schemaJson));
             return JsonConvert.DeserializeObject<JMXSchema>(schemaJson);
         }
-#if NETCOREAPP2_0
+#if NETCOREAPP
         public static JMXSchema ParseXml(string schemaXML)
         {
             schemaXML.NullTest(nameof(schemaXML));

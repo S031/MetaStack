@@ -9,7 +9,7 @@ using System.Linq;
 using S031.MetaStack.Common;
 
 
-#if NETCOREAPP2_0
+#if NETCOREAPP
 using S031.MetaStack.Core.Json;
 namespace S031.MetaStack.Core.ORM
 #else
