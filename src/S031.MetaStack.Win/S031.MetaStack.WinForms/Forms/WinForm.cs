@@ -113,8 +113,10 @@ namespace S031.MetaStack.WinForms
 			this.RefreshHostOnExit = true;
 			this.DialogStyle = ds;
 			//ErrToolTip
-			_errToolTip = new ToolTip();
-			_errToolTip.ToolTipIcon = ToolTipIcon.Error;
+			_errToolTip = new ToolTip
+			{
+				ToolTipIcon = ToolTipIcon.Error
+			};
 		}
 		#endregion Constructor
 
@@ -179,8 +181,7 @@ namespace S031.MetaStack.WinForms
 
 		public virtual void OnDataChanged(DataChangedEventArgs e)
 		{
-			EventHandler<DataChangedEventArgs> te = DataChanged;
-			if (te != null) te(this, e);
+			DataChanged?.Invoke(this, e);
 		}
 		#endregion Events
 
@@ -225,16 +226,19 @@ namespace S031.MetaStack.WinForms
 			}
 			else if (cdi.SuperForm.ToLower() == WinForm.FolderBrowseForm)
 			{
-				FolderBrowserDialog dlg = new FolderBrowserDialog();
-				dlg.SelectedPath = string.IsNullOrEmpty(cdi.LinkedControl.Text) ? cdi.SuperMethod : cdi.LinkedControl.Text;
-				if (dlg.ShowDialog() == DialogResult.OK)
+				using (FolderBrowserDialog dlg = new FolderBrowserDialog
 				{
-					cdi.LinkedControl.Text = dlg.SelectedPath;
-					cdi.LinkedControl.Focus();
+					SelectedPath = string.IsNullOrEmpty(cdi.LinkedControl.Text) ? cdi.SuperMethod : cdi.LinkedControl.Text
+				})
+				{
+					if (dlg.ShowDialog() == DialogResult.OK)
+					{
+						cdi.LinkedControl.Text = dlg.SelectedPath;
+						cdi.LinkedControl.Focus();
+					}
+					else
+						SendKeys.Send("{TAB}");
 				}
-				else
-					SendKeys.Send("{TAB}");
-				dlg.Dispose();
 			}
 			else if (cdi.SuperForm.Left(7).Equals(WinForm.StrViewForm, StringComparison.CurrentCultureIgnoreCase))
 			{
@@ -521,9 +525,11 @@ namespace S031.MetaStack.WinForms
 					txtSource.TextArea.Caret.Position = document.OffsetToPosition(offset);
 				}
 
-				CodeCompletionProvider completionDataProvider = new CodeCompletionProvider(langID);
-				completionDataProvider.CtrlEnter = (key == ' ' && _controlPressed);
-				completionDataProvider.LetterStart = IsBasicLatin(key);
+				CodeCompletionProvider completionDataProvider = new CodeCompletionProvider(langID)
+				{
+					CtrlEnter = (key == ' ' && _controlPressed),
+					LetterStart = IsBasicLatin(key)
+				};
 
 				_codeCompletionWindow = CodeCompletionWindow.ShowCompletionWindow(
 					this,                   // The parent window for the completion window

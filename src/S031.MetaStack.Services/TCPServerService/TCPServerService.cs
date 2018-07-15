@@ -11,14 +11,17 @@ using S031.MetaStack.Common;
 using Microsoft.Extensions.Logging;
 using S031.MetaStack.Core.Logging;
 using S031.MetaStack.Core.Data;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
 
 namespace S031.MetaStack.Services
 {
-	public class TCPServerService : IAppService
+	public class TCPServerService : BackgroundService, IAppService
 	{
 		private TcpListener _listener;
 		private CancellationToken _token;
 		private ILogger _log;
+		private IConfiguration _configuration;
 		private bool isLocalLog;
 		private IAppConfig _config;
 		private IAppHost _host;
@@ -124,6 +127,25 @@ namespace S031.MetaStack.Services
 		public bool IsRuning()
 		{
 			throw new NotImplementedException();
+		}
+		public TCPServerService(ILogger log, IConfiguration config)
+		{
+			_log = log;
+			_configuration = config;
+		}
+		public TCPServerService(IConfiguration config)
+		{
+			_log = new FileLogger("1234567");
+			_configuration = config;
+		}
+
+		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+		{
+			_token = stoppingToken;
+			_listener = TcpListener.Create(8001);
+			_listener.Start();
+			await listen(_listener, _token);
+			_log.Debug($"AppService {_nameof} successfully started");
 		}
 	}
 }

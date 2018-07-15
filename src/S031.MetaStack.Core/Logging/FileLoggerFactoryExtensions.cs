@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace S031.MetaStack.Core.Logging
 {
-	public static class FileLoggerFactoryExtensions
+	public static class FileLoggerExtensions
 	{
 		/// <summary>
 		/// Adds an File logger that is enabled for <see cref="LogLevel"/>.Information or higher.
@@ -59,7 +59,23 @@ namespace S031.MetaStack.Core.Logging
 			factory.AddProvider(new FileLoggerProvider(settings));
 			return factory;
 		}
+		/// <summary>
+		/// Adds an File logger. Use <paramref name="settings"/> to enable logging for specific <see cref="LogLevel"/>s.
+		/// </summary>
+		/// <param name="builder">The extension method argument.</param>
+		/// <param name="settings">The <see cref="FileLogSettings"/>.</param>
+		/// <returns></returns>
+		public static ILoggingBuilder AddFileLog(this ILoggingBuilder builder, FileLogSettings settings = null)
+		{
+			if (builder == null)
+				throw new ArgumentNullException(nameof(builder));
 
+			if (settings == null)
+				settings = FileLogSettings.Default;
+
+			builder.AddProvider(new FileLoggerProvider(settings));
+			return builder;
+		}
 		public static void Debug(this ILogger logger, string message, [System.Runtime.CompilerServices.CallerMemberName] string callerName = "")
 		{
 			logger.LogDebug(new EventId(0, callerName), message);
