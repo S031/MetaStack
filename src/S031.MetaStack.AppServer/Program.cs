@@ -1,5 +1,4 @@
-﻿//using S031.MetaStack.Core.App;
-using System;
+﻿using System;
 using System.Threading;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +9,7 @@ using System.Reflection;
 using System.Runtime.Loader;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+
 
 namespace S031.MetaStack.AppServer
 {
@@ -26,7 +26,8 @@ namespace S031.MetaStack.AppServer
 			{
 				var host = new HostBuilder()
 					.ConfigureServices((context, services) => services
-						.AddSingleton<ILogger>(logger))
+						.AddSingleton<ILogger>(logger)
+						.AddSingleton<IConfiguration>(configuration))
 					.ConfigureServices((context, services) =>
 						ConfigureServicesFromConfigFile(context, services))
 					.UseConsoleLifetime()
@@ -42,9 +43,14 @@ namespace S031.MetaStack.AppServer
 
 		private static void ConfigureServicesFromConfigFile(HostBuilderContext host, IServiceCollection services)
 		{
-			Assembly a = LoadAssembly("S031.MetaStack.Services");
-			foreach (Type t in a.GetExportedTypes().Where(t => typeof(IHostedService).IsAssignableFrom(t)))
-				services.AddTransient(typeof(IHostedService), t);				
+			var provider = services.BuildServiceProvider();
+			var configuration = provider.GetService<IConfiguration>();
+			var serviceList = configuration.GetSection("IAppServiceConfiguration:ImplementationList").GetChildren();
+			foreach (var section in serviceList)
+			{
+				Assembly a = LoadAssembly(section["assemblyName"]);
+				services.AddTransient(typeof(IHostedService), a.GetType(section["typeName"]));
+			}
 		}
 
 		static Assembly LoadAssembly(string assemblyID)
