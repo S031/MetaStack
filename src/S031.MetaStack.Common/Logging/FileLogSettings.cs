@@ -5,8 +5,8 @@ namespace S031.MetaStack.Common.Logging
 {
 	public class FileLogSettings
     {
-
-		static readonly FileLogSettings _default = new FileLogSettings(true);
+		private LogLevels _logLevel = LogLevels.Information;
+		private static readonly FileLogSettings _default = new FileLogSettings(true);
 		public static FileLogSettings Default => _default;
 		private FileLogSettings(bool isStatic)
 		{
@@ -60,5 +60,15 @@ namespace S031.MetaStack.Common.Logging
 		public LogLevels LevelToFlush { get; set; }
 
 		public Func<LogLevels, object, object, string> Formater { get; set; }
+
+		public LogLevels LogLevel
+		{
+			get => _logLevel;
+			set
+			{
+				_logLevel = value;
+				Filter = (s, l) => l >= _logLevel;
+			}
+		}
 	}
 }

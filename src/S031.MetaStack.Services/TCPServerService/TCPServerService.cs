@@ -133,19 +133,19 @@ namespace S031.MetaStack.Services
 			_log = log;
 			_configuration = config;
 		}
-		public TCPServerService(IConfiguration config)
-		{
-			_log = new FileLogger("1234567");
-			_configuration = config;
-		}
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
 			_token = stoppingToken;
 			_listener = TcpListener.Create(8001);
 			_listener.Start();
-			await listen(_listener, _token);
 			_log.Debug($"AppService {_nameof} successfully started");
+			await listen(_listener, _token);
+		}
+		public override void Dispose()
+		{
+			Stop();
+			base.Dispose();
 		}
 	}
 }
