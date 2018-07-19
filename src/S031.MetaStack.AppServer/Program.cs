@@ -48,8 +48,13 @@ namespace S031.MetaStack.AppServer
 			var serviceList = configuration.GetSection("IAppServiceConfiguration:ImplementationList").GetChildren();
 			foreach (var section in serviceList)
 			{
-				Assembly a = LoadAssembly(section["assemblyName"]);
-				services.AddTransient(typeof(IHostedService), a.GetType(section["typeName"]));
+				var options = section.Get<Core.Services.HostedServiceOptions>();
+				services.AddScoped<Core.Services.HostedServiceOptions>(s => options);
+				using (var scopeProvider = provider.CreateScope())
+				{
+					Assembly a = LoadAssembly(options.AssemblyName);
+					services.AddTransient(typeof(IHostedService), a.GetType(options.TypeName));
+				}
 			}
 		}
 

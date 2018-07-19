@@ -13,6 +13,7 @@ using S031.MetaStack.Core.Logging;
 using S031.MetaStack.Core.Data;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
+using S031.MetaStack.Core.Services;
 
 namespace S031.MetaStack.Services
 {
@@ -21,7 +22,7 @@ namespace S031.MetaStack.Services
 		private TcpListener _listener;
 		private CancellationToken _token;
 		private ILogger _log;
-		private IConfiguration _configuration;
+		private HostedServiceOptions _options;
 		private bool isLocalLog;
 		private IAppConfig _config;
 		private IAppHost _host;
@@ -128,10 +129,10 @@ namespace S031.MetaStack.Services
 		{
 			throw new NotImplementedException();
 		}
-		public TCPServerService(ILogger log, IConfiguration config)
+		public TCPServerService(ILogger log, HostedServiceOptions options)
 		{
 			_log = log;
-			_configuration = config;
+			_options = options;
 		}
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
