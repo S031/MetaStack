@@ -21,7 +21,7 @@ namespace S031.MetaStack.AppServer
 				.AddJsonFile("config.json", optional: false, reloadOnChange: true)
 				.Build();
 
-			var logSettings = configuration.GetSection("ApplicationLogSettings").Get<S031.MetaStack.Common.Logging.FileLogSettings>();
+			var logSettings = configuration.GetSection("ApplicationLogSettings").Get<Common.Logging.FileLogSettings>();
 			using (var logger = new FileLogger($"S031.MetaStack.AppServer.{Environment.MachineName}", logSettings))
 			{
 				var host = new HostBuilder()
