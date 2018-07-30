@@ -9,7 +9,8 @@ using System.Reflection;
 using System.Runtime.Loader;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-
+using Microsoft.Extensions.Hosting.Internal;
+using S031.MetaStack.Core.App;
 
 namespace S031.MetaStack.AppServer
 {
@@ -24,18 +25,22 @@ namespace S031.MetaStack.AppServer
 			var logSettings = configuration.GetSection("ApplicationLogSettings").Get<Common.Logging.FileLogSettings>();
 			using (var logger = new FileLogger($"S031.MetaStack.AppServer.{Environment.MachineName}", logSettings))
 			{
-				var host = new HostBuilder()
+				using (var cts = new CancellationTokenSource())
+				using (var host = new HostBuilder()
+					.UseConsoleLifetime()
 					.ConfigureServices((context, services) => services
 						.AddSingleton<ILogger>(logger)
 						.AddSingleton<IConfiguration>(configuration))
 					.ConfigureServices((context, services) =>
 						ConfigureServicesFromConfigFile(context, services))
-					.UseConsoleLifetime()
-					.Build();
-
-				using (var cts = new CancellationTokenSource())
-				using (host)
+					.UseApplicationContext()
+					.Build())
 				{
+					//ConsoleExtensions.OnExit(() =>
+					//{
+					//	cts.Cancel();
+					//	return true;
+					//});
 					await host.RunAsync(cts.Token);
 				}
 			}

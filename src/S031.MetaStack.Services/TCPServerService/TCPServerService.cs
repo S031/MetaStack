@@ -17,35 +17,14 @@ using S031.MetaStack.Core.Services;
 
 namespace S031.MetaStack.Services
 {
-	public class TCPServerService : BackgroundService, IAppService
+	public class TCPServerService : BackgroundService
 	{
 		private TcpListener _listener;
 		private CancellationToken _token;
 		private ILogger _log;
 		private HostedServiceOptions _options;
 		private bool isLocalLog;
-		private IAppConfig _config;
-		private IAppHost _host;
 		private readonly string _nameof = typeof(TCPServerService).FullName;
-
-		public async Task StartAsync(IAppHost host, AppServiceOptions options)
-		{
-			_host = host;
-			_token = options.CancellationToken == CancellationToken.None ? new CancellationTokenSource().Token :
-				options.CancellationToken;
-			_config = host.AppConfig;
-			if (options.LogName.IsEmpty())
-				_log = host.Log;
-			else
-			{
-				_log = new FileLogger(_nameof, options.LogSettings);
-				isLocalLog = true;
-			}
-			_listener = TcpListener.Create(8001);
-			_listener.Start();
-			await listen(_listener, _token);
-			_log.Debug($"AppService {_nameof} successfully started");
-		}
 
 
 		static async Task listen(TcpListener listener, CancellationToken token)
@@ -112,23 +91,16 @@ namespace S031.MetaStack.Services
 			return result;
 		}
 
-		public async Task StopAsync()
-		{
-			await Task.Factory.StartNew(() => Stop());
-		}
-
-		public void Stop()
+		public override  async Task StopAsync(CancellationToken cancellationToken)
 		{
 			_listener.Stop();
 			_log.Debug($"AppService {_nameof} successfully stoped");
 			if (isLocalLog)
 				(_log as IDisposable)?.Dispose();
+			await base.StopAsync(cancellationToken);
 		}
 
-		public bool IsRuning()
-		{
-			throw new NotImplementedException();
-		}
+
 		public TCPServerService(ILogger log, HostedServiceOptions options)
 		{
 			_log = log;
@@ -142,11 +114,6 @@ namespace S031.MetaStack.Services
 			_listener.Start();
 			_log.Debug($"AppService {_nameof} successfully started");
 			await listen(_listener, _token);
-		}
-		public override void Dispose()
-		{
-			Stop();
-			base.Dispose();
 		}
 	}
 }
