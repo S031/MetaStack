@@ -16,6 +16,8 @@ namespace S031.MetaStack.Core.App
 		}
 		public static IServiceProvider GetServices(ServiceProviderOptions options = default)
 		{
+			if (options == null)
+				return _services.BuildServiceProvider();
 			return _services.BuildServiceProvider(options);
 		}
     }
