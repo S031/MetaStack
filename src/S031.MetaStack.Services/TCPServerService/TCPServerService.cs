@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 using S031.MetaStack.Core.Logging;
 using S031.MetaStack.Core.Data;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using S031.MetaStack.Core.Services;
 
 namespace S031.MetaStack.Services
@@ -23,11 +23,10 @@ namespace S031.MetaStack.Services
 		private CancellationToken _token;
 		private ILogger _log;
 		private HostedServiceOptions _options;
-		private bool isLocalLog;
 		private readonly string _nameof = typeof(TCPServerService).FullName;
 
 
-		static async Task listen(TcpListener listener, CancellationToken token)
+		static async Task Listen(TcpListener listener, CancellationToken token)
 		{
 			while (!token.IsCancellationRequested)
 			{
@@ -50,7 +49,7 @@ namespace S031.MetaStack.Services
 						break;
 					var res = await GetByteArrayFromStreamAsync(stream, streamSize);
 
-					var response = (await processMessage(new DataPackage(res))).ToArray();
+					var response = (await ProcessMessage(new DataPackage(res))).ToArray();
 					streamSize = response.Length;
 					await stream.WriteAsync(BitConverter.GetBytes(streamSize), 0, 4);
 					await stream.WriteAsync(response, 0, streamSize);
@@ -58,7 +57,7 @@ namespace S031.MetaStack.Services
 			}
 		}
 
-		static async Task<DataPackage> processMessage(DataPackage inputMessage)
+		static async Task<DataPackage> ProcessMessage(DataPackage inputMessage)
 		{
 			return await Task.Factory.StartNew(() =>
 			{
@@ -94,16 +93,15 @@ namespace S031.MetaStack.Services
 		public override  async Task StopAsync(CancellationToken cancellationToken)
 		{
 			_listener.Stop();
-			_log.Debug($"AppService {_nameof} successfully stoped");
-			if (isLocalLog)
-				(_log as IDisposable)?.Dispose();
+			_log.Debug($"{_nameof} successfully stoped");
 			await base.StopAsync(cancellationToken);
 		}
 
 
-		public TCPServerService(ILogger log, HostedServiceOptions options)
+		public TCPServerService(HostedServiceOptions options)
 		{
-			_log = log;
+			_log = ApplicationContext.GetServices(new ServiceProviderOptions() { ValidateScopes = true })
+				.GetRequiredService<ILogger>();
 			_options = options;
 		}
 
@@ -112,8 +110,8 @@ namespace S031.MetaStack.Services
 			_token = stoppingToken;
 			_listener = TcpListener.Create(8001);
 			_listener.Start();
-			_log.Debug($"AppService {_nameof} successfully started");
-			await listen(_listener, _token);
+			_log.Debug($"{_nameof} successfully started");
+			await Listen(_listener, _token);
 		}
 	}
 }
