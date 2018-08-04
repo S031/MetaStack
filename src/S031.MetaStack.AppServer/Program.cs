@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Runtime.Loader;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Hosting.Internal;
 using S031.MetaStack.Core.App;
 
 namespace S031.MetaStack.AppServer
@@ -27,17 +28,24 @@ namespace S031.MetaStack.AppServer
 			using (var host = new HostBuilder()
 				.UseConsoleLifetime()
 				.ConfigureServices((context, services) => services
-					.AddTransient<ILogger>(s => logger)
+					.AddTransient<ILogger>(s=>logger)
 					.AddSingleton<IConfiguration>(configuration))
 				.ConfigureServices((context, services) =>
 					ConfigureServicesFromConfigFile(context, services))
 				.UseApplicationContext()
 				.Build())
 			{
-				await host.RunAsync(cts.Token);
+				using (var r = cts.Token.Register(ShutdownApp))
+				{
+					await host.RunAsync(cts.Token);
+				}
 			}
 		}
-
+		static void ShutdownApp()
+		{
+			//var log = ApplicationContext.GetServices().GetRequiredService<ILogger>();
+			//(log as FileLogger)?.Dispose();
+		}
 
 		private static void ConfigureServicesFromConfigFile(HostBuilderContext host, IServiceCollection services)
 		{
@@ -51,7 +59,7 @@ namespace S031.MetaStack.AppServer
 				using (var scopeProvider = provider.CreateScope())
 				{
 					Assembly a = LoadAssembly(options.AssemblyName);
-					services.AddSingleton(typeof(IHostedService), a.GetType(options.TypeName));
+					services.AddTransient(typeof(IHostedService), a.GetType(options.TypeName));
 				}
 			}
 		}

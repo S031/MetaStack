@@ -94,6 +94,7 @@ namespace S031.MetaStack.Services
 		{
 			_listener.Stop();
 			_log.Debug($"{_nameof} successfully stoped");
+			(_log as FileLogger)?.Dispose();
 			await base.StopAsync(cancellationToken);
 		}
 
@@ -101,7 +102,7 @@ namespace S031.MetaStack.Services
 		public TCPServerService(HostedServiceOptions options)
 		{
 			_log = ApplicationContext.GetServices(new ServiceProviderOptions() { ValidateScopes = true })
-				.GetRequiredService<ILogger>();
+				.CreateScope().ServiceProvider.GetRequiredService<ILogger>();
 			_options = options;
 		}
 

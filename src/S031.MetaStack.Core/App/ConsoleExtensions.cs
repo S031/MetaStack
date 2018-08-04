@@ -44,12 +44,12 @@ namespace S031.MetaStack.Core.App
 					{
 						//onExitCallBack();
 					};
-				//Ctrl+c pressed 
-				Console.CancelKeyPress += (c, e) =>
-					{
-						e.Cancel = onExitCallBack();
-					};
 			}
+			//Ctrl+c pressed 
+			Console.CancelKeyPress += (c, e) =>
+				{
+					e.Cancel = onExitCallBack();
+				};
 		}
 	}
 }
