@@ -23,15 +23,15 @@ namespace S031.MetaStack.Services
 		private CancellationToken _token;
 		private ILogger _log;
 		private readonly HostedServiceOptions _options;
-		private readonly string _nameof = typeof(TCPServerService).FullName;
+		private static readonly string _nameof = typeof(TCPServerService).FullName;
 
 
-		static async Task Listen(TcpListener listener, CancellationToken token)
+		async Task Listen()
 		{
-			while (!token.IsCancellationRequested)
+			while (!_token.IsCancellationRequested)
 			{
-				await listener.AcceptTcpClientAsync()
-				.ContinueWith(Accept, token)
+				await _listener.AcceptTcpClientAsync()
+				.ContinueWith(Accept, _token)
 				.ConfigureAwait(false);
 			}
 		}
@@ -101,8 +101,15 @@ namespace S031.MetaStack.Services
 
 		public TCPServerService(HostedServiceOptions options)
 		{
-			_log = ApplicationContext.GetServices(new ServiceProviderOptions() { ValidateScopes = true })
-				.CreateScope().ServiceProvider.GetRequiredService<ILogger>();
+			var serviceBuilder = ApplicationContext.GetServices(new ServiceProviderOptions() { ValidateScopes = true });
+			using (var scope = serviceBuilder.CreateScope())
+			{
+				var serviceProvider = scope.ServiceProvider;
+				if (!options.LogName.IsEmpty())
+					_log = new FileLogger(_nameof, options.LogSettings);
+				else
+					_log = serviceProvider.GetRequiredService<ILogger>();
+			}
 			_options = options;
 		}
 
@@ -112,7 +119,7 @@ namespace S031.MetaStack.Services
 			_listener = TcpListener.Create(8001);
 			_listener.Start();
 			_log.Debug($"{_nameof} successfully started");
-			await Listen(_listener, _token);
+			await Listen();
 		}
 	}
 }
