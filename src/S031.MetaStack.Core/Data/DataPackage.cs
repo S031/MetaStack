@@ -12,7 +12,9 @@ using S031.MetaStack.WinForms.Json;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
+#if SERIALIZEBINARY
 using MessagePack;
+#endif
 
 #if NETCOREAPP
 namespace S031.MetaStack.Core.Data
@@ -106,9 +108,17 @@ namespace S031.MetaStack.WinForms.Data
 			{typeof(byte[]), new DataTypeInfo(){ID = MdbType.byteArray, WriteDelegate = (bw, obj) => {  bw.Write((byte)MdbType.byteArray); WriteByteArray(bw, (byte[])obj); }, ReadDelegate = ReadByteArray}},
 			{typeof(char[]), new DataTypeInfo(){ID = MdbType.charArray, WriteDelegate = (bw, obj) => {  bw.Write((byte)MdbType.charArray);WriteCharArray(bw, (char[])obj); }, ReadDelegate = ReadCharArray}},
 			{typeof(Guid), new DataTypeInfo(){ID = MdbType.guid, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.guid); WriteByteArray(bw, ((Guid)obj).ToByteArray()); }, ReadDelegate = br => new Guid(ReadByteArray(br))}},
-			{typeof(object), new DataTypeInfo(){ID = MdbType.@object, WriteDelegate = (bw, obj) => {
+#if SERIALIZEBINARY
+			//For fast optimization serialization
+			//Required https://www.nuget.org/packages/MessagePack/
+			{ typeof(object), new DataTypeInfo(){ID = MdbType.@object, WriteDelegate = (bw, obj) => {
 				bw.Write((byte)MdbType.@object); WriteByteArray(bw, MessagePackSerializer.Typeless.Serialize(obj)); },
 				ReadDelegate = br => MessagePackSerializer.Typeless.Deserialize(ReadByteArray(br))}}
+#else
+			{typeof(object), new DataTypeInfo(){ID = MdbType.@object, WriteDelegate = (bw, obj) => {
+				bw.Write((byte)MdbType.@object); bw.Write(JSONExtensions.SerializeObject(obj)); },
+				ReadDelegate = br => JSONExtensions.DeserializeObject(br.ReadString())}}
+#endif
 		};
 
 		MemoryStream _ms;
@@ -167,7 +177,7 @@ namespace S031.MetaStack.WinForms.Data
 			{
 				string name = _br.ReadString();
 				_indexes.Add(name);
-				_colInfo.Add(readColumnInfo(_br));
+				_colInfo.Add(ReadColumnInfo(_br));
 			}
 			_dataPos = _ms.Position;
 		}
@@ -181,7 +191,7 @@ namespace S031.MetaStack.WinForms.Data
 		/// </code>
 		/// </example>
 		public DataPackage(params string[] columns) :
-			this(writeData(_headerSpaceSizeDef, columns, null))
+			this(WriteDataInternal(_headerSpaceSizeDef, columns, null))
 		{
 		}
 		/// <summary>
@@ -194,7 +204,7 @@ namespace S031.MetaStack.WinForms.Data
 		/// </code>
 		/// </example>
 		public DataPackage(params object[] keyValuePayr)
-			: this(writeData(_headerSpaceSizeDef, keyValuePayr.Where((obj, i) => i % 2 == 0).Select(obj => (string)obj).ToArray(),
+			: this(WriteDataInternal(_headerSpaceSizeDef, keyValuePayr.Where((obj, i) => i % 2 == 0).Select(obj => (string)obj).ToArray(),
 			keyValuePayr.Where((obj, i) => i % 2 != 0).ToArray()))
 		{
 		}
@@ -210,7 +220,7 @@ namespace S031.MetaStack.WinForms.Data
 		///	</code>
 		/// </example>
 		public DataPackage(string[] columns, object[] values) :
-			this(writeData(_headerSpaceSizeDef, columns, values))
+			this(WriteDataInternal(_headerSpaceSizeDef, columns, values))
 		{
 		}
 		/// <summary>
@@ -220,7 +230,7 @@ namespace S031.MetaStack.WinForms.Data
 		/// <param name="columns">list of columns definitions strings  in format ColimnName[.ColumnType][.ColumnWidth]</param>
 		/// <param name="values">list of values</param>
 		public DataPackage(int headerSpaceSize, string[] columns, object[] values) :
-			this(writeData(headerSpaceSize, columns, values))
+			this(WriteDataInternal(headerSpaceSize, columns, values))
 		{
 		}
 		/// <summary>
@@ -231,9 +241,9 @@ namespace S031.MetaStack.WinForms.Data
 		/// <param name="values">list of values</param>
 		/// <returns><see cref="byte[]"/></returns>
 		public static byte[] WriteData(int headerSpaceSize, string[] columns, object[] values)=>
-			writeData(headerSpaceSize, columns, values).ToArray();
+			WriteDataInternal(headerSpaceSize, columns, values).ToArray();
 
-		static MemoryStream writeData(int headerSpaceSize, string[] columns, object[] values)
+		static MemoryStream WriteDataInternal(int headerSpaceSize, string[] columns, object[] values)
 		{
 			MemoryStream ms = new MemoryStream();
 			BinaryWriter bw = new BinaryWriter(ms);
@@ -252,17 +262,17 @@ namespace S031.MetaStack.WinForms.Data
 				if (columns[i].IndexOf('.') > 0)
 				{
 					bw.Write(columns[i].GetToken(0, "."));
-					writeColumnInfo(bw, ColumnInfo.FromName(columns[i]));
+					WriteColumnInfo(bw, ColumnInfo.FromName(columns[i]));
 				}
 				else if (hasValues)
 				{
 					bw.Write(columns[i]);
-					writeColumnInfo(bw, ColumnInfo.FromValue(values[i]));
+					WriteColumnInfo(bw, ColumnInfo.FromValue(values[i]));
 				}
 				else
 				{
 					bw.Write(columns[i]);
-					writeColumnInfo(bw, ColumnInfo.FromType(typeof(string)));
+					WriteColumnInfo(bw, ColumnInfo.FromType(typeof(string)));
 				}
 
 			}
@@ -355,7 +365,7 @@ namespace S031.MetaStack.WinForms.Data
 			foreach (KeyValuePair<string, ColumnInfo> kvp in colInfo)
 			{
 				bw.Write(kvp.Key);
-				writeColumnInfo(bw, kvp.Value);
+				WriteColumnInfo(bw, kvp.Value);
 			}
 
 
@@ -379,7 +389,7 @@ namespace S031.MetaStack.WinForms.Data
 		{
 			if (_rowPos != 0 && _rowPos >= _ms.Length)
 				//Добавление новой строки
-				writeRow();
+				WriteRow();
 			else if (_rowPos != 0)
 			{
 				//Обновление существующей с перезаписью до конца потока
@@ -387,7 +397,7 @@ namespace S031.MetaStack.WinForms.Data
 				int count = (int)(_ms.Length - _ms.Position);
 				byte[] nextData = new byte[count];
 				int result = _ms.Read(nextData, 0, count);
-				writeRow();
+				WriteRow();
 				long l = _ms.Position;
 				_ms.Write(nextData, 0, (int)nextData.Length);
 				if (_ms.Position < _ms.Length)
@@ -403,14 +413,14 @@ namespace S031.MetaStack.WinForms.Data
 		{
 			if (_rowPos != 0 && _rowPos >= _ms.Length)
 				//Add new row
-				writeRow();
+				WriteRow();
 			else if (_rowPos != 0)
 			{
 				//Updates the current row with a rewrite to end of array
 				int count = (int)(_ms.Length - _ms.Position);
 				byte[] nextData = new byte[count];
 				int result = await _ms.ReadAsync(nextData, 0, count).ConfigureAwait(false);
-				writeRow();
+				WriteRow();
 				long l = _ms.Position;
 				await _ms.WriteAsync(nextData, 0, (int)nextData.Length).ConfigureAwait(false);
 				if (_ms.Position < _ms.Length)
@@ -418,7 +428,7 @@ namespace S031.MetaStack.WinForms.Data
 				_ms.Seek(l, SeekOrigin.Begin);
 			}
 		}
-		void writeRow()
+		void WriteRow()
 		{
 			_ms.Seek(_rowPos, SeekOrigin.Begin);
 			for (int i = 0; i < _colCount; i++)
@@ -474,7 +484,11 @@ namespace S031.MetaStack.WinForms.Data
 					else if (t.MdbType == MdbType.charArray)
 						len += ((char[])value).Length;
 					else if (t.MdbType == MdbType.@object)
+#if SERIALIZEBINARY
 						len += MessagePackSerializer.Typeless.Serialize(value).Length;
+#else
+						len += JSONExtensions.SerializeObject(value).Length;
+#endif
 					else
 						len += t.Size;
 				}
@@ -711,7 +725,7 @@ namespace S031.MetaStack.WinForms.Data
 			set { _dataRow[_indexes[i]] = value; }
 		}
 
-		static void writeColumnInfo(BinaryWriter bw, ColumnInfo ci)
+		static void WriteColumnInfo(BinaryWriter bw, ColumnInfo ci)
 		{
 			if (_dti.ContainsKey(ci.DataType))
 				bw.Write((byte)_dti[ci.DataType].ID);
@@ -736,7 +750,7 @@ namespace S031.MetaStack.WinForms.Data
 			if (len > 0) bw.Write(c);
 		}
 
-		static ColumnInfo readColumnInfo(BinaryReader br)
+		static ColumnInfo ReadColumnInfo(BinaryReader br)
 		{
 			ColumnInfo ci = new ColumnInfo()
 			{
@@ -766,12 +780,12 @@ namespace S031.MetaStack.WinForms.Data
         public string ToString(TsExportFormat fmt)
 		{
 			if (fmt == TsExportFormat.JSON)
-				return saveJSON();
+				return SaveJSON();
 			else
 				throw new NotImplementedException();
 		}
 
-		private string saveJSON()
+		private string SaveJSON()
 		{
 			JObject j = new JObject();
 

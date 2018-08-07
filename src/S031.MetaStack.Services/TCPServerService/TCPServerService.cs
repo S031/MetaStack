@@ -22,7 +22,7 @@ namespace S031.MetaStack.Services
 		private TcpListener _listener;
 		private CancellationToken _token;
 		private ILogger _log;
-		private HostedServiceOptions _options;
+		private readonly HostedServiceOptions _options;
 		private readonly string _nameof = typeof(TCPServerService).FullName;
 
 
