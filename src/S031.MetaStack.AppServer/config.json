@@ -33,20 +33,6 @@
       "connectionString": "Data Source=SERGEY-SQL2016;Initial Catalog=Bank;User ID=Sa;Password=_92b1A7C8"
     }
   },
-  "pluginManagerConfiguration": {
-    "InterfacesList": [
-      {
-        "name": "IAppService",
-        "assemblyName": "S031.MetaStack.Core",
-        "typeName": "S031.MetaStack.Core.App.IAppService"
-      },
-      {
-        "name": "IAppEvaluator",
-        "assemblyName": "S031.MetaStack.Core",
-        "typeName": "S031.MetaStack.Core.App.IAppEvaluator"
-      }
-    ]
-  },
   "IAppServiceConfiguration": {
     "ImplementationList": [
       {

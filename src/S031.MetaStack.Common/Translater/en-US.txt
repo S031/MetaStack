@@ -17,6 +17,8 @@ S031.MetaStack.Core.Data.DbProviderFactories.GetFactory.1=The {0} type does not 
 S031.MetaStack.Core.Data.DbProviderFactories.GetFactory.2=The type derived from DbProviderFactory was not found in {0}
 S031.MetaStack.Core.Data.DbProviderFactories.GetFactory.3=An assembly containing definitions for {0} was not found
 S031.MetaStack.Core.Data.DbProviderFactories.GetFactory.4=No library containing definitions for {0}
+S031.MetaStack.Core.Data.ObjectFactories.GetFactories.1=The type derived from {0} was not found in service collection
+
 
 S031.MetaStack.Core.Data.MdbContext.array2List.1=Parameter a must implements IEnumerable<> interface
 S031.MetaStack.Core.Data.MdbContext.array2List.2=IEnumerable <{0}> argument type not supported

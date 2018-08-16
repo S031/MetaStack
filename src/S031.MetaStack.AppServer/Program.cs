@@ -1,16 +1,13 @@
-﻿using System;
-using System.Threading;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using S031.MetaStack.Core.Logging;
-using System.Threading.Tasks;
-using System.Reflection;
-using System.Runtime.Loader;
-using System.Linq;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Hosting.Internal;
 using S031.MetaStack.Core.App;
+using S031.MetaStack.Core.Logging;
+using System;
+using System.Data.Common;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace S031.MetaStack.AppServer
 {
@@ -55,20 +52,9 @@ namespace S031.MetaStack.AppServer
 			foreach (var section in serviceList)
 			{
 				var options = section.Get<Core.Services.HostedServiceOptions>();
-				services.AddScoped<Core.Services.HostedServiceOptions>(s => options);
-				using (var scopeProvider = provider.CreateScope())
-				{
-					Assembly a = LoadAssembly(options.AssemblyName);
-					services.AddTransient(typeof(IHostedService), a.GetType(options.TypeName));
-				}
+				services.AddTransient<Core.Services.HostedServiceOptions>(s => options);
+				services.Add<IHostedService>(options.TypeName, options.AssemblyName);
 			}
-		}
-
-		static Assembly LoadAssembly(string assemblyID)
-		{
-			Assembly a = AssemblyLoadContext.Default.LoadFromAssemblyPath(
-				System.IO.Path.Combine(System.AppContext.BaseDirectory, $"{assemblyID}.dll"));
-			return a;
 		}
 	}
 }

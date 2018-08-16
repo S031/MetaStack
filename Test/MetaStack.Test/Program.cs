@@ -1,16 +1,34 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using S031.MetaStack.Core.App;
+using S031.MetaStack.Core.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace CommonTest
+namespace MetaStack.Test
 {
-    public class Program
+    public static class Program
     {
-        public static void Main1(string[] args)
-        {
-			//(new CommonTest.Data.MdbContextTest()).GetReaderTest();
-			Console.ReadKey();
-        }
-    }
+		static IHost _host;
+
+		public static void ConfigureTests()
+		{
+			IConfiguration configuration = new ConfigurationBuilder()
+				.AddJsonFile("config.json", optional: false, reloadOnChange: true)
+				.Build();
+
+			_host = new HostBuilder()
+				.UseConsoleLifetime()
+				.ConfigureServices((context, services) => services
+					.AddSingleton<IConfiguration>(configuration))
+				.UseApplicationContext()
+				.Build();
+		}
+
+	}
 }

@@ -109,5 +109,13 @@ namespace S031.MetaStack.Common
 			else { return null; }
 
 		}
+
+		public static IEnumerable<Type> GetImplements(this Type type, Assembly assembly = null)
+		{
+			IEnumerable<Assembly> l = assembly == null ? AppDomain.CurrentDomain.GetAssemblies() : new Assembly[] { assembly };
+			foreach (var a in l)
+				foreach (Type t in a.GetTypes().Where(t => type.IsAssignableFrom(t) && !type.Equals(t)))
+					yield return t;
+		}
 	}
 }

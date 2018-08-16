@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 #if NETCOREAPP
-using Microsoft.Extensions.DependencyModel;
 
 namespace S031.MetaStack.Core
 #else
@@ -17,12 +16,6 @@ namespace S031.MetaStack.WinForms
 		static readonly object objLock = new object();
 
 		static readonly Dictionary<Type, List<Type>> _iList = new Dictionary<Type, List<Type>>();
-
-		static readonly IServiceCollection _services = new ServiceCollection();
-
-		public static IServiceProvider GetServiceProvider() => _services.BuildServiceProvider();
-
-		public static IServiceCollection GetServices() => _services;
 
 		public static IEnumerable<Type> GetTypes(Type type)
 		{
@@ -61,13 +54,7 @@ namespace S031.MetaStack.WinForms
 		}
 		private static IEnumerable<Assembly> getAssemblies()
 		{
-#if NETCOREAPP
-			foreach (var a in DependencyContext.Default.CompileLibraries
-				.Select<CompilationLibrary, Assembly>(l => TryLoad(l.Name)).Where(ass=>ass != null))
-				yield return a;
-#else
 			return AppDomain.CurrentDomain.GetAssemblies();
-#endif
 		}
 		private static Assembly TryLoad(string name)
 		{

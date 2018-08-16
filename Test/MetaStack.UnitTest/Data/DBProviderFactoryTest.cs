@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using S031.MetaStack.Common.Logging;
-using S031.MetaStack.Core.Data;
+using S031.MetaStack.Core;
 using System.Data.Common;
 
 namespace MetaStack.UnitTest.Data
@@ -13,7 +13,7 @@ namespace MetaStack.UnitTest.Data
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
 		}
 		[TestMethod]
-		public void getFactoryTest()
+		public void GetFactoryTest()
 		{
 			using (FileLog l = new FileLog("DBProviderFactoryTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -22,11 +22,11 @@ namespace MetaStack.UnitTest.Data
 				int i = 0;
 				for (i = 0; i < 1000000; i++)
 				{
-					f = S031.MetaStack.Core.Data.DbProviderFactories.GetFactory("System.Data.SqlClient");
+					f = ObjectFactories.GetFactory<DbProviderFactory>("System.Data.SqlClient");
 				}
 				l.Debug($"SpeedTest 2 Finish {i} count result {f}");
 				l.Debug("GetFactoryProviderNames:");
-				foreach (string s in S031.MetaStack.Core.Data.DbProviderFactories.GetFactoryProviderNames())
+				foreach (string s in ObjectFactories.GetFactoryNames<DbProviderFactory>())
 					l.Debug(s);
 
 			}

@@ -17,6 +17,7 @@ S031.MetaStack.Core.Data.DbProviderFactories.GetFactory.1=Тип {0} не име
 S031.MetaStack.Core.Data.DbProviderFactories.GetFactory.2=В {0} не найден тип производный от DbProviderFactory
 S031.MetaStack.Core.Data.DbProviderFactories.GetFactory.3=Не найдена сборка содержащая определения для {0}
 S031.MetaStack.Core.Data.DbProviderFactories.GetFactory.4=Не найдена билиотека содержащая определения для {0}
+S031.MetaStack.Core.Data.ObjectFactories.GetFactories.1=Тип производный от {0} не найден в service collection
 
 S031.MetaStack.Core.Data.MdbContext.array2List.1=Параметр должен реализовывать интерфейс IEnumerable<>
 S031.MetaStack.Core.Data.MdbContext.array2List.2=Тип аргумента IEnumerable<{0}> не поддерживается

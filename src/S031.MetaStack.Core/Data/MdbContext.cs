@@ -17,6 +17,13 @@ namespace S031.MetaStack.Core.Data
 		PostgreSql
 	}
 
+	public class ConnectInfo
+	{
+		public string ProviderName { get; set; }
+		public string DbName { get; set; }
+		public string ConnectionString { get; set; }
+	}
+
 	public class MdbContext : IDisposable
 	{
 		internal struct ConnectInfo
@@ -98,7 +105,7 @@ namespace S031.MetaStack.Core.Data
 			logger.NullTest(nameof(logger));
 			_logger = logger;
 			_connectInfo = getConnectionInfo(connectionString);
-			_factory = DbProviderFactories.GetFactory(_connectInfo.ProviderName);
+			_factory = ObjectFactories.GetFactory<DbProviderFactory>(_connectInfo.ProviderName);
 			try
 			{
 				_connection = _factory.CreateConnection(_connectInfo.ConnectionString);
@@ -373,7 +380,7 @@ namespace S031.MetaStack.Core.Data
 				Logger = logger,
 				_connectInfo = getConnectionInfo(connectionString)
 			};
-			mctx._factory = DbProviderFactories.GetFactory(mctx._connectInfo.ProviderName);
+			mctx._factory = ObjectFactories.GetFactory<DbProviderFactory>(mctx._connectInfo.ProviderName);
 			try
 			{
 				mctx._connection = await mctx._factory.CreateConnectionAsync(mctx._connectInfo.ConnectionString);

@@ -3,7 +3,11 @@ using S031.MetaStack.Common.Logging;
 using S031.MetaStack.Core.Data;
 using System.Data.Common;
 using System.Data;
+using System.Linq;
 using S031.MetaStack.Core;
+using Microsoft.Extensions.DependencyInjection;
+using S031.MetaStack.Common;
+using S031.MetaStack.Core.App;
 
 namespace MetaStack.Test.Data
 {
@@ -11,10 +15,11 @@ namespace MetaStack.Test.Data
 	{
 		public DBProviderFactoryTest()
 		{
+			MetaStack.Test.Program.ConfigureTests();
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
 		}
 		[Fact]
-		void getFactoryTest()
+		void GetFactoryTest()
 		{
 			using (FileLog l = new FileLog("DBProviderFactoryTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -23,13 +28,14 @@ namespace MetaStack.Test.Data
 				int i = 0;
 				for (i = 0; i < 1000000; i++)
 				{
-					f = S031.MetaStack.Core.Data.DbProviderFactories.GetFactory("System.Data.SqlClient");
+					f = ObjectFactories.GetFactory<DbProviderFactory>("System.Data.SqlClient");
 				}
-				l.Debug($"SpeedTest 2 Finish {i} count result {f}");
+				l.Debug($"SpeedTest 1 Finish {i} count result {f}");
+				ApplicationContext.Services.AddFromAssembly<DbProviderFactory>(ServiceLifetime.Singleton,
+					(s, t) => t.CreateInstance2<DbProviderFactory>());
 				l.Debug("GetFactoryProviderNames:");
-				foreach (string s in S031.MetaStack.Core.Data.DbProviderFactories.GetFactoryProviderNames())
+				foreach (string s in ObjectFactories.GetFactoryNames<DbProviderFactory>())
 					l.Debug(s);
-				
 				//Retrieve the installed providers and factories.
 				DataTable table = System.Data.Common.DbProviderFactories.GetFactoryClasses();
 

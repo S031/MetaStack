@@ -9,13 +9,15 @@ using System.Linq;
 using S031.MetaStack.Core.Data;
 using System.Threading.Tasks;
 using System.Text;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MetaStack.Test.Data
 {
 	public class MdbContextTest
 	{
 		const string connection_name = "bankLocal";
-		readonly AppConfig _config = new AppConfig(System.IO.File.ReadAllText("config.json"));
+		readonly IConfiguration _configuration;
 		readonly string _cn;
 		readonly string _providerName;
 
@@ -23,10 +25,13 @@ namespace MetaStack.Test.Data
 		internal string connectionString => _cn;
 		public MdbContextTest()
 		{
+			MetaStack.Test.Program.ConfigureTests();
+
+			_configuration = ApplicationContext.GetServices().GetService<IConfiguration>();
+			var cs = _configuration.GetSection($"connectionStrings:{connection_name}").Get<ConnectInfo>();
+			_providerName = cs.ProviderName;
+			_cn = MdbContext.CreateConnectionString(_providerName, cs.ConnectionString);
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
-			_providerName = (string)_config["connectionStrings"][connection_name]["providerName"];
-			_cn = MdbContext.CreateConnectionString(_providerName,
-				(string)_config["connectionStrings"][connection_name]["connectionString"]);
 		}
 		[Fact]
 		void createContextTest()

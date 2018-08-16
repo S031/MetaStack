@@ -21,6 +21,7 @@ namespace MetaStack.Test.ORM
 	{
 		public ORMSchemaTest()
 		{
+			Program.ConfigureTests();
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
 		}
 
@@ -182,6 +183,15 @@ namespace MetaStack.Test.ORM
 				{
 					var l = ImplementsList.GetTypes(typeof(IDataReader)).ToArray();
 				}
+				//ImplementsList.Add(typeof(IDataReader));
+				//foreach (var s in ImplementsList.GetTypes(typeof(IDataReader)))
+				//	_logger.Debug(s.FullName);
+
+				//_logger.Debug("Start speed test for find implements IDataReader");
+				//for (int i = 0; i < 1000000; i++)
+				//{
+				//	var l = ImplementsList.GetTypes(typeof(IDataReader)).ToArray();
+				//}
 				_logger.Debug("Finish speed test");
 			}
 		}

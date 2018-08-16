@@ -9,16 +9,32 @@ namespace S031.MetaStack.Core.App
     public static class ApplicationContext
     {
 		static IServiceCollection _services;
+		static IServiceProvider _lastBuildServiceProvider = null;
+		static int _lastBuildHash = 0;
+		static readonly object obj4Lock = new object();
+
 		public static IHostBuilder UseApplicationContext(this IHostBuilder host)
 		{
 			host.ConfigureServices(services => _services = services);
 			return host;
 		}
+
+		public static IServiceCollection Services => _services;
+
 		public static IServiceProvider GetServices(ServiceProviderOptions options = default)
 		{
-			if (options == null)
-				return _services.BuildServiceProvider();
-			return _services.BuildServiceProvider(options);
+			int hash = new {ServiceCount = _services.Count, ValidateScopes = (options != null && options.ValidateScopes) }.GetHashCode();
+			if (hash == _lastBuildHash)
+				return _lastBuildServiceProvider;
+			lock (obj4Lock)
+			{
+				if (options == null)
+					_lastBuildServiceProvider = _services.BuildServiceProvider();
+				else
+					_lastBuildServiceProvider = _services.BuildServiceProvider(options);
+				_lastBuildHash = hash;
+			}
+			return _lastBuildServiceProvider;
 		}
     }
 }
