@@ -202,16 +202,19 @@ namespace S031.MetaStack.Core.Data
 					pName = (string)p;
 				else
 				{
-					bool replace = true;
-					Type t = p.GetType();
-					if (t.IsNumeric())
-						pValue = p.ToString();
-					else if (t == typeof(string))
-						pValue = "'" + p.ToString().Replace("'", "''") + "'";
-					else if (t != typeof(byte[]) && t.GetInterfaces().FirstOrDefault(type => type.Name == "IEnumerable`1") != null)
-						pValue = array2List(p);
-					else
-						replace = false;
+					bool replace = sql.IndexOf(pName) > -1;
+					if (replace)
+					{
+						Type t = p.GetType();
+						if (t.IsNumeric())
+							pValue = p.ToString();
+						else if (t == typeof(string))
+							pValue = "'" + p.ToString().Replace("'", "''") + "'";
+						else if (t != typeof(byte[]) && t.GetInterfaces().FirstOrDefault(type => type.Name == "IEnumerable`1") != null)
+							pValue = array2List(p);
+						else
+							replace = false;
+					}
 
 					if (replace)
 						sql = sql.Replace(pName, pValue);
