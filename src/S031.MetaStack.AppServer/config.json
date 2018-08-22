@@ -49,6 +49,9 @@
           "CacheSize": 100,
           "DateFolderMask": "yyyy-MM-dd",
           "LogLevel": "Debug"
+        },
+        "Parameters": {
+          "Port": 8001
         }
       }
     ]

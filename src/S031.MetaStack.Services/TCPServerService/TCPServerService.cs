@@ -116,7 +116,7 @@ namespace S031.MetaStack.Services
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
 			_token = stoppingToken;
-			_listener = TcpListener.Create(8001);
+			_listener = TcpListener.Create(_options.Parameters.GetValue<int>("Port", 8001));
 			_listener.Start();
 			_log.Debug($"{_nameof} successfully started");
 			await Listen();

@@ -19,13 +19,12 @@ namespace S031.MetaStack.WinForms.Json
 			JTokenType type = jsonValue.Type;
 			if (type == JTokenType.String)
 			{
-				bool val;
 				string source = ((string)jsonValue).ToLower();
 				if (source == "1" || source == "true")
 					return true;
 				else if (source == "0" || source == "false")
 					return false;
-				else if (bool.TryParse(source, out val))
+				else if (bool.TryParse(source, out bool val))
 					return val;
 				else
 					return false;

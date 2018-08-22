@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Security.Cryptography;
 
 namespace S031.MetaStack.Core.App
 {
@@ -11,14 +12,21 @@ namespace S031.MetaStack.Core.App
 		static IServiceCollection _services;
 		static IServiceProvider _lastBuildServiceProvider = null;
 		static int _lastBuildHash = 0;
+		static readonly RSA _rsa = RSA.Create();
 		static readonly object obj4Lock = new object();
 
 		public static IHostBuilder UseApplicationContext(this IHostBuilder host)
 		{
-			host.ConfigureServices(services => _services = services);
+			host.ConfigureServices(services => Configure(services));
 			return host;
 		}
 
+		private static IServiceCollection Configure(IServiceCollection services)
+		{
+			services.AddSingleton<RSA>(_rsa);
+			_services = services;
+			return services;
+		}
 		public static IServiceCollection Services => _services;
 
 		public static IServiceProvider GetServices(ServiceProviderOptions options = default)

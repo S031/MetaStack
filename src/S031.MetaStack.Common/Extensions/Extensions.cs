@@ -332,9 +332,15 @@ namespace S031.MetaStack.Common
 	{
 		public static object GetValue(this IDictionary<string, object> d, string key, object defaultValue = null)
 		{
-			if (d != null && d.ContainsKey(key))
-				return d[key];
+			if (d != null && d.TryGetValue(key, out object result))
+				return result;
 			return defaultValue;
+		}
+		public static T GetValue<T>(this IDictionary<string, object> d, string key, object defaultValue = null)
+		{
+			if (d != null && d.TryGetValue(key, out object result))
+				return result.ToString().To<T>();
+			return (T)defaultValue;
 		}
 	}
 

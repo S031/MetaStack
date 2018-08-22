@@ -8,6 +8,8 @@ namespace S031.MetaStack.Core.Services
     {
 		private string _assemblyName;
 		private string _typeName;
+		private readonly Dictionary<string, object> _parameters = new Dictionary<string, object>();
+
 		private const int _delay = 60000;
 
 		public HostedServiceOptions()
@@ -35,6 +37,8 @@ namespace S031.MetaStack.Core.Services
 		public string LogName { get; set; }
 
 		public Common.Logging.FileLogSettings LogSettings { get; set; }
+
+		public Dictionary<string, object> Parameters => _parameters;
 
 	}
 }
