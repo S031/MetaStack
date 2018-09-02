@@ -155,7 +155,11 @@ namespace S031.MetaStack.WinForms.Data
 			_br = new BinaryReader(_ms);
 			_bw = new BinaryWriter(_ms);
 			_headerSpaceSize = _br.ReadInt32();
+			if (_headerSpaceSize < 0)
+				throw new DataPackageMessageFormatException("Invalid header size");
 			_colCount = _br.ReadInt32();
+			if (_colCount <=0)
+				throw new DataPackageMessageFormatException("Invalid column count");
 			//Headers start
 			int headCount = _br.ReadInt32();
 			_headers = new Dictionary<string, object>();
@@ -176,6 +180,8 @@ namespace S031.MetaStack.WinForms.Data
 			for (int i = 0; i < _colCount; i++)
 			{
 				string name = _br.ReadString();
+				if (name.IsEmpty())
+					throw new DataPackageMessageFormatException($"Invalid column name for column index {i}");
 				_indexes.Add(name);
 				_colInfo.Add(ReadColumnInfo(_br));
 			}
@@ -752,13 +758,20 @@ namespace S031.MetaStack.WinForms.Data
 
 		static ColumnInfo ReadColumnInfo(BinaryReader br)
 		{
-			ColumnInfo ci = new ColumnInfo()
+			try
 			{
-				DataType = MdbTypeMap.GetType((MdbType)br.ReadByte()),
-				ColumnSize = br.ReadInt32(),
-				AllowDBNull = br.ReadBoolean()
-			};
-			return ci;
+				ColumnInfo ci = new ColumnInfo()
+				{
+					DataType = MdbTypeMap.GetType((MdbType)br.ReadByte()),
+					ColumnSize = br.ReadInt32(),
+					AllowDBNull = br.ReadBoolean()
+				};
+				return ci;
+			}
+			catch (Exception e)
+			{
+				throw new DataPackageMessageFormatException(e.Message);
+			}			
 		}
 
 		static byte[] ReadByteArray(BinaryReader br)
@@ -810,6 +823,8 @@ namespace S031.MetaStack.WinForms.Data
 						headers[key] = (bool)v;
 					else if (tp == typeof(string))
 						headers[key] = (string)v;
+					else if (tp == typeof(DateTime))
+						headers[key] = (DateTime)v;
 					else if (tp == typeof(Guid))
 						headers[key] = (Guid)v;
 					else if (tp == typeof(byte[]))
@@ -854,6 +869,8 @@ namespace S031.MetaStack.WinForms.Data
 							dr[colName] = (bool)v;
 						else if (tp == typeof(string))
 							dr[colName] = (string)v;
+						else if (tp == typeof(DateTime))
+							dr[colName] = (DateTime)v;
 						else if (tp == typeof(Guid))
 							dr[colName] = (Guid)v;
 						else if (tp == typeof(byte[]))
@@ -943,4 +960,10 @@ namespace S031.MetaStack.WinForms.Data
 			return ts;
 		}
 	}
+	public class DataPackageMessageFormatException: Exception
+	{
+		public DataPackageMessageFormatException() : base() { }
+		public DataPackageMessageFormatException(string message) : base(message) { }
+	}
+
 }

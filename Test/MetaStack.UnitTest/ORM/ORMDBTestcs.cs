@@ -160,7 +160,7 @@ namespace MetaStack.UnitTest.ORM
 		{
 			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
-				using (MdbContext mdb = new MdbContext(_cn, _logger))
+				using (MdbContext mdb = new MdbContext(_cn))
 				{
 					string s1 = mdb.Execute<string>("SysCat.Get_TableSchema_xml",
 						new MdbParameter("@table_name", "dbo.OrderDetails"));

@@ -40,11 +40,11 @@ namespace S031.MetaStack.Core.ORM
 			if (_counter == 0)
 				ImplementsList.Add(typeof(ISchemaDBSync));
 
-			_syncronizer = getSyncronizer(dbProviderName);
+			_syncronizer = GetSyncronizer(dbProviderName);
 			_syncronizer.SchemaProvider = this;
 			if (_counter == 0)
 			{
-				using (var mdb = new MdbContext(_cn, _logger))
+				using (var mdb = new MdbContext(_cn))
 				{
 					if (!_syncronizer.TestSysCatAsync(mdb).GetAwaiter().GetResult())
 						_syncronizer.CreateDbSchemaAsync(mdb).GetAwaiter().GetResult();
@@ -54,7 +54,7 @@ namespace S031.MetaStack.Core.ORM
 			}
 		}
 
-		private static ISchemaDBSync getSyncronizer(string dbProviderName)
+		private static ISchemaDBSync GetSyncronizer(string dbProviderName)
 		{
 			var l = ImplementsList.GetTypes(typeof(ISchemaDBSync));
 			if (l == null)
@@ -83,7 +83,7 @@ namespace S031.MetaStack.Core.ORM
 				schema.SchemaProvider = this;
 				return schema;
 			}
-			using (var mdb = await MdbContext.CreateMdbContextAsync(_cn, _logger).ConfigureAwait(false))
+			using (var mdb = await MdbContext.CreateMdbContextAsync(_cn).ConfigureAwait(false))
 			{
 				schema = await _syncronizer.GetSchemaAsync(mdb, name.AreaName, name.ObjectName).ConfigureAwait(false);
 				lock (objLock)
@@ -102,7 +102,7 @@ namespace S031.MetaStack.Core.ORM
 
 		public async Task<JMXSchema> SaveSchemaAsync(JMXSchema schema)
 		{
-			using (var mdb = await MdbContext.CreateMdbContextAsync(_cn, _logger).ConfigureAwait(false))
+			using (var mdb = await MdbContext.CreateMdbContextAsync(_cn).ConfigureAwait(false))
 			{
 				await _syncronizer.SaveSchemaAsync(mdb, schema).ConfigureAwait(false);
 			}
@@ -132,7 +132,7 @@ namespace S031.MetaStack.Core.ORM
 
 		public async Task ClearCatalogAsync()
 		{
-			using (var mdb = await MdbContext.CreateMdbContextAsync(_cn, _logger).ConfigureAwait(false))
+			using (var mdb = await MdbContext.CreateMdbContextAsync(_cn).ConfigureAwait(false))
 			{
 				await _syncronizer.DropDbSchemaAsync(mdb).ConfigureAwait(false);
 			}
@@ -141,7 +141,7 @@ namespace S031.MetaStack.Core.ORM
 		public async Task<JMXSchema> SyncSchemaAsync(string objectName)
 		{
 			JMXObjectName name = objectName;
-			using (var mdb = await MdbContext.CreateMdbContextAsync(_cn, _logger).ConfigureAwait(false))
+			using (var mdb = await MdbContext.CreateMdbContextAsync(_cn).ConfigureAwait(false))
 			{
 				var schema = await _syncronizer.SyncSchemaAsync(mdb, name.AreaName, name.ObjectName).ConfigureAwait(false);
 				lock (objLock)
@@ -158,7 +158,7 @@ namespace S031.MetaStack.Core.ORM
 		public async Task DropSchemaAsync(string objectName)
 		{
 			JMXObjectName name = objectName;
-			using (var mdb = await MdbContext.CreateMdbContextAsync(_cn, _logger).ConfigureAwait(false))
+			using (var mdb = await MdbContext.CreateMdbContextAsync(_cn).ConfigureAwait(false))
 			{
 				await _syncronizer.DropSchemaAsync(mdb, name.AreaName, name.ObjectName).ConfigureAwait(false);
 			}

@@ -166,5 +166,7 @@ namespace S031.MetaStack.WinForms
 				this.InterfaceParameters.OutputParameters().Select(pi => pi.ParameterID).ToArray());
 		}
 		public ActionWebAuthenticationType WebAuthentication { get; set; }
+		bool AuthenticationRequired { get; set; }
+		bool AuthorizationRequired { get; set; }
 	}
 }
