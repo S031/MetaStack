@@ -101,6 +101,7 @@ namespace S031.MetaStack.Core.ORM
 		private static string _sqlVersion = string.Empty;
 
 		public IJMXSchemaProvider SchemaProvider { get; set; }
+		public ILogger Logger { get; set; }
 
 		public async Task<bool> TestSysCatAsync(MdbContext mdb)
 		{
@@ -116,7 +117,7 @@ namespace S031.MetaStack.Core.ORM
 
 		public async Task CreateDbSchemaAsync(MdbContext mdb)
 		{
-			var log = mdb.Logger;
+			var log = this.Logger;
 			if (!await TestSysCatAsync(mdb))
 			{
 				try
@@ -156,7 +157,7 @@ namespace S031.MetaStack.Core.ORM
 
 		public async Task DropDbSchemaAsync(MdbContext mdb)
 		{
-			var log = mdb.Logger;
+			var log = this.Logger;
 			var test = await mdb.ExecuteAsync<string>(SqlServer.TestSchema);
 			if (!test.IsEmpty())
 			{
@@ -396,7 +397,7 @@ namespace S031.MetaStack.Core.ORM
 				{
 					foreach (var sql in sqlList)
 					{
-						mdb.Logger.Debug(sql);
+						this.Logger.Debug(sql);
 						await mdb.ExecuteAsync(sql);
 					}
 					await mdb.ExecuteAsync(SqlServer.DelSysSchemas,
@@ -504,7 +505,7 @@ namespace S031.MetaStack.Core.ORM
 			{
 				foreach (var sql in sqlList)
 				{
-					mdb.Logger.Debug(sql);
+					this.Logger.Debug(sql);
 					await mdb.ExecuteAsync(sql);
 				}
 				//if (!createNew)

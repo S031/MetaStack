@@ -41,8 +41,6 @@ namespace S031.MetaStack.Core.Data
 		private DbConnection _connection;
 		private DbTransaction _transaction;
 		private int _transactionLevel = 0;
-		private ILogger _logger;
-		private readonly bool _isLocalLog;
 		private ConnectInfo _connectInfo;
 
 		private static readonly ConcurrentDictionary<string, ConnectInfo> _csCache = new ConcurrentDictionary<string, ConnectInfo>();
@@ -58,15 +56,9 @@ namespace S031.MetaStack.Core.Data
 		/// <returns></returns>
 		public static string CreateConnectionString(string providerName, string connectionString) =>
 			$"{_providerNameField}={providerName};{connectionString}";
-		/// <summary>
-		/// Create new <see cref="S031.MetaStack.Core.Data.MdbContext"/> with specified connection string
-		/// </summary>
-		/// <param name="connectionString">connection string with Provider Name item if you don't use default </param>
-		public MdbContext(string connectionString) : this(connectionString, new Logging.FileLogger(typeof(MdbContext).FullName))
-		{
-			_isLocalLog = true;
-		}
+
 		private MdbContext() { }
+
 		internal static ConnectInfo getConnectionInfo(string connectionString)
 		{
 			if (!_csCache.TryGetValue(connectionString, out ConnectInfo connectInfo))
@@ -98,36 +90,17 @@ namespace S031.MetaStack.Core.Data
 		/// Create new <see cref="S031.MetaStack.Core.Data.MdbContext"/> with specified connection string and logger
 		/// </summary>
 		/// <param name="connectionString">connection string with Provider Name item if you don't use default</param>
-		/// <param name="logger"><see cref="ILogger"/></param>
-		public MdbContext(string connectionString, ILogger logger)
+		public MdbContext(string connectionString)
 		{
 			connectionString.NullTest(nameof(connectionString));
-			logger.NullTest(nameof(logger));
-			_logger = logger;
 			_connectInfo = getConnectionInfo(connectionString);
 			_factory = ObjectFactories.GetFactory<DbProviderFactory>(_connectInfo.ProviderName);
-			try
-			{
-				_connection = _factory.CreateConnection(_connectInfo.ConnectionString);
-			}
-			catch (Exception e)
-			{
-				_logger.LogError(e.Message);
-				throw e;
-			}
+			_connection = _factory.CreateConnection(_connectInfo.ConnectionString);
 		}
 		public string ProviderName => _connectInfo.ProviderName;
 		public string DbName => _connectInfo.DbName;
 		public DbProviderFactory Factory => _factory;
 		public DbConnection Connection => _connection;
-		/// <summary>
-		/// <see cref="ILogger"/>
-		/// </summary>
-		public ILogger Logger
-		{
-			get { return _logger; }
-			set { _logger = value; }
-		}
 		/// <summary>
 		/// Run <see cref="DbCommand.ExecuteReader()"/> and returns the data in the format <see cref="DataPackage"/>
 		/// </summary>
@@ -362,8 +335,6 @@ namespace S031.MetaStack.Core.Data
 			if (_connection != null && _connection.State == ConnectionState.Open)
 				_connection.Close();
 			_connection.Dispose();
-			if (_isLocalLog)
-				(_logger as IDisposable)?.Dispose();
 		}
 		#region async_methods
 		/// <summary>
@@ -372,27 +343,16 @@ namespace S031.MetaStack.Core.Data
 		/// <param name="connectionString">connection string with Provider Name item if you don't use default </param>
 		/// <param name="logger"><see cref="ILogger"/></param>
 		/// <returns></returns>
-		public static async Task<MdbContext> CreateMdbContextAsync(string connectionString, ILogger logger)
+		public static async Task<MdbContext> CreateMdbContextAsync(string connectionString)
 		{
 			//Не рекомендуется в async методе выбрасывать исключения при проверке аргументов.
 			connectionString.NullTest(nameof(connectionString));
-			logger.NullTest(nameof(logger));
-			//
 			MdbContext mctx = new MdbContext
 			{
-				Logger = logger,
 				_connectInfo = getConnectionInfo(connectionString)
 			};
 			mctx._factory = ObjectFactories.GetFactory<DbProviderFactory>(mctx._connectInfo.ProviderName);
-			try
-			{
-				mctx._connection = await mctx._factory.CreateConnectionAsync(mctx._connectInfo.ConnectionString);
-			}
-			catch (Exception e)
-			{
-				mctx.Logger.LogError(e.Message);
-				throw;
-			}
+			mctx._connection = await mctx._factory.CreateConnectionAsync(mctx._connectInfo.ConnectionString);
 			return mctx;
 		}
 		/// <summary>

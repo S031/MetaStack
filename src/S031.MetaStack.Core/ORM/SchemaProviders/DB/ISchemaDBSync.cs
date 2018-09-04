@@ -1,4 +1,5 @@
-﻿using S031.MetaStack.Core.Data;
+﻿using Microsoft.Extensions.Logging;
+using S031.MetaStack.Core.Data;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,6 +10,7 @@ namespace S031.MetaStack.Core.ORM
 	public interface ISchemaDBSync
 	{
 		IJMXSchemaProvider SchemaProvider { get; set; }
+		ILogger Logger { get; set; }
 		string MapServerType(MdbType t);
 		Task<bool> TestSysCatAsync(MdbContext mdb);
 		Task<string> GetDefaultDbSchemaAsync(MdbContext mdb);

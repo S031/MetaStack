@@ -51,7 +51,8 @@
           "LogLevel": "Debug"
         },
         "Parameters": {
-          "Port": 8001
+          "Port": 8001,
+          "MaxReceivedMessageSize": 16384
         }
       }
     ]

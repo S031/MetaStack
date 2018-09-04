@@ -23,6 +23,7 @@ namespace S031.MetaStack.Services
 		private TcpListener _listener;
 		private CancellationToken _token;
 		private ILogger _log;
+		private long _maxReceivedMessageSize = 1048576;
 		private readonly HostedServiceOptions _options;
 		private static readonly string _nameof = typeof(TCPServerService).FullName;
 
@@ -36,7 +37,7 @@ namespace S031.MetaStack.Services
 				.ConfigureAwait(false);
 			}
 		}
-		static async Task Accept(Task<TcpClient> task)
+		async Task Accept(Task<TcpClient> task)
 		{
 			using (var client = task.Result)
 			using (var stream = client.GetStream())
@@ -44,13 +45,25 @@ namespace S031.MetaStack.Services
 				var buffer = new byte[4];
 				while (client.Connected)
 				{
-					buffer = await GetByteArrayFromStreamAsync(stream, 4);
-					var streamSize = BitConverter.ToInt32(buffer, 0);
-					if (streamSize == 0)
-						break;
-					var res = await GetByteArrayFromStreamAsync(stream, streamSize);
+					byte[] response;
+					int streamSize;
+					try
+					{
+						buffer = await GetByteArrayFromStreamAsync(stream, 4);
+						streamSize = BitConverter.ToInt32(buffer, 0);
+						if (streamSize == 0)
+							break;
+						else if (streamSize > _maxReceivedMessageSize)
+							throw new InvalidOperationException(
+								$"The size of the incoming message is greater than the one specified in the settings({_maxReceivedMessageSize})");
+						var res = await GetByteArrayFromStreamAsync(stream, streamSize);
 
-					var response = (await ProcessMessage(new DataPackage(res))).ToArray();
+						response = (await ProcessMessage(new DataPackage(res))).ToArray();
+					}
+					catch (Exception ex)
+					{
+						response = DataPackage.CreateErrorPackage(ex).ToArray();
+					}
 					streamSize = response.Length;
 					await stream.WriteAsync(BitConverter.GetBytes(streamSize), 0, 4);
 					await stream.WriteAsync(response, 0, streamSize);
@@ -118,6 +131,7 @@ namespace S031.MetaStack.Services
 		{
 			_token = stoppingToken;
 			_listener = TcpListener.Create(_options.Parameters.GetValue<int>("Port", 8001));
+			_maxReceivedMessageSize = _options.Parameters.GetValue<int>("MaxReceivedMessageSize", 1048576);
 			_listener.Start();
 			_log.Debug($"{_nameof} successfully started");
 			await Listen();
