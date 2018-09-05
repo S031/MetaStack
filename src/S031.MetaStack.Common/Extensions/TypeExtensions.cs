@@ -117,5 +117,11 @@ namespace S031.MetaStack.Common
 				foreach (Type t in a.GetTypes().Where(t => type.IsAssignableFrom(t) && !type.Equals(t)))
 					yield return t;
 		}
+		public static string GetWorkName(this Assembly assembly)
+		{
+			assembly.NullTest(nameof(assembly));
+			string fullName = assembly.FullName;
+			return fullName.Left(fullName.IndexOf(','));
+		}
 	}
 }

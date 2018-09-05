@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Security.Cryptography;
+using System.Threading;
 
 namespace S031.MetaStack.Core.App
 {
@@ -14,6 +15,7 @@ namespace S031.MetaStack.Core.App
 		static int _lastBuildHash = 0;
 		static readonly RSA _rsa = RSA.Create();
 		static readonly object obj4Lock = new object();
+		static readonly CancellationTokenSource _cts = new CancellationTokenSource();
 
 		public static IHostBuilder UseApplicationContext(this IHostBuilder host)
 		{
@@ -24,6 +26,7 @@ namespace S031.MetaStack.Core.App
 		private static IServiceCollection Configure(IServiceCollection services)
 		{
 			services.AddSingleton<RSA>(_rsa);
+			services.AddSingleton<CancellationTokenSource>(_cts);
 			_services = services;
 			return services;
 		}
@@ -44,5 +47,7 @@ namespace S031.MetaStack.Core.App
 			}
 			return _lastBuildServiceProvider;
 		}
+
+		public static CancellationToken CancellationToken => _cts.Token;
     }
 }

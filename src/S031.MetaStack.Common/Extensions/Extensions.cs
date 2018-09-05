@@ -112,12 +112,14 @@ namespace S031.MetaStack.Common
 			}
 
 		}
-		public static byte[] ToByteArray(this string str)
+		public static byte[] ToByteArray(this string str, System.Text.Encoding encoding = null)
 		{
 			str.NullTest(nameof(str));
 			if (IsBase64String(str))
 				return Convert.FromBase64String(str);
-			return System.Text.Encoding.ASCII.GetBytes(str);
+			else if (encoding != null)
+				return encoding.GetBytes(str);
+			return System.Text.Encoding.Default.GetBytes(str);
 		}
 
 		public static string TruncDub(this string str, string dublicatedChars)

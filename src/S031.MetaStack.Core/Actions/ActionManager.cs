@@ -7,13 +7,15 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
+using S031.MetaStack.Common;
 
 namespace S031.MetaStack.Core.Actions
 {
 	public class ActionManager:IDisposable
 	{
 		private static readonly object obj4Lock = new object();
-		private static readonly Dictionary<string, ActionInfo> actions = new Dictionary<string, ActionInfo>();
+		//private static readonly Dictionary<string, ActionInfo> actions = new Dictionary<string, ActionInfo>();
 		private MdbContext _mdbContext;
 
 		ActionManager() { }
@@ -36,11 +38,20 @@ namespace S031.MetaStack.Core.Actions
 			return actionManager;
 		}
 
-		internal static Dictionary<string, ActionInfo> Actions => actions;
+		internal static Dictionary<string, ActionInfo> Actions => _actions;
 
 		public void Dispose()
 		{
 			_mdbContext.Dispose();
 		}
+
+		private static readonly Dictionary<string, ActionInfo> _actions = new Dictionary<string, ActionInfo>()
+		{
+			{"Sys.LoginRequest", new ActionInfo(){
+				ActionID = "Sys.LoginRequest",
+				AssemblyID = Assembly.GetExecutingAssembly().GetWorkName(),
+				}
+			}
+		};
 	}
 }

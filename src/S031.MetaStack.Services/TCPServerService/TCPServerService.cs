@@ -19,7 +19,6 @@ namespace S031.MetaStack.Services
 {
 	public class TCPServerService : BackgroundService
 	{
-		private int _maxReceivedMessageSize = 16777216;
 		private TcpListener _listener;
 		private CancellationToken _token;
 		private ILogger _log;

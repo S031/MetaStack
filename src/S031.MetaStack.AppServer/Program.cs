@@ -21,7 +21,6 @@ namespace S031.MetaStack.AppServer
 
 			var logSettings = configuration.GetSection("ApplicationLogSettings").Get<Common.Logging.FileLogSettings>();
 			using (var logger = new FileLogger($"S031.MetaStack.AppServer.{Environment.MachineName}", logSettings))
-			using (var cts = new CancellationTokenSource())
 			using (var host = new HostBuilder()
 				.UseConsoleLifetime()
 				.ConfigureServices((context, services) => services
@@ -32,10 +31,7 @@ namespace S031.MetaStack.AppServer
 				.UseApplicationContext()
 				.Build())
 			{
-				using (var r = cts.Token.Register(ShutdownApp))
-				{
-					await host.RunAsync(cts.Token);
-				}
+				await host.RunAsync(ApplicationContext.CancellationToken);
 			}
 		}
 		static void ShutdownApp()

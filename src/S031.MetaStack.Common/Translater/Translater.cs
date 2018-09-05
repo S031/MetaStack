@@ -55,7 +55,7 @@ namespace S031.MetaStack.Common
 		{
 			Assembly asm = typeof(Translater).Assembly;
 			return new System.IO.StreamReader(asm.GetManifestResourceStream(
-					$"{asm.FullName.Split(',')[0] }.Translater.{lang}.txt")).ReadToEnd();
+					$"{asm.GetWorkName() }.Translater.{lang}.txt")).ReadToEnd();
 		}
 
 		public static string GetString(string index) => _languages[_current][index];
