@@ -10,6 +10,10 @@ namespace MetaStack.Test.Security
 {
 	public class CryptographyTest
 	{
+		public CryptographyTest()
+		{
+			MetaStack.Test.Program.ConfigureTests();
+		}
 		[Fact]
 		void RSATest()
 		{
@@ -35,5 +39,11 @@ namespace MetaStack.Test.Security
 
 			return Convert.ToBase64String(lRSA.Encrypt(Encoding.UTF8.GetBytes(pInputString), RSAEncryptionPadding.OaepSHA256));
 		}
+		[Fact]
+		void ImpersonateTest()
+		{
+			Impersonator.Execute("Sergey", "@9d4a-75087R", () => Assert.False(false));
+		}
+
 	}
 }

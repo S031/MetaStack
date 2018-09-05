@@ -33,6 +33,13 @@ namespace S031.MetaStack.Core.Security
 				LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT,
 				out safeAccessTokenHandle);
 
+			if (!returnValue)
+			{
+				int ret = Marshal.GetLastWin32Error();
+				Console.WriteLine("LogonUser failed with error code : {0}", ret);
+				throw new System.ComponentModel.Win32Exception(ret);
+			}
+
 			// Note: if you want to run as unimpersonated, pass
 			//       'SafeAccessTokenHandle.InvalidHandle' instead of variable 'safeAccessTokenHandle'
 			WindowsIdentity.RunImpersonated(
