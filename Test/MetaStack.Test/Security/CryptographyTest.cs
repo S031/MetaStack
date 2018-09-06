@@ -1,9 +1,11 @@
 ﻿using S031.MetaStack.Common;
+using S031.MetaStack.Core.App;
 using S031.MetaStack.Core.Security;
 using System;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace MetaStack.Test.Security
@@ -42,7 +44,15 @@ namespace MetaStack.Test.Security
 		[Fact]
 		void ImpersonateTest()
 		{
-			Impersonator.Execute("Sergey", "@9d4a-75087R", () => Assert.False(false));
+			Impersonator.Execute("Test", "test", () => Assert.False(false));
+		}
+
+		[Fact]
+		void LogonTest()
+		{
+
+			var loginFactory = ApplicationContext.GetServices().GetService<ILoginFactory>().LoginRequest(userName, publicKey);
+
 		}
 
 	}

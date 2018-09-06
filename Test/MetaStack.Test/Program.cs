@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using S031.MetaStack.Core.App;
+using S031.MetaStack.Core.Security;
 using S031.MetaStack.Core.Logging;
 using System;
 using System.Collections.Generic;
@@ -25,7 +26,8 @@ namespace MetaStack.Test
 			_host = new HostBuilder()
 				.UseConsoleLifetime()
 				.ConfigureServices((context, services) => services
-					.AddSingleton<IConfiguration>(configuration))
+					.AddSingleton<IConfiguration>(configuration)
+					.AddSingleton<ILoginFactory>(new BasicLoginFactory()))
 				.UseApplicationContext()
 				.Build();
 		}
