@@ -97,6 +97,8 @@ namespace S031.MetaStack.Common
 				return str.ToDateOrDefault();
 			else if (type == typeof(TimeSpan))
 				return str.ToTimeSpan();
+			else if (type == typeof(Guid))
+				return new Guid(str);
 			else if (type.IsNumeric(NumericTypesScope.Integral))
 				return str.ToIntOrDefault();
 			else if (type.IsNumeric(NumericTypesScope.Long))
