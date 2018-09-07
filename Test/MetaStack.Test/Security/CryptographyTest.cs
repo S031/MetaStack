@@ -27,24 +27,32 @@ namespace MetaStack.Test.Security
 			var data = "Данные для шифрования";
 
 			var rsaServer = RSA.Create();
-			var toSendPK = rsaServer.ExportParameters(false).Export();
+			var toSendPK = rsaServer.Export();
 
 			var encryptedData = Encrypt(toSendPK, Encoding.UTF8.GetBytes(data));
 
 			var decryptedData = rsaServer.Decrypt(Convert.FromBase64String(encryptedData), _padding);
 			Assert.Equal(data, Encoding.UTF8.GetString(decryptedData));
 		}
+		[Fact]
+		void AesTest()
+		{
+			Guid data = Guid.NewGuid();
+			var aesServer = Aes.Create();
+			var key = aesServer.ExportBin();
+
+			var encryptedData = aesServer.EncryptBin(data.ToByteArray());
+			Assert.Equal(data, new Guid(Aes.Create().ImportBin(key).DecryptBin(encryptedData)));
+		}
 
 		private string Encrypt(string pPublicKey, byte[] pInput)
 		{
-			//Create a new instance of the RSACryptoServiceProvider class.
-			var lRSA = RSA.Create();
-
-			//Import key parameters into RSA.
-			lRSA.ImportParameters(new RSAParameters().Import(pPublicKey));
-
-			return Convert.ToBase64String(lRSA.Encrypt(pInput, _padding));
+			return Convert.ToBase64String(
+				RSA.Create()
+				.Import(pPublicKey)
+				.Encrypt(pInput, _padding));
 		}
+
 		[Fact]
 		void ImpersonateTest()
 		{
@@ -63,20 +71,24 @@ namespace MetaStack.Test.Security
 				//var serverPK = serverRSA.ExportParameters(false).Export();
 
 				var clientRSA = RSA.Create();
-				var clientPK = clientRSA.ExportParameters(false).Export();
+				var clientPK = clientRSA.Export();
 				var loginFactory = svcProv.GetService<ILoginFactory>();
 				var serverPK = loginFactory.LoginRequest(userName, clientPK);
 
 				var serverRSA = RSA.Create();
-				serverRSA.ImportParameters(new RSAParameters().Import(serverPK));
+				serverRSA.Import(serverPK);
 				string token = loginFactory.Logon(userName,
 					Convert.ToBase64String(serverRSA.Encrypt(Encoding.UTF8.GetBytes(secret), _padding)));
 				Guid sessionID = new Guid(clientRSA.Decrypt(token.ToByteArray(), _padding));
 				Assert.NotEqual(sessionID, Guid.Empty);
 
 				l.Debug("Start performance test for 1000 logins");
-				for (int i = 1; i < 1000; i++)
+				var data = Aes.Create().ExportBin();
+				for (int i = 1; i < 10000; i++)
+				{
+					Aes.Create().ImportBin(data).EncryptBin(sessionID.ToByteArray());
 					token = loginFactory.Logon(userName, sessionID.ToString());
+				}
 				//token = loginFactory.Logon(userName,
 				//	Convert.ToBase64String(serverRSA.Encrypt(sessionID.ToByteArray(), _padding)));				
 				l.Debug("End performance test for 1000 logins");
@@ -86,7 +98,7 @@ namespace MetaStack.Test.Security
 		RSA CreateFromPK(string publicKeyBase64String)
 		{
 			var rsa = RSA.Create();
-			rsa.ImportParameters(new RSAParameters().Import(publicKeyBase64String));
+			rsa.Import(publicKeyBase64String);
 			return rsa;
 		}
 	}

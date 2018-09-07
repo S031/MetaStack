@@ -13,7 +13,6 @@ namespace S031.MetaStack.Core.App
 		static IServiceCollection _services;
 		static IServiceProvider _lastBuildServiceProvider = null;
 		static int _lastBuildHash = 0;
-		static readonly RSA _rsa = RSA.Create();
 		static readonly object obj4Lock = new object();
 		static readonly CancellationTokenSource _cts = new CancellationTokenSource();
 
@@ -25,7 +24,6 @@ namespace S031.MetaStack.Core.App
 
 		private static IServiceCollection Configure(IServiceCollection services)
 		{
-			services.AddSingleton<RSA>(_rsa);
 			services.AddSingleton<CancellationTokenSource>(_cts);
 			_services = services;
 			return services;

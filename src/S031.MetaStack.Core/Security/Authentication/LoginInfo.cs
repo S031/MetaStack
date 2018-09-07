@@ -15,5 +15,9 @@ namespace S031.MetaStack.Core.Security
 		public Guid SessionID { get; }
 		public DateTime LastTime { get; set; }
 		public string PublicKeyData { get; }
+		public byte[] RsaModulus { get; }
+		public byte[] RsaExponent { get; }
+		public byte[] AesKey { get; set; }
+		public byte[] AesIV { get; set; }
 	}
 }

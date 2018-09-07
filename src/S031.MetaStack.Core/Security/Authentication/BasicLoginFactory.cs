@@ -19,22 +19,12 @@ namespace S031.MetaStack.Core.Security
 		static readonly object obj4Lock = new object();
 		static readonly object obj4LockUser = new object();
 		static DateTime _lastCheckLogedTime = DateTime.Now;
-		//static readonly Timer _timer = new Timer(Tick, null, expirePeriod, expirePeriod);
+		static readonly Timer _timer = new Timer(Tick, null, expirePeriod, expirePeriod);
 
 		static readonly Dictionary<string, LoginInfo> _notLogedUsers = new Dictionary<string, LoginInfo>();
 		static readonly Dictionary<string, Dictionary<Guid, LoginInfo>> _logedUsers = new Dictionary<string, Dictionary<Guid, LoginInfo>>();
 
-		private RSA _serverRSA = null;
-
-		private RSA GetRSA()
-		{
-			if (_serverRSA == null)
-				_serverRSA = App.ApplicationContext
-				.GetServices()
-				.GetService<RSA>();
-			return _serverRSA;
-		}
-
+		private static readonly RSA _serverRSA = RSA.Create();
 
 		public BasicLoginFactory()
 		{
@@ -70,12 +60,14 @@ namespace S031.MetaStack.Core.Security
 				if (userExists)
 					throw new AuthenticationExceptions("Timeout expired");
 			}
+			var aes = Aes.Create();
+			var loginInfo = new LoginInfo(clientPublicKey);
+			aes.Key.CopyTo(loginInfo.AesKey, 0);
+			aes.IV.CopyTo(loginInfo.AesIV, 0);
 			lock (obj4Lock)
-				_notLogedUsers.Add(userName, new LoginInfo(clientPublicKey));
+				_notLogedUsers.Add(userName, loginInfo);
 
-			return GetRSA()
-				.ExportParameters(false)
-				.Export();
+			return _serverRSA.Export();
 		}
 		
 		/// <summary>
@@ -140,7 +132,7 @@ namespace S031.MetaStack.Core.Security
 		private static string Encrypt(string publicKeyData, byte[] data)
 		{
 			var rsa = RSA.Create();
-			rsa.ImportParameters(new RSAParameters().Import(publicKeyData));
+			rsa.Import(publicKeyData);
 			return rsa.Encrypt(data, _padding).ToBASE64String();
 		}
 
@@ -148,7 +140,7 @@ namespace S031.MetaStack.Core.Security
 		{
 			try
 			{
-				return GetRSA().Decrypt(encryptedData.ToByteArray(), _padding);
+				return _serverRSA.Decrypt(encryptedData.ToByteArray(), _padding);
 			}
 			catch { return null; }
 		}
