@@ -73,24 +73,24 @@ namespace MetaStack.Test.Security
 				var clientRSA = RSA.Create();
 				var clientPK = clientRSA.Export();
 				var loginFactory = svcProv.GetService<ILoginFactory>();
-				var serverPK = loginFactory.LoginRequest(userName, clientPK);
+				//var serverPK = loginFactory.LoginRequest(userName, clientPK);
 
-				var serverRSA = RSA.Create();
-				serverRSA.Import(serverPK);
-				string token = loginFactory.Logon(userName,
-					Convert.ToBase64String(serverRSA.Encrypt(Encoding.UTF8.GetBytes(secret), _padding)));
-				Guid sessionID = new Guid(clientRSA.Decrypt(token.ToByteArray(), _padding));
-				Assert.NotEqual(sessionID, Guid.Empty);
+				//var serverRSA = RSA.Create();
+				//serverRSA.Import(serverPK);
+				//string token = loginFactory.Logon(userName,
+				//	Convert.ToBase64String(serverRSA.Encrypt(Encoding.UTF8.GetBytes(secret), _padding)));
+				//Guid sessionID = new Guid(clientRSA.Decrypt(token.ToByteArray(), _padding));
+				//Assert.NotEqual(sessionID, Guid.Empty);
 
-				l.Debug("Start performance test for 1000 logins");
-				var data = Aes.Create().ExportBin();
-				for (int i = 1; i < 10000; i++)
-				{
-					Aes.Create().ImportBin(data).EncryptBin(sessionID.ToByteArray());
-					token = loginFactory.Logon(userName, sessionID.ToString());
-				}
-				//token = loginFactory.Logon(userName,
-				//	Convert.ToBase64String(serverRSA.Encrypt(sessionID.ToByteArray(), _padding)));				
+				//l.Debug("Start performance test for 1000 logins");
+				//var data = Aes.Create().ExportBin();
+				//for (int i = 1; i < 100000; i++)
+				//{
+				//	Aes.Create().ImportBin(data).EncryptBin(sessionID.ToByteArray());
+				//	token = loginFactory.Logon(userName, sessionID.ToString());
+				//}
+				////token = loginFactory.Logon(userName,
+				////	Convert.ToBase64String(serverRSA.Encrypt(sessionID.ToByteArray(), _padding)));				
 				l.Debug("End performance test for 1000 logins");
 			}
 		}

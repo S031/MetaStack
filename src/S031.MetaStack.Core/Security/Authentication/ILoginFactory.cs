@@ -7,7 +7,7 @@ namespace S031.MetaStack.Core.Security
 	public interface ILoginFactory
 	{
 		string LoginRequest(string userName, string clientPublicKey);
-		string Logon(string userName, string encryptedKey);
+		string Logon(string userName, string sessionID, string encryptedKey);
 		void Logout(string userName, string encryptedKey);
 	}
 }

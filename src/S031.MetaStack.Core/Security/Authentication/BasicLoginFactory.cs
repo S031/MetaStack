@@ -13,7 +13,7 @@ namespace S031.MetaStack.Core.Security
 	{
 		const int expirePeriod = 3000;
 		const int expirePeriod4Loged = 7200000;
-		const int maxUserSessions = 10;
+		const int maxUserSessions = 64;
 
 		static readonly RSAEncryptionPadding _padding = RSAEncryptionPadding.OaepSHA256;
 		static readonly object obj4Lock = new object();
@@ -23,8 +23,6 @@ namespace S031.MetaStack.Core.Security
 
 		static readonly Dictionary<string, LoginInfo> _notLogedUsers = new Dictionary<string, LoginInfo>();
 		static readonly Dictionary<string, Dictionary<Guid, LoginInfo>> _logedUsers = new Dictionary<string, Dictionary<Guid, LoginInfo>>();
-
-		private static readonly RSA _serverRSA = RSA.Create();
 
 		public BasicLoginFactory()
 		{
@@ -38,16 +36,6 @@ namespace S031.MetaStack.Core.Security
 		/// <returns></returns>
 		public string LoginRequest(string userName, string clientPublicKey)
 		{
-			if (_logedUsers.ContainsKey(userName))
-			{
-				//Find old sessions for this client
-				var session = _logedUsers[userName]
-					.FirstOrDefault(kvp => kvp.Value.PublicKeyData == clientPublicKey);
-				if (!session.IsEmpty())
-					lock (obj4Lock)
-						_logedUsers[userName].Remove(session.Key);
-			}
-
 			bool userExists = _notLogedUsers.ContainsKey(userName);
 			if (userExists)
 			{
@@ -60,61 +48,70 @@ namespace S031.MetaStack.Core.Security
 				if (userExists)
 					throw new AuthenticationExceptions("Timeout expired");
 			}
-			var aes = Aes.Create();
-			var loginInfo = new LoginInfo(clientPublicKey);
-			aes.Key.CopyTo(loginInfo.AesKey, 0);
-			aes.IV.CopyTo(loginInfo.AesIV, 0);
+			var loginInfo = new LoginInfo();
 			lock (obj4Lock)
 				_notLogedUsers.Add(userName, loginInfo);
 
-			return _serverRSA.Export();
+			return RSA.Create()
+				.Import(clientPublicKey)
+				.Encrypt(loginInfo.Export(), _padding)
+				.ToBASE64String();
 		}
 		
 		/// <summary>
-		/// !!! Add exception handling && multisessions with max sessions
+		/// !!! Add solt
 		/// </summary>
 		/// <param name="userName">User name</param>
-		/// <param name="encryptedKey">Base64 string, may be sessionID or passwors</param>
+		/// <param name="encryptedKey">Base64 string, must be a sessionID and passwors</param>
 		/// <returns></returns>
-		public string Logon(string userName, string encryptedKey)
+		public string Logon(string userName, string sessionID, string encryptedKey)
 		{
-			if (!Guid.TryParse(encryptedKey, out Guid sessionID))
-				sessionID = Guid.Empty;
+			byte[] data;
+			var requestExists = _notLogedUsers.TryGetValue(userName, out LoginInfo loginInfo);
 
-			//var sessionID = GetSessionIDFromDecryptedData(data);
-			bool userExists = _logedUsers.ContainsKey(userName);
-			if (sessionID != Guid.Empty && userExists && _logedUsers[userName].ContainsKey(sessionID))
+			if (requestExists)
 			{
-				lock (obj4Lock)
-					_logedUsers[userName][sessionID].LastTime = DateTime.Now;
-				//return Encrypt(_logedUsers[userName][sessionID].PublicKeyData, sessionID.ToByteArray());
-				return sessionID.ToString();
-			}
-			else if (sessionID != Guid.Empty)
-				throw new AuthenticationExceptions($"Session token used for login {userName} not found");
-			else if (_notLogedUsers.TryGetValue(userName, out LoginInfo loginInfo))
-			{
-				var data = Decrypt(encryptedKey);
-				if (data == null)
-					throw new AuthenticationExceptions($"Can't decrypt data for login user {userName}");
 
-				string password = Encoding.UTF8.GetString(data);
-				Impersonator.Execute(userName, password, () => { return; });
-				var newInfo = new LoginInfo(loginInfo.PublicKeyData);
-				sessionID = newInfo.SessionID;
-				lock (obj4Lock)
-				{
-					if (!_logedUsers.ContainsKey(userName))
-						_logedUsers.Add(userName, new Dictionary<Guid, LoginInfo>() { { sessionID, newInfo } });
-					else if (_logedUsers[userName].Count >= maxUserSessions)
-						throw new AuthenticationExceptions($"Active sessions count for user {userExists} less then {maxUserSessions}");
-					else
-						_logedUsers[userName].Add(sessionID, newInfo);
-				}
-				return Encrypt(newInfo.PublicKeyData, newInfo.SessionID.ToByteArray());
 			}
-			else
+			else if (!_logedUsers.ContainsKey(userName))
 				throw new AuthenticationExceptions($"Timeout logon for user {userName} expired, or not LoginRequest called before");
+			else
+			{ }
+
+			//if (!Guid.TryParse(encryptedKey, out Guid sessionID))
+			//	sessionID = Guid.Empty;
+
+			////var sessionID = GetSessionIDFromDecryptedData(data);
+			//;
+			//if (sessionID != Guid.Empty && userExists && _logedUsers[userName].ContainsKey(sessionID))
+			//{
+			//	lock (obj4Lock)
+			//		_logedUsers[userName][sessionID].LastTime = DateTime.Now;
+			//	//return Encrypt(_logedUsers[userName][sessionID].PublicKeyData, sessionID.ToByteArray());
+			//	return sessionID.ToString();
+			//}
+			//else if (sessionID != Guid.Empty)
+			//	throw new AuthenticationExceptions($"Session token used for login {userName} not found");
+
+			//	if (data == null)
+			//		throw new AuthenticationExceptions($"Can't decrypt data for login user {userName}");
+
+			//	string password = Encoding.UTF8.GetString(data);
+			//	Impersonator.Execute(userName, password, () => { return; });
+			//	var newInfo = new LoginInfo(loginInfo.PublicKeyData);
+			//	sessionID = newInfo.SessionID;
+			//	lock (obj4Lock)
+			//	{
+			//		if (!_logedUsers.ContainsKey(userName))
+			//			_logedUsers.Add(userName, new Dictionary<Guid, LoginInfo>() { { sessionID, newInfo } });
+			//		else if (_logedUsers[userName].Count >= maxUserSessions)
+			//			throw new AuthenticationExceptions($"Active sessions count for user {userExists} less then {maxUserSessions}");
+			//		else
+			//			_logedUsers[userName].Add(sessionID, newInfo);
+			//	}
+			//	return Encrypt(newInfo.PublicKeyData, newInfo.SessionID.ToByteArray());
+			//}
+			return "";
 		}
 
 		private Guid GetSessionIDFromDecryptedData(byte[] data)
@@ -127,22 +124,6 @@ namespace S031.MetaStack.Core.Security
 			{
 				return Guid.Empty;
 			}
-		}
-
-		private static string Encrypt(string publicKeyData, byte[] data)
-		{
-			var rsa = RSA.Create();
-			rsa.Import(publicKeyData);
-			return rsa.Encrypt(data, _padding).ToBASE64String();
-		}
-
-		private byte[] Decrypt(string encryptedData)
-		{
-			try
-			{
-				return _serverRSA.Decrypt(encryptedData.ToByteArray(), _padding);
-			}
-			catch { return null; }
 		}
 
 		/// <summary>

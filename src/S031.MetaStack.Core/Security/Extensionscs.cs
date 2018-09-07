@@ -77,6 +77,7 @@ namespace S031.MetaStack.Core.Security
 		public static byte[] DecryptBin(this Aes aes, byte[] data)=>
 			aes.CreateDecryptor(aes.Key, aes.IV)
 			.TransformFinalBlock(data, 0, data.Length);
+
 	}
 
 }
