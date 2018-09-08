@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using S031.MetaStack.Core;
 using S031.MetaStack.Core.Data;
 using Microsoft.Extensions.DependencyInjection;
 using S031.MetaStack.Core.Security;
+using System.Threading.Tasks;
 
 namespace S031.MetaStack.Core.Actions
 {
@@ -14,8 +12,16 @@ namespace S031.MetaStack.Core.Actions
 		{
 			string userName = (string)dp["UserName"];
 			string publicKey = (string)dp["PublicKey"];
-			var key = App.ApplicationContext.GetServices().GetService<ILoginFactory>().LoginRequest(userName, publicKey);
+			var key = App.ApplicationContext
+				.GetServices()
+				.GetService<ILoginFactory>()
+				.LoginRequest(userName, publicKey);
 			return new DataPackage("PublicKey", key);
+		}
+
+		public Task<DataPackage> InvokeAsync(DataPackage dp)
+		{
+			throw new InvalidCastException("This action can not be executed in asynchronous mode");
 		}
 	}
 }

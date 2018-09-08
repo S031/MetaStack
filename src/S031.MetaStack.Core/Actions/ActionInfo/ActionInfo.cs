@@ -53,7 +53,8 @@ namespace S031.MetaStack.WinForms.Actions
 				this.InterfaceParameters.OutputParameters().Select(pi => pi.ParameterID).ToArray());
 		}
 		public ActionWebAuthenticationType WebAuthentication { get; set; }
-		bool AuthenticationRequired { get; set; }
-		bool AuthorizationRequired { get; set; }
+		public bool AuthenticationRequired { get; set; }
+		public bool AuthorizationRequired { get; set; }
+		public bool AsyncMode { get; set; } = false;
 	}
 }

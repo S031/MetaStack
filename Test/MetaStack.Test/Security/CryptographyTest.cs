@@ -9,6 +9,7 @@ using System.Text;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using S031.MetaStack.Core.Logging;
+using System.Threading.Tasks;
 
 namespace MetaStack.Test.Security
 {
@@ -56,7 +57,7 @@ namespace MetaStack.Test.Security
 		[Fact]
 		void ImpersonateTest()
 		{
-			Impersonator.Execute("Test", "test", () => Assert.False(false));
+			Impersonator.Execute("Test", "@TestPassword", () => Assert.False(false));
 		}
 
 		[Fact]
@@ -67,31 +68,44 @@ namespace MetaStack.Test.Security
 				var userName = "Test";
 				var secret = "@TestPassword";
 				var svcProv = ApplicationContext.GetServices();
-				//var serverRSA = svcProv.GetService<RSA>();
-				//var serverPK = serverRSA.ExportParameters(false).Export();
 
 				var clientRSA = RSA.Create();
 				var clientPK = clientRSA.Export();
 				var loginFactory = svcProv.GetService<ILoginFactory>();
-				//var serverPK = loginFactory.LoginRequest(userName, clientPK);
+				var secretData = loginFactory.LoginRequest(userName, clientPK)
+					.ToByteArray();
 
-				//var serverRSA = RSA.Create();
-				//serverRSA.Import(serverPK);
-				//string token = loginFactory.Logon(userName,
-				//	Convert.ToBase64String(serverRSA.Encrypt(Encoding.UTF8.GetBytes(secret), _padding)));
-				//Guid sessionID = new Guid(clientRSA.Decrypt(token.ToByteArray(), _padding));
-				//Assert.NotEqual(sessionID, Guid.Empty);
+				LoginInfo loginInfo = new LoginInfo();
+				loginInfo.Import(clientRSA.Decrypt(secretData, _padding));
 
-				//l.Debug("Start performance test for 1000 logins");
-				//var data = Aes.Create().ExportBin();
-				//for (int i = 1; i < 100000; i++)
-				//{
-				//	Aes.Create().ImportBin(data).EncryptBin(sessionID.ToByteArray());
-				//	token = loginFactory.Logon(userName, sessionID.ToString());
-				//}
-				////token = loginFactory.Logon(userName,
-				////	Convert.ToBase64String(serverRSA.Encrypt(sessionID.ToByteArray(), _padding)));				
-				l.Debug("End performance test for 1000 logins");
+				var clientAes = Aes.Create()
+					.ImportBin(loginInfo.CryptoKey);
+				string token = loginFactory.Logon(userName, loginInfo.SessionID.ToString(),
+					clientAes
+					.EncryptBin(Encoding.UTF8.GetBytes(secret))
+					.ToBASE64String());
+
+				Guid ticket = new Guid(clientAes.DecryptBin(token.ToByteArray()).Take(16).ToArray());
+				Assert.NotEqual(ticket, Guid.Empty);
+
+				l.Debug("Start performance test for logins");
+				int i;
+				for (i = 0; i < 10000; i++)
+				{
+					//token = loginFactory.LogonAsync(userName, loginInfo.SessionID.ToString(),
+					//	clientAes.EncryptBin(ticket
+					//		.ToByteArray()
+					//		.Concat(BitConverter.GetBytes(DateTime.Now.Millisecond)).ToArray())
+					//		.ToBASE64String())
+					//		.GetAwaiter()
+					//		.GetResult();
+					token = loginFactory.Logon(userName, loginInfo.SessionID.ToString(),
+						clientAes.EncryptBin(ticket
+							.ToByteArray()
+							.Concat(BitConverter.GetBytes(DateTime.Now.Millisecond)).ToArray())
+							.ToBASE64String());
+				}
+				l.Debug($"End performance test for {i} logins");
 			}
 		}
 
