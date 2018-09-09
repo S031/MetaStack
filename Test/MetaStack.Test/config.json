@@ -2,11 +2,13 @@
   "appSettings": {
     "auditEnabled": true
   },
+  "Connectors": {
+    "TCPConnector": {
+      "Host": "localhost",
+      "Port": 8001
+    }
+  },
   "connectionStrings": {
-    "bank": {
-      "providerName": "System.Data.SqlClient",
-      "connectionString": "Data Source=VM-SQL-2008;Initial Catalog=Bank;User ID=Sa;Password=_92b1A7C8"
-    },
     "bankLocal": {
       "providerName": "System.Data.SqlClient",
       "connectionString": "Data Source=SERGEY-SQL2016;Initial Catalog=Bank;User ID=Sa;Password=_92b1A7C8"

@@ -1,10 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-#if NETCOREAPP
-using S031.MetaStack.Core.Data;
-#else
-using S031.MetaStack.WinForms.Data;
-#endif
 
 #if NETCOREAPP
 namespace S031.MetaStack.Core.Actions

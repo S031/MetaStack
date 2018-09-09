@@ -33,6 +33,12 @@
       "connectionString": "Data Source=SERGEY-SQL2016;Initial Catalog=Bank;User ID=Sa;Password=_92b1A7C8"
     }
   },
+  "Connectors": {
+    "TCPConnector": {
+      "IPAddress": "localhost",
+      "Port": 8001
+    }
+  },
   "IAppServiceConfiguration": {
     "ImplementationList": [
       {

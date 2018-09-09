@@ -1,8 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
+#if NETCOREAPP
 namespace S031.MetaStack.Core.Security
+#else
+namespace S031.MetaStack.WinForms.Security
+#endif
 {
 	public class AuthenticationExceptions : Exception
 	{

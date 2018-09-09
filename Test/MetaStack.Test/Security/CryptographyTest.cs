@@ -92,13 +92,6 @@ namespace MetaStack.Test.Security
 				int i;
 				for (i = 0; i < 10000; i++)
 				{
-					//token = loginFactory.LogonAsync(userName, loginInfo.SessionID.ToString(),
-					//	clientAes.EncryptBin(ticket
-					//		.ToByteArray()
-					//		.Concat(BitConverter.GetBytes(DateTime.Now.Millisecond)).ToArray())
-					//		.ToBASE64String())
-					//		.GetAwaiter()
-					//		.GetResult();
 					token = loginFactory.Logon(userName, loginInfo.SessionID.ToString(),
 						clientAes.EncryptBin(ticket
 							.ToByteArray()
