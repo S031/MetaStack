@@ -42,6 +42,7 @@ namespace S031.MetaStack.Core.ORM
 
 			_syncronizer = GetSyncronizer(dbProviderName);
 			_syncronizer.SchemaProvider = this;
+			_syncronizer.Logger = logger;
 			if (_counter == 0)
 			{
 				using (var mdb = new MdbContext(_cn))

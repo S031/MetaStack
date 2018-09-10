@@ -63,7 +63,7 @@ namespace MetaStack.Test.ORM
 		[Fact]
 		void Test2()
 		{
-			//SaveSchemaTestAsync().GetAwaiter().GetResult();
+			SaveSchemaTestAsync().GetAwaiter().GetResult();
 		}
 
 		async Task SaveSchemaTestAsync()

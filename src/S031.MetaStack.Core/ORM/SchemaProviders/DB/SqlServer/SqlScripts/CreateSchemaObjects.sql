@@ -197,7 +197,7 @@ create view SysCat.V_SysSchemas as
 	from [SysCat].[SysAreas] A
 	inner join [SysCat].[SysSchemas] S On A.ID = S.[SysAreaID]
 --go
-/*CREATE PROCEDURE  [SysCat].[Get_TableSchema]
+CREATE PROCEDURE  [SysCat].[Get_TableSchema]
 	@table_name sysname
 AS
 BEGIN
@@ -364,7 +364,7 @@ END
 ELSE
 	SELECT ''
 END
-*/
+
 --go
 CREATE PROCEDURE  [SysCat].[Get_TableSchema_xml]
 	@table_name sysname
@@ -709,7 +709,7 @@ BEGIN
 		SELECT ''
 END
 --GO
-CREATE PROCEDURE  [SysCat].[Get_TableSchema]
+CREATE PROCEDURE  [SysCat].[Get_TableSchema_ansi]
 	@table_name sysname
 AS
 BEGIN
