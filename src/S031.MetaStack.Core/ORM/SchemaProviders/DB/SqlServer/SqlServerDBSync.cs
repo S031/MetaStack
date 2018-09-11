@@ -123,7 +123,9 @@ namespace S031.MetaStack.Core.ORM
 				try
 				{
 					await mdb.BeginTransactionAsync();
-					foreach (string statement in SqlServer.CreateSchemaObjects.Split("--go", StringSplitOptions.RemoveEmptyEntries))
+					var scripts = SqlServer.CreateSchemaObjects.Split(new string[]{ "--go", "--GO"}, 
+						StringSplitOptions.RemoveEmptyEntries);
+					foreach (string statement in scripts)
 						await mdb.ExecuteAsync(statement);
 					log.Debug($"Schema SysCat was created in database {mdb.DbName}");
 					log.Debug("Schema tables SysCat.SysAreas and SysCat.SysSchemas was created in SysCat Schema");

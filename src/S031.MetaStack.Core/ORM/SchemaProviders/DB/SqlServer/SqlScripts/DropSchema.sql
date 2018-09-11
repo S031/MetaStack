@@ -1,6 +1,7 @@
 begin
 	drop procedure if exists SysCat.Get_TableSchema
 	drop procedure if exists SysCat.Get_TableSchema_xml
+	drop procedure if exists SysCat.Get_TableSchema_ansi
 	drop procedure if exists SysCat.Get_ParentRelations
 	drop procedure if exists SysCat.Get_ParentRelations_ansi
 	drop view if exists SysCat.V_SysSchemas
