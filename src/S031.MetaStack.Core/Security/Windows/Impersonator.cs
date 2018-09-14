@@ -28,10 +28,9 @@ namespace S031.MetaStack.Core.Security
 			const int LOGON32_PROVIDER_DEFAULT = 0;
 			const int LOGON32_LOGON_INTERACTIVE = 2;
 
-			SafeAccessTokenHandle safeAccessTokenHandle;
 			bool returnValue = LogonUser(userName, domainName, password,
 				LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT,
-				out safeAccessTokenHandle);
+				out SafeAccessTokenHandle safeAccessTokenHandle);
 
 			if (!returnValue)
 			{

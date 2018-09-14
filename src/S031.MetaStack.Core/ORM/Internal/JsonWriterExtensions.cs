@@ -38,7 +38,7 @@ namespace S031.MetaStack.WinForms.ORM
 		}
 		public static void WriteProperty(this JsonWriter writer, string propertyName, DateTime value)
 		{
-			if (value != default(DateTime))
+			if (value != default)
 			{
 				writer.WritePropertyName(propertyName);
 				writer.WriteValue(value);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace S031.MetaStack.Common
 {
@@ -21,36 +22,26 @@ namespace S031.MetaStack.Common
 		public static int ToIntOrDefault(this string str)
 		{
 			str.NullTest(nameof(str));
-			int result;
-			if (int.TryParse(str, out result))
-				return result;
-			return 0;
+			return int.TryParse(str, out int result) ? result : 0;
 		}
 
 		public static double ToDoubleOrDefault(this string str)
 		{
 			str.NullTest(nameof(str));
-			double result;
-			if (double.TryParse(str, out result))
-				return result;
-			return 0;
+			return double.TryParse(str, out double result) ? result : 0;
 		}
 
 		public static decimal ToDecimalOrDefault(this string str)
 		{
 			str.NullTest(nameof(str));
-			decimal result;
-			if (decimal.TryParse(str, out result))
-				return result;
-			return 0;
+			return decimal.TryParse(str, out decimal result) ? result : 0;
 		}
 
 		public static DateTime ToDateOrDefault(this string str)
 		{
-			DateTime val;
 			if (string.IsNullOrEmpty(str) || str == "0" || str.Left(4) == "0:00" || str.Left(5) == "00:00")
 				return DateTime.MinValue;
-			else if (DateTime.TryParse(str, out val))
+			else if (DateTime.TryParse(str, out DateTime val))
 				return val;
 			else
 				return DateTime.MinValue;
@@ -58,11 +49,10 @@ namespace S031.MetaStack.Common
 
 		public static TimeSpan ToTimeSpan(this string str)
 		{
-			TimeSpan val;
 			if (string.IsNullOrEmpty(str) || str == "0" || str.Left(4) == "0:00"
 				|| str.Left(5) == "00:00")
 				return TimeSpan.MinValue;
-			else if (TimeSpan.TryParse(str, out val))
+			else if (TimeSpan.TryParse(str, out TimeSpan val))
 				return val;
 			return TimeSpan.MinValue;
 		}
@@ -72,16 +62,13 @@ namespace S031.MetaStack.Common
 			if (string.IsNullOrEmpty(str))
 				return false;
 
-			bool val;
 			string source = str.ToLower();
 			if (source == "1" || source == "true")
 				return true;
 			else if (source == "0" || source == "false")
 				return false;
-			else if (bool.TryParse(str, out val))
-				return val;
 			else
-				return false;
+				return bool.TryParse(str, out bool val) ? val : false;
 		}
 		public static T To<T>(this string str)
 		{
@@ -360,6 +347,32 @@ namespace S031.MetaStack.Common
 		public static void NullTest(this object value, string valueName, Action<object, string> action)
 		{
 			if (value == null)	action(value, valueName);
+		}
+		public static U Match<T, U>(this T val, params (Func<T, bool> qualifier, Func<T, U> func)[] matches)
+		{
+			U ret = default;
+
+			foreach (var (qualifier, func) in matches)
+			{
+				if (qualifier(val))
+				{
+					ret = func(val);
+					break;
+				}
+			}
+
+			return ret;
+		}
+		public async static void MatchAsync<T>(this T val, params (Func<T, bool> qualifier, Action<T> action)[] matches)
+		{
+			foreach (var (qualifier, action) in matches)
+			{
+				if (await Task.Run(() => qualifier(val)))
+				{
+					await Task.Run(() => action(val));
+					break;
+				}
+			}
 		}
 	}
 }

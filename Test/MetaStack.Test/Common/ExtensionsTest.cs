@@ -14,7 +14,7 @@ namespace MetaStack.Test.Common
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
 		}
 		[Fact]
-		void nullExceptiobnTest()
+		void NullExceptiobnTest()
 		{
 			using (FileLog l = new FileLog("nullEceptionTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -34,7 +34,7 @@ namespace MetaStack.Test.Common
 		}
 
 		[Fact]
-		void stringExtensionsTest()
+		void StringExtensionsTest()
 		{
 			Assert.True("1234" == "12345677890".Left(4));
 			Assert.True("7890" == "12345677890".Right(4));
@@ -81,7 +81,7 @@ namespace MetaStack.Test.Common
 			Assert.True("123456[[(())]]77890".RemoveChar("[[(())]]".ToCharArray()) == "12345677890");
 		}
 		[Fact]
-		void stringExtensionsTokenTets()
+		void StringExtensionsTokenTets()
 		{
 			using (FileLog l = new FileLog("stringExtensionsTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -119,11 +119,58 @@ namespace MetaStack.Test.Common
 		}
 
 		[Fact]
-		void byteArrayExtensionsTest()
+		void ByteArrayExtensionsTest()
 		{
 			Assert.True("0KHQtdGA0LPQtdC5INCS0LjRgtCw0LvRjNC10LLQuNGHINCS0L7RgdGC0YDQuNC60L7Qsg==".IsBase64String());
 			Assert.Equal(new byte[] { 1, 2, 3, 4, 5 }.ToBASE64String().ToByteArray().ToBASE64String(), 
 				new byte[] { 1, 2, 3, 4, 5 }.ToBASE64String());
 		}
-    }
+		[Fact]
+		void ObjectExtensionsTest()
+		{
+			using (FileLog l = new FileLog("ObjectExtensionsTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			{
+				string ret = 2.Match(
+				(n => n == 0, _ => "Zero"),
+				(n => n == 1, _ => "One"),
+				(n => n == 2, _ => "Two"),
+				(n => n == 3, _ => "Three"),
+				(n => n == 4, _ => "Four"));
+
+				l.Debug(ret);
+
+				5.ForEach(q =>
+				{
+					dynamic retd = q.Match<int, dynamic>(
+						(n => n == 0, _ => "Zero"),
+						(n => n == 5, n => BitConverter.GetBytes(n)),
+						(n => n == 4, n => n.ToString()),
+						(n => true, n => $"default {n}"));
+					if (retd != null)
+						l.Debug(retd.ToString());
+				});
+
+				DateTime start = DateTime.Now;
+				1000000.ForEach(q => (q % 5).Match(
+					(n => n == 0, _ => "Zero"),
+					(n => n == 1, _ => "One"),
+					(n => n == 2, _ => "Two"),
+					(n => n == 3, _ => "Three"),
+					(n => n == 4, _ => "Four")));
+				DateTime stop = DateTime.Now;
+				l.Debug("Match Return for 1,000,000 runs took " + (stop - start).TotalMilliseconds + "ms");
+			}
+		}
+
+	}
+	static class TestExt
+	{
+		public static void ForEach(this int n, Action<int> action)
+		{
+			for (int i = 0; i < n; i++)
+			{
+				action(i);
+			}
+		}
+	}
 }

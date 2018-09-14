@@ -45,12 +45,7 @@ namespace S031.MetaStack.WinForms.Json
 			else if (type == JTokenType.Float)
 				return (long)jsonValue;
 			else if (type == JTokenType.String)
-			{
-				long result;
-				if (long.TryParse((string)jsonValue, out result))
-					return result;
-				return 0;
-			}
+				return long.TryParse((string)jsonValue, out long result) ? result : 0;
 			else
 				return 0;
 
@@ -68,19 +63,13 @@ namespace S031.MetaStack.WinForms.Json
 			else if (type == JTokenType.Float)
 				return (decimal)jsonValue;
 			else if (type == JTokenType.String)
-			{
-				decimal result;
-				if (decimal.TryParse((string)jsonValue, out result))
-					return result;
-				return 0;
-			}
+				return decimal.TryParse((string)jsonValue, out decimal result) ? result : 0;
 			else
 				return 0;
 
 		}
 		public static DateTime ToDateOrDefault(this JToken jsonValue)
 		{
-			DateTime val;
 			string str;
 			if (jsonValue == null)
 				return DateTime.MinValue;
@@ -96,7 +85,7 @@ namespace S031.MetaStack.WinForms.Json
 
 			if (string.IsNullOrEmpty(str) || str == "0" || str.Left(4) == "0:00" || str.Left(5) == "00:00")
 				return DateTime.MinValue;
-			else if (DateTime.TryParse(str, out val))
+			else if (DateTime.TryParse(str, out DateTime val))
 				return val;
 			return DateTime.MinValue;
 		}
@@ -154,7 +143,7 @@ namespace S031.MetaStack.WinForms.Json
 			}
 			catch
 			{
-				return default(T);
+				return default;
 			}
 		}
 		public static string SerializeObject(object value)

@@ -35,10 +35,9 @@ namespace S031.MetaStack.Common
 
             set
             {
-                DateTime d;
-                if (DateTime.TryParse(value, out d))
-                    _dayStartTime = d.ToString(timeFormat);
-            }
+				if (DateTime.TryParse(value, out DateTime d))
+					_dayStartTime = d.ToString(timeFormat);
+			}
         }
 
         public string DayEndTime
@@ -50,10 +49,9 @@ namespace S031.MetaStack.Common
 
             set
             {
-                DateTime d;
-                if (DateTime.TryParse(value, out d))
-                    _dayEndTime = d.ToString(timeFormat);
-            }
+				if (DateTime.TryParse(value, out DateTime d))
+					_dayEndTime = d.ToString(timeFormat);
+			}
         }
 
         public string WeekDayMask
