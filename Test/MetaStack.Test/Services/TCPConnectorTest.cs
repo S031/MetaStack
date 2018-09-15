@@ -21,7 +21,7 @@ namespace MetaStack.Test.Services
 		}
 
 		[Fact]
-		void speedTest4ConnectedSocket()
+		void SpeedTest4ConnectedSocket()
 		{
 			using (TCPConnector connector = TCPConnector.Create())
 			{

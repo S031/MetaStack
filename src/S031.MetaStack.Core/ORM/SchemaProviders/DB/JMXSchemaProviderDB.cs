@@ -36,7 +36,7 @@ namespace S031.MetaStack.Core.ORM
 			_logger = logger;
 			_isLocalLog = false;
 			_cn = connectionString;
-			string dbProviderName = MdbContext.getConnectionInfo(connectionString).ProviderName;
+			string dbProviderName = new ConnectInfo(connectionString).ProviderName;
 			if (_counter == 0)
 				ImplementsList.Add(typeof(ISchemaDBSync));
 

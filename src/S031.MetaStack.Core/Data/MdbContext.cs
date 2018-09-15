@@ -17,75 +17,14 @@ namespace S031.MetaStack.Core.Data
 		PostgreSql
 	}
 
-	public class ConnectInfo
-	{
-		public string ProviderName { get; set; }
-		public string DbName { get; set; }
-		public string ConnectionString { get; set; }
-	}
 
 	public class MdbContext : IDisposable
 	{
-		internal struct ConnectInfo
-		{
-			public string ProviderName;
-			public string DbName;
-			public string ConnectionString;
-		}
-
-		const string _providerNameField = "Provider Name";
-		const string _providerNameDefault = "System.Data.SqlClient";
-		const string _dbNameField = "Initial Catalog";
-
-		private DbProviderFactory _factory;
-		private DbConnection _connection;
 		private DbTransaction _transaction;
 		private int _transactionLevel = 0;
 		private ConnectInfo _connectInfo;
 
-		private static readonly ConcurrentDictionary<string, ConnectInfo> _csCache = new ConcurrentDictionary<string, ConnectInfo>();
-		/// <summary>
-		/// Provider name key for connection string aka Provider Name=<see cref="System.Data.SqlClient"/>"
-		/// </summary>
-		public static string ProviderNameField => _providerNameField;
-		/// <summary>
-		/// Create valid connectuion string from providerName & connectionString
-		/// </summary>
-		/// <param name="providerName">Provider Name aka <see cref="System.Data.SqlClient"/></param>
-		/// <param name="connectionString">Connection string valid for this provider</param>
-		/// <returns></returns>
-		public static string CreateConnectionString(string providerName, string connectionString) =>
-			$"{_providerNameField}={providerName};{connectionString}";
-
 		private MdbContext() { }
-
-		internal static ConnectInfo getConnectionInfo(string connectionString)
-		{
-			if (!_csCache.TryGetValue(connectionString, out ConnectInfo connectInfo))
-			{
-				DbConnectionStringBuilder sb = new DbConnectionStringBuilder
-				{
-					ConnectionString = connectionString
-				};
-				connectInfo = new ConnectInfo();
-				if (!sb.ContainsKey(_providerNameField))
-				{
-					connectInfo.ProviderName = _providerNameDefault;
-					connectInfo.ConnectionString = connectionString;
-				}
-				else
-				{
-					connectInfo.ProviderName = (string)sb[_providerNameField];
-					sb.Remove(_providerNameField);
-					connectInfo.ConnectionString = sb.ToString();
-				}
-				if (sb.ContainsKey(_dbNameField))
-					connectInfo.DbName = (string)sb[_dbNameField];
-
-				_csCache.TryAdd(connectionString, connectInfo);
-			}
-			return connectInfo;
-		}
 		/// <summary>
 		/// Create new <see cref="S031.MetaStack.Core.Data.MdbContext"/> with specified connection string and logger
 		/// </summary>
@@ -93,14 +32,14 @@ namespace S031.MetaStack.Core.Data
 		public MdbContext(string connectionString)
 		{
 			connectionString.NullTest(nameof(connectionString));
-			_connectInfo = getConnectionInfo(connectionString);
-			_factory = ObjectFactories.GetFactory<DbProviderFactory>(_connectInfo.ProviderName);
-			_connection = _factory.CreateConnection(_connectInfo.ConnectionString);
+			_connectInfo = new ConnectInfo(connectionString);
+			Factory = ObjectFactories.GetFactory<DbProviderFactory>(_connectInfo.ProviderName);
+			Connection = Factory.CreateConnection(_connectInfo.ConnectionString);
 		}
 		public string ProviderName => _connectInfo.ProviderName;
 		public string DbName => _connectInfo.DbName;
-		public DbProviderFactory Factory => _factory;
-		public DbConnection Connection => _connection;
+		public DbProviderFactory Factory { get; private set; }
+		public DbConnection Connection { get; private set; }
 		/// <summary>
 		/// Run <see cref="DbCommand.ExecuteReader()"/> and returns the data in the format <see cref="DataPackage"/>
 		/// </summary>
@@ -129,7 +68,7 @@ namespace S031.MetaStack.Core.Data
 		public DataPackage[] GetReaders(string sql, params MdbParameter[] parameters)
 		{
 			List<DataPackage> rs = new List<Data.DataPackage>();
-			using (DbCommand command = _factory.CreateCommand(_connection, sql))
+			using (DbCommand command = Factory.CreateCommand(Connection, sql))
 			{
 				if (_transaction != null)
 					command.Transaction = _transaction;
@@ -274,7 +213,7 @@ namespace S031.MetaStack.Core.Data
 		}
 		DbCommand getCommandInternal(string sql, params MdbParameter[] parameters)
 		{
-			DbCommand command = _factory.CreateCommand(_connection, sql);
+			DbCommand command = Factory.CreateCommand(Connection, sql);
 			if (_transaction != null)
 				command.Transaction = _transaction;
 			if (sql.IndexOf(' ') != -1)
@@ -294,7 +233,7 @@ namespace S031.MetaStack.Core.Data
 		{
 			if (_transaction == null)
 			{
-				_transaction = _connection.BeginTransaction(MdbContextOptions.GetOptions().TransactionIsolationLevel);
+				_transaction = Connection.BeginTransaction(MdbContextOptions.GetOptions().TransactionIsolationLevel);
 				_transactionLevel++;
 			}
 			else
@@ -332,9 +271,9 @@ namespace S031.MetaStack.Core.Data
 		{
 			if (_transaction != null)
 				_transaction.Dispose();
-			if (_connection != null && _connection.State == ConnectionState.Open)
-				_connection.Close();
-			_connection.Dispose();
+			if (Connection != null && Connection.State == ConnectionState.Open)
+				Connection.Close();
+			Connection.Dispose();
 		}
 		#region async_methods
 		/// <summary>
@@ -349,10 +288,10 @@ namespace S031.MetaStack.Core.Data
 			connectionString.NullTest(nameof(connectionString));
 			MdbContext mctx = new MdbContext
 			{
-				_connectInfo = getConnectionInfo(connectionString)
+				_connectInfo = new ConnectInfo(connectionString)
 			};
-			mctx._factory = ObjectFactories.GetFactory<DbProviderFactory>(mctx._connectInfo.ProviderName);
-			mctx._connection = await mctx._factory.CreateConnectionAsync(mctx._connectInfo.ConnectionString);
+			mctx.Factory = ObjectFactories.GetFactory<DbProviderFactory>(mctx._connectInfo.ProviderName);
+			mctx.Connection = await mctx.Factory.CreateConnectionAsync(mctx._connectInfo.ConnectionString);
 			return mctx;
 		}
 		/// <summary>
@@ -378,7 +317,7 @@ namespace S031.MetaStack.Core.Data
 		public async Task<DataPackage[]> GetReadersAsync(string sql, params MdbParameter[] parameters)
 		{
 			List<DataPackage> rs = new List<Data.DataPackage>();
-			using (DbCommand command = _factory.CreateCommand(_connection, sql))
+			using (DbCommand command = Factory.CreateCommand(Connection, sql))
 			{
 				if (_transaction != null)
 					command.Transaction = _transaction;

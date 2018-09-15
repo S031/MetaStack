@@ -30,7 +30,7 @@ namespace MetaStack.Test.Data
 			_configuration = ApplicationContext.GetServices().GetService<IConfiguration>();
 			var cs = _configuration.GetSection($"connectionStrings:{connection_name}").Get<ConnectInfo>();
 			_providerName = cs.ProviderName;
-			_cn = MdbContext.CreateConnectionString(_providerName, cs.ConnectionString);
+			_cn = new ConnectInfo(_providerName, cs.ConnectionString).ToString();
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
 		}
 		[Fact]

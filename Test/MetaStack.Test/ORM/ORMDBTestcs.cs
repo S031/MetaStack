@@ -155,7 +155,7 @@ namespace MetaStack.Test.ORM
 			}
 		}
 		[Fact]
-		void speedGetHashCodeTest()
+		void SpeedGetHashCodeTest()
 		{
 			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -191,7 +191,7 @@ namespace MetaStack.Test.ORM
 		}
 
 		[Fact]
-		void saveTestData()
+		void SaveTestData()
 		{
 			//foreach (var s in GetTestSchemas())
 			//	System.IO.File.WriteAllText($"d:\\testData\\{s.ObjectName}.json", s.ToString());
@@ -202,7 +202,7 @@ namespace MetaStack.Test.ORM
 			//}
 			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
-				var s = creaateTestSchema();
+				var s = RreaateTestSchema();
 				_logger.Debug(s.ToString());
 				var s1 = JMXSchema.Parse(s.ToString());
 				Assert.Equal(s.ToString(), s1.ToString());
@@ -211,7 +211,7 @@ namespace MetaStack.Test.ORM
 
 		}
 
-		JMXSchema creaateTestSchema()
+		JMXSchema RreaateTestSchema()
 		{
 
 			JMXSchema s = new JMXSchema("SysSchema")
@@ -234,7 +234,7 @@ namespace MetaStack.Test.ORM
 			return s;
 		}
 
-		static string[] getTestNames()
+		static string[] GetTestNames()
 		{
 			return new string[] { "dbo.Customer", "dbo.Terminal", "dbo.Contact", "dbo.Terminal2Customer",
 				"dbo.Card", "dbo.PaymentState", "dbo.ErrorCode", "dbo.Request", "dbo.Payment", "dbo.PaymentStateHist" };
@@ -243,7 +243,7 @@ namespace MetaStack.Test.ORM
 		{
 			List<JMXSchema> l = new List<JMXSchema>();
 			var rm = Resources.TestSchemas.ResourceManager;
-			foreach (JMXObjectName item in getTestNames())
+			foreach (JMXObjectName item in GetTestNames())
 			{
 				l.Add(JMXSchema.Parse(Encoding.UTF8.GetString((byte[])rm.GetObject(item.ObjectName))));
 			}

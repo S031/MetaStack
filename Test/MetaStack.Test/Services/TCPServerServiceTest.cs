@@ -18,11 +18,11 @@ namespace MetaStack.Test.Services
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
 		}
 		[Fact]
-		void speedTest4ConnectedSocket()
+		void SpeedTest4ConnectedSocket()
 		{
 			using (FileLog l = new FileLog("TCPServerServicesTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
-				var p = getTestPackage();
+				var p = GetTestPackage();
 				l.Debug($"Input message: {p.ToString(TsExportFormat.JSON)}");
 				DataPackage response = null;
 				using (var client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
@@ -31,8 +31,8 @@ namespace MetaStack.Test.Services
 					using (var stream = new NetworkStream(client))
 					{
 						for (int i = 0; i < 2000; i++)
-							response = sendAndRecieve(stream, p);
-						close(stream);
+							response = SendAndRecieve(stream, p);
+						Close(stream);
 					}
 				}
 				l.Debug($"Output message: {response}");
@@ -40,11 +40,11 @@ namespace MetaStack.Test.Services
 		}
 
 		[Fact]
-		void speedTest4Mixed()
+		void SpeedTest4Mixed()
 		{
 			using (FileLog l = new FileLog("TCPServerServicesTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
-				var p = getTestPackage();
+				var p = GetTestPackage();
 				l.Debug($"Input message: {p.ToString(TsExportFormat.JSON)}");
 				DataPackage response = null;
 				List<Task> tasks = new List<Task>();
@@ -58,8 +58,8 @@ namespace MetaStack.Test.Services
 							using (var stream = new NetworkStream(client))
 							{
 								for (int i = 0; i < 2000; i++)
-									response = sendAndRecieve(stream, p);
-								close(stream);
+									response = SendAndRecieve(stream, p);
+								Close(stream);
 							}
 						}
 					}));
@@ -69,7 +69,7 @@ namespace MetaStack.Test.Services
 			}
 		}
 
-		private static DataPackage sendAndRecieve(NetworkStream stream, DataPackage p)
+		private static DataPackage SendAndRecieve(NetworkStream stream, DataPackage p)
 		{
 			var data = p.ToArray();
 			stream.Write(BitConverter.GetBytes(data.Length), 0, 4);
@@ -83,17 +83,17 @@ namespace MetaStack.Test.Services
 			return new DataPackage(res);
 		}
 
-		void close(NetworkStream stream)
+		void Close(NetworkStream stream)
 		{
 			stream.Write(BitConverter.GetBytes(0), 0, 4);
 		}
 
 		[Fact]
-		void speedTestForDisconnectedSocket()
+		void SpeedTestForDisconnectedSocket()
 		{
 			using (FileLog l = new FileLog("TCPServerServicesTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
-				var p = getTestPackage();
+				var p = GetTestPackage();
 				l.Debug($"Input message: {p.ToString(TsExportFormat.JSON)}");
 				DataPackage response = null;
 				for (int i = 0; i < 2000; i++)
@@ -103,8 +103,8 @@ namespace MetaStack.Test.Services
 						client.Connect("localhost", 8001);
 						using (var stream = new NetworkStream(client))
 						{
-							response = sendAndRecieve(stream, p);
-							close(stream);
+							response = SendAndRecieve(stream, p);
+							Close(stream);
 						}
 					}
 				}
@@ -112,7 +112,7 @@ namespace MetaStack.Test.Services
 			}
 		}
 
-		static DataPackage getTestPackage()
+		static DataPackage GetTestPackage()
 		{
 			var p = new DataPackage(new string[] { "Col1.int", "Col2.string.255", "Col3.datetime.10", "Col4.Guid.34", "Col5.object" });
 			p.Headers.Add("Username", "Сергей");
@@ -134,9 +134,9 @@ namespace MetaStack.Test.Services
 			}
 			return p;
 		}
-		private class testClass
+		private class TestClass
 		{
-			public testClass()
+			public TestClass()
 			{
 				ItemList = new Dictionary<string, object>();
 			}
@@ -153,15 +153,15 @@ namespace MetaStack.Test.Services
 			public DataPackage SendAndWaitForResponse(DataPackage input)
 			{
 				var data = input.ToArray();
-				send(data);
-				return resieve();
+				Send(data);
+				return Resieve();
 			}
-			private void send(byte[] data)
+			private void Send(byte[] data)
 			{
 				_stream.Write(BitConverter.GetBytes(data.Length), 0, 4);
 				_stream.Write(data, 0, data.Length);
 			}
-			DataPackage resieve()
+			DataPackage Resieve()
 			{
 				byte[] buffer = new byte[4096];
 				var bytesRead = 0;

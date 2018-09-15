@@ -26,7 +26,7 @@ namespace S031.MetaStack.Core.Actions
 			var cs = _configuration.GetSection($"connectionStrings:{sysCatConnectionName}")?.Get<ConnectInfo>();
 			if (cs == null)
 				throw new KeyNotFoundException($"The connection string with name {sysCatConnectionName} was not found in the configuration file");
-			_mdbContext = new MdbContext(MdbContext.CreateConnectionString(cs.ProviderName, cs.ConnectionString));
+			_mdbContext = new MdbContext(new ConnectInfo(cs.ProviderName, cs.ConnectionString));
 		}
 
 		public static async Task<ActionManager> CreateManagerAsync(string sysCatConnectionName, ILogger logger)
