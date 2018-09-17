@@ -2,8 +2,9 @@
 using S031.MetaStack.Common;
 using Xunit.Abstractions;
 using System;
+using System.Linq;
 using S031.MetaStack.Common.Logging;
-
+using System.Collections.Generic;
 
 namespace MetaStack.Test.Common
 {
@@ -138,6 +139,7 @@ namespace MetaStack.Test.Common
 				(n => n == 4, _ => "Four"));
 
 				l.Debug(ret);
+				//"Zero,One,Two,Three,Fore".Split(',').fore
 
 				5.ForEach(q =>
 				{
@@ -170,6 +172,17 @@ namespace MetaStack.Test.Common
 			for (int i = 0; i < n; i++)
 			{
 				action(i);
+			}
+		}
+	}
+	static class TestExt1
+	{
+		public static IEnumerable<T> ForEach<T>(IEnumerable<T> xs, Action<T> f)
+		{
+			foreach (var x in xs)
+			{
+				f(x);
+				yield return x;
 			}
 		}
 	}

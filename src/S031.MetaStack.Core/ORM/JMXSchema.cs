@@ -61,6 +61,7 @@ namespace S031.MetaStack.WinForms.ORM
         /// Assigned from schema provider
         /// </summary>
         public IJMXSchemaProvider SchemaProvider { get; set; }
+        public IJMXRepo SchemaRepo { get; set; }
         public int ID { get; set; }
         public Guid UID { get; set; }
         public string Name { get; set; }

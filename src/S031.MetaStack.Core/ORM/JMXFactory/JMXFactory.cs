@@ -10,16 +10,10 @@ using System.Threading.Tasks;
 
 namespace S031.MetaStack.Core.ORM
 {
-	public abstract class JMXRepo : IJMXRepo, IDisposable
+	public abstract class JMXFactory : IDisposable
 	{
 		private ILogger _logger;
 		private bool _isLocalLog;
-
-		public JMXRepo(MdbContext mdbContext)
-		{
-			mdbContext.NullTest(nameof(mdbContext));
-			this.MdbContext = mdbContext;
-		}
 
 		public void Dispose()
 		{
@@ -46,45 +40,24 @@ namespace S031.MetaStack.Core.ORM
 				_isLocalLog = false;
 			}
 		}
-		
-		protected MdbContext MdbContext { get; private set; }
 
-		public virtual IEnumerable<string> GetChildObjects(string objectName)
+		public JMXFactory(MdbContext mdbContext)
+		{
+			mdbContext.NullTest(nameof(mdbContext));
+			this.MdbContext = mdbContext;
+		}
+
+		public MdbContext MdbContext { get; }
+
+		public virtual IJMXRepo CreateJMXRepo()
 		{
 			throw new NotImplementedException();
 		}
-
-		public virtual JMXSchema GetSchema(string objectName)
+		public virtual IJMXProvider CreateJMXProvider()
 		{
 			throw new NotImplementedException();
 		}
-
-		public virtual JMXSchema SaveSchema(JMXSchema schema)
-		{
-			throw new NotImplementedException();
-		}
-
-		public virtual void DropSchema(string objectName)
-		{
-			throw new NotImplementedException();
-		}
-
-		public virtual Task<JMXSchema> GetSchemaAsync(string objectName)
-		{
-			throw new NotImplementedException();
-		}
-
-		public virtual Task<JMXSchema> SaveSchemaAsync(JMXSchema schema)
-		{
-			throw new NotImplementedException();
-		}
-
-		public virtual Task<JMXSchema> SyncSchemaAsync(string objectName)
-		{
-			throw new NotImplementedException();
-		}
-
-		public virtual Task DropSchemaAsync(string objectName)
+		public virtual JMXObject CreateObject(string objectName)
 		{
 			throw new NotImplementedException();
 		}

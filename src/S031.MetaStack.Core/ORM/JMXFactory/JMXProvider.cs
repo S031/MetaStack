@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using S031.MetaStack.Common;
 using S031.MetaStack.Core.Data;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,12 @@ namespace S031.MetaStack.Core.ORM
 		private ILogger _logger;
 		private bool _isLocalLog;
 
+		public JMXProvider(MdbContext mdbContext)
+		{
+			mdbContext.NullTest(nameof(mdbContext));
+			MdbContext = mdbContext;
+		}
+
 		public void Dispose()
 		{
 			if (_isLocalLog)
@@ -24,7 +31,7 @@ namespace S031.MetaStack.Core.ORM
 			{
 				if (_logger == null)
 				{
-					_logger = new Logging.FileLogger(typeof(JMXRepo).FullName);
+					_logger = new Logging.FileLogger(this.GetType().FullName);
 					_isLocalLog = true;
 				}
 				return _logger;
@@ -32,7 +39,7 @@ namespace S031.MetaStack.Core.ORM
 			set
 			{
 				if (_logger != null)
-					throw new InvalidOperationException("The Logger has already been assigned this instance of the JMXRepo class");
+					throw new InvalidOperationException($"The Logger has already been assigned this instance of the {this.GetType().FullName} class"); ;
 				_logger = value;
 				_isLocalLog = false;
 			}

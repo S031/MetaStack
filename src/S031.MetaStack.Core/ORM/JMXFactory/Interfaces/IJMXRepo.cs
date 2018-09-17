@@ -9,7 +9,7 @@ namespace S031.MetaStack.Core.ORM
 namespace S031.MetaStack.WinForms.ORM
 #endif
 {
-	public interface IJMXSRepo
+	public interface IJMXRepo
 	{
 		IEnumerable<string> GetChildObjects(string objectName);
 		JMXSchema GetSchema(string objectName);
