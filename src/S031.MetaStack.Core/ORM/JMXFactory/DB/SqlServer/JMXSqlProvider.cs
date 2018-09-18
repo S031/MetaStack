@@ -8,10 +8,11 @@ namespace S031.MetaStack.Core.ORM
 {
 	public class JMXSqlProvider : JMXProvider
 	{
-		public JMXSqlProvider(MdbContext mdbContext) : base(mdbContext)
+		public JMXSqlProvider(MdbContext mdbContext, Microsoft.Extensions.Logging.ILogger logger) : base(mdbContext)
 		{
 			if (!mdbContext.ProviderName.Equals(JMXSqlFactory.ProviderInvariantName, StringComparison.CurrentCultureIgnoreCase))
 				throw new ArgumentException($"MdbContext must be created using { JMXSqlFactory.ProviderInvariantName} provider.");
+			this.Logger = logger;
 		}
 
 	}

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using S031.MetaStack.Common;
 using S031.MetaStack.Core.Data;
 
@@ -12,12 +13,13 @@ namespace S031.MetaStack.Core.ORM
 
 		private readonly JMXSqlRepo _repo;
 		private readonly JMXSqlProvider _jmx;
-		public JMXSqlFactory(MdbContext mdbContext) : base(mdbContext)
+		public JMXSqlFactory(MdbContext mdbContext, ILogger logger) : base(mdbContext)
 		{
 			if (!mdbContext.ProviderName.Equals(ProviderInvariantName, StringComparison.CurrentCultureIgnoreCase))
 				throw new ArgumentException($"MdbContext must be created using { ProviderInvariantName} provider.");
-			_repo = new JMXSqlRepo(mdbContext);
-			_jmx = new JMXSqlProvider(mdbContext);
+			this.Logger = logger;
+			_repo = new JMXSqlRepo(mdbContext, logger);
+			_jmx = new JMXSqlProvider(mdbContext, logger);
 		}
 		public override IJMXRepo CreateJMXRepo() => _repo;
 
