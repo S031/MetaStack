@@ -116,6 +116,11 @@ namespace S031.MetaStack.Core.ORM
 				.GetResult();
 		}
 
+		public override IDictionary<MdbType, string> GetTypeMap() => _typeMap;
+
+		public override IDictionary<string, MdbTypeInfo> GetServerTypeMap() => _typeInfo;
+
+		public override string[] GetVariableLenghtDataTypes() => variable_lenght_data_types.Split(';');
 		#region GetSchema
 		public override JMXSchema GetSchema(string objectName)=> GetSchemaAsync(objectName).GetAwaiter().GetResult();
 		public override async Task<JMXSchema> GetSchemaAsync(string objectName)
@@ -614,14 +619,14 @@ namespace S031.MetaStack.Core.ORM
 			bool createNew = (schemaFromDb == null);
 			string[] sqlList;
 			if (createNew)
-				sqlList = createNewStatements(schema);
+				sqlList = CreateNewStatements(schema);
 			else
 			{
 				// Compare with previos version of schema
 				// error schema not found if db objects exists, but 
 				// synced version schema don't exists
 				var prevSchema = await GetSchemaInternalAsync(mdb, dbSchema, objectName, 1);
-				sqlList = await compareSchemasAsync(mdb, schema, prevSchema);
+				sqlList = await CompareSchemasAsync(mdb, schema, prevSchema);
 			}
 
 			await mdb.BeginTransactionAsync();
@@ -647,6 +652,608 @@ namespace S031.MetaStack.Core.ORM
 			}
 			return schema;
 		}
+		private static string[] CreateNewStatements(JMXSchema schema)
+		{
+			List<string> sql = new List<string>();
+			StringBuilder sb = new StringBuilder();
+			WriteCreateNewTableStatements(sb, schema);
+			sql.Add(sb.ToString());
+			return sql.ToArray();
+		}
+
+		private static void WriteCreateNewTableStatements(StringBuilder sb, JMXSchema schema)
+		{
+			WriteCreateTableStatements(sb, schema);
+			WriteCreatePKStatement(sb, schema);
+			foreach (var att in schema.Attributes)
+				WriteCreateConstraintStatement(sb, schema, att);
+			foreach (var index in schema.Indexes)
+				WriteCreateIndexStatement(sb, schema, index);
+			foreach (var fk in schema.ForeignKeys)
+				WriteCreateFKStatement(sb, schema, fk);
+			WriteCreateDetailTableStatements(sb, schema);
+		}
+
+		private static void WriteCreateTableStatements(StringBuilder sb, JMXSchema schema)
+		{
+			sb.Append($"create table {schema.DbObjectName.ToString()}");
+			sb.Append("(\n");
+			int count = schema.Attributes.Count;
+			for (int i = 0; i < count; i++)
+			{
+				var att = schema.Attributes[i];
+				sb.Append($"[{att.FieldName}]\t{att.ServerDataType}");
+
+				MdbTypeInfo ti = _typeInfo[att.ServerDataType];
+				if (att.DataType == MdbType.@decimal && !ti.FixedSize && !att.DataSize.IsEmpty())
+					sb.Append($"({att.DataSize.Precision},{att.DataSize.Scale})");
+				else if (variable_lenght_data_types.IndexOf(att.ServerDataType) > -1)
+					if (att.DataSize.Size == -1)
+						sb.Append("(max)");
+					else
+						sb.Append($"({att.DataSize.Size})");
+
+				if (att.Identity.IsIdentity)
+					sb.Append($"\tidentity({att.Identity.Seed},{att.Identity.Increment})");
+				else
+					sb.Append($"\t{att.NullOption}");
+
+				if (i != count - 1)
+					sb.Append(",\n");
+
+				att.ID = i + 1;
+			}
+			sb.Append(")\n");
+		}
+
+		private static void WriteCreateDetailTableStatements(StringBuilder sb, JMXSchema schema)
+		{
+			foreach (var att in schema.Attributes.Where(a => a.DataType == MdbType.@object))
+				WriteCreateNewTableStatements(sb, att.ObjectSchema);
+		}
+
+		private static void WriteCreatePKStatement(StringBuilder sb, JMXSchema schema)
+		{
+			var pk = schema.PrimaryKey;
+			if (pk != null)
+			{
+				sb.Append($"alter table {schema.DbObjectName} add constraint [{pk.KeyName}] primary key (");
+				int count = pk.KeyMembers.Count;
+				for (int i = 0; i < count; i++)
+				{
+					var m = pk.KeyMembers[i];
+					sb.Append($"[{m.FieldName}] " + (m.IsDescending ? "DESC" : "ASC"));
+					if (i != count - 1)
+						sb.Append(", ");
+					else
+						sb.Append(")\n");
+
+				}
+			}
+		}
+
+		private static void WriteCreateIndexStatement(StringBuilder sb, JMXSchema schema, JMXIndex index)
+		{
+			//CREATE UNIQUE NONCLUSTERED INDEX [AK1_SysSchemas] ON [SysCat].[SysSchemas] ([SysAreaID] ASC, [ObjectName] ASC)
+			sb.Append("create " + (index.IsUnique ? "unique " : "") + (index.ClusteredOption == 1 ? "clustered " : "nonclustered ") +
+				$"index [{index.IndexName}] " +
+				$"on {schema.DbObjectName.ToString()} (");
+			int count = index.KeyMembers.Count;
+			for (int i = 0; i < count; i++)
+			{
+				var m = index.KeyMembers[i];
+				sb.Append($"[{m.FieldName}] " + (m.IsDescending ? "DESC" : "ASC"));
+				if (i != count - 1)
+					sb.Append(", ");
+				else
+					sb.Append(")\n");
+			}
+		}
+
+		private static void WriteCreateFKStatement(StringBuilder sb, JMXSchema schema, JMXForeignKey fk)
+		{
+			//Можно сделать сначала с NOCHECK затем CHECK
+			//	ALTER TABLE[SysCat].[SysSchemas] WITH CHECK ADD CONSTRAINT[FK_SYSSCHEMAS_SYSAREAS]([SysAreaID]) REFERENCES[SysCat].[SysAreas] ([ID]) 
+			//	ALTER TABLE[SysCat].[SysSchemas] CHECK CONSTRAINT[FK_SYSSCHEMAS_SYSAREAS]
+			if (fk.CheckOption)
+				// Enable for new added rows
+				sb.Append($"alter table {schema.DbObjectName} with check  add constraint [{fk.KeyName}] foreign key (");
+			else
+				sb.Append($"alter table {schema.DbObjectName} with nocheck  add constraint [{fk.KeyName}] foreign key (");
+
+			sb.Append(string.Join(", ", fk.KeyMembers.Select(m => '[' + m.FieldName + ']').ToArray()));
+			sb.Append(")");
+			sb.Append($"references {fk.RefDbObjectName} (");
+			sb.Append(string.Join(", ", fk.RefKeyMembers.Select(m => '[' + m.FieldName + ']').ToArray()));
+			sb.Append(")\n");
+			if (fk.CheckOption)
+				// check existing rows
+				sb.Append($"alter table {schema.DbObjectName} check constraint [{fk.KeyName}]\n");
+		}
+
+		private static void WriteCreateConstraintStatement(StringBuilder sb, JMXSchema schema, JMXAttribute att)
+		{
+			if (!att.CheckConstraint.IsEmpty())
+				sb.Append($"alter table {schema.DbObjectName} add constraint {att.CheckConstraint.ConstraintName} check({att.CheckConstraint.Definition})\n");
+			if (!att.DefaultConstraint.IsEmpty())
+				sb.Append($"alter table {schema.DbObjectName} add constraint {att.DefaultConstraint.ConstraintName} default({att.DefaultConstraint.Definition}) for [{att.FieldName}]\n");
+		}
+
+		private static void WriteCreateParentRelationStatement(StringBuilder sb, JMXSchema schema, JToken fk)
+		{
+			bool withCheck = (bool)fk["CheckOption"];
+			string check = withCheck ? "check" : "nocheck";
+			// Enable for new added rows
+			sb.AppendFormat("alter table [{0}].[{1}] with {2} add constraint [{3}] foreign key (",
+			(string)fk["ParentObject"]["AreaName"],
+			(string)fk["ParentObject"]["ObjectName"],
+			check, (string)fk["KeyName"]);
+
+
+			sb.Append(string.Join(", ", fk["KeyMembers"].Select(m => '[' + (string)m["FieldName"] + ']').ToArray()));
+			sb.Append(")");
+			sb.Append($"references [{fk["RefObject"]["AreaName"]}].[{fk["RefObject"]["ObjectName"]}] (");
+			sb.Append(string.Join(", ", fk["RefKeyMembers"].Select(m => '[' + (string)m["FieldName"] + ']').ToArray()));
+			sb.Append(")\n");
+			if (withCheck)
+				// check existing rows
+				sb.Append($"alter table [{fk["ParentObject"]["AreaName"]}].[{fk["ParentObject"]["ObjectName"]}] " +
+					$"check constraint [{(string)fk["KeyName"]}]\n");
+
+		}
+
+		private static async Task<string[]> CompareSchemasAsync(MdbContext mdb, JMXSchema schema, JMXSchema fromDbSchema)
+		{
+			List<string> sql = new List<string>();
+			StringBuilder sb = new StringBuilder();
+
+			await CompareSchemasStatementsAsync(mdb, sb, schema, fromDbSchema);
+
+			if (sb.Length > 1)
+				sql.Add(sb.ToString());
+			return sql.ToArray();
+		}
+
+		private static async Task CompareSchemasStatementsAsync(MdbContext mdb, StringBuilder sb, JMXSchema schema, JMXSchema fromDbSchema)
+		{
+			bool recreate = false;
+			foreach (var att in fromDbSchema.Attributes.Where(a => a.FieldName.StartsWith(detail_field_prefix)))
+			{
+				if (!schema.Attributes.Any(a => a.FieldName == att.FieldName))
+				{
+					string[] names = att.FieldName.Split('_');
+					var schemaFromDb = await GetTableSchema(mdb, new JMXObjectName(names[1], names[2]).ToString());
+					if (schemaFromDb != null)
+						await WriteDropStatementsAsync(mdb, sb, schemaFromDb);
+				}
+
+			}
+
+			recreate = CompareAttributes(sb, schema, fromDbSchema);
+			if (!recreate)
+				recreate = ComparePK(sb, schema, fromDbSchema);
+
+			if (!recreate)
+			{
+				CompareIndexes(sb, schema, fromDbSchema);
+				CompareFK(sb, schema, fromDbSchema);
+			}
+			else
+				await RecreateSchemaAsync(mdb, sb, schema, fromDbSchema);
+
+			foreach (var att in schema.Attributes.Where(a => a.DataType == MdbType.@object))
+			{
+				var schemaFromDb = await GetTableSchema(mdb, att.ObjectSchema.DbObjectName.ToString());
+				if (schemaFromDb != null)
+					await CompareSchemasStatementsAsync(mdb, sb, att.ObjectSchema, schemaFromDb);
+				else
+					WriteCreateNewTableStatements(sb, att.ObjectSchema);
+
+			}
+
+		}
+
+		private static bool CompareAttributes(StringBuilder sb, JMXSchema schema, JMXSchema fromDbSchema)
+		{
+			bool recreate = false;
+			int count = schema.Attributes.Count;
+			List<(JMXAttribute att, JMXAttribute att2, AttribCompareDiff diff)> l =
+				new List<(JMXAttribute, JMXAttribute, AttribCompareDiff)>();
+			for (int i = 0; i < count; i++)
+			{
+				var att = schema.Attributes[i];
+				//var att2 = fromDbSchema.Attributes.FirstOrDefault(a => a.ID == att.ID);
+				var att2 = fromDbSchema.Attributes.FirstOrDefault(a =>
+					a.FieldName.Equals(att.FieldName, StringComparison.CurrentCultureIgnoreCase));
+				//bool found = (att2 != null && att.FieldName.Equals(att2.FieldName, StringComparison.CurrentCultureIgnoreCase));
+				bool found = (att2 != null);
+				AttribCompareDiff diff = AttribCompareDiff.none;
+				if (found)
+				{
+					if (!att.ServerDataType.Equals(att2.ServerDataType, StringComparison.CurrentCultureIgnoreCase))
+						diff = AttribCompareDiff.dataTtype;
+					if (att.Required != att2.Required)
+						diff |= AttribCompareDiff.nullOptions;
+					if (att.Identity.IsIdentity != att2.Identity.IsIdentity ||
+						att.Identity.Seed != att2.Identity.Seed ||
+						att.Identity.Increment != att2.Identity.Increment)
+						diff |= AttribCompareDiff.identity;
+
+					if (att.DataType != MdbType.@object &&
+						!att.AttribName.Equals(att2.FieldName, StringComparison.CurrentCultureIgnoreCase))
+						diff |= AttribCompareDiff.name;
+
+					//Server DataTypes is equals
+					if ((diff & AttribCompareDiff.dataTtype) != AttribCompareDiff.dataTtype)
+					{
+						MdbTypeInfo ti = _typeInfo[att.ServerDataType];
+						if (!ti.FixedSize)
+						{
+							if (variable_lenght_data_types.IndexOf(att.ServerDataType) > -1 && att.DataSize.Size != att2.DataSize.Size)
+								diff |= AttribCompareDiff.size;
+							else if (ti.MdbType == MdbType.@decimal && (att.DataSize.Precision != att2.DataSize.Precision ||
+								att.DataSize.Scale != att2.DataSize.Scale))
+								diff |= AttribCompareDiff.size;
+						}
+					}
+					if (!att.CheckConstraint.Definition.RemoveChar("[( )]".ToCharArray()).
+						Equals(att2.CheckConstraint.Definition.RemoveChar("[( )]".ToCharArray()),
+						StringComparison.CurrentCultureIgnoreCase))
+						diff |= AttribCompareDiff.constraint;
+					else if (!att.DefaultConstraint.Definition.RemoveChar("[( )]".ToCharArray()).
+						Equals(att2.DefaultConstraint.Definition.RemoveChar("[( )]".ToCharArray()),
+						StringComparison.CurrentCultureIgnoreCase))
+						diff |= AttribCompareDiff.constraint;
+				}
+				//else if (att2 != null)
+				//	diff |= AttribCompareDiff.name;
+				else
+					diff = AttribCompareDiff.notFound;
+				l.Add((att, att2, diff));
+			}
+			foreach (var att2 in fromDbSchema.Attributes)
+			{
+				//var att = schema.Attributes.FirstOrDefault(a => a.ID == att2.ID);
+				var att = schema.Attributes.FirstOrDefault(a =>
+					a.FieldName.Equals(att2.FieldName, StringComparison.InvariantCultureIgnoreCase));
+				if (att == null)
+					l.Add((att, att2, AttribCompareDiff.remove));
+			}
+
+			foreach (var (att, att2, diff) in l)
+			{
+				if ((diff & AttribCompareDiff.remove) == AttribCompareDiff.remove)
+				{
+					WriteDropColumnStatement(sb, schema, att2);
+					continue;
+				}
+				if ((diff & AttribCompareDiff.constraint) == AttribCompareDiff.constraint)
+				{
+					WriteDropConstraintStatement(sb, fromDbSchema, att2);
+					WriteCreateConstraintStatement(sb, schema, att);
+				}
+				if ((diff & AttribCompareDiff.dataTtype) == AttribCompareDiff.dataTtype ||
+					(diff & AttribCompareDiff.size) == AttribCompareDiff.size ||
+					(diff & AttribCompareDiff.nullOptions) == AttribCompareDiff.nullOptions)
+					WriteAlterColumnStatement(sb, schema, att);
+				else if ((diff & AttribCompareDiff.notFound) == AttribCompareDiff.notFound)
+					WriteAlterColumnStatement(sb, schema, att, true);
+				else if ((diff & AttribCompareDiff.name) == AttribCompareDiff.name)
+				{
+					att.FieldName = att.AttribName;
+					WriteRenameColumnStatement(sb, schema, att2.FieldName, att.FieldName);
+				}
+				else if ((diff & AttribCompareDiff.identity) == AttribCompareDiff.identity)
+					recreate = true;
+			}
+			return recreate;
+		}
+
+		private static bool ComparePK(StringBuilder sb, JMXSchema schema, JMXSchema fromDbSchema)
+		{
+			///Add PK compare
+			///writeDropPKStatement
+			///writeCreatePKStatement
+			///The constraint 'XPK1Requests' is being referenced by table 'PaymentStateHists', 
+			///foreign key constraint 'FK_PAYMENTSTATEHISTS_REQUESTS'.
+			///Could not drop constraint. See previous errors.
+			if (schema.PrimaryKey == null && fromDbSchema.PrimaryKey != null)
+				//writeDropPKStatement(sb, fromDbSchema);
+				return true;
+			else if (schema.PrimaryKey != null && fromDbSchema.PrimaryKey == null)
+				WriteCreatePKStatement(sb, schema);
+			else if (schema.PrimaryKey != null &&
+				schema.PrimaryKey.KeyName != fromDbSchema.PrimaryKey.KeyName ||
+				schema.PrimaryKey.KeyMembers == fromDbSchema.PrimaryKey.KeyMembers)
+			{
+				//writeDropPKStatement(sb, fromDbSchema);
+				//writeCreatePKStatement(sb, schema);
+				return true;
+			}
+			return false;
+		}
+
+		private static void CompareIndexes(StringBuilder sb, JMXSchema schema, JMXSchema fromDbSchema)
+		{
+			List<(JMXIndex i1, JMXIndex i2, DbObjectOnDiffActions action)> l =
+				new List<(JMXIndex i1, JMXIndex i2, DbObjectOnDiffActions action)>();
+			int count = schema.Indexes.Count;
+			for (int i = 0; i < count; i++)
+			{
+				var i1 = schema.Indexes[i];
+				var i2 = fromDbSchema.Indexes.FirstOrDefault(index => index.IndexName == i1.IndexName);
+				if (i2 == null)
+					l.Add((i1, i2, DbObjectOnDiffActions.add));
+				else if (i1.ClusteredOption != i2.ClusteredOption)
+					l.Add((i1, i2, DbObjectOnDiffActions.alter));
+				else if (i1.IsUnique != i2.IsUnique)
+					l.Add((i1, i2, DbObjectOnDiffActions.alter));
+				else
+				{
+					foreach (var m in i1.KeyMembers)
+					{
+						var m2 = i2.KeyMembers.FirstOrDefault(memeber => memeber.FieldName == m.FieldName && memeber.Position == m.Position);
+						if (m != m2)
+						{
+							l.Add((i1, i2, DbObjectOnDiffActions.alter));
+							break;
+						}
+
+					}
+				}
+			}
+			count = fromDbSchema.Indexes.Count;
+			for (int i = 0; i < count; i++)
+			{
+				var i2 = fromDbSchema.Indexes[i];
+				var i1 = schema.Indexes.FirstOrDefault(index => index.IndexName == i2.IndexName);
+				if (i1 == null)
+					l.Add((i1, i2, DbObjectOnDiffActions.drop));
+			}
+			foreach (var (i1, i2, action) in l)
+			{
+				if (action == DbObjectOnDiffActions.drop)
+					WriteDropIndexStatement(sb, fromDbSchema, i2);
+			}
+			foreach (var (i1, i2, action) in l)
+			{
+				if (action == DbObjectOnDiffActions.add)
+					WriteCreateIndexStatement(sb, schema, i1);
+				else if (action == DbObjectOnDiffActions.alter)
+				{
+					WriteDropIndexStatement(sb, fromDbSchema, i2);
+					WriteCreateIndexStatement(sb, schema, i1);
+				}
+			}
+
+		}
+
+		private static void CompareFK(StringBuilder sb, JMXSchema schema, JMXSchema fromDbSchema)
+		{
+			List<(JMXForeignKey i1, JMXForeignKey i2, DbObjectOnDiffActions action)> l =
+				new List<(JMXForeignKey i1, JMXForeignKey i2, DbObjectOnDiffActions action)>();
+			int count = schema.ForeignKeys.Count;
+			for (int i = 0; i < count; i++)
+			{
+				var k1 = schema.ForeignKeys[i];
+				var k2 = fromDbSchema.ForeignKeys.FirstOrDefault(fk => fk.KeyName == k1.KeyName);
+				if (k2 == null)
+					l.Add((k1, k2, DbObjectOnDiffActions.add));
+				else if (k1.CheckOption != k2.CheckOption ||
+					k1.DeleteRefAction != k2.DeleteRefAction ||
+					k1.UpdateRefAction != k2.UpdateRefAction ||
+					!k1.RefDbObjectName.ToString().Equals(k2.RefDbObjectName.ToString(), StringComparison.CurrentCultureIgnoreCase))
+					l.Add((k1, k2, DbObjectOnDiffActions.alter));
+				else
+				{
+					foreach (var m in k1.KeyMembers)
+					{
+						var m2 = k2.KeyMembers.FirstOrDefault(memeber => memeber.FieldName == m.FieldName && memeber.Position == m.Position);
+						if (m != m2)
+						{
+							l.Add((k1, k2, DbObjectOnDiffActions.alter));
+							break;
+						}
+
+					}
+					foreach (var m in k1.RefKeyMembers)
+					{
+						var m2 = k2.RefKeyMembers.FirstOrDefault(memeber => memeber.FieldName == m.FieldName && memeber.Position == m.Position);
+						if (m != m2)
+						{
+							l.Add((k1, k2, DbObjectOnDiffActions.alter));
+							break;
+						}
+
+					}
+				}
+			}
+
+			count = fromDbSchema.ForeignKeys.Count;
+			for (int i = 0; i < count; i++)
+			{
+				var k2 = fromDbSchema.ForeignKeys[i];
+				var k1 = schema.ForeignKeys.FirstOrDefault(fk => fk.KeyName == k2.KeyName);
+				if (k1 == null)
+					l.Add((k1, k2, DbObjectOnDiffActions.drop));
+			}
+			foreach (var (i1, i2, action) in l)
+			{
+				if (action == DbObjectOnDiffActions.drop)
+					WriteDropFKStatement(sb, fromDbSchema, i2);
+			}
+			foreach (var (i1, i2, action) in l)
+			{
+				if (action == DbObjectOnDiffActions.add)
+					WriteCreateFKStatement(sb, schema, i1);
+				else if (action == DbObjectOnDiffActions.alter)
+				{
+					WriteDropFKStatement(sb, fromDbSchema, i2);
+					WriteCreateFKStatement(sb, schema, i1);
+				}
+			}
+		}
+
+		private static async Task RecreateSchemaAsync(MdbContext mdb, StringBuilder sb, JMXSchema schema, JMXSchema fromDbSchema)
+		{
+			int recCount = (await mdb.ExecuteAsync<int>($"select count(*) from {fromDbSchema.DbObjectName.ToString()}"));
+
+			string s = (await mdb.ExecuteAsync<string>(SqlServer.GetParentRelations,
+				new MdbParameter("@table_name", schema.DbObjectName.ToString()))) ?? "";
+			JArray parentRelations = null;
+			if (!s.IsEmpty())
+			{
+				parentRelations = JArray.Parse(s);
+				foreach (var fk in parentRelations)
+					WriteDropParentRelationStatement(sb, fk);
+			}
+			foreach (var fk in fromDbSchema.ForeignKeys)
+				WriteDropFKStatement(sb, fromDbSchema, fk);
+
+			string tmpTableName = fromDbSchema.DbObjectName.ObjectName + "_" + DateTime.Now.Subtract(vbo.Date()).Seconds.ToString();
+			if (recCount > 0)
+				WriteRenameTableStatement(sb, fromDbSchema, tmpTableName);
+			else
+				WriteDropTableStatement(sb, fromDbSchema);
+
+			WriteCreateTableStatements(sb, schema);
+
+			if (recCount > 0)
+			{
+				WriteInsertRowsStatement(sb, schema, tmpTableName);
+				WriteDropTableStatement(sb, fromDbSchema, tmpTableName);
+			}
+
+			WriteCreatePKStatement(sb, schema);
+			foreach (var att in schema.Attributes)
+				WriteCreateConstraintStatement(sb, schema, att);
+			foreach (var index in schema.Indexes)
+				WriteCreateIndexStatement(sb, schema, index);
+			foreach (var fk in schema.ForeignKeys)
+				WriteCreateFKStatement(sb, schema, fk);
+
+
+			if (parentRelations != null)
+			{
+				foreach (var fk in parentRelations)
+					WriteCreateParentRelationStatement(sb, schema, fk);
+			}
+		}
+
+		private static void WriteRenameTableStatement(StringBuilder sb, JMXSchema schema, string newName)
+		{
+			//EXEC sp_rename 'Sales.SalesTerritory', 'SalesTerr'; 
+			sb.Append($"EXEC sp_rename '{schema.DbObjectName}', '{newName}'\n");
+		}
+
+		private static void WriteInsertRowsStatement(StringBuilder sb, JMXSchema schema, string tmpTableName)
+		{
+			/// [dbo].[Customers]
+			//		([Name])
+
+			//select
+			//	Name
+			//From Bank.dbo.Clients where ClType = 0;
+			sb.Append($"insert into {schema.DbObjectName} (\n");
+			int count = schema.Attributes.Count;
+			for (int i = 0; i < count; i++)
+			{
+				var att = schema.Attributes[i];
+				if (!att.Identity.IsIdentity)
+				{
+					sb.Append($"[{att.FieldName}]");
+					if (i != count - 1)
+						sb.Append(",\n");
+				}
+				att.ID = i + 1;
+			}
+			sb.Append(")\nselect\n");
+			for (int i = 0; i < count; i++)
+			{
+				var att = schema.Attributes[i];
+				if (!att.Identity.IsIdentity)
+				{
+					sb.Append($"[{att.FieldName}]");
+					if (i != count - 1)
+						sb.Append(",\n");
+				}
+				att.ID = i + 1;
+			}
+			sb.Append($"from [{schema.DbObjectName.AreaName}].[{tmpTableName}]");
+		}
+
+		/// <summary>
+		/// ALTER TABLE only allows columns to be added that can contain nulls, 
+		/// or have a DEFAULT definition specified, 
+		/// or the column being added is an identity or timestamp column, 
+		/// or alternatively if none of the previous conditions are satisfied the table must be empty
+		/// to allow addition of this column. 
+		/// </summary>
+		private static void WriteAlterColumnStatement(StringBuilder sb, JMXSchema schema, JMXAttribute att, bool addNew = false)
+		{
+			string action = addNew ? "add" : "alter column";
+			sb.Append($"alter table [{schema.DbObjectName.AreaName}].[{schema.DbObjectName.ObjectName}] {action} [{att.FieldName}]\t{att.ServerDataType}");
+
+			MdbTypeInfo ti = _typeInfo[att.ServerDataType];
+			if (att.DataType == MdbType.@decimal && !ti.FixedSize && !att.DataSize.IsEmpty())
+				sb.Append($"({att.DataSize.Precision},{att.DataSize.Scale})");
+			else if (variable_lenght_data_types.IndexOf(att.ServerDataType) > -1)
+				if (att.DataSize.Size == -1)
+					sb.Append("(max)");
+				else
+					sb.Append($"({att.DataSize.Size})");
+			sb.Append($"\t{att.NullOption}\n");
+		}
+
+		private static void WriteRenameColumnStatement(StringBuilder sb, JMXSchema schema, string oldName, string newName)
+		{
+			sb.Append($"exec sp_rename '{schema.DbObjectName}.{oldName}', '{newName}', 'COLUMN'\n");
+		}
+
+		private static void WriteDropColumnStatement(StringBuilder sb, JMXSchema schema, JMXAttribute att)
+		{
+			sb.Append($"alter table [{schema.DbObjectName.AreaName}].[{schema.DbObjectName.ObjectName}] drop column [{att.FieldName}]\n");
+		}
+
+		private static void WriteDropIndexStatement(StringBuilder sb, JMXSchema schema, JMXIndex index)
+		{
+			sb.Append($"drop index {index.IndexName} on {schema.DbObjectName}\n");
+		}
+
+		private static void WriteDropPKStatement(StringBuilder sb, JMXSchema schema)
+		{
+			sb.Append($"alter table {schema.DbObjectName} drop constraint {schema.PrimaryKey.KeyName}\n");
+		}
+
+		private static void WriteDropConstraintStatement(StringBuilder sb, JMXSchema schema, JMXAttribute att)
+		{
+			if (!att.DefaultConstraint.IsEmpty())
+				sb.Append($"alter table {schema.DbObjectName} drop constraint {att.DefaultConstraint.ConstraintName}\n");
+			if (!att.CheckConstraint.IsEmpty())
+				sb.Append($"alter table {schema.DbObjectName} drop constraint {att.CheckConstraint.ConstraintName}\n");
+		}
+
+		private static string GetDiffs(AttribCompareDiff diff)
+		{
+			List<string> l = new List<string>();
+			if (((diff & AttribCompareDiff.notFound) == AttribCompareDiff.notFound))
+				l.Add(AttribCompareDiff.notFound.ToString());
+			if (((diff & AttribCompareDiff.name) == AttribCompareDiff.name))
+				l.Add(AttribCompareDiff.name.ToString());
+			if (((diff & AttribCompareDiff.dataTtype) == AttribCompareDiff.dataTtype))
+				l.Add(AttribCompareDiff.dataTtype.ToString());
+			if (((diff & AttribCompareDiff.size) == AttribCompareDiff.size))
+				l.Add(AttribCompareDiff.size.ToString());
+			if (((diff & AttribCompareDiff.nullOptions) == AttribCompareDiff.nullOptions))
+				l.Add(AttribCompareDiff.nullOptions.ToString());
+			if (((diff & AttribCompareDiff.identity) == AttribCompareDiff.identity))
+				l.Add(AttribCompareDiff.identity.ToString());
+			if (l.Count == 0)
+				l.Add(AttribCompareDiff.none.ToString());
+			return string.Join('\t', l.ToArray());
+		}
+
+
 		#endregion Sync Schema
 
 		#region Utils
