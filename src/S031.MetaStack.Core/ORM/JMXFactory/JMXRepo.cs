@@ -53,6 +53,7 @@ namespace S031.MetaStack.Core.ORM
 		{
 			throw new NotImplementedException();
 		}
+
 		public virtual IDictionary<string, MdbTypeInfo> GetServerTypeMap()
 		{
 			throw new NotImplementedException();

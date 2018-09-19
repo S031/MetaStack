@@ -13,6 +13,9 @@ namespace S031.MetaStack.Core.Data
 		public const string ProviderNameField = "Provider Name";
 		public const string ProviderNameDefault = "System.Data.SqlClient";
 		public const string DbNameField = "Initial Catalog";
+		public ConnectInfo()
+		{
+		}
 
 		public ConnectInfo(string connectionString)
 		{

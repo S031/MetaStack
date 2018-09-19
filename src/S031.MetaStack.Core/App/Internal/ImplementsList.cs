@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Microsoft.Extensions.DependencyInjection;
 #if NETCOREAPP
 
 namespace S031.MetaStack.Core
@@ -21,7 +20,13 @@ namespace S031.MetaStack.WinForms
 		{
 			if (_iList.TryGetValue(type, out var l))
 				return l;
-			return default(List<Type>);
+
+			l = getImplements(type).ToList();
+			lock (objLock)
+			{
+					_iList.Add(type, l);
+			}
+			return l;
 		}
 
 		public static IEnumerable<Type> Add(Type type, Assembly a = null)
@@ -55,15 +60,6 @@ namespace S031.MetaStack.WinForms
 		private static IEnumerable<Assembly> getAssemblies()
 		{
 			return AppDomain.CurrentDomain.GetAssemblies();
-		}
-		private static Assembly TryLoad(string name)
-		{
-			try
-			{
-				return Assembly.Load(new AssemblyName(name));
-			}
-			catch { }
-			return null;
 		}
 	}
 }

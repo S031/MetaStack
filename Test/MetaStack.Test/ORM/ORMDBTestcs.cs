@@ -46,8 +46,10 @@ namespace MetaStack.Test.ORM
 		void Test1()
 		{
 			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			using (MdbContext mdb = new MdbContext(_cn))
 			{
-				JMXSchemaProviderDB p = JMXSchemaProviderFactory.GetProvider<JMXSchemaProviderDB>(_cn, _logger);
+				JMXFactory f = JMXFactory.Create(mdb, _logger);
+				//JMXSchemaProviderDB p = JMXSchemaProviderFactory.GetProvider<JMXSchemaProviderDB>(_cn, _logger);
 				//_logger.Debug("Start speed test for obtain JMXSchemaProviderDB");
 				//for (int i = 0; i < 150000; i++)
 				//	p.GetSchema("dbo.SysSequence");

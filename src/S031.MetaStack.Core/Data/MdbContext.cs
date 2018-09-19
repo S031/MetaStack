@@ -308,7 +308,8 @@ namespace S031.MetaStack.Core.Data
 		{
 			using (DbCommand command = getCommandInternal(sql, parameters))
 			{
-				return (T)await command.ExecuteScalarAsync().ConfigureAwait(false);
+				var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
+				return (T)result;
 			}
 		}
 		/// <summary>

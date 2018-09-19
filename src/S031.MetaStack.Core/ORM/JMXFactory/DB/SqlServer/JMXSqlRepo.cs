@@ -65,7 +65,7 @@ namespace S031.MetaStack.Core.ORM
 		};
 		const string variable_lenght_data_types = "varchar;nvarchar;char;nchar;varbinary";
 
-		private static readonly Dictionary<string, MdbTypeInfo> _typeInfo = new Dictionary<string, MdbTypeInfo>()
+		private static readonly Dictionary<string, MdbTypeInfo> _typeInfo = new Dictionary<string, MdbTypeInfo>(StringComparer.CurrentCultureIgnoreCase)
 		{
 			{ "bit", new MdbTypeInfo() { MdbType = MdbType.@bool, Type = typeof(bool), Name = "bit", Size = 1, Scale = 0, Precision = 0, FixedSize = true, NullIfEmpty = false} },
 			{ "tinyint", new MdbTypeInfo() { MdbType = MdbType.@byte, Type = typeof(byte), Name = "tinyint", Size = 1, Scale = 0, Precision = 3, FixedSize = true, NullIfEmpty = true} },
@@ -110,6 +110,7 @@ namespace S031.MetaStack.Core.ORM
 			if (!mdbContext.ProviderName.Equals(JMXSqlFactory.ProviderInvariantName, StringComparison.CurrentCultureIgnoreCase))
 				throw new ArgumentException($"MdbContext must be created using { JMXSqlFactory.ProviderInvariantName} provider.");
 			Logger = logger;
+			//TestSysCat();
 			TestSysCatAsync()
 				.ConfigureAwait(false)
 				.GetAwaiter()
@@ -121,6 +122,7 @@ namespace S031.MetaStack.Core.ORM
 		public override IDictionary<string, MdbTypeInfo> GetServerTypeMap() => _typeInfo;
 
 		public override string[] GetVariableLenghtDataTypes() => variable_lenght_data_types.Split(';');
+
 		#region GetSchema
 		public override JMXSchema GetSchema(string objectName)=> GetSchemaAsync(objectName).GetAwaiter().GetResult();
 		public override async Task<JMXSchema> GetSchemaAsync(string objectName)
@@ -144,10 +146,24 @@ namespace S031.MetaStack.Core.ORM
 		{
 			if (_counter == 0)
 			{
-				if (!(await this.MdbContext.ExecuteAsync<string>(SqlServer.TestSchema)).IsEmpty())
+				var result = await this.MdbContext.ExecuteAsync<string>(SqlServer.TestSchema);
+				if (result.IsEmpty())
 				{
 					await CreateDbSchemaAsync(this.MdbContext, this.Logger);
 					_defaultDbSchema = await GetDefaultDbSchemaAsync(this.MdbContext);
+					Interlocked.Increment(ref _counter);
+				}
+			}
+		}
+		private void TestSysCat()
+		{
+			if (_counter == 0)
+			{
+				var result = this.MdbContext.Execute<string>(SqlServer.TestSchema);
+				if (result.IsEmpty())
+				{
+					CreateDbSchemaAsync(this.MdbContext, this.Logger).GetAwaiter().GetResult();
+					_defaultDbSchema = GetDefaultDbSchemaAsync(this.MdbContext).GetAwaiter().GetResult();
 					Interlocked.Increment(ref _counter);
 				}
 			}
@@ -235,12 +251,15 @@ namespace S031.MetaStack.Core.ORM
 		public override async Task DropSchemaAsync(string objectName)
 		{
 			JMXObjectName name = objectName;
-			await DropSchemaAsync(this.MdbContext, this.Logger, name.AreaName, name.ObjectName).ConfigureAwait(false);
+			await DropSchemaAsync(name.AreaName, name.ObjectName).ConfigureAwait(false);
 			lock (objLock)
 				_schemaCache.Remove(name.ToString());
 		}
-		private static async Task DropSchemaAsync(MdbContext mdb, ILogger logger, string areaName, string objectName)
+
+		private async Task DropSchemaAsync(string areaName, string objectName)
 		{
+			MdbContext mdb = this.MdbContext;
+			ILogger logger = this.Logger;
 			var schema = await GetSchemaAsync(mdb, areaName, objectName);
 			var schemaFromDb = await GetTableSchema(mdb, schema.DbObjectName.ToString());
 
@@ -248,7 +267,7 @@ namespace S031.MetaStack.Core.ORM
 			if (schemaFromDb == null)
 				sqlList = new string[] { };
 			else
-				sqlList = await DropSchemaStatementsAsync(mdb, schemaFromDb);
+				sqlList = await DropSchemaStatementsAsync(schemaFromDb);
 
 			if (sqlList.Length > 0)
 			{
@@ -273,65 +292,31 @@ namespace S031.MetaStack.Core.ORM
 
 		}
 
-		private static async Task<string[]> DropSchemaStatementsAsync(MdbContext mdb, JMXSchema fromDbSchema)
+		private async Task<string[]> DropSchemaStatementsAsync(JMXSchema fromDbSchema)
 		{
 			List<string> sql = new List<string>();
-			StringBuilder sb = new StringBuilder();
-			await WriteDropStatementsAsync(mdb, sb, fromDbSchema);
-			sql.Add(sb.ToString());
+			using (SQLStatementWriter sb = new SQLStatementWriter(this, fromDbSchema))
+			{
+				await WriteDropStatementsAsync(sb, fromDbSchema);
+				sql.Add(sb.ToString());
+			}
 			return sql.ToArray();
 		}
 
-		private static async Task WriteDropStatementsAsync(MdbContext mdb, StringBuilder sb, JMXSchema fromDbSchema)
+		private async Task WriteDropStatementsAsync(SQLStatementWriter sb, JMXSchema fromDbSchema)
 		{
+			MdbContext mdb = this.MdbContext;
 			foreach (var att in fromDbSchema.Attributes.Where(a => a.FieldName.StartsWith(detail_field_prefix)))
 			{
 				string[] names = att.FieldName.Split('_');
 				var schemaFromDb = await GetTableSchema(mdb, new JMXObjectName(names[1], names[2]).ToString());
 				if (schemaFromDb != null)
-					await WriteDropStatementsAsync(mdb, sb, schemaFromDb);
+					await WriteDropStatementsAsync(sb, schemaFromDb);
 
 			}
 			string s = (await mdb.ExecuteAsync<string>(SqlServer.GetParentRelations,
 				new MdbParameter("@table_name", fromDbSchema.DbObjectName.ToString()))) ?? "";
-			if (!s.IsEmpty())
-			{
-				JArray a = JArray.Parse(s);
-				foreach (var o in a)
-				{
-					string sch = (string)o["ParentObject"]["AreaName"];
-					string tbl = (string)o["ParentObject"]["ObjectName"];
-					if (!fromDbSchema.Attributes.Any(at =>
-						at.FieldName == $"{detail_field_prefix}{sch}_{tbl}"))
-						WriteDropParentRelationStatement(sb, o);
-				}
-			}
-			foreach (var fk in fromDbSchema.ForeignKeys)
-				WriteDropFKStatement(sb, fromDbSchema, fk);
-			WriteDropTableStatement(sb, fromDbSchema);
-		}
-
-		private static void WriteDropParentRelationStatement(StringBuilder sb, JToken o)
-		{
-			sb.AppendFormat("alter table [{0}].[{1}] drop constraint [{2}]\n",
-				(string)o["ParentObject"]["AreaName"],
-				(string)o["ParentObject"]["ObjectName"],
-				(string)o["KeyName"]);
-		}
-
-		private static void WriteDropFKStatement(StringBuilder sb, JMXSchema fromDbSchema, JMXForeignKey fk)
-		{
-			sb.AppendFormat("alter table [{0}].[{1}] drop constraint [{2}]\n",
-				fromDbSchema.DbObjectName.AreaName,
-				fromDbSchema.DbObjectName.ObjectName,
-				fk.KeyName);
-		}
-
-		private static void WriteDropTableStatement(StringBuilder sb, JMXSchema fromDbSchema, string tmpTableName = null)
-		{
-			sb.AppendFormat("drop table [{0}].[{1}]\n",
-				fromDbSchema.DbObjectName.AreaName,
-				tmpTableName.IsEmpty() ? fromDbSchema.DbObjectName.ObjectName : tmpTableName);
+			sb.WriteDropStatements(s, fromDbSchema);
 		}
 
 		#endregion Drop Schema
@@ -598,22 +583,22 @@ namespace S031.MetaStack.Core.ORM
 		public override async Task<JMXSchema> SyncSchemaAsync(string objectName)
 		{
 			JMXObjectName name = objectName;
-			var schema = await SyncSchemaAsync(this.MdbContext, this.Logger, name.AreaName, name.ObjectName).ConfigureAwait(false);
+			var schema = await SyncSchemaAsync(name.AreaName, name.ObjectName).ConfigureAwait(false);
 			lock (objLock)
 				_schemaCache[schema.ObjectName] = schema;
 			return schema;
 		}
-		public static async Task<JMXSchema> SyncSchemaAsync(MdbContext mdb, ILogger log,  string dbSchema, string objectName)
+		public async Task<JMXSchema> SyncSchemaAsync(string dbSchema, string objectName)
 		{
+			MdbContext mdb = this.MdbContext;
+			ILogger log = this.Logger;
 			var schema = await GetSchemaInternalAsync(mdb, dbSchema, objectName, 0);
 			//schema was syncronized
 			if (schema.SyncState == 1)
 				return schema;
 
 			foreach (var o in GetDependences(schema))
-			{
-				await SyncSchemaAsync(mdb, log, o.AreaName, o.ObjectName);
-			}
+				await SyncSchemaAsync(o.AreaName, o.ObjectName);
 
 			var schemaFromDb = await GetTableSchema(mdb, schema.DbObjectName.ToString());
 			bool createNew = (schemaFromDb == null);
@@ -652,170 +637,33 @@ namespace S031.MetaStack.Core.ORM
 			}
 			return schema;
 		}
-		private static string[] CreateNewStatements(JMXSchema schema)
+		private string[] CreateNewStatements(JMXSchema schema)
 		{
 			List<string> sql = new List<string>();
-			StringBuilder sb = new StringBuilder();
-			WriteCreateNewTableStatements(sb, schema);
-			sql.Add(sb.ToString());
-			return sql.ToArray();
-		}
-
-		private static void WriteCreateNewTableStatements(StringBuilder sb, JMXSchema schema)
-		{
-			WriteCreateTableStatements(sb, schema);
-			WriteCreatePKStatement(sb, schema);
-			foreach (var att in schema.Attributes)
-				WriteCreateConstraintStatement(sb, schema, att);
-			foreach (var index in schema.Indexes)
-				WriteCreateIndexStatement(sb, schema, index);
-			foreach (var fk in schema.ForeignKeys)
-				WriteCreateFKStatement(sb, schema, fk);
-			WriteCreateDetailTableStatements(sb, schema);
-		}
-
-		private static void WriteCreateTableStatements(StringBuilder sb, JMXSchema schema)
-		{
-			sb.Append($"create table {schema.DbObjectName.ToString()}");
-			sb.Append("(\n");
-			int count = schema.Attributes.Count;
-			for (int i = 0; i < count; i++)
+			using (SQLStatementWriter sb = new SQLStatementWriter(this, schema))
 			{
-				var att = schema.Attributes[i];
-				sb.Append($"[{att.FieldName}]\t{att.ServerDataType}");
-
-				MdbTypeInfo ti = _typeInfo[att.ServerDataType];
-				if (att.DataType == MdbType.@decimal && !ti.FixedSize && !att.DataSize.IsEmpty())
-					sb.Append($"({att.DataSize.Precision},{att.DataSize.Scale})");
-				else if (variable_lenght_data_types.IndexOf(att.ServerDataType) > -1)
-					if (att.DataSize.Size == -1)
-						sb.Append("(max)");
-					else
-						sb.Append($"({att.DataSize.Size})");
-
-				if (att.Identity.IsIdentity)
-					sb.Append($"\tidentity({att.Identity.Seed},{att.Identity.Increment})");
-				else
-					sb.Append($"\t{att.NullOption}");
-
-				if (i != count - 1)
-					sb.Append(",\n");
-
-				att.ID = i + 1;
-			}
-			sb.Append(")\n");
-		}
-
-		private static void WriteCreateDetailTableStatements(StringBuilder sb, JMXSchema schema)
-		{
-			foreach (var att in schema.Attributes.Where(a => a.DataType == MdbType.@object))
-				WriteCreateNewTableStatements(sb, att.ObjectSchema);
-		}
-
-		private static void WriteCreatePKStatement(StringBuilder sb, JMXSchema schema)
-		{
-			var pk = schema.PrimaryKey;
-			if (pk != null)
-			{
-				sb.Append($"alter table {schema.DbObjectName} add constraint [{pk.KeyName}] primary key (");
-				int count = pk.KeyMembers.Count;
-				for (int i = 0; i < count; i++)
-				{
-					var m = pk.KeyMembers[i];
-					sb.Append($"[{m.FieldName}] " + (m.IsDescending ? "DESC" : "ASC"));
-					if (i != count - 1)
-						sb.Append(", ");
-					else
-						sb.Append(")\n");
-
-				}
-			}
-		}
-
-		private static void WriteCreateIndexStatement(StringBuilder sb, JMXSchema schema, JMXIndex index)
-		{
-			//CREATE UNIQUE NONCLUSTERED INDEX [AK1_SysSchemas] ON [SysCat].[SysSchemas] ([SysAreaID] ASC, [ObjectName] ASC)
-			sb.Append("create " + (index.IsUnique ? "unique " : "") + (index.ClusteredOption == 1 ? "clustered " : "nonclustered ") +
-				$"index [{index.IndexName}] " +
-				$"on {schema.DbObjectName.ToString()} (");
-			int count = index.KeyMembers.Count;
-			for (int i = 0; i < count; i++)
-			{
-				var m = index.KeyMembers[i];
-				sb.Append($"[{m.FieldName}] " + (m.IsDescending ? "DESC" : "ASC"));
-				if (i != count - 1)
-					sb.Append(", ");
-				else
-					sb.Append(")\n");
-			}
-		}
-
-		private static void WriteCreateFKStatement(StringBuilder sb, JMXSchema schema, JMXForeignKey fk)
-		{
-			//Можно сделать сначала с NOCHECK затем CHECK
-			//	ALTER TABLE[SysCat].[SysSchemas] WITH CHECK ADD CONSTRAINT[FK_SYSSCHEMAS_SYSAREAS]([SysAreaID]) REFERENCES[SysCat].[SysAreas] ([ID]) 
-			//	ALTER TABLE[SysCat].[SysSchemas] CHECK CONSTRAINT[FK_SYSSCHEMAS_SYSAREAS]
-			if (fk.CheckOption)
-				// Enable for new added rows
-				sb.Append($"alter table {schema.DbObjectName} with check  add constraint [{fk.KeyName}] foreign key (");
-			else
-				sb.Append($"alter table {schema.DbObjectName} with nocheck  add constraint [{fk.KeyName}] foreign key (");
-
-			sb.Append(string.Join(", ", fk.KeyMembers.Select(m => '[' + m.FieldName + ']').ToArray()));
-			sb.Append(")");
-			sb.Append($"references {fk.RefDbObjectName} (");
-			sb.Append(string.Join(", ", fk.RefKeyMembers.Select(m => '[' + m.FieldName + ']').ToArray()));
-			sb.Append(")\n");
-			if (fk.CheckOption)
-				// check existing rows
-				sb.Append($"alter table {schema.DbObjectName} check constraint [{fk.KeyName}]\n");
-		}
-
-		private static void WriteCreateConstraintStatement(StringBuilder sb, JMXSchema schema, JMXAttribute att)
-		{
-			if (!att.CheckConstraint.IsEmpty())
-				sb.Append($"alter table {schema.DbObjectName} add constraint {att.CheckConstraint.ConstraintName} check({att.CheckConstraint.Definition})\n");
-			if (!att.DefaultConstraint.IsEmpty())
-				sb.Append($"alter table {schema.DbObjectName} add constraint {att.DefaultConstraint.ConstraintName} default({att.DefaultConstraint.Definition}) for [{att.FieldName}]\n");
-		}
-
-		private static void WriteCreateParentRelationStatement(StringBuilder sb, JMXSchema schema, JToken fk)
-		{
-			bool withCheck = (bool)fk["CheckOption"];
-			string check = withCheck ? "check" : "nocheck";
-			// Enable for new added rows
-			sb.AppendFormat("alter table [{0}].[{1}] with {2} add constraint [{3}] foreign key (",
-			(string)fk["ParentObject"]["AreaName"],
-			(string)fk["ParentObject"]["ObjectName"],
-			check, (string)fk["KeyName"]);
-
-
-			sb.Append(string.Join(", ", fk["KeyMembers"].Select(m => '[' + (string)m["FieldName"] + ']').ToArray()));
-			sb.Append(")");
-			sb.Append($"references [{fk["RefObject"]["AreaName"]}].[{fk["RefObject"]["ObjectName"]}] (");
-			sb.Append(string.Join(", ", fk["RefKeyMembers"].Select(m => '[' + (string)m["FieldName"] + ']').ToArray()));
-			sb.Append(")\n");
-			if (withCheck)
-				// check existing rows
-				sb.Append($"alter table [{fk["ParentObject"]["AreaName"]}].[{fk["ParentObject"]["ObjectName"]}] " +
-					$"check constraint [{(string)fk["KeyName"]}]\n");
-
-		}
-
-		private static async Task<string[]> CompareSchemasAsync(MdbContext mdb, JMXSchema schema, JMXSchema fromDbSchema)
-		{
-			List<string> sql = new List<string>();
-			StringBuilder sb = new StringBuilder();
-
-			await CompareSchemasStatementsAsync(mdb, sb, schema, fromDbSchema);
-
-			if (sb.Length > 1)
+				sb.WriteCreateNewTableStatements();
 				sql.Add(sb.ToString());
+			}
 			return sql.ToArray();
 		}
 
-		private static async Task CompareSchemasStatementsAsync(MdbContext mdb, StringBuilder sb, JMXSchema schema, JMXSchema fromDbSchema)
+		private async Task<string[]> CompareSchemasAsync(MdbContext mdb, JMXSchema schema, JMXSchema fromDbSchema)
 		{
+			List<string> sql = new List<string>();
+			using (SQLStatementWriter sb = new SQLStatementWriter(this, schema))
+			{
+				await CompareSchemasStatementsAsync(sb, schema, fromDbSchema);
+				string stmt = sb.ToString();
+				if (stmt.Length > 1)
+					sql.Add(sb.ToString());
+			}
+			return sql.ToArray();
+		}
+
+		private async Task CompareSchemasStatementsAsync(SQLStatementWriter sb, JMXSchema schema, JMXSchema fromDbSchema)
+		{
+			MdbContext mdb = this.MdbContext;
 			bool recreate = false;
 			foreach (var att in fromDbSchema.Attributes.Where(a => a.FieldName.StartsWith(detail_field_prefix)))
 			{
@@ -824,7 +672,7 @@ namespace S031.MetaStack.Core.ORM
 					string[] names = att.FieldName.Split('_');
 					var schemaFromDb = await GetTableSchema(mdb, new JMXObjectName(names[1], names[2]).ToString());
 					if (schemaFromDb != null)
-						await WriteDropStatementsAsync(mdb, sb, schemaFromDb);
+						await WriteDropStatementsAsync(sb, schemaFromDb);
 				}
 
 			}
@@ -845,15 +693,14 @@ namespace S031.MetaStack.Core.ORM
 			{
 				var schemaFromDb = await GetTableSchema(mdb, att.ObjectSchema.DbObjectName.ToString());
 				if (schemaFromDb != null)
-					await CompareSchemasStatementsAsync(mdb, sb, att.ObjectSchema, schemaFromDb);
+					await CompareSchemasStatementsAsync(sb, att.ObjectSchema, schemaFromDb);
 				else
-					WriteCreateNewTableStatements(sb, att.ObjectSchema);
+					sb.WriteCreateNewTableStatements(att.ObjectSchema);
 
 			}
-
 		}
 
-		private static bool CompareAttributes(StringBuilder sb, JMXSchema schema, JMXSchema fromDbSchema)
+		private static bool CompareAttributes(SQLStatementWriter sb, JMXSchema schema, JMXSchema fromDbSchema)
 		{
 			bool recreate = false;
 			int count = schema.Attributes.Count;
@@ -924,24 +771,24 @@ namespace S031.MetaStack.Core.ORM
 			{
 				if ((diff & AttribCompareDiff.remove) == AttribCompareDiff.remove)
 				{
-					WriteDropColumnStatement(sb, schema, att2);
+					sb.WriteDropColumnStatement(att2);
 					continue;
 				}
 				if ((diff & AttribCompareDiff.constraint) == AttribCompareDiff.constraint)
 				{
-					WriteDropConstraintStatement(sb, fromDbSchema, att2);
-					WriteCreateConstraintStatement(sb, schema, att);
+					sb.WriteDropConstraintStatement(att2, fromDbSchema);
+					sb.WriteCreateConstraintStatement(att);
 				}
 				if ((diff & AttribCompareDiff.dataTtype) == AttribCompareDiff.dataTtype ||
 					(diff & AttribCompareDiff.size) == AttribCompareDiff.size ||
 					(diff & AttribCompareDiff.nullOptions) == AttribCompareDiff.nullOptions)
-					WriteAlterColumnStatement(sb, schema, att);
+					sb.WriteAlterColumnStatement(att);
 				else if ((diff & AttribCompareDiff.notFound) == AttribCompareDiff.notFound)
-					WriteAlterColumnStatement(sb, schema, att, true);
+					sb.WriteAlterColumnStatement(att, true);
 				else if ((diff & AttribCompareDiff.name) == AttribCompareDiff.name)
 				{
 					att.FieldName = att.AttribName;
-					WriteRenameColumnStatement(sb, schema, att2.FieldName, att.FieldName);
+					sb.WriteRenameColumnStatement(att2.FieldName, att.FieldName);
 				}
 				else if ((diff & AttribCompareDiff.identity) == AttribCompareDiff.identity)
 					recreate = true;
@@ -949,7 +796,7 @@ namespace S031.MetaStack.Core.ORM
 			return recreate;
 		}
 
-		private static bool ComparePK(StringBuilder sb, JMXSchema schema, JMXSchema fromDbSchema)
+		private static bool ComparePK(SQLStatementWriter sb, JMXSchema schema, JMXSchema fromDbSchema)
 		{
 			///Add PK compare
 			///writeDropPKStatement
@@ -961,7 +808,7 @@ namespace S031.MetaStack.Core.ORM
 				//writeDropPKStatement(sb, fromDbSchema);
 				return true;
 			else if (schema.PrimaryKey != null && fromDbSchema.PrimaryKey == null)
-				WriteCreatePKStatement(sb, schema);
+				sb.WriteCreatePKStatement();
 			else if (schema.PrimaryKey != null &&
 				schema.PrimaryKey.KeyName != fromDbSchema.PrimaryKey.KeyName ||
 				schema.PrimaryKey.KeyMembers == fromDbSchema.PrimaryKey.KeyMembers)
@@ -973,7 +820,7 @@ namespace S031.MetaStack.Core.ORM
 			return false;
 		}
 
-		private static void CompareIndexes(StringBuilder sb, JMXSchema schema, JMXSchema fromDbSchema)
+		private static void CompareIndexes(SQLStatementWriter sb, JMXSchema schema, JMXSchema fromDbSchema)
 		{
 			List<(JMXIndex i1, JMXIndex i2, DbObjectOnDiffActions action)> l =
 				new List<(JMXIndex i1, JMXIndex i2, DbObjectOnDiffActions action)>();
@@ -1013,22 +860,22 @@ namespace S031.MetaStack.Core.ORM
 			foreach (var (i1, i2, action) in l)
 			{
 				if (action == DbObjectOnDiffActions.drop)
-					WriteDropIndexStatement(sb, fromDbSchema, i2);
+					sb.WriteDropIndexStatement(i2, fromDbSchema);
 			}
 			foreach (var (i1, i2, action) in l)
 			{
 				if (action == DbObjectOnDiffActions.add)
-					WriteCreateIndexStatement(sb, schema, i1);
+					sb.WriteCreateIndexStatement(i1);
 				else if (action == DbObjectOnDiffActions.alter)
 				{
-					WriteDropIndexStatement(sb, fromDbSchema, i2);
-					WriteCreateIndexStatement(sb, schema, i1);
+					sb.WriteDropIndexStatement(i2, fromDbSchema);
+					sb.WriteCreateIndexStatement(i1);
 				}
 			}
 
 		}
 
-		private static void CompareFK(StringBuilder sb, JMXSchema schema, JMXSchema fromDbSchema)
+		private static void CompareFK(SQLStatementWriter sb, JMXSchema schema, JMXSchema fromDbSchema)
 		{
 			List<(JMXForeignKey i1, JMXForeignKey i2, DbObjectOnDiffActions action)> l =
 				new List<(JMXForeignKey i1, JMXForeignKey i2, DbObjectOnDiffActions action)>();
@@ -1080,21 +927,21 @@ namespace S031.MetaStack.Core.ORM
 			foreach (var (i1, i2, action) in l)
 			{
 				if (action == DbObjectOnDiffActions.drop)
-					WriteDropFKStatement(sb, fromDbSchema, i2);
+					sb.WriteDropFKStatement(i2, fromDbSchema);
 			}
 			foreach (var (i1, i2, action) in l)
 			{
 				if (action == DbObjectOnDiffActions.add)
-					WriteCreateFKStatement(sb, schema, i1);
+					sb.WriteCreateFKStatement(i1);
 				else if (action == DbObjectOnDiffActions.alter)
 				{
-					WriteDropFKStatement(sb, fromDbSchema, i2);
-					WriteCreateFKStatement(sb, schema, i1);
+					sb.WriteDropFKStatement(i2, fromDbSchema);
+					sb.WriteCreateFKStatement(i1);
 				}
 			}
 		}
 
-		private static async Task RecreateSchemaAsync(MdbContext mdb, StringBuilder sb, JMXSchema schema, JMXSchema fromDbSchema)
+		private static async Task RecreateSchemaAsync(MdbContext mdb, SQLStatementWriter sb, JMXSchema schema, JMXSchema fromDbSchema)
 		{
 			int recCount = (await mdb.ExecuteAsync<int>($"select count(*) from {fromDbSchema.DbObjectName.ToString()}"));
 
@@ -1105,132 +952,37 @@ namespace S031.MetaStack.Core.ORM
 			{
 				parentRelations = JArray.Parse(s);
 				foreach (var fk in parentRelations)
-					WriteDropParentRelationStatement(sb, fk);
+					sb.WriteDropParentRelationStatement(fk);
 			}
 			foreach (var fk in fromDbSchema.ForeignKeys)
-				WriteDropFKStatement(sb, fromDbSchema, fk);
+				sb.WriteDropFKStatement(fk, fromDbSchema);
 
 			string tmpTableName = fromDbSchema.DbObjectName.ObjectName + "_" + DateTime.Now.Subtract(vbo.Date()).Seconds.ToString();
 			if (recCount > 0)
-				WriteRenameTableStatement(sb, fromDbSchema, tmpTableName);
+				sb.WriteRenameTableStatement(tmpTableName, fromDbSchema);
 			else
-				WriteDropTableStatement(sb, fromDbSchema);
+				sb.WriteDropTableStatement(null, fromDbSchema);
 
-			WriteCreateTableStatements(sb, schema);
+			sb.WriteCreateTableStatements(schema);
 
 			if (recCount > 0)
 			{
-				WriteInsertRowsStatement(sb, schema, tmpTableName);
-				WriteDropTableStatement(sb, fromDbSchema, tmpTableName);
+				sb.WriteInsertRowsStatement(tmpTableName, schema);
+				sb.WriteDropTableStatement(tmpTableName, fromDbSchema);
 			}
 
-			WriteCreatePKStatement(sb, schema);
+			sb.WriteCreatePKStatement(schema);
 			foreach (var att in schema.Attributes)
-				WriteCreateConstraintStatement(sb, schema, att);
+				sb.WriteCreateConstraintStatement(att, schema);
 			foreach (var index in schema.Indexes)
-				WriteCreateIndexStatement(sb, schema, index);
+				sb.WriteCreateIndexStatement(index, schema);
 			foreach (var fk in schema.ForeignKeys)
-				WriteCreateFKStatement(sb, schema, fk);
+				sb.WriteCreateFKStatement(fk, schema);
 
 
 			if (parentRelations != null)
-			{
 				foreach (var fk in parentRelations)
-					WriteCreateParentRelationStatement(sb, schema, fk);
-			}
-		}
-
-		private static void WriteRenameTableStatement(StringBuilder sb, JMXSchema schema, string newName)
-		{
-			//EXEC sp_rename 'Sales.SalesTerritory', 'SalesTerr'; 
-			sb.Append($"EXEC sp_rename '{schema.DbObjectName}', '{newName}'\n");
-		}
-
-		private static void WriteInsertRowsStatement(StringBuilder sb, JMXSchema schema, string tmpTableName)
-		{
-			/// [dbo].[Customers]
-			//		([Name])
-
-			//select
-			//	Name
-			//From Bank.dbo.Clients where ClType = 0;
-			sb.Append($"insert into {schema.DbObjectName} (\n");
-			int count = schema.Attributes.Count;
-			for (int i = 0; i < count; i++)
-			{
-				var att = schema.Attributes[i];
-				if (!att.Identity.IsIdentity)
-				{
-					sb.Append($"[{att.FieldName}]");
-					if (i != count - 1)
-						sb.Append(",\n");
-				}
-				att.ID = i + 1;
-			}
-			sb.Append(")\nselect\n");
-			for (int i = 0; i < count; i++)
-			{
-				var att = schema.Attributes[i];
-				if (!att.Identity.IsIdentity)
-				{
-					sb.Append($"[{att.FieldName}]");
-					if (i != count - 1)
-						sb.Append(",\n");
-				}
-				att.ID = i + 1;
-			}
-			sb.Append($"from [{schema.DbObjectName.AreaName}].[{tmpTableName}]");
-		}
-
-		/// <summary>
-		/// ALTER TABLE only allows columns to be added that can contain nulls, 
-		/// or have a DEFAULT definition specified, 
-		/// or the column being added is an identity or timestamp column, 
-		/// or alternatively if none of the previous conditions are satisfied the table must be empty
-		/// to allow addition of this column. 
-		/// </summary>
-		private static void WriteAlterColumnStatement(StringBuilder sb, JMXSchema schema, JMXAttribute att, bool addNew = false)
-		{
-			string action = addNew ? "add" : "alter column";
-			sb.Append($"alter table [{schema.DbObjectName.AreaName}].[{schema.DbObjectName.ObjectName}] {action} [{att.FieldName}]\t{att.ServerDataType}");
-
-			MdbTypeInfo ti = _typeInfo[att.ServerDataType];
-			if (att.DataType == MdbType.@decimal && !ti.FixedSize && !att.DataSize.IsEmpty())
-				sb.Append($"({att.DataSize.Precision},{att.DataSize.Scale})");
-			else if (variable_lenght_data_types.IndexOf(att.ServerDataType) > -1)
-				if (att.DataSize.Size == -1)
-					sb.Append("(max)");
-				else
-					sb.Append($"({att.DataSize.Size})");
-			sb.Append($"\t{att.NullOption}\n");
-		}
-
-		private static void WriteRenameColumnStatement(StringBuilder sb, JMXSchema schema, string oldName, string newName)
-		{
-			sb.Append($"exec sp_rename '{schema.DbObjectName}.{oldName}', '{newName}', 'COLUMN'\n");
-		}
-
-		private static void WriteDropColumnStatement(StringBuilder sb, JMXSchema schema, JMXAttribute att)
-		{
-			sb.Append($"alter table [{schema.DbObjectName.AreaName}].[{schema.DbObjectName.ObjectName}] drop column [{att.FieldName}]\n");
-		}
-
-		private static void WriteDropIndexStatement(StringBuilder sb, JMXSchema schema, JMXIndex index)
-		{
-			sb.Append($"drop index {index.IndexName} on {schema.DbObjectName}\n");
-		}
-
-		private static void WriteDropPKStatement(StringBuilder sb, JMXSchema schema)
-		{
-			sb.Append($"alter table {schema.DbObjectName} drop constraint {schema.PrimaryKey.KeyName}\n");
-		}
-
-		private static void WriteDropConstraintStatement(StringBuilder sb, JMXSchema schema, JMXAttribute att)
-		{
-			if (!att.DefaultConstraint.IsEmpty())
-				sb.Append($"alter table {schema.DbObjectName} drop constraint {att.DefaultConstraint.ConstraintName}\n");
-			if (!att.CheckConstraint.IsEmpty())
-				sb.Append($"alter table {schema.DbObjectName} drop constraint {att.CheckConstraint.ConstraintName}\n");
+					sb.WriteCreateParentRelationStatement(fk);
 		}
 
 		private static string GetDiffs(AttribCompareDiff diff)
@@ -1252,7 +1004,6 @@ namespace S031.MetaStack.Core.ORM
 				l.Add(AttribCompareDiff.none.ToString());
 			return string.Join('\t', l.ToArray());
 		}
-
 
 		#endregion Sync Schema
 

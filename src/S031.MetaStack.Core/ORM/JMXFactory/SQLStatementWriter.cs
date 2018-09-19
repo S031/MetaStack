@@ -1,162 +1,359 @@
 ﻿using Newtonsoft.Json.Linq;
+using S031.MetaStack.Common;
 using S031.MetaStack.Core.Data;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
 namespace S031.MetaStack.Core.ORM
 {
-	internal class SQLStatementWriter
+	internal class SQLStatementWriter : StringWriter
 	{
-		private readonly StringBuilder _sb = new StringBuilder();
+		const string detail_field_prefix = "$1_";
 		private JMXSchema _schema;
 		private JMXRepo _repo;
+
+		public SQLStatementWriter(JMXRepo repo)
+		{
+			_repo = repo;
+		}
+
 		public SQLStatementWriter(JMXRepo repo, JMXSchema schema)
 		{
 			_repo = repo;
 			_schema = schema;
 		}
-		private void WriteCreateNewTableStatements(StringBuilder sb, JMXSchema schema)
+
+		public SQLStatementWriter WriteCreateNewTableStatements(JMXSchema fromSchema = null)
 		{
-			WriteCreateTableStatements(sb, schema);
-			WriteCreatePKStatement(sb, schema);
-			foreach (var att in schema.Attributes)
-				WriteCreateConstraintStatement(sb, schema, att);
-			foreach (var index in schema.Indexes)
-				WriteCreateIndexStatement(sb, schema, index);
-			foreach (var fk in schema.ForeignKeys)
-				WriteCreateFKStatement(sb, schema, fk);
-			WriteCreateDetailTableStatements(sb, schema);
+			if (fromSchema == null)
+				fromSchema = _schema;
+			WriteCreateTableStatements();
+			WriteCreatePKStatement();
+			foreach (var att in fromSchema.Attributes)
+				WriteCreateConstraintStatement(att);
+			foreach (var index in fromSchema.Indexes)
+				WriteCreateIndexStatement(index);
+			foreach (var fk in fromSchema.ForeignKeys)
+				WriteCreateFKStatement(fk);
+			WriteCreateDetailTableStatements();
+			return this;
 		}
 
-		private static void WriteCreateTableStatements(StringBuilder sb, JMXSchema schema)
+		public SQLStatementWriter WriteCreateTableStatements(JMXSchema fromSchema = null)
 		{
-			sb.Append($"create table {schema.DbObjectName.ToString()}");
-			sb.Append("(\n");
-			int count = schema.Attributes.Count;
+			if (fromSchema == null)
+				fromSchema = _schema;
+			Write($"create table {fromSchema.DbObjectName.ToString()}");
+			Write("(\n");
+			int count = fromSchema.Attributes.Count;
 			for (int i = 0; i < count; i++)
 			{
-				var att = schema.Attributes[i];
-				sb.Append($"[{att.FieldName}]\t{att.ServerDataType}");
+				var att = fromSchema.Attributes[i];
+				Write($"[{att.FieldName}]\t{att.ServerDataType}");
 
-				MdbTypeInfo ti = _typeInfo[att.ServerDataType];
+				MdbTypeInfo ti = _repo.GetServerTypeMap()[att.ServerDataType];
 				if (att.DataType == MdbType.@decimal && !ti.FixedSize && !att.DataSize.IsEmpty())
-					sb.Append($"({att.DataSize.Precision},{att.DataSize.Scale})");
-				else if (variable_lenght_data_types.IndexOf(att.ServerDataType) > -1)
+					Write($"({att.DataSize.Precision},{att.DataSize.Scale})");
+				else if (_repo.GetVariableLenghtDataTypes().Contains(att.ServerDataType))
 					if (att.DataSize.Size == -1)
-						sb.Append("(max)");
+						Write("(max)");
 					else
-						sb.Append($"({att.DataSize.Size})");
+						Write($"({att.DataSize.Size})");
 
 				if (att.Identity.IsIdentity)
-					sb.Append($"\tidentity({att.Identity.Seed},{att.Identity.Increment})");
+					Write($"\tidentity({att.Identity.Seed},{att.Identity.Increment})");
 				else
-					sb.Append($"\t{att.NullOption}");
+					Write($"\t{att.NullOption}");
 
 				if (i != count - 1)
-					sb.Append(",\n");
+					Write(",\n");
 
 				att.ID = i + 1;
 			}
-			sb.Append(")\n");
+			Write(")\n");
+			return this;
 		}
 
-		private static void WriteCreateDetailTableStatements(StringBuilder sb, JMXSchema schema)
+		public SQLStatementWriter WriteCreateDetailTableStatements(JMXSchema fromSchema = null)
 		{
-			foreach (var att in schema.Attributes.Where(a => a.DataType == MdbType.@object))
-				WriteCreateNewTableStatements(sb, att.ObjectSchema);
+			if (fromSchema == null)
+				fromSchema = _schema;
+			foreach (var att in fromSchema.Attributes.Where(a => a.DataType == MdbType.@object))
+				WriteCreateNewTableStatements(att.ObjectSchema);
+			return this;
 		}
 
-		private static void WriteCreatePKStatement(StringBuilder sb, JMXSchema schema)
+		public SQLStatementWriter WriteCreatePKStatement(JMXSchema fromSchema = null)
 		{
-			var pk = schema.PrimaryKey;
+			if (fromSchema == null)
+				fromSchema = _schema;
+			var pk = fromSchema.PrimaryKey;
 			if (pk != null)
 			{
-				sb.Append($"alter table {schema.DbObjectName} add constraint [{pk.KeyName}] primary key (");
+				Write($"alter table {fromSchema.DbObjectName} add constraint [{pk.KeyName}] primary key (");
 				int count = pk.KeyMembers.Count;
 				for (int i = 0; i < count; i++)
 				{
 					var m = pk.KeyMembers[i];
-					sb.Append($"[{m.FieldName}] " + (m.IsDescending ? "DESC" : "ASC"));
+					Write($"[{m.FieldName}] " + (m.IsDescending ? "DESC" : "ASC"));
 					if (i != count - 1)
-						sb.Append(", ");
+						Write(", ");
 					else
-						sb.Append(")\n");
+						Write(")\n");
 
 				}
 			}
+			return this;
 		}
 
-		private static void WriteCreateIndexStatement(StringBuilder sb, JMXSchema schema, JMXIndex index)
+		public SQLStatementWriter WriteCreateIndexStatement(JMXIndex index, JMXSchema fromSchema = null)
 		{
+			if (fromSchema == null)
+				fromSchema = _schema;
 			//CREATE UNIQUE NONCLUSTERED INDEX [AK1_SysSchemas] ON [SysCat].[SysSchemas] ([SysAreaID] ASC, [ObjectName] ASC)
-			sb.Append("create " + (index.IsUnique ? "unique " : "") + (index.ClusteredOption == 1 ? "clustered " : "nonclustered ") +
+			Write("create " + (index.IsUnique ? "unique " : "") + (index.ClusteredOption == 1 ? "clustered " : "nonclustered ") +
 				$"index [{index.IndexName}] " +
-				$"on {schema.DbObjectName.ToString()} (");
+				$"on {fromSchema.DbObjectName.ToString()} (");
 			int count = index.KeyMembers.Count;
 			for (int i = 0; i < count; i++)
 			{
 				var m = index.KeyMembers[i];
-				sb.Append($"[{m.FieldName}] " + (m.IsDescending ? "DESC" : "ASC"));
+				Write($"[{m.FieldName}] " + (m.IsDescending ? "DESC" : "ASC"));
 				if (i != count - 1)
-					sb.Append(", ");
+					Write(", ");
 				else
-					sb.Append(")\n");
+					Write(")\n");
 			}
+			return this;
 		}
 
-		private static void WriteCreateFKStatement(StringBuilder sb, JMXSchema schema, JMXForeignKey fk)
+		public SQLStatementWriter WriteCreateFKStatement(JMXForeignKey fk, JMXSchema fromSchema = null)
 		{
+			if (fromSchema == null)
+				fromSchema = _schema;
 			//Можно сделать сначала с NOCHECK затем CHECK
 			//	ALTER TABLE[SysCat].[SysSchemas] WITH CHECK ADD CONSTRAINT[FK_SYSSCHEMAS_SYSAREAS]([SysAreaID]) REFERENCES[SysCat].[SysAreas] ([ID]) 
 			//	ALTER TABLE[SysCat].[SysSchemas] CHECK CONSTRAINT[FK_SYSSCHEMAS_SYSAREAS]
 			if (fk.CheckOption)
 				// Enable for new added rows
-				sb.Append($"alter table {schema.DbObjectName} with check  add constraint [{fk.KeyName}] foreign key (");
+				Write($"alter table {fromSchema.DbObjectName} with check  add constraint [{fk.KeyName}] foreign key (");
 			else
-				sb.Append($"alter table {schema.DbObjectName} with nocheck  add constraint [{fk.KeyName}] foreign key (");
+				Write($"alter table {fromSchema.DbObjectName} with nocheck  add constraint [{fk.KeyName}] foreign key (");
 
-			sb.Append(string.Join(", ", fk.KeyMembers.Select(m => '[' + m.FieldName + ']').ToArray()));
-			sb.Append(")");
-			sb.Append($"references {fk.RefDbObjectName} (");
-			sb.Append(string.Join(", ", fk.RefKeyMembers.Select(m => '[' + m.FieldName + ']').ToArray()));
-			sb.Append(")\n");
+			Write(string.Join(", ", fk.KeyMembers.Select(m => '[' + m.FieldName + ']').ToArray()));
+			Write(")");
+			Write($"references {fk.RefDbObjectName} (");
+			Write(string.Join(", ", fk.RefKeyMembers.Select(m => '[' + m.FieldName + ']').ToArray()));
+			Write(")\n");
 			if (fk.CheckOption)
 				// check existing rows
-				sb.Append($"alter table {schema.DbObjectName} check constraint [{fk.KeyName}]\n");
+				Write($"alter table {fromSchema.DbObjectName} check constraint [{fk.KeyName}]\n");
+			return this;
 		}
 
-		private static void WriteCreateConstraintStatement(StringBuilder sb, JMXSchema schema, JMXAttribute att)
+		public SQLStatementWriter WriteCreateConstraintStatement(JMXAttribute att, JMXSchema fromSchema = null)
 		{
+			if (fromSchema == null)
+				fromSchema = _schema;
 			if (!att.CheckConstraint.IsEmpty())
-				sb.Append($"alter table {schema.DbObjectName} add constraint {att.CheckConstraint.ConstraintName} check({att.CheckConstraint.Definition})\n");
+				Write($"alter table {fromSchema.DbObjectName} add constraint {att.CheckConstraint.ConstraintName} check({att.CheckConstraint.Definition})\n");
 			if (!att.DefaultConstraint.IsEmpty())
-				sb.Append($"alter table {schema.DbObjectName} add constraint {att.DefaultConstraint.ConstraintName} default({att.DefaultConstraint.Definition}) for [{att.FieldName}]\n");
+				Write($"alter table {fromSchema.DbObjectName} add constraint {att.DefaultConstraint.ConstraintName} default({att.DefaultConstraint.Definition}) for [{att.FieldName}]\n");
+			return this;
 		}
 
-		private static void WriteCreateParentRelationStatement(StringBuilder sb, JMXSchema schema, JToken fk)
+		public SQLStatementWriter WriteCreateParentRelationStatement(JToken fk)
 		{
 			bool withCheck = (bool)fk["CheckOption"];
 			string check = withCheck ? "check" : "nocheck";
 			// Enable for new added rows
-			sb.AppendFormat("alter table [{0}].[{1}] with {2} add constraint [{3}] foreign key (",
-			(string)fk["ParentObject"]["AreaName"],
-			(string)fk["ParentObject"]["ObjectName"],
-			check, (string)fk["KeyName"]);
+			Write("alter table [{0}].[{1}] with {2} add constraint [{3}] foreign key (".ToFormat(
+				(string)fk["ParentObject"]["AreaName"],
+				(string)fk["ParentObject"]["ObjectName"],
+				check, (string)fk["KeyName"]));
 
-
-			sb.Append(string.Join(", ", fk["KeyMembers"].Select(m => '[' + (string)m["FieldName"] + ']').ToArray()));
-			sb.Append(")");
-			sb.Append($"references [{fk["RefObject"]["AreaName"]}].[{fk["RefObject"]["ObjectName"]}] (");
-			sb.Append(string.Join(", ", fk["RefKeyMembers"].Select(m => '[' + (string)m["FieldName"] + ']').ToArray()));
-			sb.Append(")\n");
+			Write(string.Join(", ", fk["KeyMembers"].Select(m => '[' + (string)m["FieldName"] + ']').ToArray()));
+			Write(")\n");
+			Write($"references [{fk["RefObject"]["AreaName"]}].[{fk["RefObject"]["ObjectName"]}] (");
+			Write(string.Join(", ", fk["RefKeyMembers"].Select(m => '[' + (string)m["FieldName"] + ']').ToArray()));
+			Write(")\n");
 			if (withCheck)
 				// check existing rows
-				sb.Append($"alter table [{fk["ParentObject"]["AreaName"]}].[{fk["ParentObject"]["ObjectName"]}] " +
+				Write($"alter table [{fk["ParentObject"]["AreaName"]}].[{fk["ParentObject"]["ObjectName"]}] " +
 					$"check constraint [{(string)fk["KeyName"]}]\n");
-
+			return this;
 		}
 
+		public SQLStatementWriter WriteRenameTableStatement(string newName, JMXSchema fromSchema = null)
+		{
+			if (fromSchema == null)
+				fromSchema = _schema;
+			//EXEC sp_rename 'Sales.SalesTerritory', 'SalesTerr'; 
+			Write($"EXEC sp_rename '{fromSchema.DbObjectName}', '{newName}'\n");
+			return this;
+		}
+
+		public SQLStatementWriter WriteInsertRowsStatement(string tmpTableName, JMXSchema fromSchema = null)
+		{
+			if (fromSchema == null)
+				fromSchema = _schema;
+			/// [dbo].[Customers]
+			//		([Name])
+
+			//select
+			//	Name
+			//From Bank.dbo.Clients where ClType = 0;
+			Write($"insert into {fromSchema.DbObjectName} (\n");
+			int count =	fromSchema.Attributes.Count;
+			for (int i = 0; i < count; i++)
+			{
+				var att = fromSchema.Attributes[i];
+				if (!att.Identity.IsIdentity)
+				{
+					Write($"[{att.FieldName}]");
+					if (i != count - 1)
+						Write(",\n");
+				}
+				att.ID = i + 1;
+			}
+			Write(")\nselect\n");
+			for (int i = 0; i < count; i++)
+			{
+				var att = fromSchema.Attributes[i];
+				if (!att.Identity.IsIdentity)
+				{
+					Write($"[{att.FieldName}]");
+					if (i != count - 1)
+						Write(",\n");
+				}
+				att.ID = i + 1;
+			}
+			Write($"from [{fromSchema.DbObjectName.AreaName}].[{tmpTableName}]");
+			return this;
+		}
+
+		/// <summary>
+		/// ALTER TABLE only allows columns to be added that can contain nulls, 
+		/// or have a DEFAULT definition specified, 
+		/// or the column being added is an identity or timestamp column, 
+		/// or alternatively if none of the previous conditions are satisfied the table must be empty
+		/// to allow addition of this column. 
+		/// </summary>
+		public SQLStatementWriter WriteAlterColumnStatement(JMXAttribute att, bool addNew = false, JMXSchema fromSchema = null)
+		{
+			if (fromSchema == null)
+				fromSchema = _schema;
+			string action = addNew ? "add" : "alter column";
+			Write($"alter table [{fromSchema.DbObjectName.AreaName}].[{fromSchema.DbObjectName.ObjectName}] {action} [{att.FieldName}]\t{att.ServerDataType}");
+
+			MdbTypeInfo ti = _repo.GetServerTypeMap()[att.ServerDataType];
+			if (att.DataType == MdbType.@decimal && !ti.FixedSize && !att.DataSize.IsEmpty())
+				Write($"({att.DataSize.Precision},{att.DataSize.Scale})");
+			else if (_repo.GetVariableLenghtDataTypes().Contains(att.ServerDataType))
+				if (att.DataSize.Size == -1)
+					Write("(max)");
+				else
+					Write($"({att.DataSize.Size})");
+			Write($"\t{att.NullOption}\n");
+			return this;
+		}
+
+		public SQLStatementWriter WriteRenameColumnStatement(string oldName, string newName, JMXSchema fromSchema = null)
+		{
+			if (fromSchema == null)
+				fromSchema = _schema;
+			Write($"exec sp_rename '{fromSchema.DbObjectName}.{oldName}', '{newName}', 'COLUMN'\n");
+			return this;
+		}
+
+		public SQLStatementWriter WriteDropColumnStatement(JMXAttribute att, JMXSchema fromSchema = null)
+		{
+			if (fromSchema == null)
+				fromSchema = _schema;
+			Write($"alter table [{fromSchema.DbObjectName.AreaName}].[{fromSchema.DbObjectName.ObjectName}] drop column [{att.FieldName}]\n");
+			return this;
+		}
+
+		public SQLStatementWriter WriteDropIndexStatement(JMXIndex index, JMXSchema fromSchema = null)
+		{
+			if (fromSchema == null)
+				fromSchema = _schema;
+			Write($"drop index {index.IndexName} on {fromSchema.DbObjectName}\n");
+			return this;
+		}
+
+		public SQLStatementWriter WriteDropPKStatement(JMXSchema fromSchema = null)
+		{
+			if (fromSchema == null)
+				fromSchema = _schema;
+			Write($"alter table {fromSchema.DbObjectName} drop constraint {fromSchema.PrimaryKey.KeyName}\n");
+			return this;
+		}
+
+		public SQLStatementWriter WriteDropConstraintStatement(JMXAttribute att, JMXSchema fromSchema = null)
+		{
+			if (fromSchema == null)
+				fromSchema = _schema;
+			if (!att.DefaultConstraint.IsEmpty())
+				Write($"alter table {fromSchema.DbObjectName} drop constraint {att.DefaultConstraint.ConstraintName}\n");
+			if (!att.CheckConstraint.IsEmpty())
+				Write($"alter table {fromSchema.DbObjectName} drop constraint {att.CheckConstraint.ConstraintName}\n");
+			return this;
+		}
+
+		public SQLStatementWriter WriteDropStatements(string parentRelationsSchema, JMXSchema fromSchema = null)
+		{
+			if (fromSchema == null)
+				fromSchema = _schema;
+			if (!parentRelationsSchema.IsEmpty())
+			{
+				JArray a = JArray.Parse(parentRelationsSchema);
+				foreach (var o in a)
+				{
+					string sch = (string)o["ParentObject"]["AreaName"];
+					string tbl = (string)o["ParentObject"]["ObjectName"];
+					if (!fromSchema.Attributes.Any(at =>
+						at.FieldName == $"{detail_field_prefix}{sch}_{tbl}"))
+						WriteDropParentRelationStatement(o);
+				}
+			}
+			foreach (var fk in fromSchema.ForeignKeys)
+				WriteDropFKStatement(fk);
+			WriteDropTableStatement();
+			return this;
+		}
+
+		public SQLStatementWriter WriteDropParentRelationStatement(JToken o)
+		{
+			Write("alter table [{0}].[{1}] drop constraint [{2}]\n".ToFormat(
+				(string)o["ParentObject"]["AreaName"],
+				(string)o["ParentObject"]["ObjectName"],
+				(string)o["KeyName"]));
+			return this;
+		}
+
+		public SQLStatementWriter WriteDropFKStatement(JMXForeignKey fk, JMXSchema fromSchema = null)
+		{
+			if (fromSchema == null)
+				fromSchema = _schema;
+			Write("alter table [{0}].[{1}] drop constraint [{2}]\n".ToFormat(
+				fromSchema.DbObjectName.AreaName,
+				fromSchema.DbObjectName.ObjectName,
+				fk.KeyName));
+			return this;
+		}
+
+		public SQLStatementWriter WriteDropTableStatement(string tmpTableName = null, JMXSchema fromSchema = null)
+		{
+			if (fromSchema == null)
+				fromSchema = _schema;
+			Write("drop table [{0}].[{1}]\n".ToFormat(
+				fromSchema.DbObjectName.AreaName,
+				tmpTableName.IsEmpty() ? fromSchema.DbObjectName.ObjectName : tmpTableName));
+			return this;
+		}
 	}
 }

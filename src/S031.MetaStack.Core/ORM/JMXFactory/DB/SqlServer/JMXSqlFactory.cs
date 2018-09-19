@@ -7,6 +7,7 @@ using S031.MetaStack.Core.Data;
 
 namespace S031.MetaStack.Core.ORM
 {
+	[SchemaDBSync(DBProviderName = "System.Data.SqlClient")]
 	public class JMXSqlFactory: JMXFactory
 	{
 		public const string ProviderInvariantName = "System.Data.SqlClient";
