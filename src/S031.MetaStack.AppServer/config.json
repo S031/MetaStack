@@ -30,7 +30,7 @@
   "connectionStrings": {
     "bankLocal": {
       "providerName": "System.Data.SqLClient",
-      "connectionString": "Data Source=SERGEY-SQL2016;Initial Catalog=Bank;User ID=Sa;Password=_92b1A7C8"
+      "connectionString": "Data Source=localhost;Initial Catalog=MetaStack;Integrated Security=True;"
     }
   },
   "Connectors": {

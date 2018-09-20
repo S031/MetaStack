@@ -3,7 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using S031.MetaStack.Core.App;
+using S031.MetaStack.Core.Data;
 using S031.MetaStack.Core.Logging;
+using S031.MetaStack.Core.ORM;
 using System;
 using System.Data.Common;
 using System.Threading;
@@ -31,6 +33,7 @@ namespace S031.MetaStack.AppServer
 				.UseApplicationContext()
 				.Build())
 			{
+				TestConnection();
 				await host.RunAsync(ApplicationContext.CancellationToken);
 			}
 		}
@@ -50,6 +53,19 @@ namespace S031.MetaStack.AppServer
 				var options = section.Get<Core.Services.HostedServiceOptions>();
 				services.AddTransient<Core.Services.HostedServiceOptions>(s => options);
 				services.Add<IHostedService>(options.TypeName, options.AssemblyName);
+			}
+		}
+		private static void TestConnection()
+		{
+			var factory = System.Data.SqlClient.SqlClientFactory.Instance;
+			var sp = ApplicationContext.GetServices();
+			var config = sp.GetService<IConfiguration>();
+			var cn = config.GetSection($"connectionStrings:BankLocal").Get<ConnectInfo>();
+			var log = sp.GetService<ILogger>();
+			using (MdbContext mdb = new MdbContext(cn))
+			using (JMXFactory f = JMXFactory.Create(mdb, log))
+			{
+
 			}
 		}
 	}
