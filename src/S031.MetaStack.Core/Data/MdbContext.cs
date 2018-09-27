@@ -250,6 +250,7 @@ namespace S031.MetaStack.Core.Data
 			{
 				_transaction.Commit();
 				_transaction = null;
+				_transactionLevel = 0;
 			}
 			else
 				// Can't call Commit method without transaction.

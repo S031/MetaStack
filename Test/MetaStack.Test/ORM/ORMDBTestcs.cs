@@ -65,9 +65,21 @@ namespace MetaStack.Test.ORM
 		[Fact]
 		void Test2()
 		{
-			SaveSchemaTestAsync().GetAwaiter().GetResult();
+			SaveSchemaTestAsyncNew().GetAwaiter().GetResult();
 		}
 
+		async Task SaveSchemaTestAsyncNew()
+		{
+			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			using (MdbContext mdb = new MdbContext(_cn))
+			using (JMXFactory f = JMXFactory.Create(mdb, _logger))
+			{
+				var stor = f.CreateJMXRepo();
+				foreach (var s in GetTestSchemas())
+					await stor.SaveSchemaAsync(s);
+
+			}
+		}
 		async Task SaveSchemaTestAsync()
 		{
 			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
@@ -84,7 +96,19 @@ namespace MetaStack.Test.ORM
 		[Fact]
 		void Test3()
 		{
-			SyncSchemaTestAsync().GetAwaiter().GetResult();
+			SyncSchemaTestAsyncNew().GetAwaiter().GetResult();
+		}
+
+		async Task SyncSchemaTestAsyncNew()
+		{
+			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			using (MdbContext mdb = new MdbContext(_cn))
+			using (JMXFactory f = JMXFactory.Create(mdb, _logger))
+			{
+				var stor = f.CreateJMXRepo();
+				foreach (string s in GetTestNames())
+					await stor.SyncSchemaAsync(s);
+			}
 		}
 
 		async Task SyncSchemaTestAsync()
@@ -125,7 +149,19 @@ namespace MetaStack.Test.ORM
 		[Fact]
 		void Test4()
 		{
-			DropSchemaTestAsync().GetAwaiter().GetResult();
+			DropSchemaTestAsyncNew().GetAwaiter().GetResult();
+		}
+		async Task DropSchemaTestAsyncNew()
+		{
+			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			using (MdbContext mdb = new MdbContext(_cn))
+			using (JMXFactory f = JMXFactory.Create(mdb, _logger))
+			{
+				JMXSchemaProviderDB p = JMXSchemaProviderFactory.GetProvider<JMXSchemaProviderDB>(_cn, _logger);
+				var stor = f.CreateJMXRepo();
+				foreach (string s in GetTestNames())
+					await stor.DropSchemaAsync(s);
+			}
 		}
 		async Task DropSchemaTestAsync()
 		{
@@ -247,7 +283,7 @@ namespace MetaStack.Test.ORM
 			var rm = Resources.TestSchemas.ResourceManager;
 			foreach (JMXObjectName item in GetTestNames())
 			{
-				l.Add(JMXSchema.Parse(Encoding.UTF8.GetString((byte[])rm.GetObject(item.ObjectName))));
+				l.Add(JMXSchema.Parse(Encoding.UTF8.GetString((byte[])rm.GetObject(item.ObjectName)).Substring(1)));
 			}
 			return l.ToArray();
 		}

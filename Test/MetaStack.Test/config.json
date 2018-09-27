@@ -12,6 +12,10 @@
     "bankLocal": {
       "providerName": "System.Data.SqlClient",
       "connectionString": "Data Source=localhost;Initial Catalog=MetaStack;Integrated Security=True;"
+    },
+    "test": {
+      "providerName": "System.Data.SqlClient",
+      "connectionString": "Data Source=SERGEY-SQL2016;Initial Catalog=MetaStack;Integrated Security=True;"
     }
   }
 }

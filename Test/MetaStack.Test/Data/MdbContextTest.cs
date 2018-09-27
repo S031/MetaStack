@@ -11,12 +11,13 @@ using System.Threading.Tasks;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Net;
 
 namespace MetaStack.Test.Data
 {
 	public class MdbContextTest
 	{
-		const string connection_name = "bankLocal";
+		static readonly string connection_name = Dns.GetHostName() == "SERGEY-WRK" ? "Test" : "BankLocal";
 		readonly IConfiguration _configuration;
 		readonly string _cn;
 		readonly string _providerName;
