@@ -84,6 +84,11 @@ namespace S031.MetaStack.Core.ORM
 			throw new NotImplementedException();
 		}
 
+		public virtual void ClearCatalog()
+		{
+			throw new NotImplementedException();
+		}
+
 		public virtual Task<JMXSchema> GetSchemaAsync(string objectName)
 		{
 			throw new NotImplementedException();
@@ -103,5 +108,11 @@ namespace S031.MetaStack.Core.ORM
 		{
 			throw new NotImplementedException();
 		}
+
+		public virtual Task ClearCatalogAsync()
+		{
+			throw new NotImplementedException();
+		}
+
 	}
 }

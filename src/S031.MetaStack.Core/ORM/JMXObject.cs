@@ -21,6 +21,7 @@ namespace S031.MetaStack.WinForms.ORM
 	public class JMXObject : JObject
 	{
 		private JMXSchema _schema;
+		private readonly JMXFactory _factory;
 
 		// Call internal methods of JsonReader && JObjects for parse json
 		static readonly FastMethodInfo.ReturnValueDelegate _moveToContent = new FastMethodInfo(typeof(JsonReader)
@@ -34,16 +35,21 @@ namespace S031.MetaStack.WinForms.ORM
 		JMXObject()
 		{
 		}
+		public JMXObject(string objectName) : 
+			this(objectName, ObjectFactories.GetDefault<JMXFactory>())
+		{
+		}
 
-
-		public JMXObject(string objectName) : this(objectName, JMXSchemaProviderFactory.Default) { }
-		public JMXObject(string objectName, IJMXSchemaProvider schemaProvider)
+		public JMXObject(string objectName, JMXFactory schemaFactory)
 		{
 			ID = 0;
 			ObjectName = objectName;
+			_factory = schemaFactory;
 			try
 			{
-				_schema = schemaProvider.GetSchema(objectName);
+				_schema = schemaFactory
+					.CreateJMXRepo()
+					.GetSchema(objectName);
 			}
 			catch { }
 			if (_schema == null)
@@ -57,11 +63,28 @@ namespace S031.MetaStack.WinForms.ORM
 
 			}
 		}
+		public static async Task<JMXObject> CreateObjectAsync(string objectName, JMXFactory schemaFactory)
+		{
+			JMXObject instance = new JMXObject
+			{
+				ObjectName = objectName
+			};
+			try
+			{
+				instance._schema = await schemaFactory
+					.CreateJMXRepo()
+					.GetSchemaAsync(objectName);
+			}
+			catch { }
+			if (instance._schema == null)
+				throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchema.ctor.1", objectName));
+			return instance;
+		}
 		public static JMXObject CreateFrom(string json)
 		{
-			return CreateFrom(json, JMXSchemaProviderFactory.Default);
+			return CreateFrom(json, ObjectFactories.GetDefault<JMXFactory>());
 		}
-		public static JMXObject CreateFrom(string json, IJMXSchemaProvider schemaProvider)
+		public static JMXObject CreateFrom(string json, JMXFactory schemaFactory)
 		{
 			JMXObject instance = new JMXObject();
 			instance.ParseJson(json);
@@ -70,32 +93,14 @@ namespace S031.MetaStack.WinForms.ORM
 				instance.ID = 0;
 			try
 			{
-				instance._schema = schemaProvider.GetSchema(instance.ObjectName);
+				instance._schema = schemaFactory
+					.CreateJMXRepo()
+					.GetSchema(instance.ObjectName);
 			}
 			catch { }
 			if (instance._schema == null)
 				throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchema.ctor.1", instance.ObjectName));
 
-			return instance;
-		}
-
-		public static async Task<JMXObject> CreateObjectAsync(string objectName)
-		{
-			return await CreateObjectAsync(objectName, JMXSchemaProviderFactory.Default);
-		}
-		public static async Task<JMXObject> CreateObjectAsync(string objectName, IJMXSchemaProvider schemaProvider)
-		{
-			JMXObject instance = new JMXObject
-			{
-				ObjectName = objectName
-			};
-			try
-			{
-				instance._schema = await schemaProvider.GetSchemaAsync(objectName);
-			}
-			catch { }
-			if (instance._schema == null)
-				throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchema.ctor.1", objectName));
 			return instance;
 		}
 		public string ObjectName
@@ -108,8 +113,8 @@ namespace S031.MetaStack.WinForms.ORM
 			get => Convert.ToInt32(this["ID"].ToIntOrDefault());
 			set => this["ID"] = value;
 		}
-		public JMXSchema Schema { get => _schema; }
-
+		public JMXSchema Schema => _schema;
+		public JMXFactory GetJMXFactory() => _factory;
 		public override string ToString()
 		{
 			return base.ToString();

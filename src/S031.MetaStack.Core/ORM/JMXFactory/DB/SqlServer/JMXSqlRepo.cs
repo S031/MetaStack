@@ -322,7 +322,14 @@ namespace S031.MetaStack.Core.ORM
 		#endregion Drop Schema
 
 		#region Clear Catalog
-		public async Task ClearCatalogAsync()
+		public override void ClearCatalog()
+		{
+			DropDbSchemaAsync(this.MdbContext, this.Logger)
+				.ConfigureAwait(false)
+				.GetAwaiter()
+				.GetResult();
+		}
+		public override async Task ClearCatalogAsync()
 		{
 			await DropDbSchemaAsync(this.MdbContext, this.Logger).ConfigureAwait(false);
 		}

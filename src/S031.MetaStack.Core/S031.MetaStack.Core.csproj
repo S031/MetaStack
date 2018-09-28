@@ -16,10 +16,13 @@
 
   <ItemGroup>
     <Compile Remove="Configuration\**" />
+    <Compile Remove="ORM\SchemaProviders\**" />
     <Compile Remove="SysCat\**" />
     <EmbeddedResource Remove="Configuration\**" />
+    <EmbeddedResource Remove="ORM\SchemaProviders\**" />
     <EmbeddedResource Remove="SysCat\**" />
     <None Remove="Configuration\**" />
+    <None Remove="ORM\SchemaProviders\**" />
     <None Remove="SysCat\**" />
   </ItemGroup>
 
@@ -28,7 +31,7 @@
     <Compile Remove="App\AppHostExtensions.cs" />
     <Compile Remove="App\Internal\PluginManager.cs" />
     <Compile Remove="Data\DbProviderFactories.cs" />
-    <Compile Remove="ORM\SchemaProviders\DB\SqlServer\SqlServerDBSyncCat.cs" />
+    <Compile Remove="ORM\JMXSchemaProviderFactory.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -44,26 +47,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\S031.MetaStack.Common\S031.MetaStack.Common.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="ORM\SchemaProviders\DB\SqlServer\SqlServer.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>SqlServer.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="ORM\SchemaProviders\DB\SqlServer\SqlServer.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>SqlServer.Designer.cs</LastGenOutput>
-      <CustomToolNamespace>S031.MetaStack.Core.ORM</CustomToolNamespace>
-    </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ORM\SchemaProviders\DB\SqlServer\SqlScripts\" />
   </ItemGroup>
 
 </Project>

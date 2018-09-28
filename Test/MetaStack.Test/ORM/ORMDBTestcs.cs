@@ -36,7 +36,6 @@ namespace MetaStack.Test.ORM
 			};
 			sb["Initial Catalog"] = "MetaStack";
 			_cn = sb.ToString();
-			JMXSchemaProviderFactory.RegisterProvider<JMXSchemaProviderDB>();
 		}
 
 		/// <summary>
@@ -47,16 +46,8 @@ namespace MetaStack.Test.ORM
 		{
 			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			using (MdbContext mdb = new MdbContext(_cn))
+			using (JMXFactory f = JMXFactory.Create(mdb, _logger))
 			{
-				JMXFactory f = JMXFactory.Create(mdb, _logger);
-				//JMXSchemaProviderDB p = JMXSchemaProviderFactory.GetProvider<JMXSchemaProviderDB>(_cn, _logger);
-				//_logger.Debug("Start speed test for obtain JMXSchemaProviderDB");
-				//for (int i = 0; i < 150000; i++)
-				//	p.GetSchema("dbo.SysSequence");
-				////	p = JMXSchemaProviderFactory.GetProvider<JMXSchemaProviderDB>(_cn, _logger);
-				//_logger.Debug("End speed test for obtain JMXSchemaProviderDB");
-				//_logger.Debug(p.GetSchema("dbo.SysSequence"));
-
 			}
 		}
 		/// <summary>
@@ -78,15 +69,6 @@ namespace MetaStack.Test.ORM
 				foreach (var s in GetTestSchemas())
 					await stor.SaveSchemaAsync(s);
 
-			}
-		}
-		async Task SaveSchemaTestAsync()
-		{
-			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
-			{
-				JMXSchemaProviderDB p = JMXSchemaProviderFactory.GetProvider<JMXSchemaProviderDB>(_cn, _logger);
-				foreach (var s in GetTestSchemas())
-					await p.SaveSchemaAsync(s);
 			}
 		}
 
@@ -111,36 +93,23 @@ namespace MetaStack.Test.ORM
 			}
 		}
 
-		async Task SyncSchemaTestAsync()
-		{
-			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
-			{
-				JMXSchemaProviderDB p = JMXSchemaProviderFactory.GetProvider<JMXSchemaProviderDB>(_cn, _logger);
-				//foreach( string s in getTestNames())
-				//	await p.SyncSchemaAsync(s);
-				//await p.SyncSchemaAsync("dbo.SysDataTypesRow");
-				await p.SyncSchemaAsync("dbo.Order");
-				await p.SyncSchemaAsync("dbo.OrderDetail");
-			}
-		}
-
-		[Fact]
-		void Test3_1()
-		{
-			ChangeSchemaTestAsync().GetAwaiter().GetResult();
-		}
-		async Task ChangeSchemaTestAsync()
-		{
-			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
-			{
-				JMXSchemaProviderDB p = JMXSchemaProviderFactory.GetProvider<JMXSchemaProviderDB>(_cn, _logger);
-				var schema = await p.GetSchemaAsync("dbo.SysDataTypesRow");
-				//schema.DbObjectName = new JMXObjectName("dbo", "SDTRs");
-				schema.Attributes[12].Width = 512;
-				await p.SaveSchemaAsync(schema);
-				await p.SyncSchemaAsync("dbo.SysDataTypesRow");
-			}
-		}
+		//[Fact]
+		//void Test3_1()
+		//{
+		//	ChangeSchemaTestAsync().GetAwaiter().GetResult();
+		//}
+		//async Task ChangeSchemaTestAsync()
+		//{
+		//	using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+		//	{
+		//		JMXSchemaProviderDB p = JMXSchemaProviderFactory.GetProvider<JMXSchemaProviderDB>(_cn, _logger);
+		//		var schema = await p.GetSchemaAsync("dbo.SysDataTypesRow");
+		//		//schema.DbObjectName = new JMXObjectName("dbo", "SDTRs");
+		//		schema.Attributes[12].Width = 512;
+		//		await p.SaveSchemaAsync(schema);
+		//		await p.SyncSchemaAsync("dbo.SysDataTypesRow");
+		//	}
+		//}
 
 
 		/// <summary>
@@ -157,22 +126,9 @@ namespace MetaStack.Test.ORM
 			using (MdbContext mdb = new MdbContext(_cn))
 			using (JMXFactory f = JMXFactory.Create(mdb, _logger))
 			{
-				JMXSchemaProviderDB p = JMXSchemaProviderFactory.GetProvider<JMXSchemaProviderDB>(_cn, _logger);
 				var stor = f.CreateJMXRepo();
 				foreach (string s in GetTestNames())
 					await stor.DropSchemaAsync(s);
-			}
-		}
-		async Task DropSchemaTestAsync()
-		{
-			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
-			{
-				JMXSchemaProviderDB p = JMXSchemaProviderFactory.GetProvider<JMXSchemaProviderDB>(_cn, _logger);
-				//foreach (string s in getTestNames())
-				//	await p.DropSchemaAsync(s);
-				//await p.DropSchemaAsync("dbo.SysDataTypesRow");
-				await p.DropSchemaAsync("dbo.Order");
-				await p.DropSchemaAsync("dbo.OrderDetail");
 			}
 		}
 		
@@ -182,16 +138,18 @@ namespace MetaStack.Test.ORM
 		[Fact]
 		void Test5()
 		{
-			DropDBSchemaTestAsync().GetAwaiter().GetResult();
+			DropDBSchemaTestAsyncNew().GetAwaiter().GetResult();
 		}
-		async Task DropDBSchemaTestAsync()
+		async Task DropDBSchemaTestAsyncNew()
 		{
 			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			using (MdbContext mdb = new MdbContext(_cn))
+			using (JMXFactory f = JMXFactory.Create(mdb, _logger))
 			{
-				JMXSchemaProviderDB p = JMXSchemaProviderFactory.GetProvider<JMXSchemaProviderDB>(_cn, _logger);
-				await p.ClearCatalogAsync();
+				await f.CreateJMXRepo().ClearCatalogAsync();
 			}
 		}
+
 		[Fact]
 		void SpeedGetHashCodeTest()
 		{

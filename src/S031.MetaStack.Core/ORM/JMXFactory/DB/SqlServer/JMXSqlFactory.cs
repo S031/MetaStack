@@ -28,7 +28,7 @@ namespace S031.MetaStack.Core.ORM
 
 		public override JMXObject CreateObject(string objectName)
 		{
-			return new JMXObject(objectName);
+			return new JMXObject(objectName, this);
 		}
 	}
 }

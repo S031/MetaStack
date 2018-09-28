@@ -58,9 +58,8 @@ namespace S031.MetaStack.WinForms.ORM
             DbObjectType = DbObjectTypes.Table;
         }
         /// <summary>
-        /// Assigned from schema provider
+        /// Assigned from schema repository manager
         /// </summary>
-        public IJMXSchemaProvider SchemaProvider { get; set; }
         public IJMXRepo SchemaRepo { get; set; }
         public int ID { get; set; }
         public Guid UID { get; set; }
