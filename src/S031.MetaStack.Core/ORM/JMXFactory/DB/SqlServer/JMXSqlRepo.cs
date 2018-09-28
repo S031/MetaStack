@@ -14,6 +14,7 @@ namespace S031.MetaStack.Core.ORM
 {
 	public class JMXSqlRepo : JMXRepo
 	{
+		const int _sql_server_2017_version = 15;
 		readonly object objLock = new object();
 		static int _counter = 0;
 		static readonly Dictionary<string, JMXSchema> _schemaCache = new Dictionary<string, JMXSchema>();
@@ -181,8 +182,12 @@ namespace S031.MetaStack.Core.ORM
 			try
 			{
 				await mdb.BeginTransactionAsync();
-				var scripts = SqlServer.CreateSchemaObjects.Split(new string[] { "--go", "--GO" },
-					StringSplitOptions.RemoveEmptyEntries);
+				var scripts = ((await GetSqlVersion(mdb)).ToIntOrDefault() > _sql_server_2017_version) ?
+					SqlServer.CreateSchemaObjects.Split(new string[] { "--go", "--GO" },
+						StringSplitOptions.RemoveEmptyEntries) :
+					SqlServer.CreateSchemaObjects_12.Split(new string[] { "--go", "--GO" },
+						StringSplitOptions.RemoveEmptyEntries);
+
 				foreach (string statement in scripts)
 					await mdb.ExecuteAsync(statement);
 				log.Debug($"Schema SysCat was created in database {mdb.DbName}");
@@ -363,9 +368,19 @@ namespace S031.MetaStack.Core.ORM
 		{
 			var mdb = this.MdbContext;
 			schema = await NormalizeSchemaAsync(mdb, schema);
-			int id = await mdb.ExecuteAsync<int>(SqlServer.AddSysSchemas,
-				new MdbParameter("@ObjectSchema", schema.ToString()),
-				new MdbParameter("@Version", schema_version));
+			int id = ((await GetSqlVersion(mdb)).ToIntOrDefault() > _sql_server_2017_version) ?
+				await mdb.ExecuteAsync<int>(SqlServer.AddSysSchemas,
+					new MdbParameter("@ObjectSchema", schema.ToString()),
+					new MdbParameter("@Version", schema_version)) :
+				await mdb.ExecuteAsync<int>(SqlServer.AddSysSchemas,
+					new MdbParameter("@uid", schema.UID),
+					new MdbParameter("@SysAreaSchemaName", schema.ObjectName.AreaName),
+					new MdbParameter("@ObjectType", (int)schema.DbObjectType),
+					new MdbParameter("@ObjectName", schema.ObjectName.ObjectName),
+					new MdbParameter("@DbObjectName", schema.DbObjectName.ObjectName),
+					new MdbParameter("@ObjectSchema", schema.DbObjectName.ObjectName),
+					new MdbParameter("@Version", schema_version));
+
 			schema.ID = id;
 			lock (objLock)
 				_schemaCache[schema.ObjectName] = schema;
@@ -1017,20 +1032,10 @@ namespace S031.MetaStack.Core.ORM
 		#region Utils
 		private static async Task<JMXSchema> GetTableSchema(MdbContext mdb, string fullTableName)
 		{
-			if ((await GetSqlVersion(mdb)).ToIntOrDefault() > 12)
-			{
-				string s = await mdb.ExecuteAsync<string>(SqlServer.GetTableSchema,
-					new MdbParameter("@table_name", fullTableName));
-				if (s != null)
-					return JMXSchema.Parse(s);
-			}
-			else
-			{
-				string s = await mdb.ExecuteAsync<string>(SqlServer.GetTableSchema_xml,
-					new MdbParameter("@table_name", fullTableName));
-				if (s != null)
-					return JMXSchema.ParseXml(s);
-			}
+			string s = await mdb.ExecuteAsync<string>(SqlServer.GetTableSchema,
+				new MdbParameter("@table_name", fullTableName));
+			if (s != null)
+				return JMXSchema.Parse(s);
 			return null;
 		}
 		private static async Task<string> GetSqlVersion(MdbContext mdb)

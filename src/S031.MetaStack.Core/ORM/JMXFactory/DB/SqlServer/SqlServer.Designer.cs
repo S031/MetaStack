@@ -39,7 +39,7 @@ namespace S031.MetaStack.Core.ORM {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("S031.MetaStack.Core.ORM.SchemaProviders.DB.SqlServer.SqlServer", typeof(SqlServer).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("S031.MetaStack.Core.ORM.JMXFactory.DB.SqlServer.SqlServer", typeof(SqlServer).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -87,16 +87,40 @@ namespace S031.MetaStack.Core.ORM {
         ///	SchemaOwner			varchar(30)		not null,
         ///	SchemaVersion		varchar(30)		not null,
         ///	SchemaConfig		varchar(max)	null
-        ///		constraint CKC_SCHEMACONFIG_SYSAREAS check(SchemaConfig is null or isjson(SchemaConfig) = 1),
+        ///		/*constraint CKC_SCHEMACONFIG_SYSAREAS check(SchemaConfig is null or isjson(SchemaConfig) = 1)*/,
         ///	IsDefault			bit				not null,
         ///	UpdateTime			datetime		not null
         ///		 CONSTRAINT [DF_UpdateTime_SysAreas]  DEFAULT (getdate()),
         ///	DateBegin			datetime		not null, 
-        ///	DateEnd		 [rest of string was truncated]&quot;;.
+        ///	DateE [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string CreateSchemaObjects {
             get {
                 return ResourceManager.GetString("CreateSchemaObjects", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create Schema SysCat
+        ///--go
+        ///create table SysCat.SysAreas (
+        ///	ID					int				identity(1, 1),
+        ///	SchemaName			varchar(60)		not null,
+        ///	SchemaOwner			varchar(30)		not null,
+        ///	SchemaVersion		varchar(30)		not null,
+        ///	SchemaConfig		varchar(max)	null
+        ///	IsDefault			bit				not null,
+        ///	UpdateTime			datetime		not null
+        ///		 CONSTRAINT [DF_UpdateTime_SysAreas]  DEFAULT (getdate()),
+        ///	DateBegin			datetime		not null, 
+        ///	DateEnd				datetime		null 
+        ///	constraint PK_SYSAREAS primary key (ID)
+        ///)
+        ///create unique nonclustered index AK1_SysAreas on [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string CreateSchemaObjects_12 {
+            get {
+                return ResourceManager.GetString("CreateSchemaObjects_12", resourceCulture);
             }
         }
         
@@ -113,15 +137,14 @@ namespace S031.MetaStack.Core.ORM {
         ///   Looks up a localized string similar to begin
         ///	drop procedure if exists SysCat.Get_TableSchema
         ///	drop procedure if exists SysCat.Get_TableSchema_xml
+        ///	drop procedure if exists SysCat.Get_TableSchema_ansi
         ///	drop procedure if exists SysCat.Get_ParentRelations
         ///	drop procedure if exists SysCat.Get_ParentRelations_ansi
         ///	drop view if exists SysCat.V_SysSchemas
         ///	drop procedure if exists SysCat.Add_SysSchemas
         ///	drop procedure if exists SysCat.Del_SysSchemas
         ///	drop procedure if exists SysCat.State_SysSchemas
-        ///	drop table if exists [SysCat].[SysSchemas]
-        ///	drop procedure if exists SysCat.Add_SysAreas
-        ///	drop [rest of string was truncated]&quot;;.
+        ///	drop table if exists [SysCat].[SysSchemas [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string DropSchema {
             get {

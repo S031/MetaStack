@@ -35,6 +35,52 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\AddSysAreas.sql" />
+    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\AddSysSchemas.sql" />
+    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\CreateSchemaObjects.sql" />
+    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\CreateSchemaObjects_12.sql" />
+    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\DelSysSchemas.sql" />
+    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\DropSchema.sql" />
+    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetColumnsList.sql" />
+    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetCurrentSchema.sql" />
+    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetDefaultSchema.sql" />
+    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetParentRelations.sql" />
+    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetParentRelationsAnsi.sql" />
+    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetTableSchema.sql" />
+    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetTableSchema_ansi.sql" />
+    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetTableSchema_xml.sql" />
+    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\SQLVersion.sql" />
+    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\StateSysSchemas.sql" />
+    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\TestSchema.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ApplicationDefinition Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\AddSysAreas.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\CreateSchemaObjects_12.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\AddSysSchemas.sql" />
+    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\CreateSchemaObjects.sql" />
+    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\DelSysSchemas.sql" />
+    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\DropSchema.sql" />
+    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetColumnsList.sql" />
+    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetCurrentSchema.sql" />
+    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetDefaultSchema.sql" />
+    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetParentRelations.sql" />
+    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetParentRelationsAnsi.sql" />
+    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetTableSchema.sql" />
+    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetTableSchema_ansi.sql" />
+    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetTableSchema_xml.sql" />
+    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\SQLVersion.sql" />
+    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\StateSysSchemas.sql" />
+    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\TestSchema.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1" />
@@ -47,6 +93,21 @@
 
   <ItemGroup>
     <ProjectReference Include="..\S031.MetaStack.Common\S031.MetaStack.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="ORM\JMXFactory\DB\SqlServer\SqlServer.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>SqlServer.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="ORM\JMXFactory\DB\SqlServer\SqlServer.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <CustomToolNamespace>S031.MetaStack.Core.ORM</CustomToolNamespace>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

@@ -8,6 +8,7 @@ using S031.MetaStack.Core.Logging;
 using S031.MetaStack.Core.ORM;
 using System;
 using System.Data.Common;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -60,7 +61,8 @@ namespace S031.MetaStack.AppServer
 			var factory = System.Data.SqlClient.SqlClientFactory.Instance;
 			var sp = ApplicationContext.GetServices();
 			var config = sp.GetService<IConfiguration>();
-			var cn = config.GetSection($"connectionStrings:BankLocal").Get<ConnectInfo>();
+			var connectionName = Dns.GetHostName() == "SERGEY-WRK" ? "Test" : "BankLocal";
+			var cn = config.GetSection($"connectionStrings:{connectionName}").Get<ConnectInfo>();
 			var log = sp.GetService<ILogger>();
 			using (MdbContext mdb = new MdbContext(cn))
 			using (JMXFactory f = JMXFactory.Create(mdb, log))

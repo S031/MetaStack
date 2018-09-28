@@ -67,34 +67,34 @@ namespace MetaStack.Test.ORM
 				_logger.Debug("Start speed test fo JMXObject parse from json string");
 
 
-				JMXSchemaProviderFactory.RegisterProvider<JMXSchemaProviderMemory>();
-				JMXSchemaProviderFactory.SetDefault(JMXSchemaProviderFactory.GetProvider<JMXSchemaProviderMemory>());
-				JMXSchemaProviderFactory.Default.SaveSchema(creaateTestSchema());
-				JMXObject o = new JMXObject("SysCat.SysSchema");
-				for (int i = 0; i < 1000; i++)
-				{
-					o.ParseJson(ss, null);
-				}
-				_logger.Debug("Finish speed test");
-				_logger.Debug(o.ToString());
-				_logger.Debug("Start speed test fo JMXSchema serialize to json string");
-				for (int i = 0; i < 1000; i++)
-				{
-					ss = JsonConvert.SerializeObject(s);
-				}
-				_logger.Debug("Finish speed test");
-				_logger.Debug("Start speed test fo JMXSchema ToString method to json string");
-				for (int i = 0; i < 1000; i++)
-				{
-					ss = s.ToString();
-				}
-				_logger.Debug("Finish speed test");
-				_logger.Debug("Start speed test fo JMXSchema parse from json string");
-				for (int i = 0; i < 1000; i++)
-				{
-					s = JsonConvert.DeserializeObject<JMXSchema>(ss);
-				}
-				_logger.Debug("Finish speed test");
+				//JMXSchemaProviderFactory.RegisterProvider<JMXSchemaProviderMemory>();
+				//JMXSchemaProviderFactory.SetDefault(JMXSchemaProviderFactory.GetProvider<JMXSchemaProviderMemory>());
+				//JMXSchemaProviderFactory.Default.SaveSchema(creaateTestSchema());
+				//JMXObject o = new JMXObject("SysCat.SysSchema");
+				//for (int i = 0; i < 1000; i++)
+				//{
+				//	o.ParseJson(ss, null);
+				//}
+				//_logger.Debug("Finish speed test");
+				//_logger.Debug(o.ToString());
+				//_logger.Debug("Start speed test fo JMXSchema serialize to json string");
+				//for (int i = 0; i < 1000; i++)
+				//{
+				//	ss = JsonConvert.SerializeObject(s);
+				//}
+				//_logger.Debug("Finish speed test");
+				//_logger.Debug("Start speed test fo JMXSchema ToString method to json string");
+				//for (int i = 0; i < 1000; i++)
+				//{
+				//	ss = s.ToString();
+				//}
+				//_logger.Debug("Finish speed test");
+				//_logger.Debug("Start speed test fo JMXSchema parse from json string");
+				//for (int i = 0; i < 1000; i++)
+				//{
+				//	s = JsonConvert.DeserializeObject<JMXSchema>(ss);
+				//}
+				//_logger.Debug("Finish speed test");
 
 				//JMXObject o = new JMXObject(JObject.Parse(ss));
 				//_logger.Debug((o as JObject).ToString());
@@ -106,24 +106,24 @@ namespace MetaStack.Test.ORM
 		[Fact]
 		void JMXObjectTest()
 		{
-			JMXSchemaProviderFactory.RegisterProvider<JMXSchemaProviderMemory>();
-			IJMXSchemaProvider sp = JMXSchemaProviderFactory.GetProvider<JMXSchemaProviderMemory>();
-			JMXSchemaProviderFactory.SetDefault(sp);
-			using (FileLog _logger = new FileLog("ORMSchemaTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
-			{
-				sp.SaveSchema(creaateTestSchema());
+			//JMXSchemaProviderFactory.RegisterProvider<JMXSchemaProviderMemory>();
+			//IJMXSchemaProvider sp = JMXSchemaProviderFactory.GetProvider<JMXSchemaProviderMemory>();
+			//JMXSchemaProviderFactory.SetDefault(sp);
+			//using (FileLog _logger = new FileLog("ORMSchemaTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			//{
+			//	sp.SaveSchema(creaateTestSchema());
 
-				JMXObject o = new JMXObject("SysCat.SysSchema")
-				{
-					["ID"] = 1
-				};
-				_logger.Debug(o.ToString());
-				string s = o.ToString();
-				o.ParseJson(s, null);
-				_logger.Debug(o.ToString());
-				o = JMXObject.CreateFrom(o.ToString());
-				_logger.Debug(o.ToString());
-			}
+			//	JMXObject o = new JMXObject("SysCat.SysSchema")
+			//	{
+			//		["ID"] = 1
+			//	};
+			//	_logger.Debug(o.ToString());
+			//	string s = o.ToString();
+			//	o.ParseJson(s, null);
+			//	_logger.Debug(o.ToString());
+			//	o = JMXObject.CreateFrom(o.ToString());
+			//	_logger.Debug(o.ToString());
+			//}
 		}
 		[Fact]
 		void JMXParameterTest()

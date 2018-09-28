@@ -127,6 +127,9 @@
   <data name="CreateSchemaObjects" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>SqlScripts\CreateSchemaObjects.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1251</value>
   </data>
+  <data name="CreateSchemaObjects_12" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>SqlScripts\CreateSchemaObjects_12.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1251</value>
+  </data>
   <data name="DelSysSchemas" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>SqlScripts\DelSysSchemas.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1251</value>
   </data>

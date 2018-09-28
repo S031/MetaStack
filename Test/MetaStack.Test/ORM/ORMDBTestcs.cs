@@ -241,7 +241,7 @@ namespace MetaStack.Test.ORM
 			var rm = Resources.TestSchemas.ResourceManager;
 			foreach (JMXObjectName item in GetTestNames())
 			{
-				l.Add(JMXSchema.Parse(Encoding.UTF8.GetString((byte[])rm.GetObject(item.ObjectName)).Substring(1)));
+				l.Add(JMXSchema.Parse(Encoding.Default.GetString((byte[])rm.GetObject(item.ObjectName)).Substring(1)));
 			}
 			return l.ToArray();
 		}

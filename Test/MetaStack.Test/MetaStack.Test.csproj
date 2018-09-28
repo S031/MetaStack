@@ -29,6 +29,32 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ORM\Resources\TestSchemas\Card.json" />
+    <None Remove="ORM\Resources\TestSchemas\Contact.json" />
+    <None Remove="ORM\Resources\TestSchemas\Customer.json" />
+    <None Remove="ORM\Resources\TestSchemas\ErrorCode.json" />
+    <None Remove="ORM\Resources\TestSchemas\Payment.json" />
+    <None Remove="ORM\Resources\TestSchemas\PaymentState.json" />
+    <None Remove="ORM\Resources\TestSchemas\PaymentStateHist.json" />
+    <None Remove="ORM\Resources\TestSchemas\Request.json" />
+    <None Remove="ORM\Resources\TestSchemas\Terminal.json" />
+    <None Remove="ORM\Resources\TestSchemas\Terminal2Customer.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="ORM\Resources\TestSchemas\Card.json" />
+    <EmbeddedResource Include="ORM\Resources\TestSchemas\Contact.json" />
+    <EmbeddedResource Include="ORM\Resources\TestSchemas\Customer.json" />
+    <EmbeddedResource Include="ORM\Resources\TestSchemas\ErrorCode.json" />
+    <EmbeddedResource Include="ORM\Resources\TestSchemas\Payment.json" />
+    <EmbeddedResource Include="ORM\Resources\TestSchemas\PaymentState.json" />
+    <EmbeddedResource Include="ORM\Resources\TestSchemas\PaymentStateHist.json" />
+    <EmbeddedResource Include="ORM\Resources\TestSchemas\Request.json" />
+    <EmbeddedResource Include="ORM\Resources\TestSchemas\Terminal.json" />
+    <EmbeddedResource Include="ORM\Resources\TestSchemas\Terminal2Customer.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="MessagePack" Version="1.7.3.4" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
