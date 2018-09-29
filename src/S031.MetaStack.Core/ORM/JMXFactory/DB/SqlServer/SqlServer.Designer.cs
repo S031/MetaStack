@@ -108,7 +108,7 @@ namespace S031.MetaStack.Core.ORM {
         ///	SchemaName			varchar(60)		not null,
         ///	SchemaOwner			varchar(30)		not null,
         ///	SchemaVersion		varchar(30)		not null,
-        ///	SchemaConfig		varchar(max)	null
+        ///	SchemaConfig		varchar(max)	null,
         ///	IsDefault			bit				not null,
         ///	UpdateTime			datetime		not null
         ///		 CONSTRAINT [DF_UpdateTime_SysAreas]  DEFAULT (getdate()),
@@ -116,7 +116,7 @@ namespace S031.MetaStack.Core.ORM {
         ///	DateEnd				datetime		null 
         ///	constraint PK_SYSAREAS primary key (ID)
         ///)
-        ///create unique nonclustered index AK1_SysAreas on [rest of string was truncated]&quot;;.
+        ///create unique nonclustered index AK1_SysAreas o [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string CreateSchemaObjects_12 {
             get {
@@ -200,38 +200,11 @@ namespace S031.MetaStack.Core.ORM {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to SysCat.Get_ParentRelations_ansi.
-        /// </summary>
-        internal static string GetParentRelationsAnsi {
-            get {
-                return ResourceManager.GetString("GetParentRelationsAnsi", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to SysCat.Get_TableSchema.
         /// </summary>
         internal static string GetTableSchema {
             get {
                 return ResourceManager.GetString("GetTableSchema", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to SysCat.Get_TableSchema_ansi.
-        /// </summary>
-        internal static string GetTableSchema_ansi {
-            get {
-                return ResourceManager.GetString("GetTableSchema_ansi", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to SysCat.Get_TableSchema_xml.
-        /// </summary>
-        internal static string GetTableSchema_xml {
-            get {
-                return ResourceManager.GetString("GetTableSchema_xml", resourceCulture);
             }
         }
         

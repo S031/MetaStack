@@ -198,7 +198,7 @@ namespace MetaStack.Test.ORM
 			//}
 			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
-				var s = RreaateTestSchema();
+				var s = CreateTestSchema();
 				_logger.Debug(s.ToString());
 				var s1 = JMXSchema.Parse(s.ToString());
 				Assert.Equal(s.ToString(), s1.ToString());
@@ -207,7 +207,7 @@ namespace MetaStack.Test.ORM
 
 		}
 
-		JMXSchema RreaateTestSchema()
+		JMXSchema CreateTestSchema()
 		{
 
 			JMXSchema s = new JMXSchema("SysSchema")
@@ -241,7 +241,8 @@ namespace MetaStack.Test.ORM
 			var rm = Resources.TestSchemas.ResourceManager;
 			foreach (JMXObjectName item in GetTestNames())
 			{
-				l.Add(JMXSchema.Parse(Encoding.Default.GetString((byte[])rm.GetObject(item.ObjectName)).Substring(1)));
+				var path = $@"..\..\..\orm\Resources\TestSchemas\{item.ObjectName}.json";
+				l.Add(JMXSchema.Parse(File.ReadAllText(path))); 
 			}
 			return l.ToArray();
 		}

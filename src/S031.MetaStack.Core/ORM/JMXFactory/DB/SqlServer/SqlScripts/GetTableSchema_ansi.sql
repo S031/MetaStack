@@ -1,1 +1,0 @@
-SysCat.Get_TableSchema_ansi

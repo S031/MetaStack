@@ -14,7 +14,7 @@ namespace S031.MetaStack.Core.ORM
 {
 	public class JMXSqlRepo : JMXRepo
 	{
-		const int _sql_server_2017_version = 15;
+		const int _sql_server_2017_version = 14;
 		readonly object objLock = new object();
 		static int _counter = 0;
 		static readonly Dictionary<string, JMXSchema> _schemaCache = new Dictionary<string, JMXSchema>();
@@ -182,10 +182,10 @@ namespace S031.MetaStack.Core.ORM
 			try
 			{
 				await mdb.BeginTransactionAsync();
-				var scripts = ((await GetSqlVersion(mdb)).ToIntOrDefault() > _sql_server_2017_version) ?
-					SqlServer.CreateSchemaObjects.Split(new string[] { "--go", "--GO" },
-						StringSplitOptions.RemoveEmptyEntries) :
+				var scripts = ((await GetSqlVersion(mdb)).ToIntOrDefault() < _sql_server_2017_version) ?
 					SqlServer.CreateSchemaObjects_12.Split(new string[] { "--go", "--GO" },
+						StringSplitOptions.RemoveEmptyEntries) :
+					SqlServer.CreateSchemaObjects.Split(new string[] { "--go", "--GO" },
 						StringSplitOptions.RemoveEmptyEntries);
 
 				foreach (string statement in scripts)
@@ -368,17 +368,17 @@ namespace S031.MetaStack.Core.ORM
 		{
 			var mdb = this.MdbContext;
 			schema = await NormalizeSchemaAsync(mdb, schema);
-			int id = ((await GetSqlVersion(mdb)).ToIntOrDefault() > _sql_server_2017_version) ?
-				await mdb.ExecuteAsync<int>(SqlServer.AddSysSchemas,
-					new MdbParameter("@ObjectSchema", schema.ToString()),
-					new MdbParameter("@Version", schema_version)) :
+			int id = ((await GetSqlVersion(mdb)).ToIntOrDefault() < _sql_server_2017_version) ?
 				await mdb.ExecuteAsync<int>(SqlServer.AddSysSchemas,
 					new MdbParameter("@uid", schema.UID),
 					new MdbParameter("@SysAreaSchemaName", schema.ObjectName.AreaName),
 					new MdbParameter("@ObjectType", (int)schema.DbObjectType),
 					new MdbParameter("@ObjectName", schema.ObjectName.ObjectName),
 					new MdbParameter("@DbObjectName", schema.DbObjectName.ObjectName),
-					new MdbParameter("@ObjectSchema", schema.DbObjectName.ObjectName),
+					new MdbParameter("@ObjectSchema", schema.ToString()),
+					new MdbParameter("@Version", schema_version)) :
+				await mdb.ExecuteAsync<int>(SqlServer.AddSysSchemas,
+					new MdbParameter("@ObjectSchema", schema.ToString()),
 					new MdbParameter("@Version", schema_version));
 
 			schema.ID = id;

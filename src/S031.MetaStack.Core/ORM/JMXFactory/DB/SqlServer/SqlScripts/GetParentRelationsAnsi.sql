@@ -1,1 +1,0 @@
-SysCat.Get_ParentRelations_ansi

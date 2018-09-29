@@ -45,10 +45,7 @@
     <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetCurrentSchema.sql" />
     <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetDefaultSchema.sql" />
     <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetParentRelations.sql" />
-    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetParentRelationsAnsi.sql" />
     <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetTableSchema.sql" />
-    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetTableSchema_ansi.sql" />
-    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetTableSchema_xml.sql" />
     <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\SQLVersion.sql" />
     <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\StateSysSchemas.sql" />
     <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\TestSchema.sql" />
@@ -71,10 +68,7 @@
     <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetCurrentSchema.sql" />
     <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetDefaultSchema.sql" />
     <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetParentRelations.sql" />
-    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetParentRelationsAnsi.sql" />
     <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetTableSchema.sql" />
-    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetTableSchema_ansi.sql" />
-    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetTableSchema_xml.sql" />
     <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\SQLVersion.sql" />
     <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\StateSysSchemas.sql" />
     <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\TestSchema.sql" />
@@ -107,6 +101,7 @@
     <EmbeddedResource Update="ORM\JMXFactory\DB\SqlServer\SqlServer.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <CustomToolNamespace>S031.MetaStack.Core.ORM</CustomToolNamespace>
+      <LastGenOutput>SqlServer.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 

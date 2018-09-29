@@ -148,17 +148,8 @@
   <data name="GetParentRelations" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>SqlScripts\GetParentRelations.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1251</value>
   </data>
-  <data name="GetParentRelationsAnsi" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>SqlScripts\GetParentRelationsAnsi.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1251</value>
-  </data>
   <data name="GetTableSchema" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>SqlScripts\GetTableSchema.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1251</value>
-  </data>
-  <data name="GetTableSchema_ansi" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>SqlScripts\GetTableSchema_ansi.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1251</value>
-  </data>
-  <data name="GetTableSchema_xml" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>SqlScripts\GetTableSchema_xml.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1251</value>
   </data>
   <data name="SQLVersion" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>SqlScripts\SQLVersion.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;windows-1251</value>

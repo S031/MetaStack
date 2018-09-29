@@ -230,7 +230,7 @@ BEGIN
 	BEGIN
 		SET @json = IsNull((SELECT
 			(SELECT char(10) +'[' + 
-				STUFF((SELECT char(10) + '{ "KeyName": "' + [ForeignKey].name + 
+				STUFF((SELECT ',{ "KeyName": "' + [ForeignKey].name + 
 				'", "CheckOption": ' + CASE WHEN [ForeignKey].is_not_trusted = 1 THEN '0' ELSE '1'	END + 
 				', "DeleteRefAction": ' + CASE 
 						WHEN [ForeignKey].delete_referential_action = 1 THEN '" ON DELETE CASCADE"' 
