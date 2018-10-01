@@ -5,22 +5,22 @@ using Microsoft.Extensions.Logging;
 using S031.MetaStack.Common;
 using S031.MetaStack.Core.Data;
 
-namespace S031.MetaStack.Core.ORM.MsSql
+namespace S031.MetaStack.Core.ORM.SQLite
 {
-	[SchemaDBSync(DBProviderName = "System.Data.SqlClient")]
-	public class JMXSqlFactory: JMXFactory
+	[SchemaDBSync(DBProviderName = "Microsoft.Data.Sqlite")]
+	public class JMXSQLiteFactory: JMXFactory
 	{
-		public const string ProviderInvariantName = "System.Data.SqlClient";
+		public const string ProviderInvariantName = "Microsoft.Data.Sqlite";
 
-		private readonly JMXSqlRepo _repo;
-		private readonly JMXSqlProvider _jmx;
-		public JMXSqlFactory(MdbContext mdbContext, ILogger logger) : base(mdbContext)
+		private readonly JMXSQLiteRepo _repo;
+		private readonly JMXSQLiteProvider _jmx;
+		public JMXSQLiteFactory(MdbContext mdbContext, ILogger logger) : base(mdbContext)
 		{
 			if (!mdbContext.ProviderName.Equals(ProviderInvariantName, StringComparison.CurrentCultureIgnoreCase))
 				throw new ArgumentException($"MdbContext must be created using { ProviderInvariantName} provider.");
 			this.Logger = logger;
-			_repo = new JMXSqlRepo(mdbContext, logger);
-			_jmx = new JMXSqlProvider(mdbContext, logger);
+			_repo = new JMXSQLiteRepo(mdbContext, logger);
+			_jmx = new JMXSQLiteProvider(mdbContext, logger);
 		}
 		public override IJMXRepo CreateJMXRepo() => _repo;
 

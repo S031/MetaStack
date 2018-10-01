@@ -9,7 +9,7 @@ using System.Text;
 
 namespace S031.MetaStack.Core.ORM
 {
-	internal class SQLStatementWriter : StringWriter
+	public class SQLStatementWriter : StringWriter
 	{
 		const string detail_field_prefix = "$1_";
 		private JMXSchema _schema;

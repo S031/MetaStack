@@ -1,0 +1,1 @@
+SysCat.Del_SysSchemas

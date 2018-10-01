@@ -34,7 +34,7 @@ namespace S031.MetaStack.AppServer
 				.UseApplicationContext()
 				.Build())
 			{
-				TestConnection();
+				//TestConnection();
 				await host.RunAsync(ApplicationContext.CancellationToken);
 			}
 		}
@@ -58,17 +58,17 @@ namespace S031.MetaStack.AppServer
 		}
 		private static void TestConnection()
 		{
-			var factory = System.Data.SqlClient.SqlClientFactory.Instance;
-			var sp = ApplicationContext.GetServices();
-			var config = sp.GetService<IConfiguration>();
-			var connectionName = Dns.GetHostName() == "SERGEY-WRK" ? "Test" : "BankLocal";
-			var cn = config.GetSection($"connectionStrings:{connectionName}").Get<ConnectInfo>();
-			var log = sp.GetService<ILogger>();
-			using (MdbContext mdb = new MdbContext(cn))
-			using (JMXFactory f = JMXFactory.Create(mdb, log))
-			{
+			//var factory = System.Data.SqlClient.SqlClientFactory.Instance;
+			//var sp = ApplicationContext.GetServices();
+			//var config = sp.GetService<IConfiguration>();
+			//var connectionName = Dns.GetHostName() == "SERGEY-WRK" ? "Test" : "BankLocal";
+			//var cn = config.GetSection($"connectionStrings:{connectionName}").Get<ConnectInfo>();
+			//var log = sp.GetService<ILogger>();
+			//using (MdbContext mdb = new MdbContext(cn))
+			//using (JMXFactory f = JMXFactory.Create(mdb, log))
+			//{
 
-			}
+			//}
 		}
 	}
 }

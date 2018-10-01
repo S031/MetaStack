@@ -14,6 +14,9 @@ namespace S031.MetaStack.Core.ORM.MsSql
 				throw new ArgumentException($"MdbContext must be created using { JMXSqlFactory.ProviderInvariantName} provider.");
 			this.Logger = logger;
 		}
-
+		public override JMXObject Read(JMXObjectName objectName, int id)
+		{
+			return base.Read(objectName, id);
+		}
 	}
 }

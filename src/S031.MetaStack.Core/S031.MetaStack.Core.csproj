@@ -16,12 +16,15 @@
 
   <ItemGroup>
     <Compile Remove="Configuration\**" />
+    <Compile Remove="ORM\JMXFactory\DB\**" />
     <Compile Remove="ORM\SchemaProviders\**" />
     <Compile Remove="SysCat\**" />
     <EmbeddedResource Remove="Configuration\**" />
+    <EmbeddedResource Remove="ORM\JMXFactory\DB\**" />
     <EmbeddedResource Remove="ORM\SchemaProviders\**" />
     <EmbeddedResource Remove="SysCat\**" />
     <None Remove="Configuration\**" />
+    <None Remove="ORM\JMXFactory\DB\**" />
     <None Remove="ORM\SchemaProviders\**" />
     <None Remove="SysCat\**" />
   </ItemGroup>
@@ -32,46 +35,6 @@
     <Compile Remove="App\Internal\PluginManager.cs" />
     <Compile Remove="Data\DbProviderFactories.cs" />
     <Compile Remove="ORM\JMXSchemaProviderFactory.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\AddSysAreas.sql" />
-    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\AddSysSchemas.sql" />
-    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\CreateSchemaObjects.sql" />
-    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\CreateSchemaObjects_12.sql" />
-    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\DelSysSchemas.sql" />
-    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\DropSchema.sql" />
-    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetColumnsList.sql" />
-    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetCurrentSchema.sql" />
-    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetDefaultSchema.sql" />
-    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetParentRelations.sql" />
-    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetTableSchema.sql" />
-    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\SQLVersion.sql" />
-    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\StateSysSchemas.sql" />
-    <None Remove="ORM\JMXFactory\DB\SqlServer\SqlScripts\TestSchema.sql" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ApplicationDefinition Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\AddSysAreas.sql" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\CreateSchemaObjects_12.sql" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\AddSysSchemas.sql" />
-    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\CreateSchemaObjects.sql" />
-    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\DelSysSchemas.sql" />
-    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\DropSchema.sql" />
-    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetColumnsList.sql" />
-    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetCurrentSchema.sql" />
-    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetDefaultSchema.sql" />
-    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetParentRelations.sql" />
-    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\GetTableSchema.sql" />
-    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\SQLVersion.sql" />
-    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\StateSysSchemas.sql" />
-    <EmbeddedResource Include="ORM\JMXFactory\DB\SqlServer\SqlScripts\TestSchema.sql" />
   </ItemGroup>
 
   <ItemGroup>
@@ -87,22 +50,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\S031.MetaStack.Common\S031.MetaStack.Common.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Update="ORM\JMXFactory\DB\SqlServer\SqlServer.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>SqlServer.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="ORM\JMXFactory\DB\SqlServer\SqlServer.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <CustomToolNamespace>S031.MetaStack.Core.ORM</CustomToolNamespace>
-      <LastGenOutput>SqlServer.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
 
 </Project>
