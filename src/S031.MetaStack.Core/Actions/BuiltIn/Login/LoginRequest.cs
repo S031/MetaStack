@@ -21,7 +21,7 @@ namespace S031.MetaStack.Core.Actions
 
 		public Task<DataPackage> InvokeAsync(DataPackage dp)
 		{
-			throw new InvalidCastException("This action can not be executed in asynchronous mode");
+			throw new InvalidOperationException("This action can not be executed in asynchronous mode");
 		}
 	}
 }

@@ -10,44 +10,11 @@ using System.Threading.Tasks;
 
 namespace S031.MetaStack.Core.ORM
 {
-	public abstract class JMXRepo : IJMXRepo, IDisposable
+	public abstract class JMXRepo : ManagerObjectBase, IJMXRepo, IDisposable
 	{
-		private ILogger _logger;
-		private bool _isLocalLog;
-
-		public JMXRepo(MdbContext mdbContext)
+		public JMXRepo(MdbContext mdbContext) : base(mdbContext)
 		{
-			mdbContext.NullTest(nameof(mdbContext));
-			this.MdbContext = mdbContext;
 		}
-
-		public void Dispose()
-		{
-			if (_isLocalLog)
-				(_logger as IDisposable)?.Dispose();
-		}
-
-		public ILogger Logger
-		{
-			get
-			{
-				if (_logger == null)
-				{
-					_logger = new Logging.FileLogger(this.GetType().FullName);
-					_isLocalLog = true;
-				}
-				return _logger;
-			}
-			set
-			{
-				if (_logger != null)
-					throw new InvalidOperationException($"The Logger has already been assigned this instance of the {this.GetType().FullName} class");
-				_logger = value;
-				_isLocalLog = false;
-			}
-		}
-		
-		protected MdbContext MdbContext { get; private set; }
 
 		public virtual IDictionary<MdbType, string> GetTypeMap()
 		{
