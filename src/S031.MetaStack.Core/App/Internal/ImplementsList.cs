@@ -24,7 +24,7 @@ namespace S031.MetaStack.WinForms
 			l = getImplements(type).ToList();
 			lock (objLock)
 			{
-					_iList.Add(type, l);
+				_iList.Add(type, l);
 			}
 			return l;
 		}

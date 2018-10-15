@@ -8,7 +8,7 @@ namespace S031.MetaStack.Core.Actions
 {
 	internal class LoginRequest : IAppEvaluator
 	{
-		public DataPackage Invoke(DataPackage dp)
+		public DataPackage Invoke(ActionInfo ai, DataPackage dp)
 		{
 			string userName = (string)dp["UserName"];
 			string publicKey = (string)dp["PublicKey"];
@@ -16,10 +16,17 @@ namespace S031.MetaStack.Core.Actions
 				.GetServices()
 				.GetService<ILoginFactory>()
 				.LoginRequest(userName, publicKey);
-			return new DataPackage("PublicKey", key);
+
+			var result = ai.GetOutputParamTable();
+			if (result == null)
+				System.IO.File.WriteAllText(@"c:\source\a123.txt", "result is null");
+			result["PublicKey"] = key;
+			result.Update();
+			System.IO.File.WriteAllText(@"c:\source\a123.txt", result.ToString());
+			return result;
 		}
 
-		public Task<DataPackage> InvokeAsync(DataPackage dp)
+		public Task<DataPackage> InvokeAsync(ActionInfo ai, DataPackage dp)
 		{
 			throw new InvalidOperationException("This action can not be executed in asynchronous mode");
 		}

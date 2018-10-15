@@ -12,7 +12,7 @@ namespace S031.MetaStack.Core.ORM
 	public class SQLStatementWriter : StringWriter
 	{
 		const string detail_field_prefix = "$1_";
-		private JMXSchema _schema;
+		private readonly JMXSchema _schema;
 		private JMXRepo _repo;
 
 		public SQLStatementWriter(JMXRepo repo)

@@ -1,7 +1,8 @@
 ﻿{
   "appSettings": {
     "auditEnabled": true,
-    "language": "ru-RU"
+    "language": "ru-RU",
+    "defaultConnection": "bankLocal"
   },
   "ApplicationLogSettings": {
     /* Cache size before flushing to disk */

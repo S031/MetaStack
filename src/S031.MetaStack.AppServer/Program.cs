@@ -6,6 +6,7 @@ using S031.MetaStack.Core.App;
 using S031.MetaStack.Core.Data;
 using S031.MetaStack.Core.Logging;
 using S031.MetaStack.Core.ORM;
+using S031.MetaStack.Core.Security;
 using System;
 using System.Data.Common;
 using System.Net;
@@ -27,8 +28,11 @@ namespace S031.MetaStack.AppServer
 			using (var host = new HostBuilder()
 				.UseConsoleLifetime()
 				.ConfigureServices((context, services) => services
-					.AddTransient<ILogger>(s=>logger)
-					.AddSingleton<IConfiguration>(configuration))
+					.AddSingleton<ILogger>(s => logger)
+					.AddSingleton<IConfiguration>(configuration)
+					.AddSingleton<DbProviderFactory>(System.Data.SqlClient.SqlClientFactory.Instance)
+					.AddSingleton<ILoginFactory>(new BasicLoginFactory())
+					)
 				.ConfigureServices((context, services) =>
 					ConfigureServicesFromConfigFile(context, services))
 				.UseApplicationContext()

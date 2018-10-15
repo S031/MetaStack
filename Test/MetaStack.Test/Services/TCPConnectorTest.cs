@@ -9,6 +9,7 @@ using System.Text;
 using System.Net.Sockets;
 using System.IO;
 using System.Threading.Tasks;
+using S031.MetaStack.Core.Actions;
 
 namespace MetaStack.Test.Services
 {
@@ -25,7 +26,7 @@ namespace MetaStack.Test.Services
 		{
 			using (TCPConnector connector = TCPConnector.Create())
 			{
-
+				connector.Connect("Test", "@TestPassword");
 			}
 		}
 	}

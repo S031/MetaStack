@@ -9,49 +9,104 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
 using S031.MetaStack.Common;
+using System.Linq;
 
 namespace S031.MetaStack.Core.Actions
 {
-	public class ActionManager:IDisposable
+	public class ActionManager : ManagerObjectBase, IDisposable
 	{
 		private static readonly object obj4Lock = new object();
-		//private static readonly Dictionary<string, ActionInfo> actions = new Dictionary<string, ActionInfo>();
-		private MdbContext _mdbContext;
+		private static readonly Dictionary<string, ActionInfo> _actions = ActionsList.CreateActionsList();
 
-		ActionManager() { }
-
-		public ActionManager(string sysCatConnectionName, ILogger logger)
+		public ActionManager(MdbContext mdbContext) : base(mdbContext)
 		{
-			var _configuration = ApplicationContext.GetServices().GetService<IConfiguration>();
-			var cs = _configuration.GetSection($"connectionStrings:{sysCatConnectionName}")?.Get<ConnectInfo>();
-			if (cs == null)
-				throw new KeyNotFoundException($"The connection string with name {sysCatConnectionName} was not found in the configuration file");
-			_mdbContext = new MdbContext(new ConnectInfo(cs.ProviderName, cs.ConnectionString));
 		}
 
-		public static async Task<ActionManager> CreateManagerAsync(string sysCatConnectionName, ILogger logger)
+		public ActionInfo GetActionInfo(string actionID)
 		{
-			ActionManager actionManager = new ActionManager
+			actionID.NullTest(nameof(actionID));
+			if (!_actions.ContainsKey(actionID))
+				throw new KeyNotFoundException($"Action {actionID} not found");
+			return _actions[actionID];
+		}
+
+		public DataPackage Execute(string actionID, DataPackage inParamStor)
+		{
+			ActionInfo ai = GetActionInfo(actionID);
+			try
 			{
-				_mdbContext = await MdbContext.CreateMdbContextAsync(sysCatConnectionName)
-			};
-			return actionManager;
-		}
-
-		internal static Dictionary<string, ActionInfo> Actions => _actions;
-
-		public void Dispose()
-		{
-			_mdbContext.Dispose();
-		}
-
-		private static readonly Dictionary<string, ActionInfo> _actions = new Dictionary<string, ActionInfo>()
-		{
-			{"Sys.LoginRequest", new ActionInfo(){
-				ActionID = "Sys.LoginRequest",
-				AssemblyID = Assembly.GetExecutingAssembly().GetWorkName(),
-				}
+				return ExecuteInternal(ai, inParamStor);
 			}
-		};
+			catch (Exception ex)
+			{
+				if (ai == null || ai.LogOnError)
+					Logger.LogError($"{ex.Message}\n{ex.StackTrace}");
+				//if (ai != null && ai.EMailOnError)
+				//	Comm.SendEMail(ai.EMailGroup, "Ошибка выполнения операции '{0}'".ToFormat(ai.ActionID), ex.Detail.FullReport);
+				throw ex;
+			}
+		}
+		public async Task<DataPackage> ExecuteAsync(string actionID, DataPackage inParamStor)
+		{
+			ActionInfo ai = GetActionInfo(actionID);
+			try
+			{
+				return await ExecuteInternalAsync(ai, inParamStor);
+			}
+			catch (Exception ex)
+			{
+				if (ai == null || ai.LogOnError)
+					Logger.LogError($"{ex.Message}\n{ex.StackTrace}");
+				//if (ai != null && ai.EMailOnError)
+				//	Comm.SendEMail(ai.EMailGroup, "Ошибка выполнения операции '{0}'".ToFormat(ai.ActionID), ex.Detail.FullReport);
+				throw ex;
+			}
+		}
+
+		private static DataPackage ExecuteInternal(ActionInfo ai, DataPackage inParamStor)
+		{
+			var se = CreateEvaluator(ai, inParamStor);
+			return se.Invoke(ai, inParamStor);
+		}
+
+		private static async Task< DataPackage> ExecuteInternalAsync(ActionInfo ai, DataPackage inParamStor)
+		{
+			var se = CreateEvaluator(ai, inParamStor);
+			return await se.InvokeAsync(ai, inParamStor);
+		}
+
+		private static IAppEvaluator CreateEvaluator(ActionInfo ai, DataPackage inParamStor)
+		{
+			var inParams = ai.InterfaceParameters.Where(kvp => kvp.Value.Dirrect == ParamDirrect.Input && kvp.Value.Required).Select(kvp => kvp.Value);
+			int pCount = inParams.Count();
+			if (inParamStor != null) inParamStor.GoDataTop();
+			if (pCount > 0 && (inParamStor == null || inParamStor.FieldCount < pCount || !inParamStor.Read()))
+			{
+				throw new InvalidOperationException(
+					"Количество параметров операции '{0}', не соответствует интерфейсу '{1}'"
+					.ToFormat(ai.ActionID, ai.InterfaceID));
+			}
+			else if (pCount > 0)
+			{
+				foreach (ParamInfo pi in inParams)
+				{
+					try
+					{
+						var val = inParamStor[pi.ParameterID];
+					}
+					catch
+					{
+						throw new InvalidOperationException(
+							"Обязательный параметер интерфейса '{0}.{1}', не найден в списке параметров  операции '{2}'"
+							.ToFormat(ai.InterfaceID, pi.ParameterID, ai.ActionID));
+					}
+				}
+				inParamStor.GoDataTop();
+			}
+			IAppEvaluator se = ImplementsList.GetTypes(typeof(IAppEvaluator))
+				.FirstOrDefault(t => t.FullName.Equals(ai.ClassName, StringComparison.CurrentCultureIgnoreCase))?
+				.CreateInstance<IAppEvaluator>();
+			return se;
+		}
 	}
 }
