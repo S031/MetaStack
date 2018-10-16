@@ -77,26 +77,6 @@ namespace S031.MetaStack.Services
 				await messagePipeline.ProcessMessageAsync();
 				return messagePipeline.ResultMessage;
 			}
-			//return await Task.Factory.StartNew(() =>
-			//{
-			//	var p = new DataPackage(new string[] { "Col1.int", "Col2.string.255", "Col3.datetime.10", "Col4.Guid.34", "Col5.object" });
-			//	p.Headers.Add("Username", "Сергей");
-			//	p.Headers.Add("Password", "1234567T");
-			//	p.Headers.Add("Sign", UnicodeEncoding.UTF8.GetBytes("Сергей"));
-			//	p.UpdateHeaders();
-			//	int i = 0;
-			//	for (i = 0; i < 5; i++)
-			//	{
-			//		p.AddNew();
-			//		p["Col1"] = i;
-			//		p["Col2"] = $"Строка # {i}";
-			//		p["Col3"] = DateTime.Now.AddDays(i);
-			//		p["Col4"] = Guid.NewGuid();
-			//		p["Col5"] = null;
-			//		p.Update();
-			//	}
-			//	return p;
-			//});
 		}
 
 		private static async Task<byte[]> GetByteArrayFromStreamAsync(NetworkStream ns, int length)

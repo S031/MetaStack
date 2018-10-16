@@ -39,18 +39,30 @@ namespace S031.MetaStack.WinForms.Actions
 		public TransactionActionSupport TransactionSupport { get; set; }
 		public DataPackage GetInputParamTable()
 		{
-			return new DataPackage("t_" + this.ActionID,
-				this.InterfaceParameters.InputParameters().Select(pi => pi.ParameterID).ToArray());
+			return new DataPackage(
+				this
+				.InterfaceParameters
+				.InputParameters()
+				.Select(pi => $"{pi.ParameterID}.{pi.DataType}.{pi.Width}.{!pi.Required}")
+				.ToArray());
 		}
 		public DataPackage GetInputParamTable(params object[] paramList)
 		{
-			return new DataPackage("t_" + this.ActionID,
-				this.InterfaceParameters.InputParameters().Select(pi => pi.ParameterID).ToArray(), paramList);
+			return new DataPackage(
+				this
+				.InterfaceParameters
+				.InputParameters()
+				.Select(pi => $"{pi.ParameterID}.{pi.DataType}.{pi.Width}.{!pi.Required}")
+				.ToArray(), paramList);
 		}
 		public DataPackage GetOutputParamTable()
 		{
-			return new DataPackage("t_" + this.ActionID,
-				this.InterfaceParameters.OutputParameters().Select(pi => pi.ParameterID).ToArray());
+			return new DataPackage(
+				this
+				.InterfaceParameters
+				.OutputParameters()
+				.Select(pi => $"{pi.ParameterID}.{pi.DataType}.{pi.Width}.{!pi.Required}")
+				.ToArray());
 		}
 		public ActionWebAuthenticationType WebAuthentication { get; set; }
 		public bool AuthenticationRequired { get; set; }

@@ -39,7 +39,8 @@ namespace S031.MetaStack.AppServer
 				.Build())
 			{
 				//TestConnection();
-				await host.RunAsync(ApplicationContext.CancellationToken);
+				//await host.RunAsync(ApplicationContext.CancellationToken);
+				await host.RunAsync();
 			}
 		}
 		static void ShutdownApp()
