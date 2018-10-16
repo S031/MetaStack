@@ -348,6 +348,8 @@ namespace S031.MetaStack.Common
 		{
 			if (value == null)	action(value, valueName);
 		}
+
+#if NETCOREAPP
 		public static U Match<T, U>(this T val, params (Func<T, bool> qualifier, Func<T, U> func)[] matches)
 		{
 			U ret = default;
@@ -374,5 +376,6 @@ namespace S031.MetaStack.Common
 				}
 			}
 		}
+#endif
 	}
 }

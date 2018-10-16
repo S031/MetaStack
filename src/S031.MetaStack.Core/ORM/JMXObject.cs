@@ -21,7 +21,7 @@ namespace S031.MetaStack.WinForms.ORM
 	public class JMXObject : JObject
 	{
 		private JMXSchema _schema;
-		private readonly JMXFactory _factory;
+		private readonly IJMXFactory _factory;
 
 		// Call internal methods of JsonReader && JObjects for parse json
 		static readonly FastMethodInfo.ReturnValueDelegate _moveToContent = new FastMethodInfo(typeof(JsonReader)
@@ -36,11 +36,11 @@ namespace S031.MetaStack.WinForms.ORM
 		{
 		}
 		public JMXObject(string objectName) : 
-			this(objectName, ObjectFactories.GetDefault<JMXFactory>())
+			this(objectName, ObjectFactories.GetDefault<IJMXFactory>())
 		{
 		}
 
-		public JMXObject(string objectName, JMXFactory schemaFactory)
+		public JMXObject(string objectName, IJMXFactory schemaFactory)
 		{
 			ID = 0;
 			ObjectName = objectName;
@@ -63,7 +63,7 @@ namespace S031.MetaStack.WinForms.ORM
 
 			}
 		}
-		public static async Task<JMXObject> CreateObjectAsync(string objectName, JMXFactory schemaFactory)
+		public static async Task<JMXObject> CreateObjectAsync(string objectName, IJMXFactory schemaFactory)
 		{
 			JMXObject instance = new JMXObject
 			{
@@ -82,9 +82,9 @@ namespace S031.MetaStack.WinForms.ORM
 		}
 		public static JMXObject CreateFrom(string json)
 		{
-			return CreateFrom(json, ObjectFactories.GetDefault<JMXFactory>());
+			return CreateFrom(json, ObjectFactories.GetDefault<IJMXFactory>());
 		}
-		public static JMXObject CreateFrom(string json, JMXFactory schemaFactory)
+		public static JMXObject CreateFrom(string json, IJMXFactory schemaFactory)
 		{
 			JMXObject instance = new JMXObject();
 			instance.ParseJson(json);
@@ -114,7 +114,7 @@ namespace S031.MetaStack.WinForms.ORM
 			set => this["ID"] = value;
 		}
 		public JMXSchema Schema => _schema;
-		public JMXFactory GetJMXFactory() => _factory;
+		public IJMXFactory GetJMXFactory() => _factory;
 		public override string ToString()
 		{
 			return base.ToString();

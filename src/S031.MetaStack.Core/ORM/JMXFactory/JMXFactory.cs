@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace S031.MetaStack.Core.ORM
 {
-	public abstract class JMXFactory : ManagerObjectBase, IDisposable
+	public abstract class JMXFactory : ManagerObjectBase, IJMXFactory, IDisposable
 	{
 		public JMXFactory(MdbContext mdbContext) : base(mdbContext)
 		{
