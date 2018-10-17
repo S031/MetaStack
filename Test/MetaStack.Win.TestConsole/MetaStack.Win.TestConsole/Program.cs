@@ -20,9 +20,11 @@ namespace MetaStack.Win.TestConsole
 				connector.Connect("Test", "@TestPassword");
 				l.Debug("Start performance test for logins");
 				int i = 0;
-				for (i = 0; i < 1; i++)
+				for (i = 0; i < 10000; i++)
 				{
 					connector.Execute("Sys.Select", new DataPackage(new string[] { "ParamName", "ParamValue" }, new object[] { "_connectionName", "Test" }));
+					if (i % 1000 == 0)
+						Console.WriteLine(i);
 				}
 				l.Debug($"End performance test for {i} logins");
 			}

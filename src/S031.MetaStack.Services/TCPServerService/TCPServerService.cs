@@ -84,7 +84,11 @@ namespace S031.MetaStack.Services
 			byte[] result = new byte[length];
 			int ReadBytes = 0;
 			while (length > ReadBytes)
+			{
 				ReadBytes += await ns.ReadAsync(result, ReadBytes, length - ReadBytes);
+				if (ReadBytes == 0)
+					break;
+			}
 			return result;
 		}
 
