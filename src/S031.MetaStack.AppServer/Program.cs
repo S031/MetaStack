@@ -40,7 +40,7 @@ namespace S031.MetaStack.AppServer
 				.UseApplicationContext()
 				.Build())
 			{
-				TestConnection();
+				//TestConnection();
 				//await host.RunAsync(ApplicationContext.CancellationToken);
 				await host.RunAsync();
 			}

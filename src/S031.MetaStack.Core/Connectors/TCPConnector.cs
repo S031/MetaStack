@@ -97,7 +97,11 @@ namespace S031.MetaStack.WinForms.Connectors
 
 		private void Connecting(string userName, string password)
 		{
+#if NETCOREAPP
 			var clientRSA = RSA.Create();
+#else
+			var clientRSA = new RSACng();
+#endif
 			var clientPK = clientRSA.Export();
 			DataPackage request = new DataPackage("UserName.String.32", "PublicKey.String.256");
 			request.Headers.Add("ActionID", "Sys.LoginRequest");

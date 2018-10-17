@@ -120,7 +120,7 @@ namespace S031.MetaStack.WinForms.Data
 				ReadDelegate = br => JSONExtensions.DeserializeObject(br.ReadString())}}
 #endif
 		};
-
+		static readonly object obj4Lock = new object();
 		MemoryStream _ms;
 		BinaryReader _br;
 		BinaryWriter _bw;
@@ -290,7 +290,8 @@ namespace S031.MetaStack.WinForms.Data
 					if (value == null || DBNull.Value.Equals(value))
 						bw.Write((byte)MdbType.@null);
 					else
-						_dti[MdbTypeMap.GetType(value.GetType())].WriteDelegate(bw, value);
+						lock(obj4Lock)
+							_dti[MdbTypeMap.GetType(value.GetType())].WriteDelegate(bw, value);
 				}
 			}
 			else if (values != null)

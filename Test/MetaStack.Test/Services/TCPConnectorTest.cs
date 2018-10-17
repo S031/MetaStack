@@ -37,7 +37,7 @@ namespace MetaStack.Test.Services
 				int i = 0;
 				for (i = 0; i < 1000; i++)
 				{
-					connector.Execute("Sys.Select", new DataPackage(new string[] { "ParamName", "ParamValue" }, new object[] { "_connectionName", "BankLocal" }));
+					connector.Execute("Sys.Select", new DataPackage(new string[] { "ParamName", "ParamValue" }, new object[] { "_connectionName", "Test" }));
 				}
 				l.Debug($"End performance test for {i} logins");
 			}
