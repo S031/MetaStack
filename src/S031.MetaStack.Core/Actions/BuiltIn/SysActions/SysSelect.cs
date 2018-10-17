@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using S031.MetaStack.Common;
 using S031.MetaStack.Core.App;
 using S031.MetaStack.Core.Data;
 
@@ -20,6 +21,7 @@ namespace S031.MetaStack.Core.Actions
 		{
 			List<object> parameters = new List<object>();
 			string connectionName = "BankLocal";
+			string viewName = string.Empty;
 			for (; dp.Read();)
 			{
 				string paramName = (string)dp["ParamName"];
@@ -30,12 +32,16 @@ namespace S031.MetaStack.Core.Actions
 				}
 				else if (paramName.Equals("_connectionName", StringComparison.CurrentCultureIgnoreCase))
 					connectionName = (string)dp["ParamValue"];
+				else if (paramName.Equals("_viewName", StringComparison.CurrentCultureIgnoreCase))
+					viewName = (string)dp["ParamValue"];
 			}
+			if (viewName.IsEmpty())
+				viewName = "Select Top 1 * From SysCat.SysSchemas";
 			var configuration = ApplicationContext.GetServices().GetService<IConfiguration>();
 			var cs = configuration.GetSection($"connectionStrings:{connectionName}").Get<ConnectInfo>();
 			using (MdbContext mdb = await MdbContext.CreateMdbContextAsync(cs))
 			{
-				return await mdb.GetReaderAsync("Select Top 1 * From SysCat.SysSchemas", parameters.ToArray());
+				return await mdb.GetReaderAsync(viewName, parameters.ToArray());
 			}
 		}
 	}

@@ -1,20 +1,22 @@
-﻿using S031.MetaStack.Core.App;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
-using S031.MetaStack.Core.Data;
 using System.Security.Cryptography;
-using S031.MetaStack.Core.Security;
 using S031.MetaStack.Common;
 using System.Linq;
 #if NETCOREAPP
+using S031.MetaStack.Core.App;
+using S031.MetaStack.Core.Data;
+using S031.MetaStack.Core.Security;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 
 namespace S031.MetaStack.Core.Connectors
 #else
+using S031.MetaStack.WinForms.Data;
+using S031.MetaStack.WinForms.Security;
 
 namespace S031.MetaStack.WinForms.Connectors
 #endif
@@ -75,6 +77,8 @@ namespace S031.MetaStack.WinForms.Connectors
 		}
 		public DataPackage Execute(string actionID, DataPackage paramTable)
 		{
+			//for paranoya mode
+			//var request = new DataPackage(paramTable.ToArray());
 			paramTable.Headers["ActionID"] = actionID;
 			paramTable.Headers["UserName"] = _userName;
 			paramTable.Headers["SessionID"] = _loginInfo.SessionID.ToString();

@@ -23,7 +23,10 @@ namespace S031.MetaStack.WinForms
 		{
 			this.Width = 500;
 			this.Height = (int)(this.Width / vbo.GoldenRatio);
-			_schema = JMXSchemaProviderFactory.Default.GetSchema(objectName);
+			_schema = JMXFactory
+				.Create()
+				.CreateJMXRepo()
+				.GetSchema(objectName);
 			this.Add<Panel>(WinFormConfig.SinglePageForm);
 			this.LoadDataComplete += (c, e) => addSTDButtons();
 		}

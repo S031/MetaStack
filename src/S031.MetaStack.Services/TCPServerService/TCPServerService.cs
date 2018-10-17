@@ -57,7 +57,7 @@ namespace S031.MetaStack.Services
 								$"The size of the incoming message is greater than the one specified in the settings({_maxReceivedMessageSize})");
 						var res = await GetByteArrayFromStreamAsync(stream, streamSize);
 
-						response = (await ProcessMessage(new DataPackage(res))).ToArray();
+						response = (await ProcessMessageAsync(new DataPackage(res))).ToArray();
 					}
 					catch (Exception ex)
 					{
@@ -70,7 +70,7 @@ namespace S031.MetaStack.Services
 			}
 		}
 
-		static async Task<DataPackage> ProcessMessage(DataPackage inputMessage)
+		static async Task<DataPackage> ProcessMessageAsync(DataPackage inputMessage)
 		{
 			using (var messagePipeline = new MessagePipeline(inputMessage))
 			{
@@ -95,7 +95,6 @@ namespace S031.MetaStack.Services
 			(_log as FileLogger)?.Dispose();
 			await base.StopAsync(cancellationToken);
 		}
-
 
 		public TCPServerService(HostedServiceOptions options)
 		{

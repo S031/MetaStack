@@ -381,7 +381,11 @@ namespace S031.MetaStack.WinForms
 		//}
 		public void AddColumnsFromObjectSchema()
 		{
-			JMXSchema s = JMXSchemaProviderFactory.Default.GetSchema(this.ObjectName);
+			//JMXSchema s = JMXSchemaProviderFactory.Default.GetSchema(this.ObjectName);
+			JMXSchema s = JMXFactory
+				.Create()
+				.CreateJMXRepo()
+				.GetSchema(this.ObjectName);
 			foreach (var attrib in s.Attributes)
 				AddColumn(attrib);
 		}

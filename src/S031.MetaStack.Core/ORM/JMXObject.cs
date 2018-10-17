@@ -35,8 +35,14 @@ namespace S031.MetaStack.WinForms.ORM
 		JMXObject()
 		{
 		}
+
+#if NETCOREAPP
 		public JMXObject(string objectName) : 
 			this(objectName, ObjectFactories.GetDefault<IJMXFactory>())
+#else
+		public JMXObject(string objectName) :
+			this(objectName, JMXFactory.Create())
+#endif
 		{
 		}
 
@@ -82,7 +88,11 @@ namespace S031.MetaStack.WinForms.ORM
 		}
 		public static JMXObject CreateFrom(string json)
 		{
+#if NETCOREAPP
 			return CreateFrom(json, ObjectFactories.GetDefault<IJMXFactory>());
+#else
+			return CreateFrom(json, JMXFactory.Create());
+#endif
 		}
 		public static JMXObject CreateFrom(string json, IJMXFactory schemaFactory)
 		{
