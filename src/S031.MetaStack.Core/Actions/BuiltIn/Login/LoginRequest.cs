@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace S031.MetaStack.Core.Actions
 {
-	internal class LoginRequest : IAppEvaluator
+	internal class SysLoginRequest : IAppEvaluator
 	{
 		public DataPackage Invoke(ActionInfo ai, DataPackage dp)
 		{
@@ -29,7 +29,7 @@ namespace S031.MetaStack.Core.Actions
 			throw new InvalidOperationException("This action can not be executed in asynchronous mode");
 		}
 	}
-	internal class Logon : IAppEvaluator
+	internal class SysLogon : IAppEvaluator
 	{
 		public DataPackage Invoke(ActionInfo ai, DataPackage dp)
 		{

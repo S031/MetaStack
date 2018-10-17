@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\S031.MetaStack.Common\S031.MetaStack.Common.csproj" />
+    <ProjectReference Include="..\S031.MetaStack.Core.ORM.MsSql\S031.MetaStack.Core.ORM.MsSql.csproj" />
     <ProjectReference Include="..\S031.MetaStack.Core\S031.MetaStack.Core.csproj" />
   </ItemGroup>
 

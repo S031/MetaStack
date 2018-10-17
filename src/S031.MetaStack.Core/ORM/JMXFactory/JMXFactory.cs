@@ -41,7 +41,7 @@ namespace S031.MetaStack.Core.ORM
 				if (att != null)
 					return (JMXFactory)t.CreateInstance(mdb, logger);
 			}
-			throw new InvalidOperationException("No class inherited from ISchemaDBSync contained attribute of type SchemaDBSyncAttribute  defined");
+			throw new InvalidOperationException("No class inherited from JMXFactory contained attribute of type SchemaDBSyncAttribute  defined");
 		}
 	}
 }

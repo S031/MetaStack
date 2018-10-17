@@ -29,6 +29,7 @@ namespace S031.MetaStack.WinForms.Connectors
 		
 		//Connection info
 		private bool _connected = false;
+		private string _userName;
 		private Guid _ticket;
 		private Aes _clientAes;
 		private LoginInfo _loginInfo;
@@ -64,12 +65,30 @@ namespace S031.MetaStack.WinForms.Connectors
 			_socket.Dispose();
 		}
 
-		public void Connect(string userName, string password)
+		public TCPConnector Connect(string userName, string password)
 		{
 			if (_socket == null || !_socket.Connected)
 				InitSocket(_endPointConfigName);
 			if (!_connected)
 				Connecting(userName, password);
+			return this;
+		}
+		public DataPackage Execute(string actionID, DataPackage paramTable)
+		{
+			paramTable.Headers["ActionID"] = actionID;
+			paramTable.Headers["UserName"] = _userName;
+			paramTable.Headers["SessionID"] = _loginInfo.SessionID.ToString();
+			paramTable.Headers["EncryptedKey"] = _clientAes
+					.EncryptBin(_ticket
+					.ToByteArray()
+					.Concat(BitConverter.GetBytes(DateTime.Now.Millisecond)).ToArray())
+					.ToBASE64String();
+			paramTable.UpdateHeaders();
+			var response = SendAndRecieve(_stream, paramTable);
+			if (response.Headers.ContainsKey("Status") &&
+				(string)response.Headers["Status"] == "ERROR")
+				throw new TCPConnectorException(response);
+			return response;
 		}
 
 		private void Connecting(string userName, string password)
@@ -116,6 +135,7 @@ namespace S031.MetaStack.WinForms.Connectors
 			response.Read();
 			var token = (string)response["Ticket"];
 			_ticket = new Guid(_clientAes.DecryptBin(token.ToByteArray()).Take(16).ToArray());
+			_userName = userName;
 			_connected = true;
 		}
 

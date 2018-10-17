@@ -18,7 +18,7 @@ namespace S031.MetaStack.Core.Actions
 				AsyncMode = false,
 				AuthenticationRequired = false,
 				AuthorizationRequired = false,
-				ClassName = typeof(LoginRequest).FullName,
+				ClassName = typeof(SysLoginRequest).FullName,
 				Description = "Запрос на логин (принимает Имя пользователя и открытый ключ клиента, возвращает ИД сессии + открытый ключ сервера)",
 				EMailOnError = false,
 				LogOnError = true,
@@ -87,7 +87,7 @@ namespace S031.MetaStack.Core.Actions
 				AsyncMode = false,
 				AuthenticationRequired = false,
 				AuthorizationRequired = false,
-				ClassName = typeof(Logon).FullName,
+				ClassName = typeof(SysLogon).FullName,
 				Description = "Аутентификация пользователя (принимает Имя пользователя, ИД сессии, зашифрованный открытым ключем сервера пароль, возвращает зашифрованный открытым ключем клиента симметричный ключ)",
 				EMailOnError = false,
 				LogOnError = true,
@@ -164,6 +164,58 @@ namespace S031.MetaStack.Core.Actions
 			actions.Add(ai.ActionID, ai);
 			#endregion Sys.Logon
 
+			#region Sys.Select
+			ai = new ActionInfo()
+			{
+				ActionID = "Sys.Select",
+				AssemblyID = typeof(ActionsList).Assembly.GetWorkName(),
+				AsyncMode = true,
+				AuthenticationRequired = true,
+				AuthorizationRequired = true,
+				ClassName = typeof(SysSelect).FullName,
+				Description = "Выборка данных из источника",
+				EMailOnError = false,
+				LogOnError = true,
+				MultipleRowsParams = true,
+				MultipleRowsResult = true,
+				TransactionSupport = TransactionActionSupport.None,
+				Name = "Выборка данных из источника",
+				WebAuthentication = ActionWebAuthenticationType.Basic
+			};
+			pi = new ParamInfo()
+			{
+				AttribName = "ParamName",
+				FieldName = "ParamName",
+				ParameterID = "ParamName",
+				DataType = "string",
+				Dirrect = ParamDirrect.Input,
+				Enabled = true,
+				Name = "Наименование параметра",
+				Position = 1,
+				PresentationType = "TextBox",
+				Visible = true,
+				Width = 30,
+				Required = true
+			};
+			ai.InterfaceParameters.Add(pi);
+			pi = new ParamInfo()
+			{
+				AttribName = "ParamValue",
+				FieldName = "ParamValue",
+				ParameterID = "ParamValue",
+				DataType = "string",
+				Dirrect = ParamDirrect.Input,
+				Enabled = true,
+				Name = "Значение параметра",
+				Position = 2,
+				PresentationType = "TextBox",
+				Visible = true,
+				Width = 1024,
+				Required = true
+			};
+			ai.InterfaceParameters.Add(pi);
+			actions.Add(ai.ActionID, ai);
+			#endregion
 			return actions;
 		}
 	}

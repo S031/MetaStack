@@ -27,16 +27,19 @@ namespace MetaStack.Test.Services
 		}
 
 		[Fact]
-		void SpeedTest4ConnectedSocket()
+		void TCPConnectorConnectTest()
 		{
+			using (FileLogger l = new FileLogger("TCPConnectorConnectTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			using (TCPConnector connector = TCPConnector.Create())
 			{
 				connector.Connect("Test", "@TestPassword");
-			}
-			//bag password
-			using (TCPConnector connector = TCPConnector.Create())
-			{
-				//connector.Connect("Test", "@TestPasswor");
+				l.Debug("Start performance test for logins");
+				int i = 0;
+				for (i = 0; i < 1000; i++)
+				{
+					connector.Execute("Sys.Select", new DataPackage(new string[] { "ParamName", "ParamValue" }, new object[] { "_connectionName", "BankLocal" }));
+				}
+				l.Debug($"End performance test for {i} logins");
 			}
 		}
 

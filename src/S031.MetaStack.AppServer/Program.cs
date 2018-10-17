@@ -10,6 +10,8 @@ using S031.MetaStack.Core.Security;
 using System;
 using System.Data.Common;
 using System.Net;
+using System.Reflection;
+using System.Runtime.Loader;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -38,7 +40,7 @@ namespace S031.MetaStack.AppServer
 				.UseApplicationContext()
 				.Build())
 			{
-				//TestConnection();
+				TestConnection();
 				//await host.RunAsync(ApplicationContext.CancellationToken);
 				await host.RunAsync();
 			}
@@ -64,16 +66,23 @@ namespace S031.MetaStack.AppServer
 		private static void TestConnection()
 		{
 			//var factory = System.Data.SqlClient.SqlClientFactory.Instance;
-			//var sp = ApplicationContext.GetServices();
-			//var config = sp.GetService<IConfiguration>();
-			//var connectionName = Dns.GetHostName() == "SERGEY-WRK" ? "Test" : "BankLocal";
-			//var cn = config.GetSection($"connectionStrings:{connectionName}").Get<ConnectInfo>();
-			//var log = sp.GetService<ILogger>();
-			//using (MdbContext mdb = new MdbContext(cn))
-			//using (JMXFactory f = JMXFactory.Create(mdb, log))
-			//{
+			LoadAssembly("S031.MetaStack.Core.ORM.MsSql");
+			var sp = ApplicationContext.GetServices();
+			var config = sp.GetService<IConfiguration>();
+			var connectionName = Dns.GetHostName() == "SERGEY-WRK" ? "Test" : "BankLocal";
+			var cn = config.GetSection($"connectionStrings:{connectionName}").Get<ConnectInfo>();
+			var log = sp.GetService<ILogger>();
+			using (MdbContext mdb = new MdbContext(cn))
+			using (JMXFactory f = JMXFactory.Create(mdb, log))
+			{
 
-			//}
+			}
+		}
+		private static Assembly LoadAssembly(string assemblyID)
+		{
+			Assembly a = AssemblyLoadContext.Default.LoadFromAssemblyPath(
+				System.IO.Path.Combine(System.AppContext.BaseDirectory, $"{assemblyID}.dll"));
+			return a;
 		}
 	}
 }
