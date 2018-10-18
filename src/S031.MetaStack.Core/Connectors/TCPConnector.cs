@@ -28,7 +28,8 @@ namespace S031.MetaStack.WinForms.Connectors
 
 		private Socket _socket;
 		private NetworkStream  _stream;
-		
+		private readonly string _host;
+		private readonly int _port;
 		//Connection info
 		private bool _connected = false;
 		private string _userName;
@@ -40,21 +41,21 @@ namespace S031.MetaStack.WinForms.Connectors
 
 		TCPConnector(string endPointConfigName)
 		{
-			InitSocket(endPointConfigName);
-		}
-
-		private void InitSocket(string endPointConfigName)
-		{
 #if NETCOREAPP
 			var config = ApplicationContext.GetServices().GetService<IConfiguration>().GetSection($"Connectors:{endPointConfigName}");
 			var host = config.GetValue<string>("Host");
 			var port = config.GetValue<int>("Port");
 #else
-			var host = "localhost";
-			var port = 8001;
+			_host = "localhost";
+			_port = 8001;
 #endif
+			InitSocket();
+		}
+
+		private void InitSocket()
+		{
 			_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-			_socket.Connect(host, port);
+			_socket.Connect(_host, _port);
 			_stream = new NetworkStream(_socket);
 			_connected = false;
 		}
@@ -70,7 +71,7 @@ namespace S031.MetaStack.WinForms.Connectors
 		public TCPConnector Connect(string userName, string password)
 		{
 			if (_socket == null || !_socket.Connected)
-				InitSocket(_endPointConfigName);
+				InitSocket();
 			if (!_connected)
 				Connecting(userName, password);
 			return this;

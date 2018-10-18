@@ -13,7 +13,7 @@ namespace S031.MetaStack.Core.Security
 		public static extern bool LogonUser(String lpszUsername, String lpszDomain, String lpszPassword,
 			int dwLogonType, int dwLogonProvider, out SafeAccessTokenHandle phToken);
 
-		public static void Execute(string userName, string password, Action userAction)
+		public static T Execute<T>(string userName, string password, Func<T> userAction)
 		{
 			string domainName = "";
 			int pos = userName.IndexOf('\\');
@@ -41,10 +41,9 @@ namespace S031.MetaStack.Core.Security
 
 			// Note: if you want to run as unimpersonated, pass
 			//       'SafeAccessTokenHandle.InvalidHandle' instead of variable 'safeAccessTokenHandle'
-			WindowsIdentity.RunImpersonated(
+			return WindowsIdentity.RunImpersonated<T>(
 				safeAccessTokenHandle,
 				userAction);
-
 		}
 	}
 }

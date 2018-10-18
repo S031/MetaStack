@@ -149,7 +149,7 @@ namespace S031.MetaStack.Core.Security
 					Aes.Create()
 					.ImportBin(loginInfo.CryptoKey)
 					.DecryptBin(encryptedTicketData));
-				Impersonator.Execute(userName, password, () => { return; });
+				Impersonator.Execute<bool>(userName, password, () => true);
 				return true;
 			}
 			catch (Exception ex)

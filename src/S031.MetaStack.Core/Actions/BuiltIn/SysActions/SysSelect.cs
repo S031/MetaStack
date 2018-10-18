@@ -31,7 +31,7 @@ namespace S031.MetaStack.Core.Actions
 					viewName = (string)dp["ParamValue"];
 			}
 			if (viewName.IsEmpty())
-				viewName = "Select Top 1 ID, UID, ObjectName From SysCat.SysSchemas";
+				viewName = "Select Top 1 * From SysCat.SysSchemas";
 			var configuration = ApplicationContext.GetServices().GetService<IConfiguration>();
 			var cs = configuration.GetSection($"connectionStrings:{connectionName}").Get<ConnectInfo>();
 			using (MdbContext mdb = new MdbContext(cs))

@@ -57,7 +57,7 @@ namespace MetaStack.Test.Security
 		[Fact]
 		void ImpersonateTest()
 		{
-			Impersonator.Execute("Test", "@TestPassword", () => Assert.False(false));
+			Impersonator.Execute<bool>("Test", "@TestPassword", () => true);
 		}
 
 		[Fact]

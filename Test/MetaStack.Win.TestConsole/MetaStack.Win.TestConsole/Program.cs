@@ -22,7 +22,8 @@ namespace MetaStack.Win.TestConsole
 				int i = 0;
 				for (i = 0; i < 10000; i++)
 				{
-					connector.Execute("Sys.Select", new DataPackage(new string[] { "ParamName", "ParamValue" }, new object[] { "_connectionName", "Test" }));
+					connector.Execute("Sys.Select", new DataPackage(new string[] { "ParamName", "ParamValue" }, 
+						new object[] { "_connectionName", "banklocal" }));
 					if (i % 1000 == 0)
 						Console.WriteLine(i);
 				}

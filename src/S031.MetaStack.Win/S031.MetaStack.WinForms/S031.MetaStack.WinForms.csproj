@@ -192,6 +192,7 @@
     <Compile Include="Interfaces\IObjectHost.cs" />
     <Compile Include="ORM\JMXFactory\JMXFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Security\CredentialManager\CredentialManager.cs" />
     <Compile Include="Tools\PathHelper.cs" />
     <Compile Include="Tools\ResourceManager.cs" />
   </ItemGroup>
