@@ -43,8 +43,8 @@ namespace S031.MetaStack.WinForms.Connectors
 		{
 #if NETCOREAPP
 			var config = ApplicationContext.GetServices().GetService<IConfiguration>().GetSection($"Connectors:{endPointConfigName}");
-			var host = config.GetValue<string>("Host");
-			var port = config.GetValue<int>("Port");
+			_host = config.GetValue<string>("Host");
+			_port = config.GetValue<int>("Port");
 #else
 			_host = "localhost";
 			_port = 8001;

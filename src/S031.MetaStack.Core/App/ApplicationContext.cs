@@ -1,33 +1,96 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Security.Cryptography;
 using System.Threading;
+using Microsoft.Extensions.Logging;
+using S031.MetaStack.Core.Security;
+using S031.MetaStack.Core.Logging;
+using S031.MetaStack.Common.Logging;
+using System.Data.Common;
+using System.Reflection;
+using System.Runtime.Loader;
 
 namespace S031.MetaStack.Core.App
 {
     public static class ApplicationContext
     {
-		static IServiceCollection _services;
 		static IServiceProvider _lastBuildServiceProvider = null;
 		static int _lastBuildHash = 0;
+
 		static readonly object obj4Lock = new object();
 		static readonly CancellationTokenSource _cts = new CancellationTokenSource();
+		static IServiceCollection _services;
+		static IConfiguration _configuration;
+		static ILogger _logger;
+		static ILoginFactory _loginFactory;
 
-		public static IHostBuilder UseApplicationContext(this IHostBuilder host)
+		public static IHostBuilder UseApplicationContext(this IHostBuilder host, IConfiguration configuration)
 		{
+			_configuration = configuration;
 			host.ConfigureServices(services => Configure(services));
+			AppDomain.CurrentDomain.ProcessExit += DisposeMe;
 			return host;
+		}
+
+		private static void DisposeMe(object sender, EventArgs e)
+		{
+			(_loginFactory as IDisposable)?.Dispose();
+			(_logger as IDisposable)?.Dispose();
 		}
 
 		private static IServiceCollection Configure(IServiceCollection services)
 		{
-			services.AddSingleton<CancellationTokenSource>(_cts);
 			_services = services;
-			return services;
+			_services
+				.AddSingleton<CancellationTokenSource>(_cts)
+				.AddSingleton<IConfiguration>(_configuration);
+			ConfigureLogging();
+			ConfigureLoginFactory();
+			ConfigureServicesFromConfigFile();
+			ConfigureProvidersFromConfigFile();
+			return _services;
 		}
+
+		private static IServiceCollection ConfigureLogging()
+		{
+			var logSettings = _configuration.GetSection("ApplicationLogSettings")?.Get<Common.Logging.FileLogSettings>();
+			if (logSettings == null)
+				logSettings = FileLogSettings.Default;
+			_logger = new FileLogger($"AppServer.{Environment.MachineName}", logSettings);
+			_services.AddSingleton<ILogger>(_logger);
+			return _services;
+		}
+		private static IServiceCollection ConfigureLoginFactory()
+		{
+			//return settings from configuration
+			_loginFactory = new BasicLoginFactory();
+			_services.AddSingleton<ILoginFactory>(_loginFactory );
+			return _services;
+		}
+
+		private static void ConfigureServicesFromConfigFile()
+		{
+			var serviceList = _configuration.GetSection("IAppServiceConfiguration:ImplementationList").GetChildren();
+			foreach (var section in serviceList)
+			{
+				var options = section.Get<Core.Services.HostedServiceOptions>();
+				_services.AddTransient<Core.Services.HostedServiceOptions>(s => options);
+				_services.Add<IHostedService>(options.TypeName, options.AssemblyName);
+			}
+		}
+		private static void ConfigureProvidersFromConfigFile()
+		{
+			//return settings from configuration
+			Assembly.Load("System.Data.SqlClient");
+			LoadAssembly("S031.MetaStack.Core.ORM.MsSql");
+		}
+		private static Assembly LoadAssembly(string assemblyID)=> AssemblyLoadContext.Default.LoadFromAssemblyPath(
+				System.IO.Path.Combine(System.AppContext.BaseDirectory, $"{assemblyID}.dll"));
+
 		public static IServiceCollection Services => _services;
 
 		public static IServiceProvider GetServices(ServiceProviderOptions options = default)

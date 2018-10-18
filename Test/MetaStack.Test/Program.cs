@@ -28,7 +28,7 @@ namespace MetaStack.Test
 				.ConfigureServices((context, services) => services
 					.AddSingleton<IConfiguration>(configuration)
 					.AddSingleton<ILoginFactory>(new BasicLoginFactory()))
-				.UseApplicationContext()
+				.UseApplicationContext(configuration)
 				.Build();
 		}
 
