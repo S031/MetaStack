@@ -155,5 +155,13 @@ namespace S031.MetaStack.WinForms.Json
 				});
 
 		}
+#if NETCOREAPP
+#else
+		public static JObject Parse2Json(this string source)
+		{
+			source.NullTest(nameof(source));
+			return JObject.Parse(source);
+		}
+#endif
 	}
 }

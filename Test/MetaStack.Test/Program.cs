@@ -25,9 +25,6 @@ namespace MetaStack.Test
 
 			_host = new HostBuilder()
 				.UseConsoleLifetime()
-				.ConfigureServices((context, services) => services
-					.AddSingleton<IConfiguration>(configuration)
-					.AddSingleton<ILoginFactory>(new BasicLoginFactory()))
 				.UseApplicationContext(configuration)
 				.Build();
 		}

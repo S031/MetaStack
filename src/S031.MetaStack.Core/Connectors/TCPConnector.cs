@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Security.Cryptography;
 using S031.MetaStack.Common;
 using System.Linq;
+using Newtonsoft.Json.Linq;
 #if NETCOREAPP
 using S031.MetaStack.Core.App;
 using S031.MetaStack.Core.Data;
@@ -17,6 +18,7 @@ namespace S031.MetaStack.Core.Connectors
 #else
 using S031.MetaStack.WinForms.Data;
 using S031.MetaStack.WinForms.Security;
+using S031.MetaStack.WinForms.Json;
 
 namespace S031.MetaStack.WinForms.Connectors
 #endif
@@ -46,8 +48,12 @@ namespace S031.MetaStack.WinForms.Connectors
 			_host = config.GetValue<string>("Host");
 			_port = config.GetValue<int>("Port");
 #else
-			_host = "localhost";
-			_port = 8001;
+			var j = System.Configuration.ConfigurationManager.AppSettings["TCPConnector"].Parse2Json();
+			if (j != null)
+			{
+				_host = (string)j["Host"];
+				_port = (int)j["Port"];
+			}
 #endif
 			InitSocket();
 		}

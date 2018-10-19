@@ -66,6 +66,7 @@ namespace S031.MetaStack.Core.App
 		}
 		private static IServiceCollection ConfigureLoginFactory()
 		{
+			//костыль
 			//return settings from configuration
 			_loginFactory = new BasicLoginFactory();
 			_services.AddSingleton<ILoginFactory>(_loginFactory );
@@ -84,6 +85,7 @@ namespace S031.MetaStack.Core.App
 		}
 		private static void ConfigureProvidersFromConfigFile()
 		{
+			//костыль
 			//return settings from configuration
 			Assembly.Load("System.Data.SqlClient");
 			LoadAssembly("S031.MetaStack.Core.ORM.MsSql");
