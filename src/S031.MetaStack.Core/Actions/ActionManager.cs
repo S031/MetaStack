@@ -41,6 +41,7 @@ namespace S031.MetaStack.Core.Actions
 			{
 				if (ai == null || ai.LogOnError)
 					Logger.LogError($"{ex.Message}\n{ex.StackTrace}");
+				//Костыль
 				//if (ai != null && ai.EMailOnError)
 				//	Comm.SendEMail(ai.EMailGroup, "Ошибка выполнения операции '{0}'".ToFormat(ai.ActionID), ex.Detail.FullReport);
 				throw ex;
@@ -57,6 +58,7 @@ namespace S031.MetaStack.Core.Actions
 			{
 				if (ai == null || ai.LogOnError)
 					Logger.LogError($"{ex.Message}\n{ex.StackTrace}");
+				//Костыль
 				//if (ai != null && ai.EMailOnError)
 				//	Comm.SendEMail(ai.EMailGroup, "Ошибка выполнения операции '{0}'".ToFormat(ai.ActionID), ex.Detail.FullReport);
 				throw ex;

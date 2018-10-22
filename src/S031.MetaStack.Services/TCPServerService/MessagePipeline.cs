@@ -43,18 +43,20 @@ namespace S031.MetaStack.Services
 			if (!_message.Headers.TryGetValue("ConnectionName", out object connectionName))
 				connectionName = connection_name;
 
-			var serviceProvider = ApplicationContext.GetServices();
-			var configuration = serviceProvider.GetService<IConfiguration>();
-			var cs = configuration.GetSection($"connectionStrings:{connectionName}").Get<ConnectInfo>();
+			var cs = ApplicationContext
+				.GetConfiguration()
+				.GetSection($"connectionStrings:{connectionName}")
+				.Get<ConnectInfo>();
 			using (MdbContext mdb = await MdbContext.CreateMdbContextAsync(cs))
-			using (ActionManager am = new ActionManager(mdb))
+			using (ActionManager am = new ActionManager(mdb) { Logger = ApplicationContext.GetLogger() })
 			{
 				string actionID = (string)_message.Headers["ActionID"];
 				ActionInfo ai = am.GetActionInfo(actionID);
 				if (ai.AuthenticationRequired)
 				{
-					var loginFactory = serviceProvider.GetService<ILoginFactory>();
-					loginFactory.Logon(
+					ApplicationContext
+						.GetLoginFactory()
+						.Logon(
 						(string)_message.Headers["UserName"],
 						(string)_message.Headers["SessionID"],
 						(string)_message.Headers["EncryptedKey"]);

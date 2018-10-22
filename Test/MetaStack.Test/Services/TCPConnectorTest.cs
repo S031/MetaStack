@@ -50,9 +50,8 @@ namespace MetaStack.Test.Services
 		{
 			using (FileLogger _logger = new FileLogger("ActionManagerTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			using (MdbContext mdb = new MdbContext(_cn))
-			using (ActionManager am = new ActionManager(mdb))
+			using (ActionManager am = new ActionManager(mdb) { Logger = _logger })
 			{
-				am.Logger = _logger;
 				ActionInfo ai = am.GetActionInfo("Sys.LoginRequest");
 				_logger.Debug(ai.GetInputParamTable().ToString());
 				_logger.Debug(ai.GetOutputParamTable().ToString());

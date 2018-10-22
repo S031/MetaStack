@@ -30,6 +30,7 @@ namespace S031.MetaStack.WinForms.ORM
         Procedure = 2,
         Function = 3,
         View = 4,
+		Action = 5
     }
 
     public class JMXSchema

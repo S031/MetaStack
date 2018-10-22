@@ -25,7 +25,7 @@ namespace MetaStack.Win.TestConsole
 				for (i = 0; i < 1000; i++)
 				{
 					var dr = connector.Execute("Sys.Select", new DataPackage(new string[] { "ParamName", "ParamValue" }, 
-						new object[] { "_connectionName", connectionName }));
+						new object[] { "_viewName", "dbo.Customer" }));
 					if (i % 1000 == 0)
 					{
 						dr.Read();
