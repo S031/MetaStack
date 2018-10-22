@@ -217,6 +217,58 @@ namespace S031.MetaStack.Core.Actions
 			actions.Add(ai.ActionID, ai);
 			#endregion
 
+			#region Sys.Getschema
+			ai = new ActionInfo()
+			{
+				ActionID = "Sys.GetSchema",
+				AssemblyID = typeof(ActionsList).Assembly.GetWorkName(),
+				AsyncMode = true,
+				AuthenticationRequired = true,
+				AuthorizationRequired = true,
+				ClassName = typeof(SysGetSchema).FullName,
+				Description = "Получить схему объекта",
+				EMailOnError = false,
+				LogOnError = true,
+				MultipleRowsParams = true,
+				MultipleRowsResult = true,
+				TransactionSupport = TransactionActionSupport.None,
+				Name = "Получить схему объекта",
+				WebAuthentication = ActionWebAuthenticationType.Basic
+			};
+			pi = new ParamInfo()
+			{
+				AttribName = "ObjectName",
+				FieldName = "ObjectName",
+				ParameterID = "ObjectName",
+				DataType = "string",
+				Dirrect = ParamDirrect.Input,
+				Enabled = true,
+				Name = "Наименование объекта",
+				Position = 1,
+				PresentationType = "TextBox",
+				Visible = true,
+				Width = 60,
+				Required = true
+			};
+			ai.InterfaceParameters.Add(pi);
+			pi = new ParamInfo()
+			{
+				AttribName = "ObjectSchema",
+				FieldName = "ObjectSchema",
+				ParameterID = "ObjectSchema",
+				DataType = "string",
+				Dirrect = ParamDirrect.Output,
+				Enabled = true,
+				Name = "Схема объекта",
+				Position = 2,
+				PresentationType = "TextBox",
+				Visible = true,
+				Width = 1024 * 256,
+				Required = true
+			};
+			ai.InterfaceParameters.Add(pi);
+			actions.Add(ai.ActionID, ai);
+			#endregion
 			return actions;
 		}
 	}

@@ -362,7 +362,33 @@ namespace S031.MetaStack.Core.ORM.MsSql
 		#region Save Schema
 		public override JMXSchema SaveSchema(JMXSchema schema)
 		{
-			return SaveSchemaAsync(schema).GetAwaiter().GetResult();
+			var mdb = this.MdbContext;
+			int id = mdb.Execute<int>(SqlServer.AddSysSchemas,
+					new MdbParameter("@uid", schema.UID),
+					new MdbParameter("@SysAreaSchemaName", schema.ObjectName.AreaName),
+					new MdbParameter("@ObjectType", (int)schema.DbObjectType),
+					new MdbParameter("@ObjectName", schema.ObjectName.ObjectName),
+					new MdbParameter("@DbObjectName", schema.DbObjectName.ObjectName),
+					new MdbParameter("@ObjectSchema", schema.ToString()),
+					new MdbParameter("@Version", schema_version));
+
+			schema.ID = id;
+			lock (objLock)
+				_schemaCache[schema.ObjectName] = schema;
+			foreach (var fk in schema.ForeignKeys)
+			{
+				if (fk.RefObjectName.IsEmpty())
+					throw new ArgumentNullException("Property RefObjectName can't be empty");
+				lock (objLock)
+				{
+					if (_parentRelations.ContainsKey(fk.RefObjectName))
+						_parentRelations[fk.RefObjectName].Add(schema.ObjectName);
+					else
+						_parentRelations.Add(fk.RefObjectName, new List<string>() { schema.ObjectName });
+				}
+			}
+			return schema;
+			//return SaveSchemaAsync(schema).GetAwaiter().GetResult();
 		}
 		public override async Task<JMXSchema> SaveSchemaAsync(JMXSchema schema)
 		{

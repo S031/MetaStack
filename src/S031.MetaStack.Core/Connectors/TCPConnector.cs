@@ -66,6 +66,8 @@ namespace S031.MetaStack.WinForms.Connectors
 			_connected = false;
 		}
 
+		public bool Connected => _socket != null && _socket.Connected && _connected;
+
 		public void Dispose()
 		{
 			_stream.Close();

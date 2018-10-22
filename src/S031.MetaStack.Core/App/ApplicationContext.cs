@@ -28,6 +28,10 @@ namespace S031.MetaStack.Core.App
 		static ILogger _logger;
 		static ILoginFactory _loginFactory;
 
+		public static IConfiguration GetConfiguration() => _configuration;
+		public static ILogger GetLogger() => _logger;
+		public static ILoginFactory GetLoginFactory() => _loginFactory;
+
 		public static IHostBuilder UseApplicationContext(this IHostBuilder host, IConfiguration configuration)
 		{
 			_configuration = configuration;
@@ -52,6 +56,7 @@ namespace S031.MetaStack.Core.App
 			ConfigureLoginFactory();
 			ConfigureServicesFromConfigFile();
 			ConfigureProvidersFromConfigFile();
+			ConfigureDefaultsFromConfigFile();
 			return _services;
 		}
 
@@ -89,6 +94,11 @@ namespace S031.MetaStack.Core.App
 			//return settings from configuration
 			Assembly.Load("System.Data.SqlClient");
 			LoadAssembly("S031.MetaStack.Core.ORM.MsSql");
+		}
+		private static void ConfigureDefaultsFromConfigFile()
+		{
+			//костыль
+			//return settings from configuration
 		}
 		private static Assembly LoadAssembly(string assemblyID)=> AssemblyLoadContext.Default.LoadFromAssemblyPath(
 				System.IO.Path.Combine(System.AppContext.BaseDirectory, $"{assemblyID}.dll"));

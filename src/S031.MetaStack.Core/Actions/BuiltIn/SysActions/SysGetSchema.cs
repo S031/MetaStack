@@ -7,21 +7,26 @@ using Microsoft.Extensions.DependencyInjection;
 using S031.MetaStack.Common;
 using S031.MetaStack.Core.App;
 using S031.MetaStack.Core.Data;
+using S031.MetaStack.Core.ORM;
 
 namespace S031.MetaStack.Core.Actions
 {
-	internal class SysSelect : IAppEvaluator
+	internal class SysGetSchema : IAppEvaluator
 	{
-		readonly List<object> _parameters = new List<object>();
 		ConnectInfo _connectInfo;
-		string _viewName;
+		string _objectName;
 
 		public DataPackage Invoke(ActionInfo ai, DataPackage dp)
 		{
 			GetParameters(ai, dp);
 			using (MdbContext mdb = new MdbContext(_connectInfo))
+			using (JMXFactory f = JMXFactory.Create(mdb, ApplicationContext.GetLogger()))
 			{
-				return mdb.GetReader(_viewName, _parameters.ToArray());
+				var dr = ai.GetOutputParamTable();
+				dr.AddNew();
+				dr["ObjectSchema"] = (f.CreateJMXRepo().GetSchema(_objectName)).ToString();
+				dr.Update();
+				return dr;
 			}
 		}
 
@@ -29,8 +34,13 @@ namespace S031.MetaStack.Core.Actions
 		{
 			GetParameters(ai, dp);
 			using (MdbContext mdb = await MdbContext.CreateMdbContextAsync(_connectInfo))
+			using (JMXFactory f = JMXFactory.Create(mdb, ApplicationContext.GetLogger()))
 			{
-				return await mdb.GetReaderAsync(_viewName, _parameters.ToArray());
+				var dr = ai.GetOutputParamTable();
+				dr.AddNew();
+				dr["ObjectSchema"] = (await f.CreateJMXRepo().GetSchemaAsync(_objectName)).ToString();
+				dr.Update();
+				return dr;
 			}
 		}
 
@@ -38,25 +48,11 @@ namespace S031.MetaStack.Core.Actions
 		{
 			if (!dp.Headers.TryGetValue("ConnectionName", out object connectionName))
 				connectionName = "BankLocal";
-
-			for (; dp.Read();)
-			{
-				string paramName = (string)dp["ParamName"];
-				if (paramName[0] == '@')
-				{
-					_parameters.Add(dp["ParamName"]);
-					_parameters.Add(dp["ParamValue"]);
-				}
-				else if (paramName.Equals("_connectionName", StringComparison.CurrentCultureIgnoreCase))
-					connectionName = (string)dp["ParamValue"];
-				else if (paramName.Equals("_viewName", StringComparison.CurrentCultureIgnoreCase))
-					_viewName = (string)dp["ParamValue"];
-			}
-			if (_viewName.IsEmpty())
-				_viewName = "Select Top 1 * From SysCat.SysSchemas";
 			var configuration = ApplicationContext.GetServices().GetService<IConfiguration>();
 			_connectInfo = configuration.GetSection($"connectionStrings:{connectionName}").Get<ConnectInfo>();
 
+			if (dp.Read())
+				_objectName = (string)dp["ObjectName"];
 		}
 	}
 }
