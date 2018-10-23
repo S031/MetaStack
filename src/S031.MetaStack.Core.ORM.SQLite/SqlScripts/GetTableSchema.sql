@@ -1,1 +1,1 @@
-SysCat.Get_TableSchema
+select ''

@@ -1,1 +1,1 @@
-SysCat.Del_SysSchemas
+delete from [SysSchemas] where ID = @id

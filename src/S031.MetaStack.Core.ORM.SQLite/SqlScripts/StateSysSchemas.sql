@@ -1,1 +1,1 @@
-SysCat.State_SysSchemas
+Update SysSchemas set State = @state where ID = @id;

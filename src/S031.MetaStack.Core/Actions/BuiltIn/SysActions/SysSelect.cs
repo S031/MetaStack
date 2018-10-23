@@ -50,7 +50,7 @@ namespace S031.MetaStack.Core.Actions
 		private void GetParameters(ActionInfo ai, DataPackage dp)
 		{
 			if (!dp.Headers.TryGetValue("ConnectionName", out object connectionName))
-				connectionName = "BankLocal";
+				connectionName = "SqliteDb";
 
 			for (; dp.Read();)
 			{

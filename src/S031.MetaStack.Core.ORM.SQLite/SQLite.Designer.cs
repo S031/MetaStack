@@ -86,28 +86,6 @@ namespace S031.MetaStack.Core.ORM.SQLite {
         ///	SchemaName			varchar(60)		not null,
         ///	SchemaOwner			varchar(30)		not null,
         ///	SchemaVersion		varchar(30)		not null,
-        ///	SchemaConfig		varchar(max)	null
-        ///		/*constraint CKC_SCHEMACONFIG_SYSAREAS check(SchemaConfig is null or isjson(SchemaConfig) = 1)*/,
-        ///	IsDefault			bit				not null,
-        ///	UpdateTime			datetime		not null
-        ///		 CONSTRAINT [DF_UpdateTime_SysAreas]  DEFAULT (getdate()),
-        ///	DateBegin			datetime		not null, 
-        ///	DateE [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string CreateSchemaObjects {
-            get {
-                return ResourceManager.GetString("CreateSchemaObjects", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Create Schema SysCat
-        ///--go
-        ///create table SysCat.SysAreas (
-        ///	ID					int				identity(1, 1),
-        ///	SchemaName			varchar(60)		not null,
-        ///	SchemaOwner			varchar(30)		not null,
-        ///	SchemaVersion		varchar(30)		not null,
         ///	SchemaConfig		varchar(max)	null,
         ///	IsDefault			bit				not null,
         ///	UpdateTime			datetime		not null

@@ -7,10 +7,10 @@ using S031.MetaStack.Core.Data;
 
 namespace S031.MetaStack.Core.ORM.SQLite
 {
-	[SchemaDBSync(DBProviderName = "Microsoft.Data.Sqlite")]
+	[SchemaDBSync(DBProviderName = "System.Data.Sqlite")]
 	public class JMXSQLiteFactory: JMXFactory
 	{
-		public const string ProviderInvariantName = "Microsoft.Data.Sqlite";
+		public const string ProviderInvariantName = "System.Data.Sqlite";
 
 		private readonly JMXSQLiteRepo _repo;
 		private readonly JMXSQLiteProvider _jmx;

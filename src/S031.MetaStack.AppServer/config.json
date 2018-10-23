@@ -2,7 +2,7 @@
   "appSettings": {
     "auditEnabled": true,
     "language": "ru-RU",
-    "defaultConnection": "bankLocal"
+    "defaultConnection": "SqliteDb"
   },
   "ApplicationLogSettings": {
     /* Cache size before flushing to disk */
@@ -32,6 +32,10 @@
     "bankLocal": {
       "providerName": "System.Data.SqLClient",
       "connectionString": "Data Source=localhost;Initial Catalog=MetaStack;Integrated Security=True;"
+    },
+    "SqliteDb": {
+      "providerName": "System.Data.Sqlite",
+      "connectionString": "Data Source=SysCat.db; Mode=Memory; Cache=Shared"
     },
     "test": {
       "providerName": "System.Data.SqLClient",

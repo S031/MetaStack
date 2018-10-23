@@ -1,1 +1,1 @@
-Select Name From sys.schemas Where name = 'SysCat'
+SELECT 'dbo' FROM sqlite_master WHERE tbl_name = 'V_SysSchemas';

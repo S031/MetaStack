@@ -1,1 +1,1 @@
-Select schema_name()
+select 'dbo'

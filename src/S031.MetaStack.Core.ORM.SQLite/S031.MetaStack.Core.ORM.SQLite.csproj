@@ -7,7 +7,6 @@
   <ItemGroup>
     <None Remove="SqlScripts\AddSysAreas.sql" />
     <None Remove="SqlScripts\AddSysSchemas.sql" />
-    <None Remove="SqlScripts\CreateSchemaObjects.sql" />
     <None Remove="SqlScripts\CreateSchemaObjects_12.sql" />
     <None Remove="SqlScripts\DelSysSchemas.sql" />
     <None Remove="SqlScripts\DropSchema.sql" />
@@ -27,7 +26,6 @@
 
   <ItemGroup>
     <EmbeddedResource Include="SqlScripts\AddSysSchemas.sql" />
-    <EmbeddedResource Include="SqlScripts\CreateSchemaObjects.sql" />
     <EmbeddedResource Include="SqlScripts\CreateSchemaObjects_12.sql" />
     <EmbeddedResource Include="SqlScripts\DelSysSchemas.sql" />
     <EmbeddedResource Include="SqlScripts\DropSchema.sql" />
@@ -42,7 +40,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="2.1.0" />
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.109.2" />
   </ItemGroup>
 
   <ItemGroup>

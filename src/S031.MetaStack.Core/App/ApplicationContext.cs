@@ -92,8 +92,10 @@ namespace S031.MetaStack.Core.App
 		{
 			//костыль
 			//return settings from configuration
-			Assembly.Load("System.Data.SqlClient");
-			LoadAssembly("S031.MetaStack.Core.ORM.MsSql");
+			//Assembly.Load("System.Data.SqlClient");
+			//LoadAssembly("S031.MetaStack.Core.ORM.MsSql");
+			LoadAssembly("S031.MetaStack.Core.ORM.SQLite");
+			Assembly.Load("System.Data.Sqlite");
 		}
 		private static void ConfigureDefaultsFromConfigFile()
 		{

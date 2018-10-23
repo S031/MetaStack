@@ -99,16 +99,18 @@ namespace S031.MetaStack.Core.ORM.SQLite
 
 		private static string _defaultDbSchema = string.Empty;
 
+		private static string _sqlVersion = string.Empty;
+
 		public JMXSQLiteRepo(MdbContext mdbContext, ILogger logger) : base(mdbContext)
 		{
 			if (!mdbContext.ProviderName.Equals(JMXSQLiteFactory.ProviderInvariantName, StringComparison.CurrentCultureIgnoreCase))
 				throw new ArgumentException($"MdbContext must be created using { JMXSQLiteFactory.ProviderInvariantName} provider.");
 			Logger = logger;
 			//Костыль need 	
-			//TestSysCatAsync()
-			//	.ConfigureAwait(false)
-			//	.GetAwaiter()
-			//	.GetResult();
+			TestSysCatAsync()
+				.ConfigureAwait(false)
+				.GetAwaiter()
+				.GetResult();
 		}
 
 		public override IDictionary<MdbType, string> GetTypeMap() => _typeMap;
@@ -184,14 +186,24 @@ namespace S031.MetaStack.Core.ORM.SQLite
 				log.Debug($"Schema SysCat was created in database {mdb.DbName}");
 				log.Debug("Schema tables SysCat.SysAreas and SysCat.SysSchemas was created in SysCat Schema");
 				string owner = await GetDefaultDbSchemaAsync(mdb);
-				int id = await mdb.ExecuteAsync<int>(SQLite.AddSysAreas,
+				long id = await mdb.ExecuteAsync<long>(SQLite.AddSysAreas,
 					new MdbParameter("@SchemaName", owner),
 					new MdbParameter("@SchemaOwner", owner),
-					new MdbParameter("@SchemaVersion", schema_version));
-				id = await mdb.ExecuteAsync<int>(SQLite.AddSysAreas,
+					new MdbParameter("@SchemaVersion", schema_version),
+					new MdbParameter("@SchemaConfig", "") { NullIfEmpty = true },
+					new MdbParameter("@IsDefault", 1),
+					new MdbParameter("@UpdateTime", DateTime.Now),
+					new MdbParameter("@DateBegin", DateTime.Now.Date),
+					new MdbParameter("@DateEnd", DateTime.MinValue) { NullIfEmpty = true });
+				id = await mdb.ExecuteAsync<long>(SQLite.AddSysAreas,
 					new MdbParameter("@SchemaName", "SysCat"),
 					new MdbParameter("@SchemaOwner", owner),
-					new MdbParameter("@SchemaVersion", schema_version));
+					new MdbParameter("@SchemaVersion", schema_version),
+					new MdbParameter("@SchemaConfig", "") { NullIfEmpty = true },
+					new MdbParameter("@IsDefault", 1),
+					new MdbParameter("@UpdateTime", DateTime.Now),
+					new MdbParameter("@DateBegin", DateTime.Now.Date),
+					new MdbParameter("@DateEnd", DateTime.MinValue) { NullIfEmpty = true });
 				await mdb.CommitAsync();
 			}
 			catch (Exception e)
@@ -204,16 +216,16 @@ namespace S031.MetaStack.Core.ORM.SQLite
 
 		private static async Task<JMXSchema> GetSchemaAsync(MdbContext mdb, string areaName, string objectName)
 		{
-			string sql = $"select Top 1 ID, ObjectSchema, SyncState from SysCat.V_SysSchemas where SchemaName = '{areaName}' and " +
+			string sql = $"select ID, ObjectSchema, SyncState from V_SysSchemas where SchemaName = '{areaName}' and " +
 				$"(ObjectName = '{objectName}' or DbObjectName = '{objectName}') and SyncState >= 0 " +
-				$"order by SyncState desc";
+				$"order by SyncState desc limit 1";
 			using (var dr = await mdb.GetReaderAsync(sql))
 			{
 				if (!dr.Read())
 					//object schema not found in database
 					throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.SysCat.SysCatManager.getSchema.1", $"{areaName}.{objectName}"));
 				var schema = JMXSchema.Parse((string)dr["ObjectSchema"]);
-				schema.ID = (int)dr["ID"];
+				schema.ID = Convert.ToInt32(dr["ID"]);
 				schema.SyncState = (int)dr["SyncState"];
 				return schema;
 			}
@@ -221,9 +233,9 @@ namespace S031.MetaStack.Core.ORM.SQLite
 
 		private static async Task<JMXSchema> GetSchemaInternalAsync(MdbContext mdb, string areaName, string objectName, int syncState)
 		{
-			string sql = $"select Top 1 ID, ObjectSchema, SyncState from SysCat.V_SysSchemas where SchemaName = '{areaName}' and " +
+			string sql = $"select ID, ObjectSchema, SyncState from V_SysSchemas where SchemaName = '{areaName}' and " +
 				$"(ObjectName = '{objectName}' or DbObjectName = '{objectName}') and SyncState >= {syncState}" +
-				$"order by SyncState";
+				$"order by SyncState limit 1";
 			using (var dr = await mdb.GetReaderAsync(sql))
 			{
 				if (!dr.Read())
@@ -236,5 +248,373 @@ namespace S031.MetaStack.Core.ORM.SQLite
 				return schema;
 			}
 		}
+
+		#region Drop Schema
+		public override void DropSchema(string objectName)
+		{
+			DropSchemaAsync(objectName).GetAwaiter().GetResult();
+		}
+
+		public override async Task DropSchemaAsync(string objectName)
+		{
+			JMXObjectName name = objectName;
+			await DropSchemaAsync(name.AreaName, name.ObjectName).ConfigureAwait(false);
+			lock (objLock)
+				_schemaCache.Remove(name.ToString());
+		}
+
+		private async Task DropSchemaAsync(string areaName, string objectName)
+		{
+			MdbContext mdb = this.MdbContext;
+			ILogger logger = this.Logger;
+			var schema = await GetSchemaAsync(mdb, areaName, objectName);
+			var schemaFromDb = await GetTableSchema(mdb, schema.DbObjectName.ToString());
+
+			string[] sqlList;
+			if (schemaFromDb == null)
+				sqlList = new string[] { };
+			else
+				sqlList = await DropSchemaStatementsAsync(schemaFromDb);
+
+			await mdb.BeginTransactionAsync();
+			try
+			{
+				foreach (var sql in sqlList)
+				{
+					logger.Debug(sql);
+					await mdb.ExecuteAsync(sql);
+				}
+				await mdb.ExecuteAsync(SQLite.DelSysSchemas,
+					new MdbParameter("@ID", schema.ID));
+				await mdb.CommitAsync();
+			}
+			catch
+			{
+				mdb.RollBack();
+				throw;
+			}
+		}
+		private async Task<string[]> DropSchemaStatementsAsync(JMXSchema fromDbSchema)
+		{
+			List<string> sql = new List<string>();
+			using (SQLStatementWriter sb = new SQLStatementWriter(this, fromDbSchema))
+			{
+				await WriteDropStatementsAsync(sb, fromDbSchema);
+				sql.Add(sb.ToString());
+			}
+			return sql.ToArray();
+		}
+
+		private async Task WriteDropStatementsAsync(SQLStatementWriter sb, JMXSchema fromDbSchema)
+		{
+			MdbContext mdb = this.MdbContext;
+			foreach (var att in fromDbSchema.Attributes.Where(a => a.FieldName.StartsWith(detail_field_prefix)))
+			{
+				string[] names = att.FieldName.Split('_');
+				var schemaFromDb = await GetTableSchema(mdb, new JMXObjectName(names[1], names[2]).ToString());
+				if (schemaFromDb != null)
+					await WriteDropStatementsAsync(sb, schemaFromDb);
+
+			}
+			string s = (await mdb.ExecuteAsync<string>(SQLite.GetParentRelations,
+				new MdbParameter("@table_name", fromDbSchema.DbObjectName.ToString()))) ?? "";
+			sb.WriteDropStatements(s, fromDbSchema);
+		}
+
+		#endregion Drop Schema
+
+		#region Clear Catalog
+		public override void ClearCatalog()
+		{
+			DropDbSchemaAsync(this.MdbContext, this.Logger)
+				.ConfigureAwait(false)
+				.GetAwaiter()
+				.GetResult();
+		}
+		public override async Task ClearCatalogAsync()
+		{
+			await DropDbSchemaAsync(this.MdbContext, this.Logger).ConfigureAwait(false);
+		}
+		private async Task DropDbSchemaAsync(MdbContext mdb, ILogger log)
+		{
+			var test = await mdb.ExecuteAsync<string>(SQLite.TestSchema);
+			if (!test.IsEmpty())
+			{
+				try
+				{
+					await mdb.ExecuteAsync(SQLite.DropSchema);
+					log.Debug($"Schema SysCat was deleted from database {mdb.DbName}");
+				}
+				catch (Exception e)
+				{
+					log.LogError($"Delete Schema error: {e.Message}");
+					throw;
+				}
+			}
+			else
+				log.Debug($"Schema SysCat not exists in database  {mdb.DbName}");
+		}
+		#endregion Clear Catalog
+
+		#region Save Schema
+		public override JMXSchema SaveSchema(JMXSchema schema) => SaveSchemaAsync(schema).GetAwaiter().GetResult();
+
+		public override async Task<JMXSchema> SaveSchemaAsync(JMXSchema schema)
+		{
+			var mdb = this.MdbContext;
+			schema = await NormalizeSchemaAsync(mdb, schema);
+			long id = await mdb.ExecuteAsync<long>(SQLite.AddSysSchemas,
+					new MdbParameter("@uid", schema.UID),
+					new MdbParameter("@SysAreaID",
+						await mdb.ExecuteAsync<long>($"Select ID From SysAreas Where SchemaName = '{schema.ObjectName.AreaName}'")),
+					new MdbParameter("@ObjectType", (int)schema.DbObjectType),
+					new MdbParameter("@ObjectName", schema.ObjectName.ObjectName),
+					new MdbParameter("@DbObjectName", schema.DbObjectName.ObjectName),
+					new MdbParameter("@ObjectSchema", schema.ToString()),
+					new MdbParameter("@Version", schema_version),
+					new MdbParameter("@UpdateTime", DateTime.Now),
+					new MdbParameter("@DateBegin", DateTime.Now.Date),
+					new MdbParameter("@DateEnd", DateTime.MinValue) { NullIfEmpty = true },
+					new MdbParameter("@PreviosID", 0) { NullIfEmpty = true });
+
+			schema.ID = Convert.ToInt32(id);
+			lock (objLock)
+				_schemaCache[schema.ObjectName] = schema;
+			foreach (var fk in schema.ForeignKeys)
+			{
+				if (fk.RefObjectName.IsEmpty())
+					throw new ArgumentNullException("Property RefObjectName can't be empty");
+				lock (objLock)
+				{
+					if (_parentRelations.ContainsKey(fk.RefObjectName))
+						_parentRelations[fk.RefObjectName].Add(schema.ObjectName);
+					else
+						_parentRelations.Add(fk.RefObjectName, new List<string>() { schema.ObjectName });
+				}
+			}
+			return schema;
+		}
+		private static async Task<JMXSchema> NormalizeSchemaAsync(MdbContext mdb, JMXSchema schema)
+		{
+			NormalizeAttributes(schema);
+			NormalizePK(schema);
+			NormalizeIndexes(schema);
+			await NormalizeFKAsync(mdb, schema);
+			await NormalizeDetailsAsync(mdb, schema);
+			return schema;
+		}
+
+		private static void NormalizeAttributes(JMXSchema schema)
+		{
+			if (schema.Attributes.Count == 0)
+				//One or more attribute is required in the schema
+				throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.1"));
+
+			int i = 0;
+			foreach (var att in schema.Attributes)
+			{
+				att.Position = ++i;
+				att.IsPK = false;
+				if (att.FieldName.IsEmpty())
+					att.FieldName = att.AttribName;
+				if (att.Identity.IsIdentity)
+					att.IsNullable = false;
+
+				if (att.DataType == MdbType.@null)
+					//For an object type attribute, you must specify a schema
+					throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.4",
+						att.FieldName));
+
+				string typeMap = _typeMap[att.DataType];
+				if (att.ServerDataType.IsEmpty() || typeMap.IndexOf(att.ServerDataType) == -1)
+					att.ServerDataType = typeMap.Split(';')[0];
+
+				if (att.DataSize.IsEmpty())
+				{
+					MdbTypeInfo ti2 = _typeInfo[att.ServerDataType];
+					if (!ti2.FixedSize)
+						att.DataSize = new JMXDataSize(ti2.Size, ti2.Scale, ti2.Precision);
+				}
+
+				var cc = att.CheckConstraint;
+				if (!cc.IsEmpty() && cc.ConstraintName.IsEmpty())
+					cc.ConstraintName = $"CKC_{ att.FieldName}_{ schema.DbObjectName.ObjectName}";
+				var dc = att.DefaultConstraint;
+				if (!dc.IsEmpty() && dc.ConstraintName.IsEmpty())
+					dc.ConstraintName = $"DF_{ att.FieldName}_{ schema.DbObjectName.ObjectName}";
+			}
+		}
+
+		private static void NormalizePK(JMXSchema schema)
+		{
+			if (schema.PrimaryKey != null)
+			{
+				var pk = schema.PrimaryKey;
+				if (pk.KeyName.IsEmpty())
+					pk.KeyName = $"PK_{schema.DbObjectName.AreaName}_{schema.DbObjectName.ObjectName}";
+				foreach (var member in pk.KeyMembers)
+				{
+					var att = schema.Attributes.FirstOrDefault(a => a.FieldName == member.FieldName);
+					if (att != null)
+					{
+						att.IsPK = true;
+						att.IsNullable = false;
+					}
+					else
+						//The FieldName specified in the primary key is not in the attribute list
+						throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.3",
+							member.FieldName, "primary key"));
+				}
+			}
+			else if (schema.Attributes.Any(a => a.DataType == MdbType.@object))
+			{
+				//Requires PK for table with object attributes
+				var pk = new JMXPrimaryKey
+				{
+					KeyName = $"PK_{schema.DbObjectName.AreaName}_{schema.DbObjectName.ObjectName}"
+				};
+				var att = schema.Attributes.FirstOrDefault(a => a.Identity.IsIdentity);
+				if (att == null)
+					att = schema.Attributes.FirstOrDefault(a => a.AttribName == "ID" || a.FieldName == "ID");
+				if (att == null)
+					att = schema.Attributes.FirstOrDefault(a => a.DefaultConstraint != null &&
+						a.DefaultConstraint.Definition.ToUpper().IndexOf("NEXT VALUE FOR") > -1);
+				if (att != null)
+				{
+					if (att.FieldName.IsEmpty())
+						att.FieldName = att.AttribName;
+					pk.AddKeyMember(att.FieldName);
+					schema.PrimaryKey = pk;
+				}
+				else
+					//A primary key is required for a table that includes columns of type 'object'
+					throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.5",
+						schema.ObjectName));
+			}
+		}
+
+		private static void NormalizeIndexes(JMXSchema schema)
+		{
+			int i = 0;
+			foreach (var index in schema.Indexes)
+			{
+				if (index.IndexName.IsEmpty() && index.IsUnique)
+					index.IndexName = $"AK{++i}_{schema.DbObjectName.AreaName}_{schema.DbObjectName.ObjectName}";
+				else if (index.IndexName.IsEmpty())
+					index.IndexName = $"IE{++i}_{schema.DbObjectName.AreaName}_{schema.DbObjectName.ObjectName}";
+				foreach (var member in index.KeyMembers)
+				{
+					var att = schema.Attributes.FirstOrDefault(a => a.FieldName == member.FieldName);
+					if (att == null)
+						//The FieldName specified in the index is not in the attribute list
+						throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.3",
+							member.FieldName, $"index '{index.IndexName}'"));
+					else if (index.IsUnique)
+						att.Required = true;
+				}
+			}
+		}
+
+		private static async Task NormalizeFKAsync(MdbContext mdb, JMXSchema schema)
+		{
+			//check indexes for FK!!!!
+			foreach (var fk in schema.ForeignKeys)
+			{
+				if (fk.KeyName.IsEmpty())
+					fk.KeyName = $"FK_{schema.DbObjectName.AreaName}_{schema.DbObjectName.ObjectName}_{fk.RefDbObjectName.ObjectName}";
+				if (fk.RefObjectName.IsEmpty())
+				{
+					JMXSchema refSchema = await GetSchemaAsync(mdb, fk.RefDbObjectName.AreaName, fk.RefDbObjectName.ObjectName);
+					if (refSchema == null)
+						throw new ArgumentNullException("Property RefObjectName can't be empty");
+					// set value, not ref
+					fk.RefObjectName = refSchema.ObjectName.ToString();
+				}
+
+				foreach (var member in fk.KeyMembers)
+				{
+					var att = schema.Attributes.FirstOrDefault(a => a.FieldName == member.FieldName);
+					if (att == null)
+						//The FieldName specified in the foreign key is not in the attribute list
+						throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.3", member.FieldName, $"foreign key '{fk.KeyName}'"));
+				}
+			}
+		}
+
+		private static async Task NormalizeDetailsAsync(MdbContext mdb, JMXSchema schema)
+		{
+			foreach (var att in schema.Attributes.Where(a => a.DataType == MdbType.@object))
+			{
+				if (att.ObjectSchema == null)
+					//For an object type attribute, you must specify a schema
+					throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.2"));
+
+				att.ObjectSchema = await NormalizeSchemaAsync(mdb, att.ObjectSchema);
+				att.ServerDataType = "varchar";
+				att.DataSize = new JMXDataSize(1);
+				att.FieldName = $"{detail_field_prefix}{att.ObjectSchema.DbObjectName.AreaName}_{att.ObjectSchema.DbObjectName.ObjectName}";
+				//check indexes fo FK
+				if (!att.ObjectSchema.ForeignKeys.Any(fk => fk.RefDbObjectName.AreaName == schema.DbObjectName.AreaName &&
+					fk.RefDbObjectName.ObjectName == schema.DbObjectName.ObjectName))
+				{
+					var fk = new JMXForeignKey($"FK_{att.ObjectSchema.DbObjectName.AreaName}_{att.ObjectSchema.DbObjectName.ObjectName}_{schema.DbObjectName.ObjectName}")
+					{
+						RefDbObjectName = schema.DbObjectName.ToString(),
+						RefObjectName = schema.ObjectName.ToString()
+					};
+
+					foreach (var m in schema.PrimaryKey.KeyMembers)
+					{
+						string fieldName = $"{schema.ObjectName}{m.FieldName}";
+						if (!att.ObjectSchema.Attributes.Any(a => a.FieldName == fieldName))
+						{
+							var refAtt = schema.Attributes.FirstOrDefault(a => a.FieldName == m.FieldName);
+							var newAtt = new JMXAttribute(fieldName)
+							{
+								DataType = refAtt.DataType,
+								ServerDataType = refAtt.ServerDataType,
+								Required = true,
+								FieldName = fieldName,
+								IsFK = true,
+								DataSize = refAtt.DataSize
+							};
+							att.ObjectSchema.Attributes.Add(newAtt);
+						}
+					}
+					//check for exists attribute $"{schema.ObjectName}{m.FieldName}" in att.ObjectSchema
+					fk.AddKeyMember(schema.PrimaryKey.KeyMembers.Select(m => $"{schema.ObjectName}{m.FieldName}").ToArray());
+					fk.AddRefKeyMember(schema.PrimaryKey.KeyMembers.Select(m => m.FieldName).ToArray());
+					att.ObjectSchema.ForeignKeys.Add(fk);
+				}
+			}
+		}
+
+		#endregion Save Schema
+
+		#region Utils
+		private static async Task<JMXSchema> GetTableSchema(MdbContext mdb, string fullTableName)
+		{
+			//Костыль!!! GetTableSchema пуст
+			string s = await mdb.ExecuteAsync<string>(SQLite.GetTableSchema,
+				new MdbParameter("@table_name", fullTableName));
+			if (!s.IsEmpty())
+				return JMXSchema.Parse(s);
+			return null;
+		}
+		private static async Task<string> GetSqlVersion(MdbContext mdb)
+		{
+			if (_sqlVersion.IsEmpty())
+			{
+				_sqlVersion = await mdb.ExecuteAsync<string>(SQLite.SQLVersion);
+				if (_sqlVersion.IsEmpty())
+					_sqlVersion = "3";
+				else
+					_sqlVersion = _sqlVersion.Split('.')[0];
+			}
+			return _sqlVersion;
+		}
+		private static JMXObjectName[] GetDependences(JMXSchema schema) =>
+			schema.ForeignKeys.Select(fk => fk.RefDbObjectName).ToArray();
+		#endregion Utils
 	}
 }

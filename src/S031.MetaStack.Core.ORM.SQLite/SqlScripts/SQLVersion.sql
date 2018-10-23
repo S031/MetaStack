@@ -1,1 +1,1 @@
-SELECT SERVERPROPERTY('ProductVersion') AS ProductVersion
+select sqlite_version() AS ProductVersion;
