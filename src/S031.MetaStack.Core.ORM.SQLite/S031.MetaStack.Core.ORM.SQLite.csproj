@@ -5,12 +5,64 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="SqlScripts\AddSysAreas.sql" />
+    <None Remove="SqlScripts\AddSysSchemas.sql" />
+    <None Remove="SqlScripts\CreateSchemaObjects.sql" />
+    <None Remove="SqlScripts\CreateSchemaObjects_12.sql" />
+    <None Remove="SqlScripts\DelSysSchemas.sql" />
+    <None Remove="SqlScripts\DropSchema.sql" />
+    <None Remove="SqlScripts\GetColumnsList.sql" />
+    <None Remove="SqlScripts\GetCurrentSchema.sql" />
+    <None Remove="SqlScripts\GetDefaultSchema.sql" />
+    <None Remove="SqlScripts\GetParentRelations.sql" />
+    <None Remove="SqlScripts\GetTableSchema.sql" />
+    <None Remove="SqlScripts\SQLVersion.sql" />
+    <None Remove="SqlScripts\StateSysSchemas.sql" />
+    <None Remove="SqlScripts\TestSchema.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ApplicationDefinition Include="SqlScripts\AddSysAreas.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="SqlScripts\AddSysSchemas.sql" />
+    <EmbeddedResource Include="SqlScripts\CreateSchemaObjects.sql" />
+    <EmbeddedResource Include="SqlScripts\CreateSchemaObjects_12.sql" />
+    <EmbeddedResource Include="SqlScripts\DelSysSchemas.sql" />
+    <EmbeddedResource Include="SqlScripts\DropSchema.sql" />
+    <EmbeddedResource Include="SqlScripts\GetColumnsList.sql" />
+    <EmbeddedResource Include="SqlScripts\GetCurrentSchema.sql" />
+    <EmbeddedResource Include="SqlScripts\GetDefaultSchema.sql" />
+    <EmbeddedResource Include="SqlScripts\GetParentRelations.sql" />
+    <EmbeddedResource Include="SqlScripts\GetTableSchema.sql" />
+    <EmbeddedResource Include="SqlScripts\SQLVersion.sql" />
+    <EmbeddedResource Include="SqlScripts\StateSysSchemas.sql" />
+    <EmbeddedResource Include="SqlScripts\TestSchema.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="2.1.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\S031.MetaStack.Common\S031.MetaStack.Common.csproj" />
     <ProjectReference Include="..\S031.MetaStack.Core\S031.MetaStack.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="SQLite.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>SQLite.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="SQLite.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>SQLite.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>
