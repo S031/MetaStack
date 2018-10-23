@@ -70,6 +70,7 @@ namespace S031.MetaStack.WinForms.Connectors
 
 		public void Dispose()
 		{
+			Disconnect();
 			_stream.Close();
 			_socket.Close();
 			_stream.Dispose();
@@ -84,6 +85,14 @@ namespace S031.MetaStack.WinForms.Connectors
 				Connecting(userName, password);
 			return this;
 		}
+		private void Disconnect()
+		{
+			if (_socket == null || !_socket.Connected)
+				return;
+			if (!_connected)
+				return;
+			Execute("Sys.Logout", new DataPackage("Col1"));
+		}
 		public DataPackage Execute(string actionID, DataPackage paramTable)
 		{
 			//for paranoya mode
@@ -91,6 +100,7 @@ namespace S031.MetaStack.WinForms.Connectors
 			paramTable.Headers["ActionID"] = actionID;
 			paramTable.Headers["UserName"] = _userName;
 			paramTable.Headers["SessionID"] = _loginInfo.SessionID.ToString();
+			//Костыль!!! Необходимо использовать таймстамп в сообщении и проверять его на сервере
 			paramTable.Headers["EncryptedKey"] = _clientAes
 					.EncryptBin(_ticket
 					.ToByteArray()

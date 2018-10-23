@@ -125,6 +125,7 @@ namespace S031.MetaStack.Core.Security
 		{
 			try
 			{
+				//Костыль!!! Необходимо в Тикет добавить проверяемое значение (таимстамп или хэщ сообщения)
 				return loginInfo.Ticket.Equals(
 						new Guid(
 							Aes.Create()

@@ -269,6 +269,27 @@ namespace S031.MetaStack.Core.Actions
 			ai.InterfaceParameters.Add(pi);
 			actions.Add(ai.ActionID, ai);
 			#endregion
+			
+			#region Sys.Logout
+			ai = new ActionInfo()
+			{
+				ActionID = "Sys.Logout",
+				AssemblyID = typeof(ActionsList).Assembly.GetWorkName(),
+				AsyncMode = false,
+				AuthenticationRequired = false,
+				AuthorizationRequired = false,
+				ClassName = typeof(SysLogout).FullName,
+				Description = "Закрыть сессию",
+				EMailOnError = false,
+				LogOnError = true,
+				MultipleRowsParams = false,
+				MultipleRowsResult = false,
+				TransactionSupport = TransactionActionSupport.None,
+				Name = "Получить схему объекта",
+				WebAuthentication = ActionWebAuthenticationType.Basic
+			};
+			actions.Add(ai.ActionID, ai);
+			#endregion
 
 			return actions;
 		}

@@ -53,4 +53,23 @@ namespace S031.MetaStack.Core.Actions
 			throw new InvalidOperationException("This action can not be executed in asynchronous mode");
 		}
 	}
+	internal class SysLogout : IAppEvaluator
+	{
+		public DataPackage Invoke(ActionInfo ai, DataPackage dp)
+		{
+			string userName = (string)dp.Headers["UserName"];
+			string sessionID = (string)dp.Headers["SessionID"];
+			string encryptedKey = (string)dp.Headers["EncryptedKey"];
+			App.ApplicationContext
+				.GetServices()
+				.GetService<ILoginFactory>()
+				.Logout(userName, sessionID, encryptedKey);
+			return new DataPackage("Result", 0);
+		}
+
+		public Task<DataPackage> InvokeAsync(ActionInfo ai, DataPackage dp)
+		{
+			throw new InvalidOperationException("This action can not be executed in asynchronous mode");
+		}
+	}
 }
