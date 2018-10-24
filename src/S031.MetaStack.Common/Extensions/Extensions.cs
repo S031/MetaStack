@@ -214,6 +214,25 @@ namespace S031.MetaStack.Common
 			}
 			return RemoveChar(source.Remove(indexOfChar, 1), charItem);
 		}
+
+		public static String Between(this string source, String start, String end)
+		{
+			int i = source.IndexOf(start) + start.Length;
+			int j = source.IndexOf(end, i);
+
+			if (j != -1)
+				return source.Substring(i, j - i);
+			return string.Empty;
+		}
+
+		public static String Between(this string source, char start, char end)
+		{
+			int i = source.IndexOf(start) + 1;
+			int j = source.IndexOf(end, i);
+			if (j != -1)
+				return source.Substring(i, j - i);
+			return string.Empty;
+		}
 	}
 
 	public static class NumericExtension

@@ -8,6 +8,7 @@ using S031.MetaStack.WinForms.Security;
 using S031.MetaStack.WinForms.Connectors;
 using S031.MetaStack.Common;
 using System.Windows.Forms;
+using System.Configuration;
 
 namespace MetApp
 {
@@ -24,9 +25,10 @@ namespace MetApp
 
 			string userName = Environment.UserName;
 			string password = string.Empty;
+			bool savePassword = ConfigurationManager.AppSettings["SavePassword"].ToBoolOrDefault();
 			bool isPrompt = false;
 			var sInfo = CredentialManager.ReadCredential(Program.AppName);
-			if (sInfo == null || sInfo.Password.IsEmpty())
+			if (sInfo == null || sInfo.Password.IsEmpty() || !savePassword)
 			{
 				password = SecureRequest(userName);
 				if (password.IsEmpty())
@@ -39,7 +41,7 @@ namespace MetApp
 			{
 				_connector = TCPConnector.Create();
 				_connector.Connect(userName, password);
-				if (isPrompt)
+				if (isPrompt && savePassword)
 					CredentialManager.WriteCredential(Program.AppName, userName, password);
 			}
 			catch(Exception ex)
@@ -63,6 +65,7 @@ namespace MetApp
 				{
 					c.FindForm().Text = $"Вход в систему пользователя {userName}";
 					TextBox tb = (c as TextBox);
+					c.Width = 100;
 					tb.PasswordChar = '*';
 				}
 			})[0];

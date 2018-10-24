@@ -35,7 +35,7 @@
     },
     "SqliteDb": {
       "providerName": "System.Data.Sqlite",
-      "connectionString": "Data Source=SysCat.db; Mode=Memory; Cache=Shared"
+      "connectionString": "Data Source=DB\\SysCat.db; Mode=Memory; Cache=Shared"
     },
     "test": {
       "providerName": "System.Data.SqLClient",

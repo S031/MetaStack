@@ -40,6 +40,10 @@ namespace S031.MetaStack.WinForms
 				cd.Add<Panel>(WinFormConfig.SinglePageForm);
 				TableLayoutPanel tlpRows = cd.Items["FormRowsPanel"].LinkedControl as TableLayoutPanel;
 				TableLayoutPanel p = tlpRows.Add<TableLayoutPanel>(new WinFormItem("WorkCells") { CellsSize = new Pair<int>(2, 1) });
+				p.ColumnStyles[0].SizeType = SizeType.Percent;
+				p.ColumnStyles[0].Width = 38;
+				p.ColumnStyles[1].SizeType = SizeType.Percent;
+				p.ColumnStyles[1].Width = 62;
 				foreach (var item in items)
 					p.Add(item);
 				cd.Items["MainPanel"].LinkedControl.Add<TableLayoutPanel>(WinFormConfig.StdButtons);

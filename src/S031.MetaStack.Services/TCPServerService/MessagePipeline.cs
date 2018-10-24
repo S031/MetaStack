@@ -41,13 +41,11 @@ namespace S031.MetaStack.Services
 		}
 		public async Task ProcessMessageAsync()
 		{
+			var config = ApplicationContext.GetConfiguration();
 			if (!_message.Headers.TryGetValue("ConnectionName", out object connectionName))
-				connectionName = connection_name;
+				connectionName = config["appSettings:defaultConnection"]; ;
 
-			var cs = ApplicationContext
-				.GetConfiguration()
-				.GetSection($"connectionStrings:{connectionName}")
-				.Get<ConnectInfo>();
+			var cs = config.GetSection($"connectionStrings:{connectionName}").Get<ConnectInfo>();
 			using (MdbContext mdb = await MdbContext.CreateMdbContextAsync(cs))
 			using (ActionManager am = new ActionManager(mdb) { Logger = ApplicationContext.GetLogger() })
 			{

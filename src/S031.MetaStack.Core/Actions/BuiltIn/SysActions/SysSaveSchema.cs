@@ -11,10 +11,10 @@ using S031.MetaStack.Core.ORM;
 
 namespace S031.MetaStack.Core.Actions
 {
-	internal class SysGetSchema : IAppEvaluator
+	internal class SysSaveSchema : IAppEvaluator
 	{
 		ConnectInfo _connectInfo;
-		string _objectName;
+		JMXSchema _schemaSource;
 
 		public DataPackage Invoke(ActionInfo ai, DataPackage dp)
 		{
@@ -24,7 +24,7 @@ namespace S031.MetaStack.Core.Actions
 			{
 				var dr = ai.GetOutputParamTable();
 				dr.AddNew();
-				dr["ObjectSchema"] = (f.CreateJMXRepo().GetSchema(_objectName)).ToString();
+				dr["ObjectSchema"] = (f.CreateJMXRepo().SaveSchema(_schemaSource)).ToString();
 				dr.Update();
 				return dr;
 			}
@@ -38,7 +38,7 @@ namespace S031.MetaStack.Core.Actions
 			{
 				var dr = ai.GetOutputParamTable();
 				dr.AddNew();
-				dr["ObjectSchema"] = (await f.CreateJMXRepo().GetSchemaAsync(_objectName)).ToString();
+				dr["ObjectSchema"] = (await f.CreateJMXRepo().SaveSchemaAsync(_schemaSource)).ToString();
 				dr.Update();
 				return dr;
 			}
@@ -52,7 +52,7 @@ namespace S031.MetaStack.Core.Actions
 			_connectInfo = configuration.GetSection($"connectionStrings:{connectionName}").Get<ConnectInfo>();
 
 			if (dp.Read())
-				_objectName = (string)dp["ObjectName"];
+				_schemaSource = JMXSchema.Parse((string)dp["ObjectName"]);
 		}
 	}
 }

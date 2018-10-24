@@ -291,6 +291,58 @@ namespace S031.MetaStack.Core.Actions
 			actions.Add(ai.ActionID, ai);
 			#endregion
 
+			#region Sys.SaveSchema
+			ai = new ActionInfo()
+			{
+				ActionID = "Sys.SaveSchema",
+				AssemblyID = typeof(ActionsList).Assembly.GetWorkName(),
+				AsyncMode = true,
+				AuthenticationRequired = true,
+				AuthorizationRequired = true,
+				ClassName = typeof(SysSaveSchema).FullName,
+				Description = "Сохранить схему объекта",
+				EMailOnError = false,
+				LogOnError = true,
+				MultipleRowsParams = true,
+				MultipleRowsResult = true,
+				TransactionSupport = TransactionActionSupport.Support,
+				Name = "Сохранить схему объекта",
+				WebAuthentication = ActionWebAuthenticationType.Basic
+			};
+			pi = new ParamInfo()
+			{
+				AttribName = "ObjectSchema",
+				FieldName = "ObjectSchema",
+				ParameterID = "ObjectSchema",
+				DataType = "string",
+				Dirrect = ParamDirrect.Input,
+				Enabled = true,
+				Name = "Схема объекта",
+				Position = 1,
+				PresentationType = "TextBox",
+				Visible = true,
+				Width = 1024 * 256,
+				Required = true
+			};
+			ai.InterfaceParameters.Add(pi);
+			pi = new ParamInfo()
+			{
+				AttribName = "ObjectSchemaResult",
+				FieldName = "ObjectSchema",
+				ParameterID = "ObjectSchemaResult",
+				DataType = "string",
+				Dirrect = ParamDirrect.Output,
+				Enabled = true,
+				Name = "Схема объекта",
+				Position = 2,
+				PresentationType = "TextBox",
+				Visible = true,
+				Width = 1024 * 256,
+				Required = true
+			};
+			ai.InterfaceParameters.Add(pi);
+			actions.Add(ai.ActionID, ai);
+			#endregion
 			return actions;
 		}
 	}
