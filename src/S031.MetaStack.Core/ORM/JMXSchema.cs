@@ -55,6 +55,7 @@ namespace S031.MetaStack.WinForms.ORM
             _indexes = new List<JMXIndex>();
             _fkeys = new List<JMXForeignKey>();
             UID = Guid.NewGuid();
+			AuditEnabled = true;
             DirectAccess = DirectAccess.ForAll;
             DbObjectType = DbObjectTypes.Table;
         }
@@ -66,6 +67,7 @@ namespace S031.MetaStack.WinForms.ORM
         public Guid UID { get; set; }
         public string Name { get; set; }
         public int SyncState { get; set; }
+        public bool AuditEnabled { get; set; }
         public JMXObjectName ObjectName
         {
             get => new JMXObjectName(_areaName, _objectName);
@@ -98,6 +100,7 @@ namespace S031.MetaStack.WinForms.ORM
             writer.WriteProperty("ID", ID);
             writer.WriteProperty("UID", UID);
             writer.WriteProperty("Name", Name);
+            writer.WriteProperty("AuditEnabled", AuditEnabled);
             writer.WriteProperty("DirectAccess", DirectAccess.ToString());
             writer.WriteProperty("DbObjectType", DbObjectType.ToString());
 

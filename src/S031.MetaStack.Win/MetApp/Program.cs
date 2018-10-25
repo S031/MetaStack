@@ -1,4 +1,5 @@
-﻿using System;
+﻿using S031.MetaStack.WinForms;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,7 +22,7 @@ namespace MetApp
 			if (ClientGate.Logon())
 			{
 				AppDomain.CurrentDomain.ProcessExit += (s, e) => ClientGate.Logout();
-				Application.Run(new Form1());
+				Application.Run(new MainForm(WinFormStyle.Form));
 			}
 		}
 	}

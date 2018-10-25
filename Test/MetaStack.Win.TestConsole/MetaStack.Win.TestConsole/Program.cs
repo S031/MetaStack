@@ -16,7 +16,7 @@ namespace MetaStack.Win.TestConsole
 		static void Main(string[] args)
 		{
 			//var connectionName = Dns.GetHostName() == "SERGEY-WRK" ? "Test" : "BankLocal";
-			var connectionName = "SqliteDb";
+			//var connectionName = "SqliteDb";
 			using (FileLog l = new FileLog("TCPConnectorConnectTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			using (TCPConnector connector = TCPConnector.Create())
 			{
