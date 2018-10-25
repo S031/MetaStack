@@ -199,6 +199,7 @@
     <Compile Include="ORM\JMXFactory\JMXRepo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\CredentialManager\CredentialManager.cs" />
+    <Compile Include="Tools\ClientGate.cs" />
     <Compile Include="Tools\PathHelper.cs" />
     <Compile Include="Tools\ResourceManager.cs" />
   </ItemGroup>

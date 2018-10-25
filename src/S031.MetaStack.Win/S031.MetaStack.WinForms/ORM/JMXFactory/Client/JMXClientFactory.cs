@@ -8,11 +8,13 @@ namespace S031.MetaStack.WinForms.ORM
 {
 	public class JMXClientFactory : JMXFactory
 	{
-		public override IJMXRepo CreateJMXRepo() =>
-			new JMXClientRepo();
+		static IJMXRepo _repo = new JMXClientRepo();
 
-		public override IJMXProvider CreateJMXProvider() =>
-			new JMXClientProvider();
+		static IJMXProvider _provider = new JMXClientProvider();
+
+		public override IJMXRepo CreateJMXRepo() => _repo;
+
+		public override IJMXProvider CreateJMXProvider() => _provider;
 
 		public override JMXObject CreateObject(string objectName) =>
 			new JMXObject(objectName, this);
