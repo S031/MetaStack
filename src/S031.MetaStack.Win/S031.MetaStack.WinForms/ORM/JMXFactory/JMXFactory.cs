@@ -8,6 +8,8 @@ namespace S031.MetaStack.WinForms.ORM
 {
 	public abstract class JMXFactory : IJMXFactory
 	{
+		private static IJMXFactory _factory = new JMXClientFactory();
+
 		public virtual IJMXProvider CreateJMXProvider()
 		{
 			throw new NotImplementedException();
@@ -23,14 +25,6 @@ namespace S031.MetaStack.WinForms.ORM
 			throw new NotImplementedException();
 		}
 
-		public static IJMXFactory Create()
-		{
-			return new JMXFactoryClient();
-		}
-	}
-
-	public class JMXFactoryClient : JMXFactory
-	{
-
+		public static IJMXFactory Create() => _factory;
 	}
 }
