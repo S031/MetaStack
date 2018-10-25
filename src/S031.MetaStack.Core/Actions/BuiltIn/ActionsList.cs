@@ -343,6 +343,60 @@ namespace S031.MetaStack.Core.Actions
 			ai.InterfaceParameters.Add(pi);
 			actions.Add(ai.ActionID, ai);
 			#endregion
+
+			#region Sys.GetActionInfo
+			ai = new ActionInfo()
+			{
+				ActionID = "Sys.GetSchema",
+				AssemblyID = typeof(ActionsList).Assembly.GetWorkName(),
+				AsyncMode = true,
+				AuthenticationRequired = true,
+				AuthorizationRequired = true,
+				ClassName = typeof(SysGetActionInfo).FullName,
+				Description = "Получить описание операции",
+				EMailOnError = false,
+				LogOnError = true,
+				MultipleRowsParams = true,
+				MultipleRowsResult = true,
+				TransactionSupport = TransactionActionSupport.None,
+				Name = "Получить описание операции",
+				WebAuthentication = ActionWebAuthenticationType.Basic
+			};
+			pi = new ParamInfo()
+			{
+				AttribName = "ActionID",
+				FieldName = "ActionID",
+				ParameterID = "ActionID",
+				DataType = "string",
+				Dirrect = ParamDirrect.Input,
+				Enabled = true,
+				Name = "Наименование операции",
+				Position = 1,
+				PresentationType = "TextBox",
+				Visible = true,
+				Width = 60,
+				Required = true
+			};
+			ai.InterfaceParameters.Add(pi);
+			pi = new ParamInfo()
+			{
+				AttribName = "ActionInfo",
+				FieldName = "ActionInfo",
+				ParameterID = "ActionInfo",
+				DataType = "string",
+				Dirrect = ParamDirrect.Output,
+				Enabled = true,
+				Name = "Схема операции",
+				Position = 2,
+				PresentationType = "TextBox",
+				Visible = true,
+				Width = 1024 * 256,
+				Required = true
+			};
+			ai.InterfaceParameters.Add(pi);
+			actions.Add(ai.ActionID, ai);
+			#endregion
+
 			return actions;
 		}
 	}

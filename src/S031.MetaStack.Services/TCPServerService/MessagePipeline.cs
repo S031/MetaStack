@@ -16,8 +16,6 @@ namespace S031.MetaStack.Services
 {
 	internal class MessagePipeline : IDisposable
 	{
-		//static readonly string connection_name = Dns.GetHostName() == "SERGEY-WRK" ? "Test" : "BankLocal";
-		static readonly string connection_name = "SqliteDb";
 		private static readonly object obj4Lock = new object();
 		readonly DataPackage _message = null;
 		DataPackage _result = null;

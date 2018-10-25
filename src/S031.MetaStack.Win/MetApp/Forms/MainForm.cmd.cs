@@ -69,8 +69,8 @@ namespace MetApp
 			ToolStripMenuItem mi = (this.GetControl<MenuStrip>("MenuBar").Items["Favorites"] as ToolStripMenuItem);
 			mi.DropDownItems.Clear();
 			mi.DropDownItems.AddRange(new ToolStripItem[] {
-				new ToolStripMenuItem("Добавить в избранные...", ResourceManager.GetImage("FavoritesAdd"), mnuClick) { Name = "FavoritesAdd", Tag = DBBrowseCommandsEnum.FavoritesAdd },
-				new ToolStripMenuItem("Управление избранным...", ResourceManager.GetImage("Favorites"), mnuClick) { Name = "FavoritesEdit", Tag = DBBrowseCommandsEnum.FavoritesEdit },
+				new ToolStripMenuItem("Добавить в избранные...", ResourceManager.GetImage("FavoritesAdd"), MenuClick) { Name = "FavoritesAdd", Tag = DBBrowseCommandsEnum.FavoritesAdd },
+				new ToolStripMenuItem("Управление избранным...", ResourceManager.GetImage("Favorites"), MenuClick) { Name = "FavoritesEdit", Tag = DBBrowseCommandsEnum.FavoritesEdit },
 				new ToolStripSeparator() { Name = "FavoritesSep1" }
 			});
 

@@ -1,9 +1,11 @@
 ﻿#if NETCOREAPP
 using S031.MetaStack.Common;
 using S031.MetaStack.Core.Data;
+using S031.MetaStack.Core.Json;
 using System;
 #else
 using S031.MetaStack.WinForms.Data;
+using S031.MetaStack.WinForms.Json;
 #endif
 using System.Linq;
 
@@ -68,5 +70,10 @@ namespace S031.MetaStack.WinForms.Actions
 		public bool AuthenticationRequired { get; set; }
 		public bool AuthorizationRequired { get; set; }
 		public bool AsyncMode { get; set; } = false;
+
+		public override string ToString() => JSONExtensions.SerializeObject(this);
+
+		public static ActionInfo Create(string serializedJsonString) =>
+			JSONExtensions.DeserializeObject<ActionInfo>(serializedJsonString);
 	}
 }

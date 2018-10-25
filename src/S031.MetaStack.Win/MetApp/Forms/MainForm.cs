@@ -20,7 +20,7 @@ namespace MetApp
 		ToolStripDateEdit _dateStart;
 		ToolStripDateEdit _dateFinish;
 
-		public MainForm(WinFormStyle formStyle) : base(formStyle)
+		public MainForm(string startupForm) : base(WinFormStyle.Form) 
 		{
 			InitializeComponent();
 			SetCommands();
@@ -68,84 +68,84 @@ namespace MetApp
 					});
 					mnuBar.Dock = DockStyle.Top;
 					((ToolStripMenuItem)mnuBar.Items["File"]).DropDownItems.AddRange(new ToolStripItem[] {
-						new ToolStripMenuItem("Открыть...", ResourceManager.GetImage("Open"), mnuClick, Keys.Control | Keys.O){ Name = "FileOpen", Tag = DBBrowseCommandsEnum.FileOpen },
-						new ToolStripMenuItem("Открыть связанную форму...", ResourceManager.GetImage("OpenRelated"), mnuClick, Keys.F7){ Name = "FileOpenRelated", Tag = DBBrowseCommandsEnum.FileOpenRelated },
-						new ToolStripMenuItem("Закрыть", null, mnuClick, Keys.Control | Keys.F4){ Name = "FileOpen", Tag = DBBrowseCommandsEnum.FileClose },
+						new ToolStripMenuItem("Открыть...", ResourceManager.GetImage("Open"), MenuClick, Keys.Control | Keys.O){ Name = "FileOpen", Tag = DBBrowseCommandsEnum.FileOpen },
+						new ToolStripMenuItem("Открыть связанную форму...", ResourceManager.GetImage("OpenRelated"), MenuClick, Keys.F7){ Name = "FileOpenRelated", Tag = DBBrowseCommandsEnum.FileOpenRelated },
+						new ToolStripMenuItem("Закрыть", null, MenuClick, Keys.Control | Keys.F4){ Name = "FileOpen", Tag = DBBrowseCommandsEnum.FileClose },
 						new ToolStripSeparator() { Name = "FileSep1" },
-						new ToolStripMenuItem("Расчетный период...", null, mnuClick, Keys.F2){ Name = "FilePeriod", Tag = DBBrowseCommandsEnum.FilePeriod },
+						new ToolStripMenuItem("Расчетный период...", null, MenuClick, Keys.F2){ Name = "FilePeriod", Tag = DBBrowseCommandsEnum.FilePeriod },
 						new ToolStripSeparator() { Name = "FileSep2" },
 						new ToolStripMenuItem("Экспорт") { Name = "FileExport" },
 						new ToolStripMenuItem("Импорт") { Name = "FileImport" },
 						new ToolStripSeparator() { Name = "FileSep3" },
-						new ToolStripMenuItem("Печать...", ResourceManager.GetImage("Print"), mnuClick, Keys.Control | Keys.P){ Name = "FilePrint", Tag = DBBrowseCommandsEnum.FilePrint },
-						new ToolStripMenuItem("Печать формы:", ResourceManager.GetImage("PrintPreview"), mnuClick, Keys.Control | Keys.Shift | Keys.P){ Name = "FilePrintCurrentForm", Tag = DBBrowseCommandsEnum.FilePrintCurrentForm },
-						new ToolStripMenuItem("Принтер...", null, mnuClick){ Name = "FilePrinter", Tag = DBBrowseCommandsEnum.FilePrinter },
+						new ToolStripMenuItem("Печать...", ResourceManager.GetImage("Print"), MenuClick, Keys.Control | Keys.P){ Name = "FilePrint", Tag = DBBrowseCommandsEnum.FilePrint },
+						new ToolStripMenuItem("Печать формы:", ResourceManager.GetImage("PrintPreview"), MenuClick, Keys.Control | Keys.Shift | Keys.P){ Name = "FilePrintCurrentForm", Tag = DBBrowseCommandsEnum.FilePrintCurrentForm },
+						new ToolStripMenuItem("Принтер...", null, MenuClick){ Name = "FilePrinter", Tag = DBBrowseCommandsEnum.FilePrinter },
 						new ToolStripSeparator() { Name = "FileSep4" },
-						new ToolStripMenuItem("Выход из программы", null, mnuClick, Keys.Alt | Keys.F4){ Name = "FileExit", Tag = DBBrowseCommandsEnum.FileExit }
+						new ToolStripMenuItem("Выход из программы", null, MenuClick, Keys.Alt | Keys.F4){ Name = "FileExit", Tag = DBBrowseCommandsEnum.FileExit }
 					});
 
 					(((ToolStripMenuItem)mnuBar.Items["File"]).DropDownItems["FileExport"] as ToolStripMenuItem).DropDownItems.AddRange(new ToolStripItem[] {
-						new ToolStripMenuItem("Результаты запроса...", null, mnuClick){ Name = "FileExportResults", Tag = DBBrowseCommandsEnum.FileExportResults },
-						new ToolStripMenuItem("В текстовый файл с разделителем...", null, mnuClick){ Name = "FileExportText", Tag = DBBrowseCommandsEnum.FileExportText },
-						new ToolStripMenuItem("Объектов в файл...", null, mnuClick){ Name = "FileExportObjects", Tag = DBBrowseCommandsEnum.FileExportObjects }
+						new ToolStripMenuItem("Результаты запроса...", null, MenuClick){ Name = "FileExportResults", Tag = DBBrowseCommandsEnum.FileExportResults },
+						new ToolStripMenuItem("В текстовый файл с разделителем...", null, MenuClick){ Name = "FileExportText", Tag = DBBrowseCommandsEnum.FileExportText },
+						new ToolStripMenuItem("Объектов в файл...", null, MenuClick){ Name = "FileExportObjects", Tag = DBBrowseCommandsEnum.FileExportObjects }
 					});
 
 					(((ToolStripMenuItem)mnuBar.Items["File"]).DropDownItems["FileImport"] as ToolStripMenuItem).DropDownItems.AddRange(new ToolStripItem[] {
-						new ToolStripMenuItem("Объектов из файла...", null, mnuClick){ Name = "FileImportObjects", Tag = DBBrowseCommandsEnum.FileImportObjects }
+						new ToolStripMenuItem("Объектов из файла...", null, MenuClick){ Name = "FileImportObjects", Tag = DBBrowseCommandsEnum.FileImportObjects }
 					});
 
 					((ToolStripMenuItem)mnuBar.Items["Edit"]).DropDownItems.AddRange(new ToolStripItem[] {
-						new ToolStripMenuItem("Добавить...", ResourceManager.GetImage("New"), mnuClick, Keys.Insert) { Name = "EditNew", Tag = DBBrowseCommandsEnum.EditNew },
-						new ToolStripMenuItem("Изменить...", ResourceManager.GetImage("Edit"), mnuClick, Keys.F4) { Name = "EditEdit", Tag = DBBrowseCommandsEnum.EditEdit },
-						new ToolStripMenuItem("Удалить", ResourceManager.GetImage("Delete"), mnuClick, Keys.Delete) { Name = "EditDelete", Tag = DBBrowseCommandsEnum.EditDelete },
+						new ToolStripMenuItem("Добавить...", ResourceManager.GetImage("New"), MenuClick, Keys.Insert) { Name = "EditNew", Tag = DBBrowseCommandsEnum.EditNew },
+						new ToolStripMenuItem("Изменить...", ResourceManager.GetImage("Edit"), MenuClick, Keys.F4) { Name = "EditEdit", Tag = DBBrowseCommandsEnum.EditEdit },
+						new ToolStripMenuItem("Удалить", ResourceManager.GetImage("Delete"), MenuClick, Keys.Delete) { Name = "EditDelete", Tag = DBBrowseCommandsEnum.EditDelete },
 						new ToolStripSeparator() { Name = "EditSep1" },
-						new ToolStripMenuItem("Вырезать", ResourceManager.GetImage("Cut"), mnuClick, Keys.Shift | Keys.Delete) { Name = "EditCut", Tag = DBBrowseCommandsEnum.EditCut },
-						new ToolStripMenuItem("Копировать", ResourceManager.GetImage("Copy"), mnuClick, Keys.Control | Keys.Insert) { Name = "EditCopy", Tag = DBBrowseCommandsEnum.EditCopy },
-						new ToolStripMenuItem("Вставить", ResourceManager.GetImage("Paste"), mnuClick, Keys.Shift | Keys.Insert) { Name = "EditPaste", Tag = DBBrowseCommandsEnum.EditPaste },
-						new ToolStripMenuItem("Сохранить как шаблон...", null, mnuClick, Keys.Control | Keys.T) { Name = "EditCopy2Template", Tag = DBBrowseCommandsEnum.EditCopy2Template },
-						new ToolStripMenuItem("Добавить из шаблона...", null, mnuClick, Keys.Control | Keys.V) { Name = "EditPasteFromTemplate", Tag = DBBrowseCommandsEnum.EditPasteFromTemplate },
-						new ToolStripMenuItem("Копировать ячейку", ResourceManager.GetImage("Textbox"), mnuClick, Keys.Control | Keys.C) { Name = "EditCopyCell", Tag = DBBrowseCommandsEnum.EditCopyCell },
+						new ToolStripMenuItem("Вырезать", ResourceManager.GetImage("Cut"), MenuClick, Keys.Shift | Keys.Delete) { Name = "EditCut", Tag = DBBrowseCommandsEnum.EditCut },
+						new ToolStripMenuItem("Копировать", ResourceManager.GetImage("Copy"), MenuClick, Keys.Control | Keys.Insert) { Name = "EditCopy", Tag = DBBrowseCommandsEnum.EditCopy },
+						new ToolStripMenuItem("Вставить", ResourceManager.GetImage("Paste"), MenuClick, Keys.Shift | Keys.Insert) { Name = "EditPaste", Tag = DBBrowseCommandsEnum.EditPaste },
+						new ToolStripMenuItem("Сохранить как шаблон...", null, MenuClick, Keys.Control | Keys.T) { Name = "EditCopy2Template", Tag = DBBrowseCommandsEnum.EditCopy2Template },
+						new ToolStripMenuItem("Добавить из шаблона...", null, MenuClick, Keys.Control | Keys.V) { Name = "EditPasteFromTemplate", Tag = DBBrowseCommandsEnum.EditPasteFromTemplate },
+						new ToolStripMenuItem("Копировать ячейку", ResourceManager.GetImage("Textbox"), MenuClick, Keys.Control | Keys.C) { Name = "EditCopyCell", Tag = DBBrowseCommandsEnum.EditCopyCell },
 						new ToolStripSeparator() { Name = "EditSep2" },
-						new ToolStripMenuItem("Поиск...", ResourceManager.GetImage("Find"), mnuClick, Keys.Control | Keys.F) { Name = "EditFind", Tag = DBBrowseCommandsEnum.EditFind },
-						new ToolStripMenuItem("Поиск далее", null, mnuClick, Keys.F3) { Name = "EditFindNext", Tag = DBBrowseCommandsEnum.EditFindNext },
-						new ToolStripMenuItem("Поиск и замена...", null, mnuClick, Keys.Control | Keys.H) { Name = "EditFindReplace", Tag = DBBrowseCommandsEnum.EditFindReplace },
-						new ToolStripMenuItem("Фильтр...", ResourceManager.GetImage("Filter"), mnuClick) { Name = "EditFilter", Tag = DBBrowseCommandsEnum.EditFilter },
-						new ToolStripMenuItem("Запрос...", null, mnuClick, Keys.Control | Keys.F2) { Name = "EditQuery", Tag = DBBrowseCommandsEnum.EditQuery },
-						new ToolStripMenuItem("Обновить форму", ResourceManager.GetImage("Refresh"), mnuClick, Keys.F5) { Name = "EditRefresh", Tag = DBBrowseCommandsEnum.EditRefresh },
+						new ToolStripMenuItem("Поиск...", ResourceManager.GetImage("Find"), MenuClick, Keys.Control | Keys.F) { Name = "EditFind", Tag = DBBrowseCommandsEnum.EditFind },
+						new ToolStripMenuItem("Поиск далее", null, MenuClick, Keys.F3) { Name = "EditFindNext", Tag = DBBrowseCommandsEnum.EditFindNext },
+						new ToolStripMenuItem("Поиск и замена...", null, MenuClick, Keys.Control | Keys.H) { Name = "EditFindReplace", Tag = DBBrowseCommandsEnum.EditFindReplace },
+						new ToolStripMenuItem("Фильтр...", ResourceManager.GetImage("Filter"), MenuClick) { Name = "EditFilter", Tag = DBBrowseCommandsEnum.EditFilter },
+						new ToolStripMenuItem("Запрос...", null, MenuClick, Keys.Control | Keys.F2) { Name = "EditQuery", Tag = DBBrowseCommandsEnum.EditQuery },
+						new ToolStripMenuItem("Обновить форму", ResourceManager.GetImage("Refresh"), MenuClick, Keys.F5) { Name = "EditRefresh", Tag = DBBrowseCommandsEnum.EditRefresh },
 						new ToolStripSeparator() { Name = "EditSep3" },
-						new ToolStripMenuItem("Выделить все", null, mnuClick, Keys.Control | Keys.A) { Name = "EditSelectAll", Tag = DBBrowseCommandsEnum.EditSelectAll },
-						new ToolStripMenuItem("Выбрать помеченные", null, mnuClick, Keys.Control | Keys.Z) { Name = "EditDoSelected", Tag = DBBrowseCommandsEnum.EditDoSelected },
+						new ToolStripMenuItem("Выделить все", null, MenuClick, Keys.Control | Keys.A) { Name = "EditSelectAll", Tag = DBBrowseCommandsEnum.EditSelectAll },
+						new ToolStripMenuItem("Выбрать помеченные", null, MenuClick, Keys.Control | Keys.Z) { Name = "EditDoSelected", Tag = DBBrowseCommandsEnum.EditDoSelected },
 						new ToolStripSeparator() { Name = "EditSep4" },
-						new ToolStripMenuItem("Статистика...", null, mnuClick, Keys.Control | Keys.S) { Name = "EditStat", Tag = DBBrowseCommandsEnum.EditStat }
+						new ToolStripMenuItem("Статистика...", null, MenuClick, Keys.Control | Keys.S) { Name = "EditStat", Tag = DBBrowseCommandsEnum.EditStat }
 					});
 
 					((ToolStripMenuItem)mnuBar.Items["Tools"]).DropDownItems.AddRange(new ToolStripItem[] {
-						new ToolStripMenuItem("Курсы валют...", ResourceManager.GetImage("Rate"), mnuClick) { Name = "ToolsRates", Tag = DBBrowseCommandsEnum.ToolsRates },
-						new ToolStripMenuItem("Загрузка курсов валют из интернет...", null, mnuClick) { Name = "ToolsLoadRates", Tag = DBBrowseCommandsEnum.ToolsLoadRates },
+						new ToolStripMenuItem("Курсы валют...", ResourceManager.GetImage("Rate"), MenuClick) { Name = "ToolsRates", Tag = DBBrowseCommandsEnum.ToolsRates },
+						new ToolStripMenuItem("Загрузка курсов валют из интернет...", null, MenuClick) { Name = "ToolsLoadRates", Tag = DBBrowseCommandsEnum.ToolsLoadRates },
 						new ToolStripSeparator() { Name = "ToolsSep1" },
 						//new ToolStripMenuItem("Выполнить процедуру...", null, mnuClick, Keys.F9) { Name = "ToolsRunFromAll", Tag = DBBrowseCommandsEnum.ToolsRunFromAll,Visible = false },
-						new ToolStripMenuItem("Выполнить процедуру из списка...", ResourceManager.GetImage("Eval"), mnuClick, Keys.Shift | Keys.F9) { Name = "ToolsRunFromAll", Tag = DBBrowseCommandsEnum.ToolsRunFromAll },
+						new ToolStripMenuItem("Выполнить процедуру из списка...", ResourceManager.GetImage("Eval"), MenuClick, Keys.Shift | Keys.F9) { Name = "ToolsRunFromAll", Tag = DBBrowseCommandsEnum.ToolsRunFromAll },
 						new ToolStripSeparator() { Name = "ToolsSep2" },
-						new ToolStripMenuItem("Загрузка обновлений программы...", null, mnuClick) { Name = "ToolsLoadRates", Tag = DBBrowseCommandsEnum.ToolsUpdate },
+						new ToolStripMenuItem("Загрузка обновлений программы...", null, MenuClick) { Name = "ToolsLoadRates", Tag = DBBrowseCommandsEnum.ToolsUpdate },
 						//new ToolStripMenuItem("Системный каталог") { Name = "ToolsSysCat" },
 						new ToolStripMenuItem("Установки") { Name = "ToolsSettings" },
 						new ToolStripSeparator() { Name = "ToolsSep3" },
-						new ToolStripMenuItem("Файлы...", ResourceManager.GetImage("Attach"), mnuClick, Keys.F11) { Name = "ToolsFile", Tag = DBBrowseCommandsEnum.ToolsFile },
+						new ToolStripMenuItem("Файлы...", ResourceManager.GetImage("Attach"), MenuClick, Keys.F11) { Name = "ToolsFile", Tag = DBBrowseCommandsEnum.ToolsFile },
 						new ToolStripSeparator() { Name = "ToolsSep4" },
 						new ToolStripMenuItem("Отчеты") { Name = "ToolsReport" }
 					}); ;
 
 					(((ToolStripMenuItem)mnuBar.Items["Tools"]).DropDownItems["ToolsReport"] as ToolStripMenuItem).DropDownItems.AddRange(new ToolStripItem[] {
-						new ToolStripMenuItem("Редактор отчетов...", null, mnuClick, Keys.Control | Keys.R) { Name = "ToolsReportDesigner", Tag = DBBrowseCommandsEnum.ToolsReportDesigner },
-						new ToolStripMenuItem("Создать отчет из текущей формы...", null, mnuClick) { Name = "ToolsReportCurrentForm", Tag = DBBrowseCommandsEnum.ToolsReportCurrentForm }
+						new ToolStripMenuItem("Редактор отчетов...", null, MenuClick, Keys.Control | Keys.R) { Name = "ToolsReportDesigner", Tag = DBBrowseCommandsEnum.ToolsReportDesigner },
+						new ToolStripMenuItem("Создать отчет из текущей формы...", null, MenuClick) { Name = "ToolsReportCurrentForm", Tag = DBBrowseCommandsEnum.ToolsReportCurrentForm }
 					});
 					(((ToolStripMenuItem)mnuBar.Items["Tools"]).DropDownItems["ToolsSettings"] as ToolStripMenuItem).DropDownItems.AddRange(new ToolStripItem[] {
-						new ToolStripMenuItem("Типы установок", null, mnuClick, Keys.Control | Keys.U){ Name = "ToolsSettingsGlobal", Tag = DBBrowseCommandsEnum.ToolsSettingsGlobal },
-						new ToolStripMenuItem("Установки пользователя", null, mnuClick){ Name = "ToolsSettingsLocal", Tag = DBBrowseCommandsEnum.ToolsSettingsLocal }
+						new ToolStripMenuItem("Типы установок", null, MenuClick, Keys.Control | Keys.U){ Name = "ToolsSettingsGlobal", Tag = DBBrowseCommandsEnum.ToolsSettingsGlobal },
+						new ToolStripMenuItem("Установки пользователя", null, MenuClick){ Name = "ToolsSettingsLocal", Tag = DBBrowseCommandsEnum.ToolsSettingsLocal }
 					});
 
 					((ToolStripMenuItem)mnuBar.Items["Help"]).DropDownItems.AddRange(new ToolStripItem[] {
-						new ToolStripMenuItem("О программе...", ResourceManager.GetImage("Help"), mnuClick) { Name = "HelpAbout", Tag = DBBrowseCommandsEnum.HelpAbout },
+						new ToolStripMenuItem("О программе...", ResourceManager.GetImage("Help"), MenuClick) { Name = "HelpAbout", Tag = DBBrowseCommandsEnum.HelpAbout },
 					});
 					showFavorites();
 				}
@@ -163,38 +163,38 @@ namespace MetApp
 					var tbTools = (c as ToolStrip);
 					tbTools.Dock = DockStyle.Top;
 					tbTools.Items.AddRange(new ToolStripItem[]{
-						new ToolStripButton("Открыть",ResourceManager.GetImage("Open"), mnuClick, "Open")
+						new ToolStripButton("Открыть",ResourceManager.GetImage("Open"), MenuClick, "Open")
 						{ DisplayStyle = ToolStripItemDisplayStyle.Image, ImageTransparentColor = System.Drawing.Color.Magenta, Tag = DBBrowseCommandsEnum.FileOpen },
-						new ToolStripButton("Открыть связанную форму",ResourceManager.GetImage("OpenRelated"), mnuClick, "OpenRelated")
+						new ToolStripButton("Открыть связанную форму",ResourceManager.GetImage("OpenRelated"), MenuClick, "OpenRelated")
 						{ DisplayStyle = ToolStripItemDisplayStyle.Image, ImageTransparentColor = System.Drawing.Color.Magenta, Tag = DBBrowseCommandsEnum.FileOpenRelated },
 						new ToolStripSeparator() { Name = "Sep1" },
-						new ToolStripButton("Печать отчетов",ResourceManager.GetImage("Print"), mnuClick, "Print")
+						new ToolStripButton("Печать отчетов",ResourceManager.GetImage("Print"), MenuClick, "Print")
 						{ DisplayStyle = ToolStripItemDisplayStyle.Image, ImageTransparentColor = System.Drawing.Color.Magenta, Tag = DBBrowseCommandsEnum.FilePrint },
 						new ToolStripSeparator() { Name = "Sep2" },
-						new ToolStripButton("Создать запись",ResourceManager.GetImage("New"), mnuClick, "New")
+						new ToolStripButton("Создать запись",ResourceManager.GetImage("New"), MenuClick, "New")
 						{ DisplayStyle = ToolStripItemDisplayStyle.Image, ImageTransparentColor = System.Drawing.Color.Magenta, Tag = DBBrowseCommandsEnum.EditNew },
-						new ToolStripButton("Изменить запись",ResourceManager.GetImage("Edit"), mnuClick, "Edit")
+						new ToolStripButton("Изменить запись",ResourceManager.GetImage("Edit"), MenuClick, "Edit")
 						{ DisplayStyle = ToolStripItemDisplayStyle.Image, ImageTransparentColor = System.Drawing.Color.Magenta, Tag = DBBrowseCommandsEnum.EditEdit },
-						new ToolStripButton("Удалить запись",ResourceManager.GetImage("Delete"), mnuClick, "Delete")
+						new ToolStripButton("Удалить запись",ResourceManager.GetImage("Delete"), MenuClick, "Delete")
 						{ DisplayStyle = ToolStripItemDisplayStyle.Image, ImageTransparentColor = System.Drawing.Color.Magenta, Tag = DBBrowseCommandsEnum.EditDelete },
 						new ToolStripSeparator() { Name = "Sep3" },
-						new ToolStripButton("Вырезать",ResourceManager.GetImage("Cut"), mnuClick, "Cut")
+						new ToolStripButton("Вырезать",ResourceManager.GetImage("Cut"), MenuClick, "Cut")
 						{ DisplayStyle = ToolStripItemDisplayStyle.Image, ImageTransparentColor = System.Drawing.Color.Magenta, Tag = DBBrowseCommandsEnum.EditCut },
-						new ToolStripButton("Копировать",ResourceManager.GetImage("Copy"), mnuClick, "Copy")
+						new ToolStripButton("Копировать",ResourceManager.GetImage("Copy"), MenuClick, "Copy")
 						{ DisplayStyle = ToolStripItemDisplayStyle.Image, ImageTransparentColor = System.Drawing.Color.Magenta, Tag = DBBrowseCommandsEnum.EditCopy },
-						new ToolStripButton("Вставить",ResourceManager.GetImage("Paste"), mnuClick, "Paste")
+						new ToolStripButton("Вставить",ResourceManager.GetImage("Paste"), MenuClick, "Paste")
 						{ DisplayStyle = ToolStripItemDisplayStyle.Image, ImageTransparentColor = System.Drawing.Color.Magenta, Tag = DBBrowseCommandsEnum.EditPaste },
 						new ToolStripSeparator() { Name = "Sep4" },
-						new ToolStripButton("Найти",ResourceManager.GetImage("Find"), mnuClick, "Find")
+						new ToolStripButton("Найти",ResourceManager.GetImage("Find"), MenuClick, "Find")
 						{ DisplayStyle = ToolStripItemDisplayStyle.Image, ImageTransparentColor = System.Drawing.Color.Magenta, Tag = DBBrowseCommandsEnum.EditFind },
-						new ToolStripButton("Фильтр",ResourceManager.GetImage("Filter"), mnuClick, "Filter")
+						new ToolStripButton("Фильтр",ResourceManager.GetImage("Filter"), MenuClick, "Filter")
 						{ DisplayStyle = ToolStripItemDisplayStyle.Image, ImageTransparentColor = System.Drawing.Color.Magenta, Tag = DBBrowseCommandsEnum.EditFilter},
-						new ToolStripButton("Обновить форму",ResourceManager.GetImage("Refresh"), mnuClick, "Refresh")
+						new ToolStripButton("Обновить форму",ResourceManager.GetImage("Refresh"), MenuClick, "Refresh")
 						{ DisplayStyle = ToolStripItemDisplayStyle.Image, ImageTransparentColor = System.Drawing.Color.Magenta, Tag = DBBrowseCommandsEnum.EditRefresh},
 						new ToolStripSeparator() { Name = "Sep5" },
-						new ToolStripDropDownButton("Выполнить команду",ResourceManager.GetImage("Run"), mnuClick, "Run")
+						new ToolStripDropDownButton("Выполнить команду",ResourceManager.GetImage("Run"), MenuClick, "Run")
 						{ DisplayStyle = ToolStripItemDisplayStyle.Image, ImageTransparentColor = System.Drawing.Color.Magenta, Tag = DBBrowseCommandsEnum.ToolsRun},
-						new ToolStripButton("Прикрепить файл",ResourceManager.GetImage("Attach"), mnuClick, "Attach")
+						new ToolStripButton("Прикрепить файл",ResourceManager.GetImage("Attach"), MenuClick, "Attach")
 						{ DisplayStyle = ToolStripItemDisplayStyle.Image, ImageTransparentColor = System.Drawing.Color.Magenta, Tag = DBBrowseCommandsEnum.ToolsFile},
 						new ToolStripSeparator() { Name = "Sep6" },
 					});
@@ -223,8 +223,10 @@ namespace MetApp
 							_grid.Focus();
 					});
 
-					ToolStripLabel lbl = new ToolStripLabel(ResourceManager.GetImage("FastFind"));
-					lbl.ToolTipText = "Быстрый поиск";
+					ToolStripLabel lbl = new ToolStripLabel(ResourceManager.GetImage("FastFind"))
+					{
+						ToolTipText = "Быстрый поиск"
+					};
 					tbTools.Items.Add(lbl);
 					ToolStripTextBox txtFind = new ToolStripTextBox("txtFind");
 					txtFind.Size = new Size((int)(tbTools.Font.SizeInPoints* 20), txtFind.Height);
@@ -237,30 +239,30 @@ namespace MetApp
 		{
 			var mnuContext = new ContextMenuStrip();
 			mnuContext.Items.AddRange(new ToolStripItem[]{
-				new ToolStripMenuItem("Добавить...", ResourceManager.GetImage("New"), mnuClick, Keys.Insert) { Name = "EditNew", Tag = DBBrowseCommandsEnum.EditNew },
-				new ToolStripMenuItem("Изменить...", ResourceManager.GetImage("Edit"), mnuClick, Keys.F4) { Name = "EditEdit", Tag = DBBrowseCommandsEnum.EditEdit },
-				new ToolStripMenuItem("Удалить", ResourceManager.GetImage("Delete"), mnuClick, Keys.Delete) { Name = "EditDelete", Tag = DBBrowseCommandsEnum.EditDelete },
+				new ToolStripMenuItem("Добавить...", ResourceManager.GetImage("New"), MenuClick, Keys.Insert) { Name = "EditNew", Tag = DBBrowseCommandsEnum.EditNew },
+				new ToolStripMenuItem("Изменить...", ResourceManager.GetImage("Edit"), MenuClick, Keys.F4) { Name = "EditEdit", Tag = DBBrowseCommandsEnum.EditEdit },
+				new ToolStripMenuItem("Удалить", ResourceManager.GetImage("Delete"), MenuClick, Keys.Delete) { Name = "EditDelete", Tag = DBBrowseCommandsEnum.EditDelete },
 				new ToolStripMenuItem("Выполнить") { Name = "EditRun" },
 				new ToolStripSeparator() { Name = "Sep1" },
-				new ToolStripMenuItem("Вырезать", ResourceManager.GetImage("Cut"), mnuClick, Keys.Shift | Keys.Delete) { Name = "EditCut", Tag = DBBrowseCommandsEnum.EditCut },
-				new ToolStripMenuItem("Копировать", ResourceManager.GetImage("Copy"), mnuClick, Keys.Control | Keys.Insert) { Name = "EditCopy", Tag = DBBrowseCommandsEnum.EditCopy },
-				new ToolStripMenuItem("Вставить", ResourceManager.GetImage("Paste"), mnuClick, Keys.Shift | Keys.Insert) { Name = "EditPaste", Tag = DBBrowseCommandsEnum.EditPaste },
+				new ToolStripMenuItem("Вырезать", ResourceManager.GetImage("Cut"), MenuClick, Keys.Shift | Keys.Delete) { Name = "EditCut", Tag = DBBrowseCommandsEnum.EditCut },
+				new ToolStripMenuItem("Копировать", ResourceManager.GetImage("Copy"), MenuClick, Keys.Control | Keys.Insert) { Name = "EditCopy", Tag = DBBrowseCommandsEnum.EditCopy },
+				new ToolStripMenuItem("Вставить", ResourceManager.GetImage("Paste"), MenuClick, Keys.Shift | Keys.Insert) { Name = "EditPaste", Tag = DBBrowseCommandsEnum.EditPaste },
 				new ToolStripMenuItem("Шаблон") { Name = "EditTemplate" },
-				new ToolStripMenuItem("Копировать ячейку", ResourceManager.GetImage("Textbox"), mnuClick, Keys.Control | Keys.C) { Name = "EditCopyCell", Tag = DBBrowseCommandsEnum.EditCopyCell },
+				new ToolStripMenuItem("Копировать ячейку", ResourceManager.GetImage("Textbox"), MenuClick, Keys.Control | Keys.C) { Name = "EditCopyCell", Tag = DBBrowseCommandsEnum.EditCopyCell },
 				new ToolStripSeparator() { Name = "Sep2" },
-				new ToolStripMenuItem("Поиск...", ResourceManager.GetImage("Find"), mnuClick, Keys.Control | Keys.F) { Name = "EditFind", Tag = DBBrowseCommandsEnum.EditFind },
-				new ToolStripMenuItem("Поиск и замена...", null, mnuClick, Keys.Control | Keys.H) { Name = "EditFindReplace", Tag = DBBrowseCommandsEnum.EditFindReplace },
-				new ToolStripMenuItem("Фильтр...", ResourceManager.GetImage("Filter"), mnuClick) { Name = "EditFilter", Tag = DBBrowseCommandsEnum.EditFilter },
-				new ToolStripMenuItem("Запрос...", null, mnuClick, Keys.Control | Keys.F2) { Name = "EditQuery", Tag = DBBrowseCommandsEnum.EditQuery },
+				new ToolStripMenuItem("Поиск...", ResourceManager.GetImage("Find"), MenuClick, Keys.Control | Keys.F) { Name = "EditFind", Tag = DBBrowseCommandsEnum.EditFind },
+				new ToolStripMenuItem("Поиск и замена...", null, MenuClick, Keys.Control | Keys.H) { Name = "EditFindReplace", Tag = DBBrowseCommandsEnum.EditFindReplace },
+				new ToolStripMenuItem("Фильтр...", ResourceManager.GetImage("Filter"), MenuClick) { Name = "EditFilter", Tag = DBBrowseCommandsEnum.EditFilter },
+				new ToolStripMenuItem("Запрос...", null, MenuClick, Keys.Control | Keys.F2) { Name = "EditQuery", Tag = DBBrowseCommandsEnum.EditQuery },
 				new ToolStripSeparator() { Name = "Sep3" },
-				new ToolStripMenuItem("Выделить все", null, mnuClick, Keys.Control | Keys.A) { Name = "EditSelectAll", Tag = DBBrowseCommandsEnum.EditSelectAll },
-				new ToolStripMenuItem("Выбрать помеченные", null, mnuClick, Keys.Control | Keys.Z) { Name = "EditDoSelected", Tag = DBBrowseCommandsEnum.EditDoSelected },
+				new ToolStripMenuItem("Выделить все", null, MenuClick, Keys.Control | Keys.A) { Name = "EditSelectAll", Tag = DBBrowseCommandsEnum.EditSelectAll },
+				new ToolStripMenuItem("Выбрать помеченные", null, MenuClick, Keys.Control | Keys.Z) { Name = "EditDoSelected", Tag = DBBrowseCommandsEnum.EditDoSelected },
 				new ToolStripSeparator() { Name = "Sep4" },
-				new ToolStripMenuItem("Статистика...", null, mnuClick, Keys.Control | Keys.S) { Name = "EditStat", Tag = DBBrowseCommandsEnum.EditStat },
+				new ToolStripMenuItem("Статистика...", null, MenuClick, Keys.Control | Keys.S) { Name = "EditStat", Tag = DBBrowseCommandsEnum.EditStat },
 			});
 			((ToolStripMenuItem)mnuContext.Items["EditTemplate"]).DropDownItems.AddRange(new ToolStripItem[] {
-				new ToolStripMenuItem("Сохранить как шаблон...", null, mnuClick, Keys.Control | Keys.T) { Name = "EditCopy2Template", Tag = DBBrowseCommandsEnum.EditCopy2Template },
-				new ToolStripMenuItem("Добавить из шаблона...", null, mnuClick, Keys.Control | Keys.V) { Name = "EditPasteFromTemplate", Tag = DBBrowseCommandsEnum.EditPasteFromTemplate },
+				new ToolStripMenuItem("Сохранить как шаблон...", null, MenuClick, Keys.Control | Keys.T) { Name = "EditCopy2Template", Tag = DBBrowseCommandsEnum.EditCopy2Template },
+				new ToolStripMenuItem("Добавить из шаблона...", null, MenuClick, Keys.Control | Keys.V) { Name = "EditPasteFromTemplate", Tag = DBBrowseCommandsEnum.EditPasteFromTemplate },
 			});
 
 			((ToolStripMenuItem)mnuContext.Items["EditRun"]).DropDownItems.AddRange(new ToolStripItem[] {
@@ -269,7 +271,7 @@ namespace MetApp
 			_grid.ContextMenuStrip = mnuContext;
 		}
 
-		void mnuClick(object sender, EventArgs e)
+		void MenuClick(object sender, EventArgs e)
 		{
 			ToolStripItem mi = (sender as ToolStripItem);
 			if (mi != null && mi.Tag is DBBrowseCommandsEnum)
@@ -279,8 +281,7 @@ namespace MetApp
 					cmdID = (DBBrowseCommandsEnum)Enum.Parse(typeof(DBBrowseCommandsEnum), (string)mi.Tag);
 				else
 					cmdID = (DBBrowseCommandsEnum)mi.Tag;
-				if (_commands[cmdID] != null)
-					_commands[cmdID]();
+				_commands[cmdID]?.Invoke();
 			}
 		}
 	}
