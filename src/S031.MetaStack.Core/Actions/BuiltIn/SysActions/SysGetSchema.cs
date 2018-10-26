@@ -22,11 +22,10 @@ namespace S031.MetaStack.Core.Actions
 			using (MdbContext mdb = new MdbContext(_connectInfo))
 			using (JMXFactory f = JMXFactory.Create(mdb, ApplicationContext.GetLogger()))
 			{
-				var dr = ai.GetOutputParamTable();
-				dr.AddNew();
-				dr["ObjectSchema"] = (f.CreateJMXRepo().GetSchema(_objectName)).ToString();
-				dr.Update();
-				return dr;
+				return ai.GetOutputParamTable()
+					.AddNew()
+					.SetValue("ObjectSchema", (f.CreateJMXRepo().GetSchema(_objectName)).ToString())
+					.Update();
 			}
 		}
 
@@ -36,11 +35,10 @@ namespace S031.MetaStack.Core.Actions
 			using (MdbContext mdb = await MdbContext.CreateMdbContextAsync(_connectInfo))
 			using (JMXFactory f = JMXFactory.Create(mdb, ApplicationContext.GetLogger()))
 			{
-				var dr = ai.GetOutputParamTable();
-				dr.AddNew();
-				dr["ObjectSchema"] = (await f.CreateJMXRepo().GetSchemaAsync(_objectName)).ToString();
-				dr.Update();
-				return dr;
+				return ai.GetOutputParamTable()
+					.AddNew()
+					.SetValue("ObjectSchema", (f.CreateJMXRepo().GetSchema(_objectName)).ToString())
+					.Update();
 			}
 		}
 

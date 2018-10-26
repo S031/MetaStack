@@ -7,7 +7,8 @@ namespace S031.MetaStack.WinForms.ORM
 		public override JMXSchema GetSchema(string objectName)
 		{
 			var r = ClientGate.Execute("Sys.GetSchema",
-				new DataPackage(new string[] { "ObjectName" },
+				new DataPackage(
+					new string[] { "ObjectName" },
 					new object[] { objectName }));
 			r.GoDataTop();
 			if (r.Read())

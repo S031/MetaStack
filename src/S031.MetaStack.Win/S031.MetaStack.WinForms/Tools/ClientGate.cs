@@ -10,13 +10,19 @@ using S031.MetaStack.Common;
 using System.Windows.Forms;
 using System.Configuration;
 using S031.MetaStack.WinForms.Data;
+using S031.MetaStack.WinForms.Actions;
 
 namespace S031.MetaStack.WinForms
 {
 	internal static class ClientGate
 	{
+		private static readonly object obj4Lock = new object();
+
 		private static readonly string _appName = 
 			System.Diagnostics.Process.GetCurrentProcess().ProcessName;
+
+		private static readonly Dictionary<string, ActionInfo> _actionss =
+			new Dictionary<string, ActionInfo>();
 
 		private static TCPConnector _connector;
 
@@ -63,6 +69,24 @@ namespace S031.MetaStack.WinForms
 		{
 			Logon();
 			return _connector.Execute(actionID, paramTable);
+		}
+
+		public static ActionInfo GetActionInfo(string actionID)
+		{
+			if (!_actionss.TryGetValue(actionID, out ActionInfo ai))
+			{
+				var dr = Execute("SysGetActionInfo",
+					new DataPackage(new string[] { "ActionID" }, new object[] { actionID }));
+				if (dr.Read())
+					ai = ActionInfo.Create((string)dr["ActionInfo"]);
+				else
+					ai = null;
+
+				lock (obj4Lock)
+					if (!_actionss.ContainsKey(actionID))
+						_actionss.Add(actionID, ai);
+			}
+			return _actionss[actionID];
 		}
 
 		private static string SecureRequest(string userName)

@@ -9,8 +9,8 @@ namespace S031.MetaStack.Core.Actions
 	{
 		public static Dictionary<string, ActionInfo> CreateActionsList()
 		{
-			#region Sys.LoginRequest
 			Dictionary<string, ActionInfo> actions = new Dictionary<string, ActionInfo>();
+			#region Sys.LoginRequest
 			ActionInfo ai = new ActionInfo()
 			{
 				ActionID = "Sys.LoginRequest",
@@ -347,7 +347,7 @@ namespace S031.MetaStack.Core.Actions
 			#region Sys.GetActionInfo
 			ai = new ActionInfo()
 			{
-				ActionID = "Sys.GetSchema",
+				ActionID = "Sys.GetActionInfo",
 				AssemblyID = typeof(ActionsList).Assembly.GetWorkName(),
 				AsyncMode = true,
 				AuthenticationRequired = true,

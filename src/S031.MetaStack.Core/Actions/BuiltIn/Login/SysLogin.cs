@@ -17,11 +17,10 @@ namespace S031.MetaStack.Core.Actions
 				.GetService<ILoginFactory>()
 				.LoginRequest(userName, publicKey);
 
-			var result = ai.GetOutputParamTable();
-			result.AddNew();
-			result["LoginInfo"] = key;
-			result.Update();
-			return result;
+			return ai.GetOutputParamTable()
+				.AddNew()
+				.SetValue("LoginInfo", key)
+				.Update();
 		}
 
 		public Task<DataPackage> InvokeAsync(ActionInfo ai, DataPackage dp)
@@ -41,11 +40,10 @@ namespace S031.MetaStack.Core.Actions
 				.GetService<ILoginFactory>()
 				.Logon(userName, sessionID, encryptedKey);
 
-			var result = ai.GetOutputParamTable();
-			result.AddNew();
-			result["Ticket"] = key;
-			result.Update();
-			return result;
+			return ai.GetOutputParamTable()
+				.AddNew()
+				.SetValue("Ticket", key)
+				.Update();
 		}
 
 		public Task<DataPackage> InvokeAsync(ActionInfo ai, DataPackage dp)
@@ -64,7 +62,7 @@ namespace S031.MetaStack.Core.Actions
 				.GetServices()
 				.GetService<ILoginFactory>()
 				.Logout(userName, sessionID, encryptedKey);
-			return new DataPackage("Result", 0);
+			return DataPackage.CreateOKPackage();
 		}
 
 		public Task<DataPackage> InvokeAsync(ActionInfo ai, DataPackage dp)

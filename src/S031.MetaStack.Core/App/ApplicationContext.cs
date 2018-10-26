@@ -13,6 +13,7 @@ using S031.MetaStack.Common.Logging;
 using System.Data.Common;
 using System.Reflection;
 using System.Runtime.Loader;
+using S031.MetaStack.Common;
 
 namespace S031.MetaStack.Core.App
 {
@@ -91,11 +92,17 @@ namespace S031.MetaStack.Core.App
 		private static void ConfigureProvidersFromConfigFile()
 		{
 			//костыль
-			//return settings from configuration
-			//Assembly.Load("System.Data.SqlClient");
-			//LoadAssembly("S031.MetaStack.Core.ORM.MsSql");
-			LoadAssembly("S031.MetaStack.Core.ORM.SQLite");
-			Assembly.Load("System.Data.Sqlite");
+			//Remove from project references all plugins and configure publish plugins to project 
+			//output folder
+			//Load to publish folder all plugins whis depencies (after publish plugin progect)
+			var serviceList = _configuration.GetSection("Dependencies").GetChildren();
+			foreach (var section in serviceList)
+			{
+				if (section["AssemblyPath"].IsEmpty())
+					Assembly.Load(section["AssemblyName"]);
+				else
+					LoadAssembly(section["AssemblyPath"]);
+			}
 		}
 		private static void ConfigureDefaultsFromConfigFile()
 		{

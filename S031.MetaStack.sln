@@ -10,6 +10,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{2A64A983-514B-4211-BB8C-633FA61BD201}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "S031.MetaStack.AppServer", "src\S031.MetaStack.AppServer\S031.MetaStack.AppServer.csproj", "{B299485A-726F-44D1-BB71-145E51CAF8A3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D6D74663-59CC-464B-9611-349FB624E179} = {D6D74663-59CC-464B-9611-349FB624E179}
+		{DD3BA885-0423-467E-9631-F2B4155CB3A0} = {DD3BA885-0423-467E-9631-F2B4155CB3A0}
+		{45CCEE9D-289A-4817-9145-DF6BAEE8D362} = {45CCEE9D-289A-4817-9145-DF6BAEE8D362}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "S031.MetaStack.Common", "src\S031.MetaStack.Common\S031.MetaStack.Common.csproj", "{2C055DBA-EB00-4B7C-BDAB-457A3F3CF56D}"
 EndProject
@@ -21,7 +26,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "S031.MetaStack.Services", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "S031.MetaStack.Core.ORM.MsSql", "src\S031.MetaStack.Core.ORM.MsSql\S031.MetaStack.Core.ORM.MsSql.csproj", "{DD3BA885-0423-467E-9631-F2B4155CB3A0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S031.MetaStack.Core.ORM.SQLite", "src\S031.MetaStack.Core.ORM.SQLite\S031.MetaStack.Core.ORM.SQLite.csproj", "{45CCEE9D-289A-4817-9145-DF6BAEE8D362}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "S031.MetaStack.Core.ORM.SQLite", "src\S031.MetaStack.Core.ORM.SQLite\S031.MetaStack.Core.ORM.SQLite.csproj", "{45CCEE9D-289A-4817-9145-DF6BAEE8D362}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

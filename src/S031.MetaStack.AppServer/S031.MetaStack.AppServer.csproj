@@ -18,7 +18,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1" />
-    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.109.2" />
+    <PackageReference Include="System.Security.Permissions" Version="4.5.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,6 +26,13 @@
     <ProjectReference Include="..\S031.MetaStack.Core.ORM.MsSql\S031.MetaStack.Core.ORM.MsSql.csproj" />
     <ProjectReference Include="..\S031.MetaStack.Core.ORM.SQLite\S031.MetaStack.Core.ORM.SQLite.csproj" />
     <ProjectReference Include="..\S031.MetaStack.Core\S031.MetaStack.Core.csproj" />
+    <ProjectReference Include="..\S031.MetaStack.Services\S031.MetaStack.Services.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="AdoNetCore.AseClient">
+      <HintPath>..\..\..\AdoNetCore.AseClient\src\AdoNetCore.AseClient\bin\Release\netcoreapp2.1\AdoNetCore.AseClient.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

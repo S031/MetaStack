@@ -392,7 +392,7 @@ namespace S031.MetaStack.WinForms.Data
 		/// <summary>
 		/// Add new row or Updates the current row with a rewrite to end of array
 		/// </summary>
-		public void Update()
+		public DataPackage Update()
 		{
 			if (_rowPos != 0 && _rowPos >= _ms.Length)
 				//Добавление новой строки
@@ -411,6 +411,7 @@ namespace S031.MetaStack.WinForms.Data
 					_ms.SetLength(_ms.Position);
 				_ms.Seek(l, SeekOrigin.Begin);
 			}
+			return this;
 		}
 		/// <summary>
 		/// Using only if update existing row
@@ -455,7 +456,11 @@ namespace S031.MetaStack.WinForms.Data
 		/// <summary>
 		/// Seek and select first data row
 		/// </summary>
-		public void GoDataTop() => _ms.Seek(_dataPos, SeekOrigin.Begin);
+		public DataPackage GoDataTop()
+		{
+			_ms.Seek(_dataPos, SeekOrigin.Begin);
+			return this;
+		}
 		/// <summary>
 		/// Close and dispose the <see cref="DataPackage"/>
 		/// </summary>
@@ -464,6 +469,11 @@ namespace S031.MetaStack.WinForms.Data
 		/// Get <see cref="DataPackage "/> headers as Dictionary<string, object>
 		/// </summary>
 		public Dictionary<string, object> Headers => _headers; 
+		public DataPackage SetHeader(string key, object value)
+		{
+			_headers[key] = value;
+			return this;
+		}
 		/// <summary>
 		/// Commit changes maded in headers data
 		/// </summary>
@@ -581,10 +591,11 @@ namespace S031.MetaStack.WinForms.Data
 		/// <summary>
 		/// Add a new row to <see cref="DataPackage"/>
 		/// </summary>
-		public void AddNew()
+		public DataPackage AddNew()
 		{
 			_dataRow = new Dictionary<string, object>(_colCount, StringComparer.CurrentCultureIgnoreCase);
 			_rowPos = _ms.Length;
+			return this;
 		}
 		/// <summary>
 		/// <see cref="IDataReader.Read()"/> advance <see cref="DataPackage"/> to the next record
@@ -732,6 +743,11 @@ namespace S031.MetaStack.WinForms.Data
 			set { _dataRow[_indexes[i]] = value; }
 		}
 
+		public DataPackage SetValue(string name, object value)
+		{
+			_dataRow[name] = value;
+			return this;
+		}
 		static void WriteColumnInfo(BinaryWriter bw, ColumnInfo ci)
 		{
 			if (_dti.ContainsKey(ci.DataType))

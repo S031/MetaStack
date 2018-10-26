@@ -13,8 +13,7 @@ namespace S031.MetaStack.Core.Data
 			p.Headers["Status"] = "ERROR";
 			p.UpdateHeaders();
 			addException(p, e);
-			Exception inner = e;
-			for (inner = inner.InnerException; inner!= null; )
+			for (Exception inner = e.InnerException; inner!= null; inner = inner.InnerException)
 				addException(p, inner);
 			return p;
 		}
@@ -26,6 +25,15 @@ namespace S031.MetaStack.Core.Data
 			p["Source"] = e.Source;
 			p["StackTrace"] = e.StackTrace;
 			p.Update();
+		}
+		public static DataPackage CreateOKPackage(int result = 0, string message = "Operation status OK")
+		{
+			return new DataPackage(new string[] { "Result.Int", "Message.String.256" })
+				.SetHeader("Status", "OK")
+				.AddNew()
+				.SetValue("Result", result)
+				.SetValue("Message", message)
+				.Update();
 		}
 	}
 }

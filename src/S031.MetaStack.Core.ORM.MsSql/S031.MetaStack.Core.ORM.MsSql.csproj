@@ -66,4 +66,8 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy $(TargetPath) ..\S031.MetaStack.AppServer\$(OutDir) /d /y" />
+  </Target>
+
 </Project>

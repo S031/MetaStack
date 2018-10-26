@@ -2,7 +2,7 @@
   "appSettings": {
     "auditEnabled": true,
     "language": "ru-RU",
-    "defaultConnection": "SqliteDb"
+    "defaultConnection": "AseDb"
   },
   "ApplicationLogSettings": {
     /* Cache size before flushing to disk */
@@ -40,7 +40,12 @@
     "test": {
       "providerName": "System.Data.SqLClient",
       "connectionString": "Data Source=SERGEY-SQL2016;Initial Catalog=MetaStack;Integrated Security=True;"
+    },
+    "AseDb": {
+      "providerName": "AdoNetCore.AseClient",
+      "connectionString": "Data Source=canopus,5000;Initial Catalog=msfodb;User ID=LoaderF;Password=igbyltkm;Max Pool Size=200;charset='cp1251';LoginTimeout=10"
     }
+
   },
   "Connectors": {
     "TCPConnector": {
@@ -71,5 +76,27 @@
         }
       }
     ]
-  }
+  },
+  "Dependencies": [
+    {
+      "AssemblyName": "AdoNetCore.AseClient",
+      "AssemblyPath": "AdoNetCore.AseClient"
+    },
+    {
+      "AssemblyName": "S031.MetaStack.Core.ORM.SQLite",
+      "AssemblyPath": "S031.MetaStack.Core.ORM.SQLite"
+    },
+    {
+      "AssemblyName": "System.Data.Sqlite",
+      "AssemblyPath": ""
+    },
+    {
+      "AssemblyName": "S031.MetaStack.Core.ORM.MSSQL",
+      "AssemblyPath": "S031.MetaStack.Core.ORM.MSSQL"
+    },
+    {
+      "AssemblyName": "System.Data.SqlClient",
+      "AssemblyPath": ""
+    }
+  ]
 }
