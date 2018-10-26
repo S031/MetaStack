@@ -39,7 +39,7 @@ namespace S031.MetaStack.AppServer
 				.Build())
 			{
 				//await host.RunAsync(ApplicationContext.CancellationToken);
-				TestConnection();
+				//TestConnection();
 				await host.RunAsync();
 			}
 		}
@@ -51,15 +51,16 @@ namespace S031.MetaStack.AppServer
 			var cn = config.GetSection($"connectionStrings:{connectionName}").Get<ConnectInfo>();
 			var log = sp.GetService<ILogger>();
 			using (MdbContext mdb = new MdbContext(cn))
-			//using (JMXFactory f = JMXFactory.Create(mdb, log))
+			using (var dr = mdb.GetReader("select Top 1000 * from tuser"))
 			{
-				Console.WriteLine(
-					mdb.Execute<string>($"select top 1 convert(integer, ModuleId) as ModuleId from cashflow_nkn where moduleid = 45 and Date < '{DateTime.Now.ToString("yyyyMMdd")}'")
-				);
+				for (; dr.Read();)
+				{
+					Console.WriteLine($"{dr[0]}\t{dr[1]}\t{dr[2]}\t{dr[3]}");
+				}
 			}
 		}
 
-		//const string _connectionString = "Data Source=barium,5000;Initial Catalog=workdb;User ID=LoaderF;Password=igbyltkm;charset='cp1251'";
+		//const string _connectionString = 
 
 		//public static void TestConnection()
 		//{

@@ -2,7 +2,7 @@
   "appSettings": {
     "auditEnabled": true,
     "language": "ru-RU",
-    "defaultConnection": "AseDb"
+    "defaultConnection": "SqliteDb"
   },
   "ApplicationLogSettings": {
     /* Cache size before flushing to disk */
@@ -43,7 +43,8 @@
     },
     "AseDb": {
       "providerName": "AdoNetCore.AseClient",
-      "connectionString": "Data Source=canopus,5000;Initial Catalog=msfodb;User ID=LoaderF;Password=igbyltkm;Max Pool Size=200;charset='cp1251';LoginTimeout=10"
+      "connectionString": "Data Source=canopus,5000;Initial Catalog=msfodb;User ID=LoaderF;Password=;Max Pool Size=200;"
+      //"connectionString": "Data Source=barium,5000;Initial Catalog=workdb;User ID=LoaderF;Password=;"
     }
 
   },
