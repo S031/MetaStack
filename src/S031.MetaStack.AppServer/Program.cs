@@ -4,19 +4,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using S031.MetaStack.Core.App;
 using S031.MetaStack.Core.Data;
-using S031.MetaStack.Core.Logging;
-using S031.MetaStack.Core.ORM;
-using S031.MetaStack.Core.Security;
 using System;
-using System.Linq;
-using System.Data;
-using System.Data.Common;
-using System.Net;
-using System.Reflection;
-using System.Runtime.Loader;
-using System.Threading;
 using System.Threading.Tasks;
-using AdoNetCore.AseClient;
 
 namespace S031.MetaStack.AppServer
 {
@@ -59,34 +48,5 @@ namespace S031.MetaStack.AppServer
 				}
 			}
 		}
-
-		//const string _connectionString = 
-
-		//public static void TestConnection()
-		//{
-		//	//DbProviderFactory dbFactory = DbProviderFactories.GetFactory(c);
-		//	//DbProviderFactory dbFactory = DbProviderFactories.GetFactory("Sybase.Data.AseClient");
-		//	DbProviderFactory dbFactory = AseClientFactory.Instance;
-		//	using (DbConnection c = dbFactory.CreateConnection())
-		//	using (DbCommand comm = dbFactory.CreateCommand())
-		//	{
-		//		c.ConnectionString = _connectionString;
-		//		comm.Connection = c;
-		//		comm.CommandText = "select count(*) from tuser";
-		//		comm.CommandType = CommandType.Text;
-		//		c.Open();
-		//		for (int i = 0; i < 1; i++)
-		//		{
-		//			using (IDataReader dr = comm.ExecuteReader())
-		//			{
-		//				for (; dr.Read();)
-		//				{
-		//					int j = (int)dr[0];
-		//					//Console.WriteLine(dr[0]);
-		//				}
-		//			}
-		//		}
-		//	}
-		//}
 	}
 }

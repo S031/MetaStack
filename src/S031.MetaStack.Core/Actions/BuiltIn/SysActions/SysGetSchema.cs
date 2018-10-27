@@ -46,7 +46,7 @@ namespace S031.MetaStack.Core.Actions
 		{
 			var configuration = ApplicationContext.GetConfiguration();
 			if (!dp.Headers.TryGetValue("ConnectionName", out object connectionName))
-				connectionName = configuration["appSettings:defaultConnection"];
+				connectionName = configuration["appSettings:SysCatConnection"];
 			_connectInfo = configuration.GetSection($"connectionStrings:{connectionName}").Get<ConnectInfo>();
 
 			if (dp.Read())

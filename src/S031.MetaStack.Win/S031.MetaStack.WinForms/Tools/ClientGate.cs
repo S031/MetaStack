@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.Configuration;
 using S031.MetaStack.WinForms.Data;
 using S031.MetaStack.WinForms.Actions;
+using S031.MetaStack.WinForms.ORM;
 
 namespace S031.MetaStack.WinForms
 {
@@ -88,6 +89,12 @@ namespace S031.MetaStack.WinForms
 			}
 			return _actionss[actionID];
 		}
+
+		public static JMXSchema GetObjectSchema(string objectName) => 
+			JMXFactory
+			.Create()
+			.CreateJMXRepo()
+			.GetSchema(objectName);
 
 		private static string SecureRequest(string userName)
 		{

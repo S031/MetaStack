@@ -32,8 +32,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Extensions.DependencyInjection">
-      <HintPath>..\Bin\Microsoft.Extensions.DependencyInjection.dll</HintPath>
+    <Reference Include="AdvancedDataGridView">
+      <HintPath>..\..\..\..\advanceddatagridview\AdvancedDataGridView\bin\Release\AdvancedDataGridView.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -171,9 +171,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Data\DataRowExtensions.cs" />
-    <Compile Include="DBGrid\DBGridBase.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="DBGrid\DBGridBase.cs" />
     <Compile Include="DBGrid\Formater.cs" />
     <Compile Include="DBGrid\GridSpeedSearch.cs" />
     <Compile Include="Editors\MultiEdit.cs">

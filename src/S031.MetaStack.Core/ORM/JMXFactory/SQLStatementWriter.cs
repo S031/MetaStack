@@ -25,6 +25,81 @@ namespace S031.MetaStack.Core.ORM
 			_repo = repo;
 			_schema = schema;
 		}
+		public SQLStatementWriter WriteSelectStatement(JMXSchema fromSchema,
+			params JMXCondition[] conditions)
+		{
+			if (fromSchema == null)
+				fromSchema = _schema;
+
+			if (fromSchema.DbObjectType == DbObjectTypes.Procedure ||
+				fromSchema.DbObjectType == DbObjectTypes.Action)
+				Write(fromSchema.DbObjectName);
+
+			else if (fromSchema.DbObjectType == DbObjectTypes.View ||
+				fromSchema.DbObjectType == DbObjectTypes.Function ||
+				fromSchema.DbObjectType == DbObjectTypes.Table)
+			{
+				WriteLine("SELECT");
+				bool first = true;
+				foreach (var att in fromSchema.Attributes)
+					if (first)
+					{
+						WriteSelectColumnStatement(fromSchema, att, "");
+						first = false;
+					}
+					else
+						WriteSelectColumnStatement(fromSchema, att, ",");
+
+				WriteLine($"FROM {fromSchema.DbObjectName} AS {fromSchema.DbObjectName.ObjectName}");
+				var cs = fromSchema.Conditions.Concat(conditions);
+				foreach (var join in cs.Where(c => c.ConditionType == JMXConditionTypes.Join))
+					WriteLine(join.Definition);
+
+				first = true;
+				foreach (var filter in cs.Where(c => c.ConditionType == JMXConditionTypes.Where))
+					if (first)
+					{
+						WriteLine($"WHERE ({filter.Definition})");
+						first = false;
+					}
+					else
+						WriteLine($"AND ({filter.Definition})");
+
+				var sort = conditions.Last(c => c.ConditionType == JMXConditionTypes.OrderBy);
+				if (sort != null)
+					WriteLine($"ORDER BY {sort.Definition}");
+
+				var group = conditions.Last(c => c.ConditionType == JMXConditionTypes.GroupBy);
+				if (group != null)
+					WriteLine($"GROUP BY {group.Definition}");
+
+				first = true;
+				foreach (var filter in cs.Where(c => c.ConditionType == JMXConditionTypes.Havind))
+					if (first)
+					{
+						WriteLine($"HAVING ({filter.Definition})");
+						first = false;
+					}
+					else
+						WriteLine($"AND ({filter.Definition})");
+			}
+			return this;
+		}
+
+		public SQLStatementWriter WriteSelectColumnStatement(JMXSchema fromSchema,
+			JMXAttribute att, string sep)
+		{
+			if (fromSchema == null)
+				fromSchema = _schema;
+			if (att.Required)
+				WriteLine($"\t{sep}{fromSchema.DbObjectName.ObjectName}.{att.FieldName} {att.AttribName}");
+			else
+			{
+				string emptyValue = MdbTypeMap.GetType(att.DataType).IsNumeric() ? "0" : "''";
+				WriteLine($"\t{sep}COALISCE({fromSchema.DbObjectName.ObjectName}.{att.FieldName}, {emptyValue}) as {att.AttribName}");
+			}
+			return this;
+		}
 
 		public SQLStatementWriter WriteCreateNewTableStatements(JMXSchema fromSchema = null)
 		{

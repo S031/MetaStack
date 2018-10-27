@@ -1,10 +1,4 @@
-﻿using System.Drawing;
-using System.Windows.Forms;
-using Newtonsoft.Json.Linq;
-using System.IO;
-using System;
-using S031.MetaStack.WinForms.ORM;
-using System.Reflection;
+﻿using System.Windows.Forms;
 using S031.MetaStack.WinForms;
 
 namespace MetApp

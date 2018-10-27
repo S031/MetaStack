@@ -2,7 +2,8 @@
   "appSettings": {
     "auditEnabled": true,
     "language": "ru-RU",
-    "defaultConnection": "SqliteDb"
+    "defaultConnection": "Test",
+    "SysCatConnection": "SqliteDb"
   },
   "ApplicationLogSettings": {
     /* Cache size before flushing to disk */

@@ -122,6 +122,7 @@ namespace S031.MetaStack.WinForms.ORM
 
 		public string AttribPath { get; set; }
 		public string Description { get; set; }
+		public string PresentationType { get; set; }
 		public int DisplayWidth { get; set; }
 		public string Mask { get; set; }
 		public string Format { get; set; }
@@ -144,7 +145,7 @@ namespace S031.MetaStack.WinForms.ORM
 		public string ObjectName { get; set; }
 		public bool IsArray { get; set; }
 		public JMXSchema ObjectSchema { get => _schema; set => _schema = value; }
-		protected void ToStringRaw(JsonWriter writer)
+		public virtual void ToStringRaw(JsonWriter writer)
 		{
 			writer.WriteProperty("ID", ID);
 			writer.WriteProperty("UID", UID);
@@ -199,6 +200,7 @@ namespace S031.MetaStack.WinForms.ORM
 			writer.WriteProperty("ReadOnly", ReadOnly);
 			writer.WriteProperty("Enabled", Enabled);
 			writer.WriteProperty("Description", Description);
+			writer.WriteProperty("PresentationType", PresentationType);
 			writer.WriteProperty("DisplayWidth", DisplayWidth);
 			writer.WriteProperty("Mask", Mask);
 			writer.WriteProperty("Format", Format);

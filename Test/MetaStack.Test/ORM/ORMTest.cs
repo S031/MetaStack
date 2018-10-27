@@ -60,6 +60,11 @@ namespace MetaStack.Test.ORM
 				fk.AddKeyMember("AreaID");
 				fk.AddRefKeyMember("ID");
 				s.ForeignKeys.Add(fk);
+				s.Conditions.Add(new JMXCondition(JMXConditionTypes.Where, "1=1"));
+				s.Conditions.Add(new JMXCondition(JMXConditionTypes.OrderBy, "Test"));
+				s.Parameters.Add(new JMXParameter("TestParam") { DataType = MdbType.guid });
+				s.Parameters.Add(new JMXParameter("TestParam1") { DataType = MdbType.@string, Dirrect = S031.MetaStack.Core.Actions.ParamDirrect.Input });
+				s.Parameters.Add(new JMXParameter("TestParam2") { DataType = MdbType.@decimal, Dirrect = S031.MetaStack.Core.Actions.ParamDirrect.Output });
 				string ss = s.ToString();
 				_logger.Debug(ss);
 				s = JsonConvert.DeserializeObject<JMXSchema>(ss);

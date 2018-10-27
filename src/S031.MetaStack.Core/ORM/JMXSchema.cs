@@ -38,9 +38,12 @@ namespace S031.MetaStack.WinForms.ORM
         private readonly string _objectName;
         private string _areaName;
         private string _dbObjectName;
+		private bool _readOnly;
         private readonly List<JMXAttribute> _attributes;
+        private readonly List<JMXParameter> _parameters;
         private readonly List<JMXIndex> _indexes;
         private readonly List<JMXForeignKey> _fkeys;
+        private readonly List<JMXCondition> _conditions;
 
         public JMXSchema(string objectName) : this(new JMXObjectName(objectName))
         {
@@ -52,8 +55,10 @@ namespace S031.MetaStack.WinForms.ORM
             _areaName = objectName.AreaName;
             _dbObjectName = objectName.ObjectName;
             _attributes = new List<JMXAttribute>();
+            _parameters = new List<JMXParameter>();
             _indexes = new List<JMXIndex>();
             _fkeys = new List<JMXForeignKey>();
+			_conditions = new List<JMXCondition>();
             UID = Guid.NewGuid();
 			AuditEnabled = true;
             DirectAccess = DirectAccess.ForAll;
@@ -68,6 +73,15 @@ namespace S031.MetaStack.WinForms.ORM
         public string Name { get; set; }
         public int SyncState { get; set; }
         public bool AuditEnabled { get; set; }
+        public bool ReadOnly
+		{
+			get => DbObjectType == DbObjectTypes.Table ? _readOnly : true;
+			set
+			{
+				if (DbObjectType == DbObjectTypes.Table)
+					_readOnly = value;
+			}
+		}
         public JMXObjectName ObjectName
         {
             get => new JMXObjectName(_areaName, _objectName);
@@ -91,16 +105,19 @@ namespace S031.MetaStack.WinForms.ORM
         public DirectAccess DirectAccess { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
         public DbObjectTypes DbObjectType { get; set; }
-        public List<JMXAttribute> Attributes { get => _attributes; }
+        public List<JMXAttribute> Attributes => _attributes;
+        public List<JMXParameter> Parameters => _parameters;
         public JMXPrimaryKey PrimaryKey { get; set; }
-        public List<JMXIndex> Indexes { get => _indexes; }
-        public List<JMXForeignKey> ForeignKeys { get => _fkeys; }
+        public List<JMXIndex> Indexes => _indexes;
+        public List<JMXForeignKey> ForeignKeys => _fkeys;
+		public List<JMXCondition> Conditions => _conditions;
         protected void ToStringRaw(JsonWriter writer)
         {
             writer.WriteProperty("ID", ID);
             writer.WriteProperty("UID", UID);
             writer.WriteProperty("Name", Name);
             writer.WriteProperty("AuditEnabled", AuditEnabled);
+            writer.WriteProperty("ReadOnly", ReadOnly);
             writer.WriteProperty("DirectAccess", DirectAccess.ToString());
             writer.WriteProperty("DbObjectType", DbObjectType.ToString());
 
@@ -129,6 +146,12 @@ namespace S031.MetaStack.WinForms.ORM
                 writer.WriteRawValue(item.ToString());
             writer.WriteEnd();
 
+            writer.WritePropertyName("Parameters");
+            writer.WriteStartArray();
+            foreach (var item in _parameters)
+                writer.WriteRawValue(item.ToString());
+            writer.WriteEnd();
+
             writer.WritePropertyName("Indexes");
             writer.WriteStartArray();
             foreach (var item in _indexes)
@@ -140,6 +163,17 @@ namespace S031.MetaStack.WinForms.ORM
             foreach (var item in _fkeys)
                 writer.WriteRawValue(item.ToString());
             writer.WriteEnd();
+
+            writer.WritePropertyName("Conditions");
+            writer.WriteStartArray();
+			foreach (var item in _conditions)
+			{
+				writer.WriteStartObject();
+				writer.WriteProperty("ConditionType", item.ConditionType.ToString());
+				writer.WriteProperty("Definition", item.Definition);
+				writer.WriteEndObject();
+			}
+			writer.WriteEnd();
         }
         public override string ToString()
         {

@@ -17,9 +17,8 @@ namespace S031.MetaStack.Core.Actions
 		readonly List<object> _parameters = new List<object>();
 		ConnectInfo _connectInfo;
 		JMXSchema _schema;
+		List<JMXCondition> _conditions;
 		string _viewName;
-		string _filter;
-		string _sort;
 		string _body;
 
 		public DataPackage Invoke(ActionInfo ai, DataPackage dp)
@@ -52,6 +51,7 @@ namespace S031.MetaStack.Core.Actions
 			if (!dp.Headers.TryGetValue("ConnectionName", out object connectionName))
 				connectionName = ApplicationContext.GetConfiguration()["appSettings:defaultConnection"]; ;
 
+			_conditions = new List<JMXCondition>();
 			for (; dp.Read();)
 			{
 				string paramName = (string)dp["ParamName"];
@@ -65,9 +65,15 @@ namespace S031.MetaStack.Core.Actions
 				else if (paramName.Equals("_viewName", StringComparison.CurrentCultureIgnoreCase))
 					_viewName = (string)dp["ParamValue"];
 				else if (paramName.Equals("_filter", StringComparison.CurrentCultureIgnoreCase))
-					_filter = (string)dp["ParamValue"];
+					_conditions.Add(new JMXCondition(JMXConditionTypes.Where, (string)dp["ParamValue"]));
 				else if (paramName.Equals("_sort", StringComparison.CurrentCultureIgnoreCase))
-					_sort = (string)dp["ParamValue"];
+					_conditions.Add(new JMXCondition(JMXConditionTypes.OrderBy, (string)dp["ParamValue"]));
+				else if (paramName.Equals("_group", StringComparison.CurrentCultureIgnoreCase))
+					_conditions.Add(new JMXCondition(JMXConditionTypes.GroupBy, (string)dp["ParamValue"]));
+				else if (paramName.Equals("_having", StringComparison.CurrentCultureIgnoreCase))
+					_conditions.Add(new JMXCondition(JMXConditionTypes.Havind, (string)dp["ParamValue"]));
+				else if (paramName.Equals("_join", StringComparison.CurrentCultureIgnoreCase))
+					_conditions.Add(new JMXCondition(JMXConditionTypes.Join, (string)dp["ParamValue"]));
 			}
 			var configuration = ApplicationContext.GetServices().GetService<IConfiguration>();
 			_connectInfo = configuration.GetSection($"connectionStrings:{connectionName}").Get<ConnectInfo>();
@@ -76,29 +82,13 @@ namespace S031.MetaStack.Core.Actions
 		private async Task CreateCommandAsync(MdbContext mdb)
 		{
 			using (JMXFactory f = JMXFactory.Create(mdb, ApplicationContext.GetLogger()))
+			using (JMXRepo repo = (f.CreateJMXRepo() as JMXRepo))
+			using (SQLStatementWriter writer = new SQLStatementWriter(repo))
 			{
-				StringBuilder s = new StringBuilder();
-				_schema = await f.CreateJMXRepo().GetSchemaAsync(_viewName);
-				if (_schema.DbObjectType == DbObjectTypes.Procedure || 
-					_schema.DbObjectType == DbObjectTypes.Action)
-					_body = _schema.DbObjectName;
-				else if (_schema.DbObjectType == DbObjectTypes.View ||
-					_schema.DbObjectType == DbObjectTypes.Function ||
-					_schema.DbObjectType == DbObjectTypes.Table)
-				{
-					//Костыль добавить IsNull, для Table Ref fields ...
-					s.AppendLine("SELECT");
-					var atrID = _schema.Attributes.FirstOrDefault(a => a.AttribName.ToUpper() == "ID");
-					s.AppendLine($"\t{atrID.FieldName} {atrID.AttribName}");
-					foreach (var att in _schema.Attributes.Where(a => a.AttribName.ToUpper() != "ID"))
-						s.AppendLine($"\t,{att.FieldName} {att.AttribName}");
-					s.AppendLine($"FROM {_schema.DbObjectName} AS {_schema.DbObjectName.ObjectName}");
-					if (!_filter.IsEmpty())
-						s.AppendLine($"WHERE ({_filter})");
-					if (!_sort.IsEmpty())
-						s.AppendLine($"ORDER BY ({_sort})");
-					_body = s.ToString();
-				}
+				_body = writer.WriteSelectStatement(
+					await repo.GetSchemaAsync(_viewName), 
+					_conditions.ToArray())
+					.ToString();
 			}
 		}
 	}

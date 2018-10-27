@@ -40,8 +40,8 @@ namespace MetApp
 			tlpRows.Add<TableLayoutPanel>(
 				new WinFormItem("WorkCells",
 					SetMenuBar(),
-					SetToolbar()
-				//SetMenuContext()
+					SetToolbar(),
+					SetGrid()
 				)
 			);
 

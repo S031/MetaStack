@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using S031.MetaStack.WinForms.Data;
 using S031.MetaStack.WinForms.Json;
 using S031.MetaStack.WinForms.ORM;
+using Zuby.ADGV; 
 
 namespace S031.MetaStack.WinForms
 {
@@ -34,7 +35,7 @@ namespace S031.MetaStack.WinForms
 		blob = 4
 	}
 
-	public class DBGridBase : DataGridView, IObjectHost
+	public class DBGridBase : AdvancedDataGridView, IObjectHost
 	{
 		public const string TransportObject = "Qualifier";
 		//public const string DetailExtendedSection = "__detailExtended.031";
@@ -61,7 +62,7 @@ namespace S031.MetaStack.WinForms
 		private Label lblFooter;
 		private Dictionary<DataGridViewColumn, Label> totalLabels = new Dictionary<DataGridViewColumn, Label>();
 		private ContextMenuStrip mnuTotal;
-		protected Panel footerPanel { get; private set; }
+		protected Panel FooterPanel { get; private set; }
 
 		//Search support
 		private object lastSearch;
@@ -87,30 +88,32 @@ namespace S031.MetaStack.WinForms
 
 		private void InitializeComponent()
 		{
-			this.footerPanel = new System.Windows.Forms.Panel();
+			this.FooterPanel = new System.Windows.Forms.Panel();
 			((System.ComponentModel.ISupportInitialize)(this)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// footerPanel
 			// 
-			this.footerPanel.BackColor = System.Drawing.SystemColors.Control;
-			this.footerPanel.ForeColor = System.Drawing.SystemColors.ControlText;
-			this.footerPanel.Location = new System.Drawing.Point(0, 0);
-			this.footerPanel.MinimumSize = new System.Drawing.Size(0, 18);
-			this.footerPanel.Name = "footerPanel";
-			this.footerPanel.Size = new System.Drawing.Size(0, this.RowTemplate.Height);
-			this.footerPanel.TabIndex = 0;
-			this.footerPanel.BorderStyle = BorderStyle.None;
+			this.FooterPanel.BackColor = System.Drawing.SystemColors.Control;
+			this.FooterPanel.ForeColor = System.Drawing.SystemColors.ControlText;
+			this.FooterPanel.Location = new System.Drawing.Point(0, 0);
+			this.FooterPanel.MinimumSize = new System.Drawing.Size(0, 18);
+			this.FooterPanel.Name = "footerPanel";
+			this.FooterPanel.Size = new System.Drawing.Size(0, this.RowTemplate.Height);
+			this.FooterPanel.TabIndex = 0;
+			this.FooterPanel.BorderStyle = BorderStyle.None;
 
-			this.Controls.Add(this.footerPanel);
+			this.Controls.Add(this.FooterPanel);
 			//
 			// lblFooter
 			//
-			lblFooter = new Label();
-			lblFooter.Name = footerLabelName;
-			lblFooter.TextAlign = ContentAlignment.MiddleLeft;
-			lblFooter.Dock = DockStyle.Left;
-			this.footerPanel.Controls.Add(lblFooter);
+			lblFooter = new Label
+			{
+				Name = footerLabelName,
+				TextAlign = ContentAlignment.MiddleLeft,
+				Dock = DockStyle.Left
+			};
+			this.FooterPanel.Controls.Add(lblFooter);
 			// 
 			// DBGridBase
 			// 
@@ -167,11 +170,11 @@ namespace S031.MetaStack.WinForms
 
 		void CheckRow(DataGridViewRow r)
 		{
-			checkRow(r);
+			CheckRowInternal(r);
 			this.Refresh();
 		}
 
-		void checkRow(DataGridViewRow r)
+		void CheckRowInternal(DataGridViewRow r)
 		{
 			if (r.Index > -1 && _selectionStyle == DBGridSelectionStyle.CheckBox)
 			{
@@ -209,7 +212,7 @@ namespace S031.MetaStack.WinForms
 					for (int i = idx; i > idxChecked; i--)
 					{
 						if (!checkedRows.Contains(this.Rows[i]))
-							checkRow(this.Rows[i]);
+							CheckRowInternal(this.Rows[i]);
 					}
 				}
 				else
@@ -217,7 +220,7 @@ namespace S031.MetaStack.WinForms
 					for (int i = idx; i < idxChecked; i++)
 					{
 						if (!checkedRows.Contains(this.Rows[i]))
-							checkRow(this.Rows[i]);
+							CheckRowInternal(this.Rows[i]);
 					}
 				}
 				this.Refresh();
@@ -321,35 +324,30 @@ namespace S031.MetaStack.WinForms
 		{
 			if (!ReadOnly)
 			{
-				EventHandler<ActionEventArgs> te = ObjectCut;
-				if (te != null) te(this, e);
+				ObjectCut?.Invoke(this, e);
 			}
 		}
 		public virtual void OnObjectCopy(ActionEventArgs e)
 		{
 			if (!ReadOnly)
 			{
-				EventHandler<ActionEventArgs> te = ObjectCopy;
-				if (te != null) te(this, e);
+				ObjectCopy?.Invoke(this, e);
 			}
 		}
 		public virtual void OnObjectPaste(ActionEventArgs e)
 		{
 			if (!ReadOnly)
 			{
-				EventHandler<ActionEventArgs> te = ObjectPaste;
-				if (te != null) te(this, e);
+				ObjectPaste?.Invoke(this, e);
 			}
 		}
 		public virtual void OnDataChanged(ActionEventArgs e)
 		{
-			EventHandler<ActionEventArgs> te = DataChanged;
-			if (te != null) te(this, e);
+			DataChanged?.Invoke(this, e);
 		}
 		public virtual void OnDataDeleted(ActionEventArgs e)
 		{
-			EventHandler<ActionEventArgs> te = DataDeleted;
-			if (te != null) te(this, e);
+			DataDeleted?.Invoke(this, e);
 		}
 		#endregion Public Events
 
@@ -398,31 +396,37 @@ namespace S031.MetaStack.WinForms
 					MacroType mt = DBGridBase.GetMacroType(ai.DataType);
 					if (mt == MacroType.log)
 					{
-						DataGridViewCheckBoxColumn dck = new DataGridViewCheckBoxColumn();
-						dck.Name = ai.AttribName;
-						dck.HeaderText = ai.Name;
-						dck.DataPropertyName = ai.FieldName;
-						dck.SortMode = ai.Sorted ? DataGridViewColumnSortMode.Programmatic : DataGridViewColumnSortMode.NotSortable;
-						dck.AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
-						dck.Visible = ai.Visible;
+						DataGridViewCheckBoxColumn dck = new DataGridViewCheckBoxColumn
+						{
+							Name = ai.AttribName,
+							HeaderText = ai.Name,
+							DataPropertyName = ai.FieldName,
+							SortMode = ai.Sorted ? DataGridViewColumnSortMode.Programmatic : DataGridViewColumnSortMode.NotSortable,
+							AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader,
+							Visible = ai.Visible
+						};
 						this.Columns.Add(dck);
 					}
 					else if (ai.Mask.Equals("icon", StringComparison.CurrentCultureIgnoreCase))
 					{
-						DataGridViewImageColumn ic = new DataGridViewImageColumn(false);
-						ic.DataPropertyName = ai.FieldName;
-						ic.Visible = true;
-						ic.Width = 50;
+						DataGridViewImageColumn ic = new DataGridViewImageColumn(false)
+						{
+							DataPropertyName = ai.FieldName,
+							Visible = true,
+							Width = 50
+						};
 						this.Columns.Add(ic);
 					}
 					else if (ai.ListData.Count > 0)
 					{
-						DataGridViewComboBoxColumn cb = new DataGridViewComboBoxColumn();
-						cb.Name = ai.AttribName;
-						cb.HeaderText = ai.Name;
-						cb.DataPropertyName = ai.FieldName;
-						cb.SortMode = ai.Sorted ? DataGridViewColumnSortMode.Programmatic : DataGridViewColumnSortMode.NotSortable;
-						cb.AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
+						DataGridViewComboBoxColumn cb = new DataGridViewComboBoxColumn
+						{
+							Name = ai.AttribName,
+							HeaderText = ai.Name,
+							DataPropertyName = ai.FieldName,
+							SortMode = ai.Sorted ? DataGridViewColumnSortMode.Programmatic : DataGridViewColumnSortMode.NotSortable,
+							AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader
+						};
 						DataTable dtList = GetItemDataList(ai.ListItems, ai.ListData, ai.DataType);
 						cb.DataSource = dtList;
 						cb.DisplayMember = dtList.Columns[0].ColumnName;
@@ -580,7 +584,7 @@ namespace S031.MetaStack.WinForms
 				footer = value;
 				if (footer)
 				{
-					this.footerPanel.Visible = true;
+					this.FooterPanel.Visible = true;
 					this.UserAddedRow += new System.Windows.Forms.DataGridViewRowEventHandler(this.OnGridUserAddedRow);
 					this.UserDeletedRow += new System.Windows.Forms.DataGridViewRowEventHandler(this.OnGridUserDeletedRow);
 					this.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.OnGridDataBindingComplete);
@@ -600,7 +604,7 @@ namespace S031.MetaStack.WinForms
 				}
 				else
 				{
-					this.footerPanel.Visible = false;
+					this.FooterPanel.Visible = false;
 					this.UserAddedRow -= new System.Windows.Forms.DataGridViewRowEventHandler(this.OnGridUserAddedRow);
 					this.UserDeletedRow -= new System.Windows.Forms.DataGridViewRowEventHandler(this.OnGridUserDeletedRow);
 					this.DataBindingComplete -= new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.OnGridDataBindingComplete);
@@ -625,7 +629,7 @@ namespace S031.MetaStack.WinForms
 			if ((e.State & DataGridViewElementStates.Selected) ==
 						DataGridViewElementStates.Selected)
 			{
-				if (footer && e.RowIndex > 2 && e.RowBounds.Y + e.RowBounds.Height - 4 > footerPanel.Top && !lastRowPainted)
+				if (footer && e.RowIndex > 2 && e.RowBounds.Y + e.RowBounds.Height - 4 > FooterPanel.Top && !lastRowPainted)
 				{
 					this.FirstDisplayedScrollingRowIndex++;
 					//this.InvalidateRow(e.RowIndex - 2);
@@ -717,11 +721,11 @@ namespace S031.MetaStack.WinForms
 		#region FooterSupport
 		private void RefreshTotals()
 		{
-			lastRowHieght();
-			addTotalLabels();
-			sizeTotalLabel();
+			LastRowHieght();
+			AddTotalLabels();
+			SizeTotalLabel();
 		}
-		private void lastRowHieght()
+		private void LastRowHieght()
 		{
 			if (footer)
 			{
@@ -741,38 +745,41 @@ namespace S031.MetaStack.WinForms
 				}
 			}
 		}
-		private void addTotalLabels()
+		private void AddTotalLabels()
 		{
 			totalLabels = new Dictionary<DataGridViewColumn, Label>();
-			for (; this.footerPanel.Controls.Count > 0;)
-				this.footerPanel.Controls.Remove(this.footerPanel.Controls[0]);
+			for (; this.FooterPanel.Controls.Count > 0;)
+				this.FooterPanel.Controls.Remove(this.FooterPanel.Controls[0]);
 
-			this.footerPanel.Controls.Add(lblFooter);
+			this.FooterPanel.Controls.Add(lblFooter);
 			foreach (DataGridViewColumn c in this.Columns)
 			{
-				Label label = new Label();
-				label.Top = 1;
-				label.Height = this.footerPanel.Height - 1;
-				label.BorderStyle = (BorderStyle)this.ColumnHeadersBorderStyle;
-				label.ContextMenuStrip = mnuTotal;
-				label.Tag = c;
-				label.Font = this.RowsDefaultCellStyle.Font ?? this.ColumnHeadersDefaultCellStyle.Font; ;
-				this.footerPanel.Controls.Add(label);
+				Label label = new Label
+				{
+					Top = 1,
+					Height = this.FooterPanel.Height - 1,
+					BorderStyle = (BorderStyle)this.ColumnHeadersBorderStyle,
+					ContextMenuStrip = mnuTotal,
+					Tag = c,
+					Font = this.RowsDefaultCellStyle.Font ?? this.ColumnHeadersDefaultCellStyle.Font
+				};
+				;
+				this.FooterPanel.Controls.Add(label);
 				totalLabels.Add(c, label);
 			}
-			sizeTotalLabel();
+			SizeTotalLabel();
 		}
-		private void sizeTotalLabel()
+		private void SizeTotalLabel()
 		{
 			if (!this.Visible || this.Columns.Count == 0 || !footer) return;
 			try
 			{
 				this.SuspendLayout();
 				int margin = this.Margin.Left;
-				this.footerPanel.Location = new Point(margin, this.ClientSize.Height - this.footerPanel.Height -
+				this.FooterPanel.Location = new Point(margin, this.ClientSize.Height - this.FooterPanel.Height -
 					(this.HorizontalScrollBar.Visible ? this.HorizontalScrollBar.Height : 0));
-				this.footerPanel.Width = this.Width;
-				this.footerPanel.Visible = footer;
+				this.FooterPanel.Width = this.Width;
+				this.FooterPanel.Visible = footer;
 
 				int rhw = (this.RowHeadersVisible ? this.RowHeadersWidth : 0) - margin;
 				int pos = rhw;
@@ -802,8 +809,8 @@ namespace S031.MetaStack.WinForms
 							width -= rhw - from;
 							from = rhw;
 						}
-						if (from + width > this.footerPanel.Width)
-							width = this.footerPanel.Width - from;
+						if (from + width > this.FooterPanel.Width)
+							width = this.FooterPanel.Width - from;
 						if (width < 4)
 						{
 							if (label.Visible) label.Visible = false;
@@ -822,7 +829,7 @@ namespace S031.MetaStack.WinForms
 			{
 				this.ResumeLayout();
 			}
-			this.footerPanel.Refresh();
+			this.FooterPanel.Refresh();
 			this.Invalidate();
 		}
 		void OnGridMouseMove(object sender, MouseEventArgs e)
@@ -831,58 +838,58 @@ namespace S031.MetaStack.WinForms
 			if (e.Button == MouseButtons.Left && e.Y >= 1 &&
 				e.Y <= this.ColumnHeadersHeight)
 			{
-				this.footerPanel.Refresh();
+				this.FooterPanel.Refresh();
 			}
 		}
 		private void OnDBGridResize(object sender, EventArgs e)
 		{
-			sizeTotalLabel();
+			SizeTotalLabel();
 		}
 		private void OnGridVisibleChanged(object sender, EventArgs e)
 		{
-			sizeTotalLabel();
+			SizeTotalLabel();
 		}
 		private void OnGridScroll(object sender, ScrollEventArgs e)
 		{
 			if (e.ScrollOrientation == ScrollOrientation.HorizontalScroll)
 			{
-				sizeTotalLabel();
+				SizeTotalLabel();
 			}
 		}
 		private void OnGridDataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
 		{
 			checkedRows.Clear();
-			lastRowHieght();
+			LastRowHieght();
 		}
 		private void OnGridUserAddedRow(object sender, DataGridViewRowEventArgs e)
 		{
-			lastRowHieght();
+			LastRowHieght();
 		}
 		private void OnGridUserDeletedRow(object sender, DataGridViewRowEventArgs e)
 		{
-			lastRowHieght();
+			LastRowHieght();
 		}
 		private void OnRowHeadersWidthChanged(object sender, EventArgs e)
 		{
-			sizeTotalLabel();
+			SizeTotalLabel();
 		}
 		private void OnColumnHeadersDefaultCellStyleChanged(object sender, EventArgs e)
 		{
-			if (this.ColumnHeadersDefaultCellStyle.BackColor != this.footerPanel.BackColor)
-				this.footerPanel.BackColor = this.ColumnHeadersDefaultCellStyle.BackColor;
+			if (this.ColumnHeadersDefaultCellStyle.BackColor != this.FooterPanel.BackColor)
+				this.FooterPanel.BackColor = this.ColumnHeadersDefaultCellStyle.BackColor;
 		}
 		private void OnGridColumnsAddedRemoved(object sender, DataGridViewColumnEventArgs e)
 		{
-			addTotalLabels();
+			AddTotalLabels();
 		}
 		private void OnGridColumnsChanged(object sender, DataGridViewColumnEventArgs e)
 		{
-			sizeTotalLabel();
+			SizeTotalLabel();
 		}
 		private void OnGridColumnsStateChanged(object sender, DataGridViewColumnStateChangedEventArgs e)
 		{
 			if (e.StateChanged == DataGridViewElementStates.Visible)
-				sizeTotalLabel();
+				SizeTotalLabel();
 		}
 		#endregion FooterSupport
 		#endregion Footer
@@ -1079,7 +1086,7 @@ namespace S031.MetaStack.WinForms
 			//		this.Find(dr => Convert.ToDecimal(vbo.IsNull(dr[colName], decimal.MinValue)) > (decimal)lastSearch, rowIndex);
 			//}
 		}
-		private void conditionFindAll()
+		private void ConditionFindAll()
 		{
 			if (this.Rows.Count == 0) return;
 			string colName = this.Columns[this.CurrentCellAddress.X].Name;
@@ -1096,7 +1103,7 @@ namespace S031.MetaStack.WinForms
 			else
 				dv.RowFilter = colName + " " + lastCondition + " " + lastSearch.ToString().Replace(',', '.');
 		}
-		private static void setAutoComplete(ComboBox tb)
+		private static void SetAutoComplete(ComboBox tb)
 		{
 			tb.Items.AddRange(searches.ToArray());
 			tb.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
@@ -1126,7 +1133,7 @@ namespace S031.MetaStack.WinForms
 			List<DataRow> listRows = new List<DataRow>();
 			foreach (DataGridViewRow gridRow in this.SelectedRows)
 			{
-				listRows.Add(this.getRow(gridRow.Index));
+				listRows.Add(this.GetRow(gridRow.Index));
 			}
 			if (listRows.Count == 0)
 				return null;
@@ -1140,11 +1147,11 @@ namespace S031.MetaStack.WinForms
 				if (this.Rows.Count == 0)
 					return null;
 				else
-					return getRow(this.CurrentCellAddress.Y);
+					return GetRow(this.CurrentCellAddress.Y);
 			}
 		}
 
-		protected DataRow getRow(int index)
+		protected DataRow GetRow(int index)
 		{
 			if (string.IsNullOrEmpty(dt.DefaultView.RowFilter))
 				return dt.Rows[index];
@@ -1170,7 +1177,7 @@ namespace S031.MetaStack.WinForms
 				checkedRows.Clear();
 				foreach (DataGridViewRow r in this.Rows)
 				{
-					checkRow(r);
+					CheckRowInternal(r);
 				}
 				this.Refresh();
 			}
@@ -1214,7 +1221,7 @@ namespace S031.MetaStack.WinForms
 
 			if (!isNew)
 			{
-				var dr = getRow(this.CurrentCellAddress.Y);
+				var dr = GetRow(this.CurrentCellAddress.Y);
 				foreach (DataGridViewColumn dc in this.Columns)
 					if (!dc.Name.IsEmpty())
 						jObj[dc.Name] = JToken.FromObject(dr[dc.Name]);
@@ -1223,11 +1230,11 @@ namespace S031.MetaStack.WinForms
 		}
 		protected virtual void DoObjectEditAdd(JMXObject objSource, bool isNew)
 		{
-			EditorFactory.ObjectEdit(objSource, isNew, this, null, editorRefreshHost, this.ObjectEditor == null ? null : this.ObjectEditor());
+			EditorFactory.ObjectEdit(objSource, isNew, this, null, EditorRefreshHost, this.ObjectEditor == null ? null : this.ObjectEditor());
 		}
 		protected virtual void DoObjectEditAdd(JMXObject objSource, bool isNew, string actionID)
 		{
-			EditorFactory.ObjectEdit(objSource, isNew, this, actionID, editorRefreshHost, this.ObjectEditor == null ? null : this.ObjectEditor());
+			EditorFactory.ObjectEdit(objSource, isNew, this, actionID, EditorRefreshHost, this.ObjectEditor == null ? null : this.ObjectEditor());
 		}
 		protected virtual void DoObjectDel(JMXObject objSource)
 		{
@@ -1272,7 +1279,7 @@ namespace S031.MetaStack.WinForms
 
 			DataRow currentRow = this.DataRow;
 			DataRow buffer = currentRow.Clone();
-			DataRow nextRow = this.getRow(newRowIndex);
+			DataRow nextRow = this.GetRow(newRowIndex);
 			nextRow.CopyTo(currentRow);
 			buffer.CopyTo(nextRow);
 			this.CurrentCell = this.Rows[newRowIndex].Cells[this.CurrentCellAddress.X];
@@ -1344,7 +1351,7 @@ namespace S031.MetaStack.WinForms
 			}
 		}
 
-		void DBGridBase_DataSourceChanged(object sender, EventArgs e)
+		private void DBGridBase_DataSourceChanged(object sender, EventArgs e)
 		{
 			if (this.DataSource is DataTable)
 				dt = (DataTable)this.DataSource;
@@ -1354,7 +1361,7 @@ namespace S031.MetaStack.WinForms
 				dt = (DataTable)this.DataSource;
 		}
 
-		void editorRefreshHost(IObjectEditor oe)
+		private void EditorRefreshHost(IObjectEditor oe)
 		{
 			var jObj = oe.EditObject;
 			OnDataChanged(new ActionEventArgs(jObj));

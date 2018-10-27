@@ -76,11 +76,11 @@ namespace S031.MetaStack.WinForms
 		private WinFormStyle _dialogStyle;
 
 		//Main Panels
-		private TabControlEx _tc;
+		private TabControlEx _tc = default;
 		//Form rows panels (any panels for form)
-		private List<TableLayoutPanel> _formRowsPanels = new List<TableLayoutPanel>();
+		private readonly List<TableLayoutPanel> _formRowsPanels = new List<TableLayoutPanel>();
 		//Pages rows panels one panel (any rows) for page
-		private List<TableLayoutPanel> _pagesRowsPanels = new List<TableLayoutPanel>();
+		private readonly List<TableLayoutPanel> _pagesRowsPanels = new List<TableLayoutPanel>();
 		//private TableLayoutPanel _buttonTablePanel;
 
 		//Error shown tooltip
@@ -97,7 +97,7 @@ namespace S031.MetaStack.WinForms
 		private char _quoteChar;
 
 		//Multi selection
-		string _separator = vbo.vbSep;
+		private string _separator = vbo.vbSep;
 		# endregion Module Variables
 
 		#region Constructor
@@ -492,7 +492,7 @@ namespace S031.MetaStack.WinForms
 			}
 		}
 
-		bool TextAreaKeyEventHandler(char key)
+		private bool TextAreaKeyEventHandler(char key)
 		{
 			CEdit txtSource = (this.ActiveControl as CEdit);
 			if (txtSource == null) return false;
@@ -534,7 +534,7 @@ namespace S031.MetaStack.WinForms
 				_codeCompletionWindow = CodeCompletionWindow.ShowCompletionWindow(
 					this,                   // The parent window for the completion window
 					txtSource,                  // The text editor to show the window for
-					txtSource.Name + fileExtension(langID),     // Filename - will be passed back to the provider
+					txtSource.Name + FileExtension(langID),     // Filename - will be passed back to the provider
 					completionDataProvider,     // Provider to get the list of possible completions
 					key                         // Key pressed - will be passed to the provider
 				);
@@ -547,7 +547,7 @@ namespace S031.MetaStack.WinForms
 			return false;
 		}
 
-		string fileExtension(string langID)
+		private string FileExtension(string langID)
 		{
 			if (langID.Equals("VBNET", StringComparison.CurrentCultureIgnoreCase))
 				return ".vb";
@@ -571,7 +571,7 @@ namespace S031.MetaStack.WinForms
 			return (i % 2 != 0);
 		}
 
-		void CloseCodeCompletionWindow(object sender, EventArgs e)
+		private void CloseCodeCompletionWindow(object sender, EventArgs e)
 		{
 			if (_codeCompletionWindow != null)
 			{
@@ -638,14 +638,15 @@ namespace S031.MetaStack.WinForms
 			return base.ProcessCmdKey(ref msg, keyData);
 		}
 
-		void WinForm_KeyDown(object sender, KeyEventArgs e)
+		private void WinForm_KeyDown(object sender, KeyEventArgs e)
 		{
 			if (!this.GetSTDAction("KeyDown"))
 				return;
 			if (e.KeyCode == Keys.Escape)
 				Close();
 		}
-		void Num_KeyPress(object sender, KeyPressEventArgs e)
+
+		private void Num_KeyPress(object sender, KeyPressEventArgs e)
 		{
 			TextBoxBase tb = (sender as TextBoxBase);
 			if (tb == null) { }
