@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using S031.MetaStack.Common.Logging;
 using S031.MetaStack.WinForms;
 using S031.MetaStack.WinForms.Connectors;
+using S031.MetaStack.WinForms;
 using S031.MetaStack.WinForms.Data;
 
 namespace MetaStack.Win.TestConsole
@@ -16,7 +17,7 @@ namespace MetaStack.Win.TestConsole
 		static void Main(string[] args)
 		{
 			//var connectionName = Dns.GetHostName() == "SERGEY-WRK" ? "Test" : "BankLocal";
-			//var connectionName = "SqliteDb";
+			var connectionName = "SqliteDb";
 			using (FileLog l = new FileLog("TCPConnectorConnectTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			using (TCPConnector connector = TCPConnector.Create())
 			{
@@ -25,8 +26,19 @@ namespace MetaStack.Win.TestConsole
 				int i = 0;
 				for (i = 0; i < 1000; i++)
 				{
-					var dr = connector.Execute("Sys.Select", new DataPackage(new string[] { "ParamName", "ParamValue" }, 
-						new object[] { "_viewName", "dbo.Customer" }));
+					var dr = ClientGate.Execute("Sys.Select",
+					   ClientGate.GetActionInfo("Sys.Select")
+					   .GetInputParamTable()
+					   .AddNew()
+					   .SetValue("ParamName", "_viewName")
+					   .SetValue("ParamValue", "SysCat.SysSchema")
+					   .Update()
+					   .AddNew()
+					   .SetValue("ParamName", "_filter")
+					   .SetValue("ParamValue", "ObjectName = 'SysSchema'")
+					   .Update()
+					   );
+
 					if (i % 1000 == 0)
 					{
 						dr.Read();
@@ -35,23 +47,23 @@ namespace MetaStack.Win.TestConsole
 				}
 				l.Debug($"End performance test for {i} Sys.Select");
 
-				l.Debug("Start performance test for logins");
-				for (i = 0; i < 10000; i++)
-				{
-					DataPackage dr = new DataPackage("ObjectName.String.64");
-					dr.AddNew();
-					dr["ObjectName"] = "dbo.Customer";
-					dr.Update();
+				//l.Debug("Start performance test for logins");
+				//for (i = 0; i < 10000; i++)
+				//{
+				//	DataPackage dr = new DataPackage("ObjectName.String.64");
+				//	dr.AddNew();
+				//	dr["ObjectName"] = "dbo.Customer";
+				//	dr.Update();
 
-					dr = connector.Execute("Sys.GetSchema", dr);
-					if (i % 1000 == 0)
-					{
-						dr.Read();
-						//Console.WriteLine($"{i}\t{dr["ObjectSchema"]}");
-						Console.WriteLine(i);
-					}
-				}
-				l.Debug($"End performance test for {i} logins");
+				//	dr = connector.Execute("Sys.GetSchema", dr);
+				//	if (i % 1000 == 0)
+				//	{
+				//		dr.Read();
+				//		//Console.WriteLine($"{i}\t{dr["ObjectSchema"]}");
+				//		Console.WriteLine(i);
+				//	}
+				//}
+				//l.Debug($"End performance test for {i} logins");
 			}
 		}
 	}

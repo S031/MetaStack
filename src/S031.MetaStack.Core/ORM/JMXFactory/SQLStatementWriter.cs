@@ -50,38 +50,44 @@ namespace S031.MetaStack.Core.ORM
 					else
 						WriteSelectColumnStatement(fromSchema, att, ",");
 
-				WriteLine($"FROM {fromSchema.DbObjectName} AS {fromSchema.DbObjectName.ObjectName}");
+				WriteLine($"FROM {fromSchema.DbObjectName.ObjectName} AS {fromSchema.DbObjectName.ObjectName}");
 				var cs = fromSchema.Conditions.Concat(conditions);
-				foreach (var join in cs.Where(c => c.ConditionType == JMXConditionTypes.Join))
-					WriteLine(join.Definition);
+				if (cs.Count() > 0)
+				{
+					foreach (var join in cs.Where(c => c.ConditionType == JMXConditionTypes.Join))
+						WriteLine(join.Definition);
 
-				first = true;
-				foreach (var filter in cs.Where(c => c.ConditionType == JMXConditionTypes.Where))
-					if (first)
+					first = true;
+					foreach (var filter in cs.Where(c => c.ConditionType == JMXConditionTypes.Where))
+						if (first)
+						{
+							WriteLine($"WHERE ({filter.Definition})");
+							first = false;
+						}
+						else
+							WriteLine($"AND ({filter.Definition})");
+
+					if (cs.Any(c => c.ConditionType == JMXConditionTypes.OrderBy))
 					{
-						WriteLine($"WHERE ({filter.Definition})");
-						first = false;
+						var sort = cs.Last(c => c.ConditionType == JMXConditionTypes.OrderBy);
+						WriteLine($"ORDER BY {sort.Definition}");
 					}
-					else
-						WriteLine($"AND ({filter.Definition})");
 
-				var sort = conditions.Last(c => c.ConditionType == JMXConditionTypes.OrderBy);
-				if (sort != null)
-					WriteLine($"ORDER BY {sort.Definition}");
-
-				var group = conditions.Last(c => c.ConditionType == JMXConditionTypes.GroupBy);
-				if (group != null)
-					WriteLine($"GROUP BY {group.Definition}");
-
-				first = true;
-				foreach (var filter in cs.Where(c => c.ConditionType == JMXConditionTypes.Havind))
-					if (first)
+					if (cs.Any(c => c.ConditionType == JMXConditionTypes.GroupBy))
 					{
-						WriteLine($"HAVING ({filter.Definition})");
-						first = false;
+						var group = cs.LastOrDefault(c => c.ConditionType == JMXConditionTypes.GroupBy);
+						WriteLine($"GROUP BY {group.Definition}");
 					}
-					else
-						WriteLine($"AND ({filter.Definition})");
+					first = true;
+					foreach (var filter in cs.Where(c => c.ConditionType == JMXConditionTypes.Havind))
+						if (first)
+						{
+							WriteLine($"HAVING ({filter.Definition})");
+							first = false;
+						}
+						else
+							WriteLine($"AND ({filter.Definition})");
+				}
 			}
 			return this;
 		}
@@ -96,7 +102,7 @@ namespace S031.MetaStack.Core.ORM
 			else
 			{
 				string emptyValue = MdbTypeMap.GetType(att.DataType).IsNumeric() ? "0" : "''";
-				WriteLine($"\t{sep}COALISCE({fromSchema.DbObjectName.ObjectName}.{att.FieldName}, {emptyValue}) as {att.AttribName}");
+				WriteLine($"\t{sep}COALESCE({fromSchema.DbObjectName.ObjectName}.{att.FieldName}, {emptyValue}) as {att.AttribName}");
 			}
 			return this;
 		}

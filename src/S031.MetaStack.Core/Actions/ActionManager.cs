@@ -82,7 +82,7 @@ namespace S031.MetaStack.Core.Actions
 				//Костыль
 				//if (ai != null && ai.EMailOnError)
 				//	Comm.SendEMail(ai.EMailGroup, "Ошибка выполнения операции '{0}'".ToFormat(ai.ActionID), ex.Detail.FullReport);
-				throw ex;
+				throw;
 			}
 		}
 		public async Task<DataPackage> ExecuteAsync(string actionID, DataPackage inParamStor)
@@ -99,7 +99,7 @@ namespace S031.MetaStack.Core.Actions
 				//Костыль
 				//if (ai != null && ai.EMailOnError)
 				//	Comm.SendEMail(ai.EMailGroup, "Ошибка выполнения операции '{0}'".ToFormat(ai.ActionID), ex.Detail.FullReport);
-				throw ex;
+				throw;
 			}
 		}
 

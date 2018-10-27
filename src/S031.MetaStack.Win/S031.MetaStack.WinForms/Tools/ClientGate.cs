@@ -15,7 +15,7 @@ using S031.MetaStack.WinForms.ORM;
 
 namespace S031.MetaStack.WinForms
 {
-	internal static class ClientGate
+	public static class ClientGate
 	{
 		private static readonly object obj4Lock = new object();
 

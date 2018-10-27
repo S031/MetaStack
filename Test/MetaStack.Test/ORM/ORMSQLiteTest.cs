@@ -14,6 +14,7 @@ using System.Text;
 using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
 using System.Linq;
+using S031.MetaStack.Core.Actions;
 
 namespace MetaStack.Test.ORM
 {
@@ -177,6 +178,28 @@ namespace MetaStack.Test.ORM
 					_logger.Debug("End speed test for SysCat.Get_TableSchema");
 				}
 
+			}
+		}
+		[Fact]
+		void ActionSelectTest()
+		{
+			using (FileLogger _logger = new FileLogger("ORMSQLiteTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			using (MdbContext mdb = new MdbContext(_ci))
+			using (ActionManager m = new ActionManager(mdb) { Logger = _logger })
+			{
+				var dr = m.Execute("Sys.Select",
+					m.GetActionInfo("Sys.Select")
+					.GetInputParamTable()
+					.AddNew()
+					.SetValue("ParamName", "_viewName")
+					.SetValue("ParamValue", "SysCat.SysSchema")
+					.Update()
+					.AddNew()
+					.SetValue("ParamName", "_filter")
+					.SetValue("ParamValue", "ObjectName = 'SysSchema'")
+					.Update()
+					);
+				_logger.Debug(dr.ToString());
 			}
 		}
 

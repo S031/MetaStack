@@ -1,6 +1,8 @@
 ﻿{
   "appSettings": {
-    "auditEnabled": true
+    "auditEnabled": true,
+    "defaultConnection": "SqliteDb",
+    "SysCatConnection": "SqliteDb"
   },
   "Connectors": {
     "TCPConnector": {
@@ -12,6 +14,10 @@
     "bankLocal": {
       "providerName": "System.Data.SqlClient",
       "connectionString": "Data Source=localhost;Initial Catalog=MetaStack;Integrated Security=True;"
+    },
+    "SqliteDb": {
+      "providerName": "System.Data.Sqlite",
+      "connectionString": "Data Source=D:\\Source\\Repos\\MetaStack\\src\\S031.MetaStack.AppServer\\DB\\SysCat.db; Mode=Memory; Cache=Shared"
     },
     "test": {
       "providerName": "System.Data.SqlClient",

@@ -82,6 +82,9 @@
     <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXAttribute.cs">
       <Link>ORM\JMXAttribute.cs</Link>
     </Compile>
+    <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXCondition.cs">
+      <Link>ORM\JMXCondition.cs</Link>
+    </Compile>
     <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXConstraint.cs">
       <Link>ORM\JMXConstraint.cs</Link>
     </Compile>
@@ -114,6 +117,9 @@
     </Compile>
     <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXObjectName.cs">
       <Link>ORM\JMXObjectName.cs</Link>
+    </Compile>
+    <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXParameter.cs">
+      <Link>ORM\JMXParameter.cs</Link>
     </Compile>
     <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXPrimaryKey.cs">
       <Link>ORM\JMXPrimaryKey.cs</Link>
