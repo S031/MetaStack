@@ -13,6 +13,8 @@ namespace S031.MetaStack.Core.ORM
 	{
 		const string detail_field_prefix = "$1_";
 		private readonly JMXSchema _schema;
+		//This repo for destination db, not for SysCat 
+		//Костыль!!! реализовать  передачу правильного repo в SQLStatementWriter
 		private JMXRepo _repo;
 
 		public SQLStatementWriter(JMXRepo repo)
@@ -31,9 +33,13 @@ namespace S031.MetaStack.Core.ORM
 			if (fromSchema == null)
 				fromSchema = _schema;
 
+			string target = _repo.IsSchemaSupport() ?
+				fromSchema.DbObjectName.ToString() :
+				fromSchema.DbObjectName.ObjectName;
+
 			if (fromSchema.DbObjectType == DbObjectTypes.Procedure ||
 				fromSchema.DbObjectType == DbObjectTypes.Action)
-				Write(fromSchema.DbObjectName);
+				Write(target);
 
 			else if (fromSchema.DbObjectType == DbObjectTypes.View ||
 				fromSchema.DbObjectType == DbObjectTypes.Function ||
@@ -50,7 +56,7 @@ namespace S031.MetaStack.Core.ORM
 					else
 						WriteSelectColumnStatement(fromSchema, att, ",");
 
-				WriteLine($"FROM {fromSchema.DbObjectName.ObjectName} AS {fromSchema.DbObjectName.ObjectName}");
+				WriteLine($"FROM {target} AS {fromSchema.DbObjectName.ObjectName}");
 				var cs = fromSchema.Conditions.Concat(conditions);
 				if (cs.Count() > 0)
 				{

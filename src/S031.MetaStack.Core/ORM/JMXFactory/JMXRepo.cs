@@ -81,5 +81,6 @@ namespace S031.MetaStack.Core.ORM
 			throw new NotImplementedException();
 		}
 
+		public virtual bool IsSchemaSupport() => true;
 	}
 }

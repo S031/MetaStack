@@ -2,8 +2,8 @@
   "appSettings": {
     "auditEnabled": true,
     "language": "ru-RU",
-    "defaultConnection": "SqliteDb",
-    "SysCatConnection": "SqliteDb"
+    "defaultConnection": "SQliteDb",
+    "SysCatConnection": "SQliteDb"
   },
   "ApplicationLogSettings": {
     /* Cache size before flushing to disk */
@@ -36,7 +36,7 @@
     },
     "SqliteDb": {
       "providerName": "System.Data.Sqlite",
-      "connectionString": "Data Source=DB\\SysCat.db; Mode=Memory; Cache=Shared"
+      "connectionString": "Data Source=DB\\SysCat.db; Mode=Memory; Version=3; Cache=Shared;Pooling=True; Max Pool Size=200"
     },
     "test": {
       "providerName": "System.Data.SqLClient",

@@ -115,6 +115,8 @@ namespace S031.MetaStack.Core.ORM.SQLite
 
 		public override IDictionary<MdbType, string> GetTypeMap() => _typeMap;
 
+		public override bool IsSchemaSupport() => false;
+
 		public override IDictionary<string, MdbTypeInfo> GetServerTypeMap() => _typeInfo;
 
 		public override string[] GetVariableLenghtDataTypes() => variable_lenght_data_types.Split(';');

@@ -17,18 +17,18 @@ namespace MetaStack.Win.TestConsole
 		static void Main(string[] args)
 		{
 			//var connectionName = Dns.GetHostName() == "SERGEY-WRK" ? "Test" : "BankLocal";
-			var connectionName = "SqliteDb";
+			//var connectionName = "SqliteDb";
 			using (FileLog l = new FileLog("TCPConnectorConnectTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
-			using (TCPConnector connector = TCPConnector.Create())
 			{
-				connector.Connect("Test", "@TestPassword");
 				l.Debug("Start performance test for Sys.Select");
 				int i = 0;
-				for (i = 0; i < 1000; i++)
+				for (i = 0; i < 10000; i++)
 				{
 					var dr = ClientGate.Execute("Sys.Select",
 					   ClientGate.GetActionInfo("Sys.Select")
 					   .GetInputParamTable()
+					   .SetHeader("ConnectionName", "Test")
+					   .UpdateHeaders()
 					   .AddNew()
 					   .SetValue("ParamName", "_viewName")
 					   .SetValue("ParamValue", "SysCat.SysSchema")
@@ -42,28 +42,29 @@ namespace MetaStack.Win.TestConsole
 					if (i % 1000 == 0)
 					{
 						dr.Read();
-						Console.WriteLine($"{i}\t{dr["ObjectName"]}");
+						Console.WriteLine($"{i}\t{dr["ObjectName"]}{DateTime.Now.Second}");
 					}
 				}
 				l.Debug($"End performance test for {i} Sys.Select");
 
-				//l.Debug("Start performance test for logins");
-				//for (i = 0; i < 10000; i++)
-				//{
-				//	DataPackage dr = new DataPackage("ObjectName.String.64");
-				//	dr.AddNew();
-				//	dr["ObjectName"] = "dbo.Customer";
-				//	dr.Update();
+				l.Debug("Start performance test for logins");
+				for (i = 0; i < 10000; i++)
+				{
+					DataPackage dr = new DataPackage("ObjectName.String.64");
+					dr.SetHeader("ConnectionName", "Test");
+					dr.AddNew();
+					dr["ObjectName"] = "SysCat.SysSchema";
+					dr.Update();
 
-				//	dr = connector.Execute("Sys.GetSchema", dr);
-				//	if (i % 1000 == 0)
-				//	{
-				//		dr.Read();
-				//		//Console.WriteLine($"{i}\t{dr["ObjectSchema"]}");
-				//		Console.WriteLine(i);
-				//	}
-				//}
-				//l.Debug($"End performance test for {i} logins");
+					dr = ClientGate.Execute("Sys.GetSchema", dr);
+					if (i % 1000 == 0)
+					{
+						dr.Read();
+						Console.WriteLine($"{i}\t{DateTime.Now.Second}");
+						//Console.WriteLine(i);
+					}
+				}
+				l.Debug($"End performance test for {i} logins");
 			}
 		}
 	}

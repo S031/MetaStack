@@ -85,8 +85,9 @@ namespace S031.MetaStack.Core.Actions
 			using (JMXRepo repo = (f.CreateJMXRepo() as JMXRepo))
 			using (SQLStatementWriter writer = new SQLStatementWriter(repo))
 			{
+				_schema = await repo.GetSchemaAsync(_viewName);
 				_body = writer.WriteSelectStatement(
-					await repo.GetSchemaAsync(_viewName), 
+					_schema, 
 					_conditions.ToArray())
 					.ToString();
 			}

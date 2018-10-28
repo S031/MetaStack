@@ -76,7 +76,7 @@ namespace S031.MetaStack.WinForms
 		{
 			if (!_actionss.TryGetValue(actionID, out ActionInfo ai))
 			{
-				var dr = Execute("SysGetActionInfo",
+				var dr = Execute("Sys.GetActionInfo",
 					new DataPackage(new string[] { "ActionID" }, new object[] { actionID }));
 				if (dr.Read())
 					ai = ActionInfo.Create((string)dr["ActionInfo"]);

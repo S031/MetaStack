@@ -23,13 +23,13 @@ using S031.MetaStack.WinForms.Json;
 namespace S031.MetaStack.WinForms.Connectors
 #endif
 {
-	public class TCPConnector:IDisposable
+	public class TCPConnector : IDisposable
 	{
 		const string _endPointConfigName = "TCPConnector";
 		static readonly RSAEncryptionPadding _padding = RSAEncryptionPadding.OaepSHA256;
 
 		private Socket _socket;
-		private NetworkStream  _stream;
+		private NetworkStream _stream;
 		private readonly string _host;
 		private readonly int _port;
 		//Connection info
@@ -166,17 +166,44 @@ namespace S031.MetaStack.WinForms.Connectors
 			_connected = true;
 		}
 
+		//private static DataPackage SendAndRecieve(NetworkStream stream, DataPackage p)
+		//{
+		//	var data = p.ToArray();
+		//	stream.Write(BitConverter.GetBytes(data.Length), 0, 4);
+		//	stream.Write(data, 0, data.Length);
+		//	var buffer = new byte[4];
+
+		//	stream.Read(buffer, 0, 4);
+		//	var byteCount = BitConverter.ToInt32(buffer, 0);
+		//	var res = new byte[byteCount];
+		//	stream.Read(res, 0, byteCount);
+		//	return new DataPackage(res);
+		//}
+
 		private static DataPackage SendAndRecieve(NetworkStream stream, DataPackage p)
 		{
 			var data = p.ToArray();
 			stream.Write(BitConverter.GetBytes(data.Length), 0, 4);
 			stream.Write(data, 0, data.Length);
-			var buffer = new byte[4];
 
-			stream.Read(buffer, 0, 4);
+			var buffer = new byte[4];
+			int ReadBytes = 0;
+			while (4 > ReadBytes)
+			{
+				ReadBytes += stream.Read(buffer, ReadBytes, 4 - ReadBytes);
+				if (ReadBytes == 0)
+					break;
+			}
+
 			var byteCount = BitConverter.ToInt32(buffer, 0);
 			var res = new byte[byteCount];
-			stream.Read(res, 0, byteCount);
+			ReadBytes = 0;
+			while (byteCount > ReadBytes)
+			{
+				ReadBytes += stream.Read(res, ReadBytes, byteCount - ReadBytes);
+				if (ReadBytes == 0)
+					break;
+			}
 			return new DataPackage(res);
 		}
 	}

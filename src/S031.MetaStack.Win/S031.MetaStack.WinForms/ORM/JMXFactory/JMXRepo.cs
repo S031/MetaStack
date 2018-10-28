@@ -43,6 +43,8 @@ namespace S031.MetaStack.WinForms.ORM
 			throw new NotImplementedException();
 		}
 
+		public bool IsSchemaSupport() => true;
+
 		public virtual JMXSchema SaveSchema(JMXSchema schema)
 		{
 			throw new NotImplementedException();
