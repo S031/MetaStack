@@ -27,7 +27,7 @@ namespace S031.MetaStack.Core.Actions
 			using (MdbContext mdb = new MdbContext(_connectInfo))
 			{
 				//Костыль
-				CreateCommandAsync(mdb).GetAwaiter().GetResult();
+				CreateCommandAsync().GetAwaiter().GetResult();
 				return mdb.GetReader(_body, _parameters.ToArray());
 			}
 		}
@@ -37,7 +37,7 @@ namespace S031.MetaStack.Core.Actions
 			GetParameters(ai, dp);
 			using (MdbContext mdb = await MdbContext.CreateMdbContextAsync(_connectInfo))
 			{
-				await CreateCommandAsync(mdb);
+				await CreateCommandAsync();
 				if (_schema.DbObjectType == DbObjectTypes.Action)
 					using (ActionManager am = new ActionManager(mdb) { Logger = ApplicationContext.GetLogger() })
 						return await am.ExecuteAsync(_body, dp);
@@ -79,15 +79,19 @@ namespace S031.MetaStack.Core.Actions
 			_connectInfo = configuration.GetSection($"connectionStrings:{connectionName}").Get<ConnectInfo>();
 
 		}
-		private async Task CreateCommandAsync(MdbContext mdb)
+		private async Task CreateCommandAsync()
 		{
+			var config = ApplicationContext.GetConfiguration();
+			var connectInfo = config.GetSection($"connectionStrings:{config["appSettings:SysCatConnection"]}").Get<ConnectInfo>();
+
+			using (MdbContext mdb = await MdbContext.CreateMdbContextAsync(connectInfo))
 			using (JMXFactory f = JMXFactory.Create(mdb, ApplicationContext.GetLogger()))
 			using (JMXRepo repo = (f.CreateJMXRepo() as JMXRepo))
 			using (SQLStatementWriter writer = new SQLStatementWriter(repo))
 			{
 				_schema = await repo.GetSchemaAsync(_viewName);
 				_body = writer.WriteSelectStatement(
-					_schema, 
+					_schema,
 					_conditions.ToArray())
 					.ToString();
 			}

@@ -12,6 +12,7 @@ using System.Configuration;
 using S031.MetaStack.WinForms.Data;
 using S031.MetaStack.WinForms.Actions;
 using S031.MetaStack.WinForms.ORM;
+using System.Data;
 
 namespace S031.MetaStack.WinForms
 {
@@ -95,6 +96,47 @@ namespace S031.MetaStack.WinForms
 			.Create()
 			.CreateJMXRepo()
 			.GetSchema(objectName);
+
+		public static DataTable GetData(string queryID, params object[] parameters)
+		{
+			var dr = ClientGate.GetActionInfo("Sys.Select")
+			   .GetInputParamTable()
+			   .AddNew()
+			   .SetValue("ParamName", "_viewName")
+			   .SetValue("ParamValue", queryID)
+			   .Update();
+
+			bool c = false;
+			for (int i = 0; i < parameters.Length; i++)
+			{
+				object p = parameters[i];
+				if (i % 2 == 0)
+				{
+					if (p.ToString().EndsWith("ConnectionName"))
+						c = true;
+					else
+					{
+						dr.AddNew();
+						dr.SetValue("ParamName", (string)p);
+					}
+				}
+				else
+				{
+					if (c)
+					{
+						dr.SetHeader("ConnectionName", p);
+						dr.UpdateHeaders();
+						c = false;
+					}
+					else
+					{
+						dr.SetValue("ParamValue", p);
+						dr.Update();
+					}
+				}
+			}
+			return ClientGate.Execute("Sys.Select", dr).ToDataTable();
+		}
 
 		private static string SecureRequest(string userName)
 		{

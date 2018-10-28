@@ -11,6 +11,7 @@ namespace MetApp
 {
 	internal sealed partial class MainForm : WinForm
 	{
+		BindingSource _bs = new BindingSource();
 		private WinFormItem SetGrid()
 		{
 			return new WinFormItem("MainGrid")
@@ -21,20 +22,22 @@ namespace MetApp
 				{
 					var grid = (c as DBGridBase);
 					//grid.Name = "MainGrid";
+					grid.SelectionStyle = DBGridSelectionStyle.CheckBox;
 					grid.Dock = DockStyle.Fill;
 					grid.Style = GridSyle.View;
-					grid.RowTemplate.Height = 32;
+					grid.RowTemplate.Height = 25;
 					grid.AllowAddObject = true;
 					grid.AllowDelObject = true;
 					grid.AllowEditObject = true;
-					grid.MultiSelect = false;
+					//grid.MultiSelect = false;
 					grid.BackgroundColor = this.BackColor;
-					//grid.ObjectName = "QualityAssessment";
-					//grid.DataSource = DataManager.getData(grid.ObjectName);
-					//grid.AddColumnsFromObjectSchema();
+					grid.ObjectName = _objectName;
+					grid.AddColumnsFromObjectSchema();
+					_bs.DataSource = ClientGate.GetData(grid.ObjectName);
+					grid.DataSource = _bs;
 					//grid.ObjectEditor = () => new Calculator(grid.ObjectName, GetItem("DOGrid").As<DBGridBase>().ReadObject());
 					//grid.DataChanged += Grid_DataChanged;
-					grid.RowHeadersVisible = false;
+					//grid.RowHeadersVisible = false;
 					grid.ColumnHeadersVisible = true;
 					//grid.Font = new Font(grid.Font.FontFamily, 10f);
 					//grid.Columns[grid.Columns.Count - 1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;

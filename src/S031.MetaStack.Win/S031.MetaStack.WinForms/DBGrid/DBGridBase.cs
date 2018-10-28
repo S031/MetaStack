@@ -35,7 +35,7 @@ namespace S031.MetaStack.WinForms
 		blob = 4
 	}
 
-	public class DBGridBase : AdvancedDataGridView, IObjectHost
+	public class DBGridBase : DataGridView, IObjectHost
 	{
 		public const string TransportObject = "Qualifier";
 		//public const string DetailExtendedSection = "__detailExtended.031";
@@ -45,7 +45,7 @@ namespace S031.MetaStack.WinForms
 
 		#region Private declarations
 		//Data Source
-		private DataTable dt;
+		private DataTable _dt;
 
 		//GridStyle, RaiseCell
 		private GridSyle gs;
@@ -369,7 +369,7 @@ namespace S031.MetaStack.WinForms
 					AllowEditObject = AllowAddObject = AllowDelObject = false;
 			}
 		}
-		public DataTable BaseTable { get { return dt; } }
+		public DataTable BaseTable { get { return _dt; } }
 		//public void AddColumn(SortedList<int, AttribInfo> attInfo)
 		//{
 		//	foreach (KeyValuePair<int, AttribInfo> kvp in attInfo)
@@ -389,6 +389,13 @@ namespace S031.MetaStack.WinForms
 		}
 		public void AddColumn(params JMXAttribute[] aiList)
 		{
+			//advancedDataGridView_main.DisableFilterAndSort(advancedDataGridView_main.Columns["int"]);
+			//advancedDataGridView_main.SetFilterDateAndTimeEnabled(advancedDataGridView_main.Columns["datetime"], true);
+			//advancedDataGridView_main.SetSortEnabled(advancedDataGridView_main.Columns["guid"], false);
+			//advancedDataGridView_main.SetFilterChecklistEnabled(advancedDataGridView_main.Columns["guid"], false);
+			//advancedDataGridView_main.SortDESC(advancedDataGridView_main.Columns["double"]);
+			//advancedDataGridView_main.SetTextFilterRemoveNodesOnSearch(advancedDataGridView_main.Columns["double"], false);
+			//advancedDataGridView_main.SetChecklistTextFilterRemoveNodesOnSearchMode(advancedDataGridView_main.Columns["decimal"], false);
 			foreach (var ai in aiList)
 			{
 				if (ai.Locate)
@@ -416,6 +423,7 @@ namespace S031.MetaStack.WinForms
 							Width = 50
 						};
 						this.Columns.Add(ic);
+						//this.DisableFilterAndSort(ic);
 					}
 					else if (ai.ListData.Count > 0)
 					{
@@ -438,7 +446,7 @@ namespace S031.MetaStack.WinForms
 					}
 					else
 					{
-						DataGridViewColumn dc = this.Columns[this.Columns.Add(ai.AttribName, ai.Name)];
+						DataGridViewColumn dc = this.Columns[this.Columns.Add(ai.AttribName, ai.Name.IsEmpty() ? ai.AttribName : ai.Name)];
 						dc.DataPropertyName = ai.FieldName;
 						dc.SortMode = ai.Sorted ? DataGridViewColumnSortMode.Programmatic : DataGridViewColumnSortMode.NotSortable;
 						dc.Visible = ai.Visible;
@@ -465,9 +473,11 @@ namespace S031.MetaStack.WinForms
 								break;
 							case MacroType.date:
 								dc.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+								//this.SetFilterDateAndTimeEnabled(dc, true);
 								break;
 							default:
 								dc.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+								//this.EnableFilterAndSort(dc);
 								break;
 						}
 					}
@@ -912,9 +922,9 @@ namespace S031.MetaStack.WinForms
 		public virtual void Find(Func<DataRow, bool> fc, int startIndex)
 		{
 			//startIndex += 1;
-			if (string.IsNullOrEmpty(dt.DefaultView.RowFilter))
+			if (string.IsNullOrEmpty(_dt.DefaultView.RowFilter))
 			{
-				DataRowCollection rows = dt.Rows;
+				DataRowCollection rows = _dt.Rows;
 				//System.Threading.Tasks.Parallel.For(startIndex, rows.Count, (i, loopState) =>
 				for (int i = startIndex; i < rows.Count; i++)
 				{
@@ -928,7 +938,7 @@ namespace S031.MetaStack.WinForms
 			}
 			else
 			{
-				DataView dv = dt.DefaultView;
+				DataView dv = _dt.DefaultView;
 				for (int i = startIndex; i < dv.Count; i++)
 				{
 					if (fc(dv[i].Row))
@@ -941,7 +951,7 @@ namespace S031.MetaStack.WinForms
 		}
 		public virtual void RefreshAll()
 		{
-			dt.DefaultView.RowFilter = "";
+			_dt.DefaultView.RowFilter = "";
 			base.Refresh();
 		}
 		public virtual void RefreshAll(object bookmark)
@@ -1090,7 +1100,7 @@ namespace S031.MetaStack.WinForms
 		{
 			if (this.Rows.Count == 0) return;
 			string colName = this.Columns[this.CurrentCellAddress.X].Name;
-			DataView dv = dt.DefaultView;
+			DataView dv = _dt.DefaultView;
 			if (lastCondition == "Like")
 			{
 				string template = lastSearch.ToString().ToLower();
@@ -1153,10 +1163,10 @@ namespace S031.MetaStack.WinForms
 
 		protected DataRow GetRow(int index)
 		{
-			if (string.IsNullOrEmpty(dt.DefaultView.RowFilter))
-				return dt.Rows[index];
+			if (string.IsNullOrEmpty(_dt.DefaultView.RowFilter))
+				return _dt.Rows[index];
 			else
-				return dt.DefaultView[index].Row;
+				return _dt.DefaultView[index].Row;
 		}
 
 		public new void SelectAll()
@@ -1165,10 +1175,10 @@ namespace S031.MetaStack.WinForms
 			{
 				if (this.Rows.Count > 0)
 				{
-					if (string.IsNullOrEmpty(dt.DefaultView.RowFilter))
+					if (string.IsNullOrEmpty(_dt.DefaultView.RowFilter))
 						this.GoTo(this.Rows.Count - 1);
 					else
-						this.GoTo(dt.DefaultView.Count - 1);
+						this.GoTo(_dt.DefaultView.Count - 1);
 				}
 				base.SelectAll();
 			}
@@ -1250,7 +1260,7 @@ namespace S031.MetaStack.WinForms
 		}
 		public DataRow FindRow(int ibjectID)
 		{
-			foreach (DataRow dr in dt.Rows)
+			foreach (DataRow dr in _dt.Rows)
 				if ((int)dr["ID"] == ibjectID)
 					return dr;
 			return null;
@@ -1354,11 +1364,13 @@ namespace S031.MetaStack.WinForms
 		private void DBGridBase_DataSourceChanged(object sender, EventArgs e)
 		{
 			if (this.DataSource is DataTable)
-				dt = (DataTable)this.DataSource;
+				_dt = (DataTable)this.DataSource;
+			else if (this.DataSource is BindingSource)
+				_dt = (DataTable)(this.DataSource as BindingSource).DataSource;
 			else if (this.DataSource is DataSet)
-				dt = (this.DataSource as DataSet).Tables[this.DataMember];
+				_dt = (this.DataSource as DataSet).Tables[this.DataMember];
 			else
-				dt = (DataTable)this.DataSource;
+				_dt = (DataTable)this.DataSource;
 		}
 
 		private void EditorRefreshHost(IObjectEditor oe)

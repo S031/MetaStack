@@ -16,12 +16,14 @@ namespace MetApp
 		CommandExecuter<DBBrowseCommandsEnum> _commands = new CommandExecuter<DBBrowseCommandsEnum>();
 		private int _curRowIdx = 0;
 		private DBGridBase _grid;
+		private string _objectName;
 
 		ToolStripDateEdit _dateStart;
 		ToolStripDateEdit _dateFinish;
 
 		public MainForm(string startupForm) : base(WinFormStyle.Form) 
 		{
+			_objectName = startupForm;
 			InitializeComponent();
 			SetCommands();
 		}
