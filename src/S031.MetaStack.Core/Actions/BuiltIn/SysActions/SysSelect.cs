@@ -45,7 +45,9 @@ namespace S031.MetaStack.Core.Actions
 					return await mdb.GetReaderAsync(_body, _parameters.ToArray());
 			}
 		}
-
+		/// <summary>
+		/// Костыль!!! Check parameters with object schema (aka action execute)
+		/// </summary>
 		private void GetParameters(ActionInfo ai, DataPackage dp)
 		{
 			if (!dp.Headers.TryGetValue("ConnectionName", out object connectionName))

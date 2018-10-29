@@ -35,7 +35,7 @@ namespace S031.MetaStack.WinForms
 			if (_connector != null && _connector.Connected)
 				return true;
 
-			string userName = Environment.UserName;
+			string userName = $@"{Environment.UserDomainName}\{Environment.UserName}";
 			string password = string.Empty;
 			bool savePassword = ConfigurationManager.AppSettings["SavePassword"].ToBoolOrDefault();
 			bool isPrompt = false;
@@ -56,9 +56,14 @@ namespace S031.MetaStack.WinForms
 				if (isPrompt && savePassword)
 					CredentialManager.WriteCredential(_appName, userName, password);
 			}
+			catch(TCPConnectorException ex)
+			{
+				MessageBox.Show($"{ex.Message}\n{ex.RemoteStackTrace}", "Logon failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return false;
+			}
 			catch(Exception ex)
 			{
-				MessageBox.Show(ex.Message, "Logon failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				MessageBox.Show($"{ex.Message}\n{ex.StackTrace}", "Logon failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return false;
 			}
 			return true;
@@ -69,8 +74,21 @@ namespace S031.MetaStack.WinForms
 
 		public static DataPackage Execute(string actionID, DataPackage paramTable)
 		{
-			Logon();
-			return _connector.Execute(actionID, paramTable);
+			try
+			{
+				Logon();
+				return _connector.Execute(actionID, paramTable);
+			}
+			catch (TCPConnectorException ex)
+			{
+				MessageBox.Show($"{ex.Message}\n{ex.RemoteStackTrace}", "Logon failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return null;
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show($"{ex.Message}\n{ex.StackTrace}", "Logon failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return null;
+			}
 		}
 
 		public static ActionInfo GetActionInfo(string actionID)

@@ -9,7 +9,7 @@ using Newtonsoft.Json.Linq;
 using S031.MetaStack.WinForms.Data;
 using S031.MetaStack.WinForms.Json;
 using S031.MetaStack.WinForms.ORM;
-using Zuby.ADGV; 
+//using Zuby.ADGV; 
 
 namespace S031.MetaStack.WinForms
 {

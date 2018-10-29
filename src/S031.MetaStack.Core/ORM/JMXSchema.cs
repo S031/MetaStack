@@ -91,7 +91,7 @@ namespace S031.MetaStack.WinForms.ORM
             //	_objectName = value.ObjectName;
             //}
         }
-        public JMXObjectName DbObjectName
+		public JMXObjectName DbObjectName
         {
             get => new JMXObjectName(_areaName, _dbObjectName);
             set
@@ -101,6 +101,10 @@ namespace S031.MetaStack.WinForms.ORM
                 _dbObjectName = value.ObjectName;
             }
         }
+		/// <summary>
+		/// Костыль!!! Связать с ParentID
+		/// </summary>
+        public JMXObjectName OwnerObject { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
         public DirectAccess DirectAccess { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
@@ -133,6 +137,15 @@ namespace S031.MetaStack.WinForms.ORM
             writer.WriteProperty("AreaName", DbObjectName.AreaName);
             writer.WriteProperty("ObjectName", DbObjectName.ObjectName);
             writer.WriteEndObject();
+
+			if (!OwnerObject.IsEmpty())
+			{
+				writer.WritePropertyName("OwnerObject");
+				writer.WriteStartObject();
+				writer.WriteProperty("AreaName", OwnerObject.AreaName);
+				writer.WriteProperty("ObjectName", OwnerObject.ObjectName);
+				writer.WriteEndObject();
+			}
 
             if (PrimaryKey != null)
             {

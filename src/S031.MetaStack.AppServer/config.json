@@ -2,7 +2,7 @@
   "appSettings": {
     "auditEnabled": true,
     "language": "ru-RU",
-    "defaultConnection": "Test",
+    "defaultConnection": "AseDb",
     "SysCatConnection": "SQliteDb"
   },
   "ApplicationLogSettings": {
@@ -32,7 +32,7 @@
   "connectionStrings": {
     "bankLocal": {
       "providerName": "System.Data.SqLClient",
-      "connectionString": "Data Source=localhost;Initial Catalog=MetaStack;Integrated Security=True;"
+      "connectionString": "Data Source=localhost;Initial Catalog=Msfodb;Integrated Security=True;"
     },
     "SqliteDb": {
       "providerName": "System.Data.Sqlite",
