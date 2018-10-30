@@ -134,13 +134,15 @@ namespace S031.MetaStack.WinForms
 
 		private WinFormItem Attrib2WinFormItem(JMXAttribute ai, object value)
 		{
-			var item = new WinFormItem(ai.AttribName);
-			item.Caption = ai.Caption;
-			item.DataType = MdbTypeMap.GetType(ai.DataType);
-			item.Width = ai.Width;
-			item.Format = ai.Format;
-			item.Mask = ai.Mask;
-			item.SuperForm = ai.SuperForm;
+			WinFormItem item = new WinFormItem(ai.AttribName)
+			{
+				Caption = ai.Caption,
+				DataType = MdbTypeMap.GetType(ai.DataType),
+				Width = ai.Width,
+				Format = ai.Format,
+				Mask = ai.Mask,
+				SuperForm = ai.SuperForm
+			};
 			if (string.IsNullOrEmpty(item.SuperForm))
 				item.SuperForm = ai.SuperObject;
 			item.SuperMethod = ai.SuperMethod;

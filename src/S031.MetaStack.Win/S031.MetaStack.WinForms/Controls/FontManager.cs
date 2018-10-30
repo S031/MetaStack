@@ -8,7 +8,7 @@ namespace S031.MetaStack.WinForms
 	public static class FontManager
 	{
 		static Screen _screen = Screen.AllScreens.First((screen) => screen.Primary);
-		static int _width = _screen.Bounds.Width;
+		static readonly int _width = _screen.Bounds.Width;
 		static float _baseFontSize = 9f; //dbs.GetSetting("Newbank;Setup;BaseFontSize", _width >= 1900 ? "9" : "8").ToIntOrDefault();
 		public static float BaseFontSize { get => _baseFontSize; }
 		public static void SetBaseFontSize(float newFontSize)
@@ -63,8 +63,7 @@ namespace S031.MetaStack.WinForms
 			float size = (float)_baseFontSize + 0.25f;
 			menu.Font = new Font(menu.Font.FontFamily, size, menu.Font.Style, menu.Font.Unit, menu.Font.GdiCharSet, menu.Font.GdiVerticalFont);
 
-			ToolStripDropDownItem item = menu as ToolStripDropDownItem;
-			if (item != null)
+			if (menu is ToolStripDropDownItem item)
 			{
 				foreach (ToolStripItem ts in item.DropDownItems)
 				{

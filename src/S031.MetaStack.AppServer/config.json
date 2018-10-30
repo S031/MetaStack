@@ -2,7 +2,7 @@
   "appSettings": {
     "auditEnabled": true,
     "language": "ru-RU",
-    "defaultConnection": "AseDb",
+    "defaultConnection": "bankLocal",
     "SysCatConnection": "SQliteDb"
   },
   "ApplicationLogSettings": {

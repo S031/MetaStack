@@ -8,7 +8,7 @@ namespace S031.MetaStack.WinForms.ORM
 {
 	public abstract class JMXFactory : IJMXFactory
 	{
-		private static IJMXFactory _factory = new JMXClientFactory();
+		private static readonly IJMXFactory _factory = new JMXClientFactory();
 
 		public virtual IJMXProvider CreateJMXProvider()
 		{

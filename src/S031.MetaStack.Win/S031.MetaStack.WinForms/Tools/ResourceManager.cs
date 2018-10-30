@@ -15,9 +15,8 @@ namespace S031.MetaStack.WinForms
 		
 		public static Image GetImage(string imageName, Assembly asm = null)
 		{
-			Image img;
 			if (!imageName.Contains(".")) imageName += ".png";
-			if (images.TryGetValue(imageName, out img)) return img;
+			if (images.TryGetValue(imageName, out Image img)) return img;
 			if (asm == null)
 				asm = typeof( ResourceManager).Assembly;
 			if (imageName.Right(4).ToLower() == ".ico")
@@ -38,9 +37,8 @@ namespace S031.MetaStack.WinForms
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
 		public static Icon GetIcon(string iconName, Size size, Assembly asm = null)
 		{
-			Icon ico;
 			if (!iconName.Contains(".")) iconName += ".ico";
-			if (icons.TryGetValue(iconName, out ico)) return ico;
+			if (icons.TryGetValue(iconName, out Icon ico)) return ico;
 			if (asm == null)
 				asm = typeof(ResourceManager).Assembly;
 			return new Icon(asm.GetManifestResourceStream(asm.FullName.Split(',')[0] + ".Resources." + iconName), size);

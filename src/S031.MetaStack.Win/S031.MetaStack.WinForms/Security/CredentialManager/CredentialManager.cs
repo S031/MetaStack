@@ -16,8 +16,7 @@ namespace S031.MetaStack.WinForms.Security
 	{
 		public static NetworkCredential ReadCredential(string applicationName)
 		{
-			IntPtr nCredPtr;
-			bool read = CredRead(applicationName, CredentialType.Generic, 0, out nCredPtr);
+			bool read = CredRead(applicationName, CredentialType.Generic, 0, out IntPtr nCredPtr);
 			if (read)
 			{
 				using (CriticalCredentialHandle critCred = new CriticalCredentialHandle(nCredPtr))
@@ -58,17 +57,19 @@ namespace S031.MetaStack.WinForms.Security
 					throw new ArgumentOutOfRangeException("secret", "The secret message has exceeded 2560 bytes.");
 			}
 
-			CREDENTIAL credential = new CREDENTIAL();
-			credential.AttributeCount = 0;
-			credential.Attributes = IntPtr.Zero;
-			credential.Comment = IntPtr.Zero;
-			credential.TargetAlias = IntPtr.Zero;
-			credential.Type = CredentialType.Generic;
-			credential.Persist = (uint)CredentialPersistence.LocalMachine;
-			credential.CredentialBlobSize = (uint)(byteArray == null ? 0 : byteArray.Length);
-			credential.TargetName = Marshal.StringToCoTaskMemUni(applicationName);
-			credential.CredentialBlob = Marshal.StringToCoTaskMemUni(secret);
-			credential.UserName = Marshal.StringToCoTaskMemUni(userName ?? Environment.UserName);
+			CREDENTIAL credential = new CREDENTIAL
+			{
+				AttributeCount = 0,
+				Attributes = IntPtr.Zero,
+				Comment = IntPtr.Zero,
+				TargetAlias = IntPtr.Zero,
+				Type = CredentialType.Generic,
+				Persist = (uint)CredentialPersistence.LocalMachine,
+				CredentialBlobSize = (uint)(byteArray == null ? 0 : byteArray.Length),
+				TargetName = Marshal.StringToCoTaskMemUni(applicationName),
+				CredentialBlob = Marshal.StringToCoTaskMemUni(secret),
+				UserName = Marshal.StringToCoTaskMemUni(userName ?? Environment.UserName)
+			};
 
 			bool written = CredWrite(ref credential, 0);
 			Marshal.FreeCoTaskMem(credential.TargetName);
@@ -86,9 +87,7 @@ namespace S031.MetaStack.WinForms.Security
 		{
 			List<NetworkCredential> result = new List<NetworkCredential>();
 
-			int count;
-			IntPtr pCredentials;
-			bool ret = CredEnumerate(null, 0, out count, out pCredentials);
+			bool ret = CredEnumerate(null, 0, out int count, out IntPtr pCredentials);
 			if (ret)
 			{
 				for (int n = 0; n < count; n++)

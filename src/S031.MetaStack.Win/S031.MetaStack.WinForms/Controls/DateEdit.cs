@@ -29,17 +29,9 @@ namespace S031.MetaStack.WinForms
 		public event EventHandler<EventArgs> ValidDate;
 
 		[Category("Behavior")]
-		protected virtual void OnInvalidDate(EventArgs e)
-		{
-			if (InvalidDate != null)
-				InvalidDate(this, e);
-		}
+		protected virtual void OnInvalidDate(EventArgs e) => InvalidDate?.Invoke(this, e);
 		[Category("Behavior")]
-		protected virtual void OnValidDate(EventArgs e)
-		{
-			if (ValidDate != null)
-				ValidDate(this, e);
-		}
+		protected virtual void OnValidDate(EventArgs e) => ValidDate?.Invoke(this, e);
 		#endregion events
 
 		#region Public
@@ -50,8 +42,10 @@ namespace S031.MetaStack.WinForms
 			BuildPosNdx();
 			base.Text = m_format;
 
-			monthCalendar = new MonthCalendar();
-			monthCalendar.ShowWeekNumbers = false;
+			monthCalendar = new MonthCalendar
+			{
+				ShowWeekNumbers = false
+			};
 			monthCalendar.DateSelected += (sender, e) =>
 							{
 								this.Value = e.Start;
@@ -78,8 +72,7 @@ namespace S031.MetaStack.WinForms
 			get { return base.Text; }
 			set
 			{
-				DateTime dt;
-				if (DateTime.TryParse(value, out dt))
+				if (DateTime.TryParse(value, out DateTime dt))
 					this.Value = dt;
 				else
 					this.Value = NullValue;
@@ -90,11 +83,10 @@ namespace S031.MetaStack.WinForms
 		{
 			get
 			{
-					// null is valid
-					if (base.Text == m_format)
-						return true;
-					DateTime ret;
-					return DateTime.TryParse(base.Text, out ret);
+				// null is valid
+				if (base.Text == m_format)
+					return true;
+				return DateTime.TryParse(base.Text, out DateTime ret);
 			}
 		}
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden), Browsable(false)]
@@ -105,8 +97,7 @@ namespace S031.MetaStack.WinForms
 				// TODO: What to return if Null not allowed and invalid value?
 				//	a) error?
 				//	b) Null?
-				DateTime ret;
-				if (DateTime.TryParse(base.Text, out ret))
+				if (DateTime.TryParse(base.Text, out DateTime ret))
 					return ret;
 				return NullValue;
 			}
@@ -312,8 +303,7 @@ namespace S031.MetaStack.WinForms
 			autoCompleteText();
 			if (this.Text == m_format)
 				return;
-			DateTime dt;
-			if (DateTime.TryParse(this.Text, out dt))
+			if (DateTime.TryParse(this.Text, out DateTime dt))
 				OnValidDate(EventArgs.Empty);
 			else
 				// fire InvalidDate event
@@ -337,8 +327,7 @@ namespace S031.MetaStack.WinForms
 				this.Text = s.Substring(0, 6) + DateTime.Now.Year.ToString("0000");
 			else
 			{
-				DateTime dt;
-				if (DateTime.TryParse(s.Replace(m_inpChar.ToString(), ""), out dt))
+				if (DateTime.TryParse(s.Replace(m_inpChar.ToString(), ""), out DateTime dt))
 					this.Text = dt.ToShortDateString();
 			}
 

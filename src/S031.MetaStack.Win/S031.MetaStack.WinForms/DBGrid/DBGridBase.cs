@@ -45,6 +45,7 @@ namespace S031.MetaStack.WinForms
 
 		#region Private declarations
 		//Data Source
+		BindingSource _bs;
 		private DataTable _dt;
 
 		//GridStyle, RaiseCell
@@ -119,7 +120,7 @@ namespace S031.MetaStack.WinForms
 			// 
 			this.AutoGenerateColumns = false;
 			this.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize; //.ColumnHeadersHeight = 18;
-			this.RowHeadersWidth = 18;
+			this.RowHeadersWidth = 20;
 			this.RowTemplate.Height = (int)(this.Font.GetHeight() * 1.5);
 			this.VirtualMode = true;
 			this.KeyDown += new KeyEventHandler(DBGridBase_KeyDown);
@@ -384,18 +385,10 @@ namespace S031.MetaStack.WinForms
 				.Create()
 				.CreateJMXRepo()
 				.GetSchema(this.ObjectName);
-			foreach (var attrib in s.Attributes)
-				AddColumn(attrib);
+				AddColumn(s.Attributes.ToArray());
 		}
 		public void AddColumn(params JMXAttribute[] aiList)
 		{
-			//advancedDataGridView_main.DisableFilterAndSort(advancedDataGridView_main.Columns["int"]);
-			//advancedDataGridView_main.SetFilterDateAndTimeEnabled(advancedDataGridView_main.Columns["datetime"], true);
-			//advancedDataGridView_main.SetSortEnabled(advancedDataGridView_main.Columns["guid"], false);
-			//advancedDataGridView_main.SetFilterChecklistEnabled(advancedDataGridView_main.Columns["guid"], false);
-			//advancedDataGridView_main.SortDESC(advancedDataGridView_main.Columns["double"]);
-			//advancedDataGridView_main.SetTextFilterRemoveNodesOnSearch(advancedDataGridView_main.Columns["double"], false);
-			//advancedDataGridView_main.SetChecklistTextFilterRemoveNodesOnSearchMode(advancedDataGridView_main.Columns["decimal"], false);
 			foreach (var ai in aiList)
 			{
 				if (ai.Locate)
@@ -423,7 +416,6 @@ namespace S031.MetaStack.WinForms
 							Width = 50
 						};
 						this.Columns.Add(ic);
-						//this.DisableFilterAndSort(ic);
 					}
 					else if (ai.ListData.Count > 0)
 					{
@@ -473,11 +465,9 @@ namespace S031.MetaStack.WinForms
 								break;
 							case MacroType.date:
 								dc.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-								//this.SetFilterDateAndTimeEnabled(dc, true);
 								break;
 							default:
 								dc.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
-								//this.EnableFilterAndSort(dc);
 								break;
 						}
 					}
@@ -578,9 +568,11 @@ namespace S031.MetaStack.WinForms
 			else if (this.DataSource != null && this.Rows.Count > 0 && this.CurrentCellAddress.Y == e.RowIndex &&
 				this.CurrentCellAddress.X == e.ColumnIndex)
 			{
-				Color color = this.RowTemplate.DefaultCellStyle.SelectionBackColor;
-				e.CellStyle.SelectionBackColor = System.Drawing.Color.FromArgb(color.R + 32, color.G + 32, color.B - 32);
-				e.CellStyle.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+				e.CellStyle.SelectionBackColor = this.RowTemplate.DefaultCellStyle.BackColor;
+				e.CellStyle.SelectionForeColor = this.RowTemplate.DefaultCellStyle.ForeColor;
+				//Color color = this.RowTemplate.DefaultCellStyle.SelectionBackColor;
+				//e.CellStyle.SelectionBackColor = System.Drawing.Color.FromArgb(color.R + 32, color.G + 32, color.B - 32);
+				//e.CellStyle.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
 			}
 		}
 		#endregion Raise Cells
@@ -1410,6 +1402,10 @@ namespace S031.MetaStack.WinForms
 			return dtList;
 		}
 		#endregion Public Static Methods
+
+		#region Protected Methods
+		protected virtual BindingSource GetBindingSource() => _bs;
+		#endregion Protected Methods
 
 		protected override void OnDataError(bool displayErrorDialogIfNoHandler, DataGridViewDataErrorEventArgs e)
 		{

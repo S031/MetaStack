@@ -15,7 +15,7 @@ namespace MetApp
 	{
 		CommandExecuter<DBBrowseCommandsEnum> _commands = new CommandExecuter<DBBrowseCommandsEnum>();
 		private int _curRowIdx = 0;
-		private DBGridBase _grid;
+		private DBGrid _grid;
 		private string _objectName;
 
 		ToolStripDateEdit _dateStart;

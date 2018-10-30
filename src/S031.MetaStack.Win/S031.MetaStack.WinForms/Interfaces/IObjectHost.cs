@@ -33,11 +33,4 @@ namespace S031.MetaStack.WinForms
 		void RefreshAll(object bookmark);
 		Form FindForm();
 	}
-	public class ActionEventArgs : EventArgs
-	{
-		public ActionEventArgs() { }
-		public ActionEventArgs(JMXObject jObject) { ObjSource = jObject; }
-		public JMXObject ObjSource { get; set; }
-		public string ActionID { get; set; }
-	}
 }

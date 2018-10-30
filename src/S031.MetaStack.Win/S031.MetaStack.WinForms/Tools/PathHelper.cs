@@ -70,5 +70,7 @@ namespace S031.MetaStack.WinForms
 		public static string TemplatesPath => Environment.GetFolderPath(Environment.SpecialFolder.Templates);
 
 		public static string UserTempPath => System.IO.Path.GetTempPath();
+
+		public static string UserName => $@"{Environment.UserDomainName}\{Environment.UserName}";
 	}
 }

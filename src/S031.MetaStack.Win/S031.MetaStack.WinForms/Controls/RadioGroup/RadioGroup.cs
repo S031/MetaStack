@@ -34,8 +34,8 @@ namespace S031.MetaStack.WinForms
             public event ItemsChangedEventHandler ItemsChanged;
             private void OnItemsChanged(ItemsChangedEventArgs e)
             {
-                if (ItemsChanged != null) ItemsChanged(this, e);
-            }
+				ItemsChanged?.Invoke(this, e);
+			}
 
             // We have to override the StringCollection's methods of items manipulating
 
@@ -222,10 +222,12 @@ namespace S031.MetaStack.WinForms
                 bool emptyGroup = buttons.Count == 0;
                 for (int i = buttons.Count; i < names.Count; ++i )
                 {
-                    RadioButton radioButton = new RadioButton();
-                    radioButton.AutoSize = true;
-                    radioButton.TabStop = true;
-                    radioButton.Click += button_Click;
+					RadioButton radioButton = new RadioButton
+					{
+						AutoSize = true,
+						TabStop = true
+					};
+					radioButton.Click += button_Click;
                     radioButton.Text = names[i];
                     buttons.Add(radioButton);
                 }
@@ -381,8 +383,8 @@ namespace S031.MetaStack.WinForms
         public event EventHandler IndexChanged;
         private void OnIndexChanged(EventArgs e)
         {
-            if (IndexChanged != null) IndexChanged(this, e);
-        }
+			IndexChanged?.Invoke(this, e);
+		}
 
         [Category("Appearance")]
         [Description("Defines quantity of columns the group will be separated to.")]
@@ -442,8 +444,8 @@ namespace S031.MetaStack.WinForms
         public new event EventHandler Click;
         private new void  OnClick(EventArgs e)
         {
-            if (Click != null) Click(this, e);
-        }
+			Click?.Invoke(this, e);
+		}
 
         #region SupportInitialize Interface implementation
 

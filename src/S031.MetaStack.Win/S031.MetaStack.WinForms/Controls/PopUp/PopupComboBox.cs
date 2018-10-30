@@ -119,11 +119,8 @@ namespace S031.MetaStack.WinForms.PopupControl
             {
                 if ((DateTime.UtcNow - dropDownHideTime).TotalSeconds > 0.5)
                 {
-                    if (DropDown != null)
-                    {
-                        DropDown(this, EventArgs.Empty);
-                    }
-                    dropDown.Show(this);
+					DropDown?.Invoke(this, EventArgs.Empty);
+					dropDown.Show(this);
                 }
                 else
                 {
@@ -146,11 +143,8 @@ namespace S031.MetaStack.WinForms.PopupControl
             if (dropDown != null)
             {
                 dropDown.Hide();
-                if (DropDownClosed != null)
-                {
-                    DropDownClosed(this, EventArgs.Empty);
-                }
-            }
+				DropDownClosed?.Invoke(this, EventArgs.Empty);
+			}
         }
 
         /// <summary>

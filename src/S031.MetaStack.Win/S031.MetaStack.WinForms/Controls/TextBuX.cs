@@ -29,10 +29,12 @@ namespace S031.MetaStack.WinForms
 
 		public TextBuX()
 		{
-			_tb = new TextBox();
-			_tb.Name = "TextBox";
-			_tb.Margin = new Padding(0, 0, 0, 0);
-			_tb.Dock = DockStyle.Left;
+			_tb = new TextBox
+			{
+				Name = "TextBox",
+				Margin = new Padding(0, 0, 0, 0),
+				Dock = DockStyle.Left
+			};
 			_tb.TextChanged += new EventHandler((o, e) => this.OnTextChanged(e));
 			_tb.KeyDown += new KeyEventHandler((o, e) =>
 				{
@@ -41,12 +43,14 @@ namespace S031.MetaStack.WinForms
 					this.OnKeyDown(e);
 				});
 
-			_btn = new Button();
-			_btn.Name = "Button";
-			_btn.Width = buttonWidth;
-			_btn.Margin = new Padding(0, 0, 0, 0);
-			_btn.Text = "...";
-			_btn.Dock = DockStyle.Right;
+			_btn = new Button
+			{
+				Name = "Button",
+				Width = buttonWidth,
+				Margin = new Padding(0, 0, 0, 0),
+				Text = "...",
+				Dock = DockStyle.Right
+			};
 			_btn.Click += new EventHandler((o, e) => { this.OnClick(e); });
 			_btn.TextChanged += new EventHandler(TextBuX_Resize);
 

@@ -15,15 +15,19 @@ namespace S031.MetaStack.WinForms
 			WinForm wf = parent.GetOwner();
 			if (wf == null)
 				throw new InvalidOperationException($"Control extensoin method Add<T> may be called only for WinForm child control");
-			WinFormItem wfi = new WinFormItem(wf.NewName(typeof(T)));
-			wfi.PresentationType = typeof(T);
+			WinFormItem wfi = new WinFormItem(wf.NewName(typeof(T)))
+			{
+				PresentationType = typeof(T)
+			};
 			return (T)add(parent, wfi);
 		}
 		public static T Add<T>(this Control parent, string name) where T : Control
 		{
 			name.NullTest(nameof(name));
-			WinFormItem wfi = new WinFormItem(name);
-			wfi.PresentationType = typeof(T);
+			WinFormItem wfi = new WinFormItem(name)
+			{
+				PresentationType = typeof(T)
+			};
 			return (T)add(parent, wfi);
 		}
 
@@ -149,8 +153,7 @@ namespace S031.MetaStack.WinForms
 			var cellAddress = winFormItem.CellAddress;
 
 			TextBuX tbux = instance as TextBuX;
-			Action<object, EventArgs> dataChanged = (c, e) =>
-				{ (c as Control)?.GetOwner().OnDataChanged(new DataChangedEventArgs(c as Control)); };
+			void dataChanged(object c, EventArgs e) { (c as Control)?.GetOwner().OnDataChanged(new DataChangedEventArgs(c as Control)); }
 
 			if (instance is TextBoxBase || tbux != null)
 			{
@@ -233,8 +236,7 @@ namespace S031.MetaStack.WinForms
 				parent.Controls.Add(instance);
 			else
 				(parent as TableLayoutPanel)?.Controls.Add(instance, cellAddress.x, cellAddress.y);
-			if (winFormItem.ControlTrigger != null)
-				winFormItem.ControlTrigger(winFormItem, instance);
+			winFormItem.ControlTrigger?.Invoke(winFormItem, instance);
 			foreach (WinFormItem item in winFormItem)
 			{
 				if (item.PresentationType != null && typeof(Control).IsAssignableFrom(item.PresentationType))

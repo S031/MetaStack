@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Text;
 
+#if NETCOREAPP
 namespace S031.MetaStack.Core.Data
+#else
+namespace S031.MetaStack.WinForms.Data
+#endif
 {
 	public partial class DataPackage : IDataReader
 	{

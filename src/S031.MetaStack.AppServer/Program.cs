@@ -32,7 +32,7 @@ namespace S031.MetaStack.AppServer
 				.Build())
 			{
 				//await host.RunAsync(ApplicationContext.CancellationToken);
-				TestConnection();
+				//TestConnection();
 				await host.RunAsync();
 			}
 		}

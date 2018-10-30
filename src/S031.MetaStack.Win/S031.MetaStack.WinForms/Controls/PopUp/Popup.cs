@@ -152,11 +152,7 @@ namespace S031.MetaStack.WinForms.PopupControl
         /// <exception cref="T:System.ArgumentNullException"><paramref name="content" /> is <code>null</code>.</exception>
         public Popup(Control content)
         {
-            if (content == null)
-            {
-                throw new ArgumentNullException("content");
-            }
-            Content = content;
+			Content = content ?? throw new ArgumentNullException("content");
             FocusOnOpen = true;
             AcceptAlt = true;
             ShowingAnimation = PopupAnimations.SystemDefault;

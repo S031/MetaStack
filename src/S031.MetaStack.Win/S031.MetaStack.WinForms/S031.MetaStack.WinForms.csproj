@@ -32,9 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AdvancedDataGridView">
-      <HintPath>..\..\..\..\advanceddatagridview\AdvancedDataGridView\bin\Release\AdvancedDataGridView.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -44,6 +41,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\S031.MetaStack.Core\Actions\ActionInfo\ActionInfo.cs">
@@ -66,6 +64,9 @@
     </Compile>
     <Compile Include="..\..\S031.MetaStack.Core\Data\DataPackage.cs">
       <Link>Data\DataPackage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\S031.MetaStack.Core\Data\DataPackageExt.cs">
+      <Link>Data\DataPackageExt.cs</Link>
     </Compile>
     <Compile Include="..\..\S031.MetaStack.Core\Data\MdbType.cs">
       <Link>Data\MdbType.cs</Link>
@@ -177,9 +178,19 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Data\DataRowExtensions.cs" />
-    <Compile Include="DBGrid\DBGridBase.cs" />
+    <Compile Include="DBGrid\DBGrid.cs" />
+    <Compile Include="DBGrid\DBGridBase.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DBGrid\DBgridParameters.cs" />
     <Compile Include="DBGrid\Formater.cs" />
     <Compile Include="DBGrid\GridSpeedSearch.cs" />
+    <Compile Include="Dialogs\TimeWaitDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\TimeWaitDialog.Designer.cs">
+      <DependentUpon>TimeWaitDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Editors\MultiEdit.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -204,10 +215,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\CredentialManager\CredentialManager.cs" />
     <Compile Include="Tools\ClientGate.cs" />
+    <Compile Include="Tools\Events.cs" />
     <Compile Include="Tools\PathHelper.cs" />
     <Compile Include="Tools\ResourceManager.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Dialogs\TimeWaitDialog.resx">
+      <DependentUpon>TimeWaitDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\Attach.png" />
     <EmbeddedResource Include="Resources\AttFiles\Avi.png" />
     <EmbeddedResource Include="Resources\AttFiles\Bat.png" />

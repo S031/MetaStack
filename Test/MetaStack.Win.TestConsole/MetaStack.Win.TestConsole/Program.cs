@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using S031.MetaStack.Common.Logging;
 using S031.MetaStack.WinForms;
 using S031.MetaStack.WinForms.Connectors;
-using S031.MetaStack.WinForms;
 using S031.MetaStack.WinForms.Data;
 
 namespace MetaStack.Win.TestConsole

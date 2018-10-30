@@ -18,7 +18,7 @@ namespace S031.MetaStack.WinForms
 
 		private object _value;
 
-		private string _name;
+		private readonly string _name;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
@@ -102,8 +102,7 @@ namespace S031.MetaStack.WinForms
 
 		protected virtual void OnPropertyChanged([CallerMemberName] String propertyName = "")
 		{
-			if (PropertyChanged != null)
-				PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
 		}
 

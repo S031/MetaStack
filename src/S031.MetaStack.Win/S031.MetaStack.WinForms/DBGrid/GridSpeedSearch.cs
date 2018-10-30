@@ -49,8 +49,10 @@ namespace S031.MetaStack.WinForms
 						this.Clear();
 				}
 			};
-			errToolTip = new ToolTip();
-			errToolTip.ToolTipIcon = ToolTipIcon.Error;
+			errToolTip = new ToolTip
+			{
+				ToolTipIcon = ToolTipIcon.Error
+			};
 		}
 
 		public void Clear()

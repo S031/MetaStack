@@ -124,9 +124,11 @@ namespace S031.MetaStack.WinForms
 		public void Find()
 		{
 			if (_cd != null) _cd.Dispose();
-			_cd = new WinForm(WinFormStyle.Dialog);
-			_cd.Size = new Size(350, Convert.ToInt32(350 / vbo.GoldenRatio));
-			_cd.Text = "Найти...";
+			_cd = new WinForm(WinFormStyle.Dialog)
+			{
+				Size = new Size(350, Convert.ToInt32(350 / vbo.GoldenRatio)),
+				Text = "Найти..."
+			};
 
 			_cd.Add<Panel>(WinFormConfig.SinglePageForm);
 			TableLayoutPanel tlpRows = _cd.Items["FormRowsPanel"].LinkedControl as TableLayoutPanel;
@@ -160,9 +162,11 @@ namespace S031.MetaStack.WinForms
 			//	new WinFormItem("Amount") { Caption = "Сумма", DataType = typeof(decimal), Value = 1000000, Format = vbo.CurrencyFormat });
 
 			if (_cd != null) _cd.Dispose();
-			_cd = new WinForm(WinFormStyle.Dialog);
-			_cd.Size = new Size(350, Convert.ToInt32(350 / vbo.GoldenRatio));
-			_cd.Text = "Найти...";
+			_cd = new WinForm(WinFormStyle.Dialog)
+			{
+				Size = new Size(350, Convert.ToInt32(350 / vbo.GoldenRatio)),
+				Text = "Найти..."
+			};
 
 			_cd.Add<Panel>(WinFormConfig.SinglePageForm);
 			TableLayoutPanel tlpRows = _cd.Items["FormRowsPanel"].LinkedControl as TableLayoutPanel;
