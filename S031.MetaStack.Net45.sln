@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetaStack.Win.TestConsole",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetApp", "src\S031.MetaStack.Win\MetApp\MetApp.csproj", "{4F43FBEA-13C4-4CEF-B0B8-8C96D9ED89CC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetApp.Report", "src\S031.MetaStack.Win\MetApp.Report\MetApp.Report.csproj", "{07F2A235-6019-45BD-BECC-353CD43D623B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{4F43FBEA-13C4-4CEF-B0B8-8C96D9ED89CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F43FBEA-13C4-4CEF-B0B8-8C96D9ED89CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F43FBEA-13C4-4CEF-B0B8-8C96D9ED89CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07F2A235-6019-45BD-BECC-353CD43D623B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07F2A235-6019-45BD-BECC-353CD43D623B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07F2A235-6019-45BD-BECC-353CD43D623B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07F2A235-6019-45BD-BECC-353CD43D623B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

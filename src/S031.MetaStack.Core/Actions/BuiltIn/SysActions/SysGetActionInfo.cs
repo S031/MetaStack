@@ -30,7 +30,8 @@ namespace S031.MetaStack.Core.Actions
 		public async Task<DataPackage> InvokeAsync(ActionInfo ai, DataPackage dp)
 		{
 			GetParameters(ai, dp);
-			using (MdbContext mdb = await MdbContext.CreateMdbContextAsync(_connectInfo))
+			//using (MdbContext mdb = await MdbContext.CreateMdbContextAsync(_connectInfo))
+			using (MdbContext mdb = new MdbContext(_connectInfo))
 			using (ActionManager am = new ActionManager(mdb) { Logger = ApplicationContext.GetLogger() })
 			{
 				return new DataPackage(new string[] { "ActionInfo" },

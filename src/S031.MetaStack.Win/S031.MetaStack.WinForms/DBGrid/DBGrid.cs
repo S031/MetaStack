@@ -33,6 +33,7 @@ namespace S031.MetaStack.WinForms
 		//Form
 		private JMXSchema xc;
 		private JMXSchema xcOriginal;
+		private string _idColName;
 
 		//private string shortcut;
 		private object[] sqlParams;
@@ -164,7 +165,6 @@ namespace S031.MetaStack.WinForms
 		}
 		#endregion Constructor
 
-		#region DataSource
 		#region Schema Support
 		public string SchemaName
 		{
@@ -209,11 +209,12 @@ namespace S031.MetaStack.WinForms
 
 				//!!! Param dialog
 				DBGridParam param = new DBGridParam(xc, this.ParentRow);
-				if (param.ShowDialog() == DialogResult.OK)
+				if (param.ShowDialog( DBGridParamShowType.ShowAll) == DialogResult.OK)
 				{
 					this.ObjectName = xc.ObjectName;
-					sqlParams = param.Values();
-					makeFrame();
+					_idColName = Schema.Attributes.FirstOrDefault(a => a.IsPK && GetMacroType(a.DataType) == MacroType.num)?.AttribName;
+					sqlParams = param.GetQueryParameters();
+					MakeFrame();
 					xcOriginal = JMXSchema.Parse(xc.ToString());
 					//!!!
 					//mainform parentForm = (this.FindForm() as DBBrowser);
@@ -225,17 +226,17 @@ namespace S031.MetaStack.WinForms
 			}
 		}
 
-		private void makeFrame()
+		private void MakeFrame()
 		{
 			freezeFooter = this.Footer;
 			this.Footer = false;
 			for (; this.Columns.Count > 0;) { this.Columns.Remove(this.Columns[0]); }
 			this.AddColumnsFromObjectSchema();
 
-			makeRecordset();
+			MakeRecordset();
 		}
 
-		private void makeRecordset()
+		private void MakeRecordset()
 		{
 			///!!! from schema
 			int elapsedTime = 5000;
@@ -243,7 +244,7 @@ namespace S031.MetaStack.WinForms
 			{
 				try
 				{
-					getRecordset();
+					GetRecordset();
 				}
 				catch (Connectors.TCPConnectorException e)
 				{
@@ -254,7 +255,7 @@ namespace S031.MetaStack.WinForms
 			else
 			{
 				TimeWaitDialog tw = new TimeWaitDialog("", elapsedTime);
-				tw.Show(this, getRecordset);
+				tw.Show(this, GetRecordset);
 				if (tw.Error != null)
 				{
 					OnGetDataException(new SchemaExceptionEventArgs(tw.Error, xc));
@@ -267,30 +268,53 @@ namespace S031.MetaStack.WinForms
 
 			if (freezeFooter) this.Footer = true;
 			freezeFooter = false;
-			makeTotals();
-			showTotals();
+			MakeTotals();
+			ShowTotals();
 			this.Refresh();
 		}
 
-		private void getRecordset()
+		private void GetRecordset()
 		{
 			string _objectName = xc.ObjectName;
-			if (_objectName.ToLower() == "dbo.dealvalue")
-				dt = ClientGate.GetData(this.ObjectName, "_filter", "Date = '2018-10-01'");
-			else if (_objectName.ToLower() == "dbo.v_dealvalue")
-				dt = ClientGate.GetData(this.ObjectName,
-					"@date", new DateTime(2018, 10, 01),
-					"@DealType", "ВкладФЛ");
-			else
-				dt = ClientGate.GetData(this.ObjectName);
+			dt = ClientGate.GetData(this.ObjectName, sqlParams);
 		}
 
 		public DataRow ParentRow { get; set; }
 		#endregion Schema Support
-		#endregion DataSource
+
+		#region Refresh
+		public override void Reload()
+		{
+			this.Schema = xcOriginal;
+		}
+		public override void RefreshAll()
+		{
+			MakeRecordset();
+		}
+		public void RefreshAll(int handle)
+		{
+			int offset = (this.CurrentCellAddress.Y - this.FirstDisplayedScrollingRowIndex);
+
+			int i = this.CurrentCellAddress.X;
+			if (i == -1) i = 0;
+			MakeRecordset();
+			if (!_idColName.IsEmpty())
+				this.Find(dr => dr[_idColName].Equals(handle));
+			int rowNumber = this.CurrentCellAddress.Y;
+			if (rowNumber > 1)
+			{
+				this.FirstDisplayedScrollingRowIndex = rowNumber - offset >= 0 ? rowNumber - offset : rowNumber;
+				this.CurrentCell = this.CurrentRow.Cells[i];
+			}
+		}
+		public override void RefreshAll(object bookmark)
+		{
+			this.RefreshAll((int)bookmark);
+		}
+		#endregion Refresh
 
 		#region Totals
-		private void makeTotals()
+		private void MakeTotals()
 		{
 			int count = dt.Rows.Count;
 			bool total = false;
@@ -305,7 +329,7 @@ namespace S031.MetaStack.WinForms
 				totals[i].totalDate = DateTime.MinValue;
 
 				string agr = xc.Attributes[i].Agregate.ToLower();
-				if (totalValid(totals[i].Type, agr))
+				if (TotalValid(totals[i].Type, agr))
 				{
 					totals[i].Check = true;
 					totals[i].Agregate = agr;
@@ -380,7 +404,7 @@ namespace S031.MetaStack.WinForms
 				}
 			}
 		}
-		private void showTotals()
+		private void ShowTotals()
 		{
 			for (int i = 0; i < totals.Length; i++)
 			{
@@ -397,7 +421,7 @@ namespace S031.MetaStack.WinForms
 				}
 			}
 		}
-		private static bool totalValid(MacroType tt, string totalFunc)
+		private static bool TotalValid(MacroType tt, string totalFunc)
 		{
 			if (string.IsNullOrEmpty(totalFunc) || totalFunc == "none")
 				return false;
@@ -452,12 +476,12 @@ namespace S031.MetaStack.WinForms
 			}
 
 			JMXAttribute att = xc.Attributes[col.Index];
-			if (totalValid(GetMacroType(att.DataType), totalFunc))
+			if (TotalValid(GetMacroType(att.DataType), totalFunc))
 			{
 				att.Agregate = totalFunc;
 				xcOriginal.Attributes[col.Index].Agregate = totalFunc;
-				makeTotals();
-				showTotals();
+				MakeTotals();
+				ShowTotals();
 			}
 		}
 		private void DBGrid_KeyDown(object sender, KeyEventArgs e)

@@ -67,6 +67,8 @@ namespace S031.MetaStack.Core.Data
 		/// <returns></returns>
 		public DataPackage[] GetReaders(string sql, params MdbParameter[] parameters)
 		{
+			if (Connection.State != ConnectionState.Open)
+				Connection.Open();
 			List<DataPackage> rs = new List<Data.DataPackage>();
 			using (DbCommand command = Factory.CreateCommand(Connection, sql))
 			{
@@ -192,6 +194,8 @@ namespace S031.MetaStack.Core.Data
 		/// <returns><see cref="int"/></returns>
 		public int Execute(string sql, params MdbParameter[] parameters)
 		{
+			if (Connection.State != ConnectionState.Open)
+				Connection.Open();
 			using (DbCommand command = getCommandInternal(sql, parameters))
 			{
 				return command.ExecuteNonQuery();
@@ -206,6 +210,8 @@ namespace S031.MetaStack.Core.Data
 		/// <returns><see cref="int"/></returns>
 		public T Execute<T>(string sql, params MdbParameter[] parameters)
 		{
+			if (Connection.State != ConnectionState.Open)
+				Connection.Open();
 			using (DbCommand command = getCommandInternal(sql, parameters))
 			{
 				return (T)command.ExecuteScalar();
@@ -233,6 +239,8 @@ namespace S031.MetaStack.Core.Data
 		{
 			if (_transaction == null)
 			{
+				if (Connection.State != ConnectionState.Open)
+					Connection.Open();
 				_transaction = Connection.BeginTransaction(MdbContextOptions.GetOptions().TransactionIsolationLevel);
 				_transactionLevel++;
 			}
@@ -270,11 +278,10 @@ namespace S031.MetaStack.Core.Data
 		/// </summary>
 		public void Dispose()
 		{
-			if (_transaction != null)
-				_transaction.Dispose();
-			if (Connection != null && Connection.State == ConnectionState.Open)
+			_transaction?.Dispose();
+			if (Connection?.State == ConnectionState.Open)
 				Connection.Close();
-			Connection.Dispose();
+			Connection?.Dispose();
 		}
 		#region async_methods
 		/// <summary>
@@ -283,23 +290,25 @@ namespace S031.MetaStack.Core.Data
 		/// <param name="connectionString">connection string with Provider Name item if you don't use default </param>
 		/// <param name="logger"><see cref="ILogger"/></param>
 		/// <returns></returns>
-		public static async Task<MdbContext> CreateMdbContextAsync(string connectionString)
-		{
-			//Не рекомендуется в async методе выбрасывать исключения при проверке аргументов.
-			connectionString.NullTest(nameof(connectionString));
-			MdbContext mctx = new MdbContext
-			{
-				_connectInfo = new ConnectInfo(connectionString)
-			};
-			mctx.Factory = ObjectFactories.GetFactory<DbProviderFactory>(mctx._connectInfo.ProviderName);
-			mctx.Connection = await mctx.Factory.CreateConnectionAsync(mctx._connectInfo.ConnectionString);
-			return mctx;
-		}
+		//public static async Task<MdbContext> CreateMdbContextAsync(string connectionString)
+		//{
+		//	//Не рекомендуется в async методе выбрасывать исключения при проверке аргументов.
+		//	connectionString.NullTest(nameof(connectionString));
+		//	MdbContext mctx = new MdbContext
+		//	{
+		//		_connectInfo = new ConnectInfo(connectionString)
+		//	};
+		//	mctx.Factory = ObjectFactories.GetFactory<DbProviderFactory>(mctx._connectInfo.ProviderName);
+		//	mctx.Connection = await mctx.Factory.CreateConnectionAsync(mctx._connectInfo.ConnectionString);
+		//	return mctx;
+		//}
 		/// <summary>
 		/// Async version of <see cref="MdbContext.Execute(string, MdbParameter[])"/>
 		/// </summary>
 		public async Task<int> ExecuteAsync(string sql, params MdbParameter[] parameters)
 		{
+			if (Connection.State != ConnectionState.Open)
+				await Connection.OpenAsync();
 			using (DbCommand command = getCommandInternal(sql, parameters))
 			{
 				return await command.ExecuteNonQueryAsync().ConfigureAwait(false);
@@ -307,6 +316,8 @@ namespace S031.MetaStack.Core.Data
 		}
 		public async Task<T> ExecuteAsync<T>(string sql, params MdbParameter[] parameters)
 		{
+			if (Connection.State != ConnectionState.Open)
+				await Connection.OpenAsync();
 			using (DbCommand command = getCommandInternal(sql, parameters))
 			{
 				var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
@@ -318,6 +329,8 @@ namespace S031.MetaStack.Core.Data
 		/// </summary>
 		public async Task<DataPackage[]> GetReadersAsync(string sql, params MdbParameter[] parameters)
 		{
+			if (Connection.State != ConnectionState.Open)
+				await Connection.OpenAsync();
 			List<DataPackage> rs = new List<Data.DataPackage>();
 			using (DbCommand command = Factory.CreateCommand(Connection, sql))
 			{
@@ -365,7 +378,9 @@ namespace S031.MetaStack.Core.Data
 		/// <returns></returns>
 		public async Task BeginTransactionAsync()
 		{
-			await Task.Run(() => BeginTransaction()).ConfigureAwait(false);
+			if (Connection.State != ConnectionState.Open)
+				await Connection.OpenAsync();
+			BeginTransaction();
 		}
 		/// <summary>
 		/// Crutch To

@@ -32,12 +32,13 @@ namespace S031.MetaStack.Core.Actions
 		public async Task<DataPackage> InvokeAsync(ActionInfo ai, DataPackage dp)
 		{
 			GetParameters(ai, dp);
-			using (MdbContext mdb = await MdbContext.CreateMdbContextAsync(_connectInfo))
+			//using (MdbContext mdb = await MdbContext.CreateMdbContextAsync(_connectInfo))
+			using (MdbContext mdb = new MdbContext(_connectInfo))
 			using (JMXFactory f = JMXFactory.Create(mdb, ApplicationContext.GetLogger()))
 			{
 				return ai.GetOutputParamTable()
 					.AddNew()
-					.SetValue("ObjectSchema", (f.CreateJMXRepo().SaveSchema(_schemaSource)).ToString())
+					.SetValue("ObjectSchema", (await f.CreateJMXRepo().SaveSchemaAsync(_schemaSource)).ToString())
 					.Update();
 			}
 		}

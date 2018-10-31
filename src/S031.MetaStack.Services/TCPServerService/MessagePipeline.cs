@@ -44,7 +44,8 @@ namespace S031.MetaStack.Services
 				connectionName = config["appSettings:defaultConnection"]; ;
 
 			var cs = config.GetSection($"connectionStrings:{connectionName}").Get<ConnectInfo>();
-			using (MdbContext mdb = await MdbContext.CreateMdbContextAsync(cs))
+			//using (MdbContext mdb = await MdbContext.CreateMdbContextAsync(cs))
+			using (MdbContext mdb = new MdbContext(cs))
 			using (ActionManager am = new ActionManager(mdb) { Logger = ApplicationContext.GetLogger() })
 			{
 				string actionID = (string)_message.Headers["ActionID"];

@@ -14,11 +14,12 @@ namespace S031.MetaStack.Core
 		/// <param name="factory"><see cref="DbProviderFactory"/></param>
 		/// <param name="connectionString"><see cref="DbConnection.ConnectionString"/></param>
 		/// <returns></returns>
-		public static DbConnection CreateConnection(this DbProviderFactory factory, string connectionString)
+		public static DbConnection CreateConnection(this DbProviderFactory factory, string connectionString, bool withOpen = false)
 		{
 			var c = factory.CreateConnection();
 			c.ConnectionString = connectionString;
-			c.Open();
+			if (withOpen)
+				c.Open();
 			return c;
 		}
 		/// <summary>

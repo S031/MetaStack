@@ -203,6 +203,7 @@
     <Compile Include="Forms\WinForm.cs" />
     <Compile Include="Forms\WinFormItem.cs" />
     <Compile Include="Forms\WinFormStyles.cs" />
+    <Compile Include="Interfaces\IObjectAction.cs" />
     <Compile Include="Interfaces\IObjectBase.cs" />
     <Compile Include="Interfaces\IObjectEditor.cs" />
     <Compile Include="Interfaces\IObjectHost.cs" />
@@ -216,8 +217,12 @@
     <Compile Include="Security\CredentialManager\CredentialManager.cs" />
     <Compile Include="Tools\ClientGate.cs" />
     <Compile Include="Tools\Events.cs" />
+    <Compile Include="Tools\LocalSettings.cs" />
     <Compile Include="Tools\PathHelper.cs" />
+    <Compile Include="Tools\Reporting\IReportercs.cs" />
+    <Compile Include="Tools\Reporting\ReportManager.cs" />
     <Compile Include="Tools\ResourceManager.cs" />
+    <Compile Include="Tools\rth.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Dialogs\TimeWaitDialog.resx">

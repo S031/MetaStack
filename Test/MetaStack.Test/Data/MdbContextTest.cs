@@ -259,13 +259,13 @@ namespace MetaStack.Test.Data
 				using (var ctx = new MdbContext(_cn))
 				{
 					ctx.BeginTransaction();
-					createTestTable(ctx, l);
-					insertTestTable(ctx, l);
-					selectTestTable(ctx, l);
+					CreateTestTable(ctx, l);
+					InsertTestTable(ctx, l);
+					SelectTestTable(ctx, l);
 					if (withCommit)
 					{
 						ctx.Commit();
-						dropTestTable(ctx, l);
+						DropTestTable(ctx, l);
 					}
 					else
 						//Отменяет все коммиты
@@ -273,7 +273,7 @@ namespace MetaStack.Test.Data
 				}
 			}
 		}
-		static void createTestTable(MdbContext ctx, FileLogger l)
+		static void CreateTestTable(MdbContext ctx, FileLogger l)
 		{
 			l.Debug("Create Test Table Start");
 			int i = 0;
@@ -287,7 +287,7 @@ namespace MetaStack.Test.Data
 			i = ctx.Execute(sql);
 			ctx.Commit();
 		}
-		static void insertTestTable(MdbContext ctx, FileLogger l)
+		static void InsertTestTable(MdbContext ctx, FileLogger l)
 		{
 			l.Debug("Insert Test Table Start");
 			string sql = @"Insert Into TestTable (ID, Name, DateOper, Handle)
@@ -305,7 +305,7 @@ namespace MetaStack.Test.Data
 			ctx.Commit();
 			l.Debug($"Insert Test Table Finish rows result {i}");
 		}
-		static void selectTestTable(MdbContext ctx, FileLogger l)
+		static void SelectTestTable(MdbContext ctx, FileLogger l)
 		{
 			l.Debug("Select Test Table Start");
 			int i = 0;
@@ -316,7 +316,7 @@ namespace MetaStack.Test.Data
 			}
 			l.Debug($"Select Test Table Finish rows result {i}");
 		}
-		static void dropTestTable(MdbContext ctx, FileLogger l)
+		static void DropTestTable(MdbContext ctx, FileLogger l)
 		{
 			l.Debug("Drop Test Table Start");
 			int i = 0;
@@ -324,27 +324,28 @@ namespace MetaStack.Test.Data
 			i = ctx.Execute(sql);
 			l.Debug($"Drop Test Table Finish rows result {i}");
 		}
-		[Fact]
-		public async Task  CreateContextTestAsync()
-		{
-			await _createContextTestAsync();
-		}
-		async Task _createContextTestAsync()
-		{
-			using (FileLogger l = new FileLogger("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
-			{
-				Type t = null;
-				l.Debug("SpeedTest 1 Start ");
-				int i = 0;
-				for (i = 0; i < 1000000; i++)
-				{
-					using (var ctx = await MdbContext.CreateMdbContextAsync(_cn))
-					{
-					}
-				}
-				l.Debug($"SpeedTest 1 Finish {i} count result {t}");
-			}
-		}
+		//[Fact]
+		//public async Task  CreateContextTestAsync()
+		//{
+		//	await _createContextTestAsync();
+		//}
+		//async Task _createContextTestAsync()
+		//{
+		//	using (FileLogger l = new FileLogger("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+		//	{
+		//		Type t = null;
+		//		l.Debug("SpeedTest 1 Start ");
+		//		int i = 0;
+		//		for (i = 0; i < 1000000; i++)
+		//		{
+		//			using (var ctx = await MdbContext.CreateMdbContextAsync(_cn))
+		//			{
+		//			}
+		//		}
+		//		l.Debug($"SpeedTest 1 Finish {i} count result {t}");
+		//	}
+		//}
+
 		[Fact]
 		public void GetReaderSpeedTestAsync()
 		{
@@ -359,11 +360,11 @@ namespace MetaStack.Test.Data
 				int i = 0;
 				for (i = 0; i < 100; i++)
 				{
-					using (var ctx = await MdbContext.CreateMdbContextAsync(_cn))
+					using (var ctx = new MdbContext(_cn))
 					{
 					}
 				}
-				using (var ctx = await MdbContext.CreateMdbContextAsync(_cn))
+				using (var ctx = new MdbContext(_cn))
 				{
 					l.Debug("SpeedTestAsync 1 Start ");
 					MdbContextOptions.GetOptions().CommandTimeout = 120;
@@ -432,7 +433,7 @@ namespace MetaStack.Test.Data
 			using (FileLogger l = new FileLogger("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
 				MdbContextOptions.GetOptions().CommandTimeout = 120;
-				using (var ctx = await MdbContext.CreateMdbContextAsync(_cn))
+				using (var ctx = new MdbContext(_cn))
 				{
 					l.Debug("Test 1 Start ");
 					int i = 0;
@@ -491,13 +492,13 @@ namespace MetaStack.Test.Data
 				using (var ctx = new MdbContext(_cn))
 				{
 					await ctx.BeginTransactionAsync();
-					await createTestTableAsync(ctx, l);
-					await insertTestTableAsync(ctx, l);
-					await selectTestTableAsync(ctx, l);
+					await CreateTestTableAsync(ctx, l);
+					await InsertTestTableAsync(ctx, l);
+					await SelectTestTableAsync(ctx, l);
 					if (withCommit)
 					{
 						await ctx.CommitAsync();
-						await dropTestTableAsync(ctx, l);
+						await DropTestTableAsync(ctx, l);
 					}
 					else
 						//Отменяет все коммиты
@@ -505,7 +506,7 @@ namespace MetaStack.Test.Data
 				}
 			}
 		}
-		static async Task createTestTableAsync(MdbContext ctx, FileLogger l)
+		static async Task CreateTestTableAsync(MdbContext ctx, FileLogger l)
 		{
 			l.Debug("Create Test Table Start");
 			int i = 0;
@@ -519,7 +520,7 @@ namespace MetaStack.Test.Data
 			i = await ctx.ExecuteAsync(sql);
 			await ctx.CommitAsync();
 		}
-		static async Task insertTestTableAsync(MdbContext ctx, FileLogger l)
+		static async Task InsertTestTableAsync(MdbContext ctx, FileLogger l)
 		{
 			l.Debug("Insert Test Table Start");
 			string sql = @"Insert Into TestTable (ID, Name, DateOper, Handle)
@@ -537,7 +538,7 @@ namespace MetaStack.Test.Data
 			await ctx.CommitAsync();
 			l.Debug($"Insert Test Table Finish rows result {i}");
 		}
-		static async Task selectTestTableAsync(MdbContext ctx, FileLogger l)
+		static async Task SelectTestTableAsync(MdbContext ctx, FileLogger l)
 		{
 			l.Debug("Select Test Table Start");
 			int i = 0;
@@ -548,7 +549,7 @@ namespace MetaStack.Test.Data
 			}
 			l.Debug($"Select Test Table Finish rows result {i}");
 		}
-		static async Task dropTestTableAsync(MdbContext ctx, FileLogger l)
+		static async Task DropTestTableAsync(MdbContext ctx, FileLogger l)
 		{
 			l.Debug("Drop Test Table Start");
 			int i = 0;

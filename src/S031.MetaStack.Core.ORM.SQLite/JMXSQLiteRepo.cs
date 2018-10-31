@@ -1030,10 +1030,12 @@ namespace S031.MetaStack.Core.ORM.SQLite
 		#region Utils
 		private async Task<JMXSchema> GetTableSchema(MdbContext mdb, string fullTableName)
 		{
-			JMXSchema schema = new JMXSchema(fullTableName.Left(fullTableName.Length - 1));
-			schema.DbObjectType = DbObjectTypes.Table;
-			schema.DbObjectName = fullTableName;
-			schema.SchemaRepo = this;
+			JMXSchema schema = new JMXSchema(fullTableName.Left(fullTableName.Length - 1))
+			{
+				DbObjectType = DbObjectTypes.Table,
+				DbObjectName = fullTableName,
+				SchemaRepo = this
+			};
 
 			var drs = await mdb.GetReadersAsync(SQLite.GetTableSchema,
 				new MdbParameter("@table_name", fullTableName));

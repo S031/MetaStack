@@ -1,5 +1,7 @@
 ﻿using System.Windows.Forms;
+using System.Linq;
 using S031.MetaStack.WinForms;
+using System.Collections.Generic;
 
 namespace MetApp
 {
@@ -12,15 +14,15 @@ namespace MetApp
 			_commands[DBBrowseCommandsEnum.FileClose] = this.Close;
 			_commands[DBBrowseCommandsEnum.FileExit] = Application.Exit;
 			_commands[DBBrowseCommandsEnum.FilePeriod] = _dateStart.Focus;
-			//_commands[DBBrowseCommandsEnum.FilePrintCurrentForm] = () => ReportManager.PrintCurrentForm(dbGrid);
+			_commands[DBBrowseCommandsEnum.FilePrintCurrentForm] = () => ReportManager.PrintCurrentForm(_grid);
 			//_commands[DBBrowseCommandsEnum.FilePrint] = cmdFilePrint;
 			//_commands[DBBrowseCommandsEnum.FileExportObjects] = cmdFileExportObjects;
-			//_commands[DBBrowseCommandsEnum.FileExportResults] = cmdFileExportResults;
+			_commands[DBBrowseCommandsEnum.FileExportResults] = cmdFileExportResults;
 			//_commands[DBBrowseCommandsEnum.FileImportObjects] = cmdFileImportObjects;
 
-			//_commands[DBBrowseCommandsEnum.EditFind] = () => dbGrid.OnFindFirst(new NewbankEventArgs());
-			//_commands[DBBrowseCommandsEnum.EditFindNext] = () => dbGrid.OnFindNext(new NewbankEventArgs());
-			//_commands[DBBrowseCommandsEnum.EditRefresh] = () => dbGrid.Reload();
+			_commands[DBBrowseCommandsEnum.EditFind] = () => _grid.OnFindFirst(new ActionEventArgs());
+			_commands[DBBrowseCommandsEnum.EditFindNext] = () => _grid.OnFindNext(new ActionEventArgs());
+			_commands[DBBrowseCommandsEnum.EditRefresh] = () => _grid.Reload();
 			//_commands[DBBrowseCommandsEnum.EditQuery] = () => dbGrid.Query();
 			//_commands[DBBrowseCommandsEnum.EditFilter] = () => dbGrid.OnFilter(new NewbankEventArgs());
 			//_commands[DBBrowseCommandsEnum.EditEdit] = () => dbGrid.OnObjectEdit(new NewbankEventArgs(dbGrid.ReadObject(false)) { ActionID = dbGrid.GetAction(2) });
@@ -30,9 +32,9 @@ namespace MetApp
 			//_commands[DBBrowseCommandsEnum.EditPaste] = () => dbGrid.OnObjectPaste(new NewbankEventArgs());
 			//_commands[DBBrowseCommandsEnum.EditDelete] = () => dbGrid.OnObjectDel(new NewbankEventArgs());
 			//_commands[DBBrowseCommandsEnum.EditDoSelected] = () => dbGrid.DoSelected();
-			//_commands[DBBrowseCommandsEnum.EditSelectAll] = () => dbGrid.SelectAll();
+			_commands[DBBrowseCommandsEnum.EditSelectAll] = () => _grid.SelectAll();
 			//_commands[DBBrowseCommandsEnum.EditStat] = () => DBGridCmd.Statistics(dbGrid);
-			//_commands[DBBrowseCommandsEnum.EditCopyCell] = () => dbGrid.CopyCellValue();
+			_commands[DBBrowseCommandsEnum.EditCopyCell] = () => _grid.CopyCellValue();
 
 			//_commands[DBBrowseCommandsEnum.ToolsUpdate] = cmdLoadAssembly;
 			//_commands[DBBrowseCommandsEnum.ToolsServerRestart] = cmdServerRestart;
@@ -52,6 +54,7 @@ namespace MetApp
 				MessageBoxButtons.OK, 
 				MessageBoxIcon.Information);
 		}
+
 		void cmdFavoritesAdd()
 		{
 			//Favorites.Add(dbGrid.Form["FormName"], this.Caption);
@@ -75,6 +78,17 @@ namespace MetApp
 			//		mi.DropDownItems.Add(new ToolStripMenuItem((string)dr["Caption"], null, favorites_Click) { Name = "Favorites_" + (string)dr["FormName"], Tag = (string)dr["FormName"] });
 			//	}
 			//}
+		}
+
+		void cmdFileExportResults()
+		{
+			string fileName = _grid.Schema.Name.Replace(".", "-");
+			ReportExportFormat format = ReportManager.GetExportReportFormat(fileName, ReportExportFormats.Formats.First().Value.ID);
+			if (format != null)
+			{
+				format.CreateParam.Sign = false; //!!! (_grid.Form.GetProperty("Sign").ToIntOrDefault() != 0);
+				ReportManager.ExportCurrentForm(_grid, format);
+			}
 		}
 	}
 }

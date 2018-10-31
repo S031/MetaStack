@@ -41,7 +41,8 @@ namespace S031.MetaStack.WinForms
 					SuperForm = p.SuperForm,
 					SuperMethod = p.SuperMethod,
 					ConstName = p.ConstName,
-					PresentationType = Type.GetType(p.PresentationType)
+					PresentationType = Type.GetType(p.PresentationType),
+					Value = p.DefaultValue
 				};
 				if (p.ListData.Count>0)
 				{
@@ -59,10 +60,10 @@ namespace S031.MetaStack.WinForms
 						item.Value = vbo.Date();
 						break;
 					case "BS_DATESTART":
-						item.Value = DateTime.Now; //!!! dbs.DateStart;
+						item.Value = rth.DateStart;
 						break;
 					case "BS_DATEFINISH":
-						item.Value = DateTime.Now; //!!!  dbs.DateFinish;
+						item.Value = rth.DateFinish;
 						break;
 					case "BS_USERNAME":
 						item.Value = PathHelper.UserName;

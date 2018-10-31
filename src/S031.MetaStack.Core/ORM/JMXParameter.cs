@@ -31,9 +31,12 @@ namespace S031.MetaStack.WinForms.ORM
 		[JsonConverter(typeof(StringEnumConverter))]
 		public Actions.ParamDirrect Dirrect { get; set; }
 
+		public bool NullIfEmpty { get; set; }
+
 		public override void ToStringRaw(JsonWriter writer)
 		{
 			writer.WriteProperty("Dirrect", Dirrect.ToString());
+			writer.WriteProperty("NullIfEmpty", NullIfEmpty);
 			base.ToStringRaw(writer);
 		}
 

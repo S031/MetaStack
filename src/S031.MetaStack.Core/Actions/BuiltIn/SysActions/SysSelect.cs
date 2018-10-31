@@ -35,7 +35,8 @@ namespace S031.MetaStack.Core.Actions
 		public async Task<DataPackage> InvokeAsync(ActionInfo ai, DataPackage dp)
 		{
 			GetParameters(ai, dp);
-			using (MdbContext mdb = await MdbContext.CreateMdbContextAsync(_connectInfo))
+			//using (MdbContext mdb = await MdbContext.CreateMdbContextAsync(_connectInfo))
+			using (MdbContext mdb = new MdbContext(_connectInfo))
 			{
 				await CreateCommandAsync();
 				if (_schema.DbObjectType == DbObjectTypes.Action)
@@ -47,6 +48,7 @@ namespace S031.MetaStack.Core.Actions
 		}
 		/// <summary>
 		/// Костыль!!! Check parameters with object schema (aka action execute)
+		/// with NullIfEmpty 
 		/// </summary>
 		private void GetParameters(ActionInfo ai, DataPackage dp)
 		{
@@ -86,7 +88,8 @@ namespace S031.MetaStack.Core.Actions
 			var config = ApplicationContext.GetConfiguration();
 			var connectInfo = config.GetSection($"connectionStrings:{config["appSettings:SysCatConnection"]}").Get<ConnectInfo>();
 
-			using (MdbContext mdb = await MdbContext.CreateMdbContextAsync(connectInfo))
+			//using (MdbContext mdb = await MdbContext.CreateMdbContextAsync(connectInfo))
+			using (MdbContext mdb = new MdbContext(connectInfo))
 			using (JMXFactory f = JMXFactory.Create(mdb, ApplicationContext.GetLogger()))
 			using (JMXRepo repo = (f.CreateJMXRepo() as JMXRepo))
 			using (SQLStatementWriter writer = new SQLStatementWriter(repo))
