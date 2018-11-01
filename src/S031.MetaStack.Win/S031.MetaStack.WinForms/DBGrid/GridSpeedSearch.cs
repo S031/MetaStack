@@ -73,8 +73,12 @@ namespace S031.MetaStack.WinForms
 
 		void txtFind_TextChanged(object sender, EventArgs e)
 		{
-			if (_grid.BaseTable.Rows.Count == 0) return;
-			DataView dv = _grid.BaseTable.DefaultView;
+			if (_grid.BaseTable.Rows.Count == 0)
+				return;
+			BindingSource datasource = _grid.DataSource as BindingSource;
+			if (datasource == null)
+				return;
+
 			string colName;
 			if (!string.IsNullOrEmpty(searchColName))
 				colName = searchColName;
@@ -85,19 +89,21 @@ namespace S031.MetaStack.WinForms
 				searchColType = _grid.CurrentCell.Value.GetType();
 			}
 			string template = txtFind.Text.ToLower();
+			string filter;
+			if (string.IsNullOrEmpty(template))
+				filter = string.Empty;
+			else if (searchColType == typeof(string))
+				filter = $"{colName} Like '%{template}%'";
+			else if (searchColType.IsNumeric())
+				filter = $"(Convert([{colName}], 'System.String') LIKE '%{template}%')";
+			else if (searchColType == typeof(DateTime)) 
+				filter = $"(Convert([{colName}], 'System.String') LIKE '%{template}%')";
+			else 
+				filter = $"(Convert([{colName}], 'System.String') LIKE '%{template}%')";
+
 			try
 			{
-				if (string.IsNullOrEmpty(template))
-					dv.RowFilter = string.Empty;
-				else if (searchColType.IsNumeric())
-					if (template == "0" || template.ToDecimalOrDefault() != 0)
-						dv.RowFilter = colName + " = " + template.Replace(',', '.');
-					else
-						throw new EvaluateException("Неверная строка поиска '" + template + "' для поля [" + _grid.Columns[colName].HeaderText + "]");
-				else if (searchColType == typeof(string))
-					dv.RowFilter = colName + " Like '%" + template + "%'";
-				else
-					throw new EvaluateException("В поле [" + _grid.Columns[colName].HeaderText + "] поиск невозможен!");
+				datasource.Filter = filter;
 			}
 			catch (EvaluateException err)
 			{
