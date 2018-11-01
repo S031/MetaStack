@@ -40,7 +40,9 @@ namespace MetApp
 					//grid.ObjectDel += _grid_ObjectDel;
 					//grid.ObjectRead += _grid_ObjectRead;
 					//grid.CellFormatting += _grid_CellFormatting;
+					grid.StartFilter = _formOptions.StartFilter;
 					grid.SchemaName = _objectName;
+					grid.SetSpeedSearch((ToolStripTextBox)GetItem("ToolBar").As<ToolStrip>().Items["txtFind"]);
 					_grid = grid;
 					SetMenuContext();
 				}

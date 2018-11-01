@@ -1,10 +1,7 @@
 ﻿using S031.MetaStack.Common;
 using S031.MetaStack.WinForms;
-using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
-using Newtonsoft.Json.Linq;
-using System.IO;
 using System;
 using S031.MetaStack.WinForms.ORM;
 using System.Reflection;
@@ -19,13 +16,16 @@ namespace MetApp
 		private int _curRowIdx = 0;
 		private DBGrid _grid;
 		private string _objectName;
+		private MainFormOptions _formOptions;
+		private GridSpeedSearch _gss;
 
 		ToolStripDateEdit _dateStart;
 		ToolStripDateEdit _dateFinish;
 
-		public MainForm(string startupForm) : base(WinFormStyle.Form)
+		public MainForm(string startupForm, MainFormOptions options = null) : base(WinFormStyle.Form)
 		{
 			_objectName = startupForm;
+			_formOptions = options ?? new MainFormOptions();
 			InitializeComponent();
 			SetCommands();
 			loadActions();
@@ -50,6 +50,8 @@ namespace MetApp
 					SetGrid()
 				)
 			);
+			_dateStart.Value = rth.DateStart;
+			_dateFinish.Value = rth.DateFinish;
 			this.ResumeLayout();
 		}
 
@@ -68,9 +70,9 @@ namespace MetApp
 					if (rs.DbObjectType == DbObjectTypes.Action)
 					{
 						items.Add(new ToolStripMenuItem(att.Name, null, MenuRun_Click) { Name = att.AttribName, ToolTipText = att.Description });
-						FontManager.Adop(items[items.Count - 1]);
+						//FontManager.Adop(items[items.Count - 1]);
 						buttons.Add(new ToolStripMenuItem(att.Name, null, MenuRun_Click) { Name = att.AttribName, ToolTipText = att.Description });
-						FontManager.Adop(buttons[buttons.Count - 1]);
+						//FontManager.Adop(buttons[buttons.Count - 1]);
 
 					}
 					else if (rs.DbObjectType == DbObjectTypes.View)
@@ -79,8 +81,11 @@ namespace MetApp
 					}
 				}
 			}
-			items.Add(new ToolStripMenuItem("Расчет и выгрузки данных по сделкам и денежным потокам", null, MenuRun_Click) { Name = "mib_msfo_CF_Calc", ToolTipText = "Расчет и выгрузки данных по сделкам и денежным потокам" });
-			buttons.Add(new ToolStripMenuItem("Расчет и выгрузки данных по сделкам и денежным потокам", null, MenuRun_Click) { Name = "mib_msfo_CF_Calc", ToolTipText = "Расчет и выгрузки данных по сделкам и денежным потокам" });
+			if (schema.ObjectName == "dbo.V_DealValue")
+			{
+				items.Add(new ToolStripMenuItem("Расчет и выгрузки данных по сделкам и денежным потокам", null, MenuRun_Click) { Name = "mib_msfo_CF_Calc", ToolTipText = "Расчет и выгрузки данных по сделкам и денежным потокам" });
+				buttons.Add(new ToolStripMenuItem("Расчет и выгрузки данных по сделкам и денежным потокам", null, MenuRun_Click) { Name = "mib_msfo_CF_Calc", ToolTipText = "Расчет и выгрузки данных по сделкам и денежным потокам" });
+			}
 
 			//foreach (ActionConfig config in configs)
 			//{
@@ -112,7 +117,8 @@ namespace MetApp
 		}
 		void loadRelated()
 		{
-			ToolStripMenuItem menuRun = (ToolStripMenuItem)GetControl<MenuStrip>("MenuBar").Items["OpenRelated"];
+			ToolStripMenuItem menuRun = (ToolStripMenuItem)(GetControl<MenuStrip>("MenuBar").Items["File"] as ToolStripMenuItem)
+				.DropDownItems["FileOpenRelated"];
 			ToolStripDropDownButton tsbRun = (ToolStripDropDownButton)GetControl<ToolStrip>("Toolbar").Items["OpenRelated"];
 			List<ToolStripMenuItem> items = new List<ToolStripMenuItem>();
 			List<ToolStripMenuItem> buttons = new List<ToolStripMenuItem>();
@@ -124,18 +130,22 @@ namespace MetApp
 					JMXSchema rs = ClientGate.GetObjectSchema(att.ObjectName);
 					if (rs.DbObjectType == DbObjectTypes.View)
 					{
-						items.Add(new ToolStripMenuItem(att.Name, null, MenuRun_Click) { Name = att.AttribName, ToolTipText = att.Description });
-						FontManager.Adop(items[items.Count - 1]);
-						buttons.Add(new ToolStripMenuItem(att.Name, null, MenuRun_Click) { Name = att.AttribName, ToolTipText = att.Description });
-						FontManager.Adop(buttons[buttons.Count - 1]);
+						items.Add(new ToolStripMenuItem(att.Name, null, MenuRel_Click) { Name = att.AttribName, ToolTipText = att.Description });
+						//FontManager.Adop(items[items.Count - 1]);
+						buttons.Add(new ToolStripMenuItem(att.Name, null, MenuRel_Click) { Name = att.AttribName, ToolTipText = att.Description });
+						//FontManager.Adop(buttons[buttons.Count - 1]);
 
 					}
 				}
 			}
-			items.Add(new ToolStripMenuItem("Данные по счетам", null, MenuRun_Click) { Name = "mib_msfo_DealAcc_Select", ToolTipText = "Процедура для вывода данных счетам из таблицы msfodb..DealAcc по одному договору" });
-			buttons.Add(new ToolStripMenuItem("Данные по счетам", null, MenuRun_Click) { Name = "mib_msfo_DealAcc_Select", ToolTipText = "Процедура для вывода данных счетам из таблицы msfodb..DealAcc по одному договору" });
-			items.Add(new ToolStripMenuItem("Данные по потокам", null, MenuRun_Click) { Name = "mib_msfo_CashFlow_Select", ToolTipText = "Процедура для вывода данных потоков из таблицы msfodb..CashFlow_NKN по одному договору" });
-			buttons.Add(new ToolStripMenuItem("Данные по потокам", null, MenuRun_Click) { Name = "mib_msfo_CashFlow_Select", ToolTipText = "Процедура для вывода данных потоков из таблицы msfodb..CashFlow_NKN по одному договору" });
+			//!!! убрать эту херню
+			if (schema.ObjectName == "dbo.V_DealValue")
+			{
+				items.Add(new ToolStripMenuItem("Данные по счетам", null, MenuRel_Click) { Name = "dbo.DealAc", ToolTipText = "Процедура для вывода данных счетам из таблицы msfodb..DealAcc по одному договору" });
+				buttons.Add(new ToolStripMenuItem("Данные по счетам", null, MenuRel_Click) { Name = "dbo.DealAc", ToolTipText = "Процедура для вывода данных счетам из таблицы msfodb..DealAcc по одному договору" });
+				items.Add(new ToolStripMenuItem("Данные по потокам", null, MenuRel_Click) { Name = "dbo.CashFlow_NKN", ToolTipText = "Процедура для вывода данных потоков из таблицы msfodb..CashFlow_NKN по одному договору" });
+				buttons.Add(new ToolStripMenuItem("Данные по потокам", null, MenuRel_Click) { Name = "dbo.CashFlow_NKN", ToolTipText = "Процедура для вывода данных потоков из таблицы msfodb..CashFlow_NKN по одному договору" });
+			}
 
 			//foreach (ActionConfig config in configs)
 			//{
@@ -156,8 +166,8 @@ namespace MetApp
 			//}
 			if (items.Count > 0)
 			{
-				//menuRun.DropDownItems.AddRange(items.ToArray());
-				//menuRun.DropDownItems.Add(new ToolStripSeparator());
+				menuRun.DropDownItems.AddRange(items.ToArray());
+				menuRun.DropDownItems.Add(new ToolStripSeparator());
 				tsbRun.DropDown.Items.AddRange(buttons.ToArray());
 			}
 			//if ((menuRun.DropDownItems[menuRun.DropDownItems.Count - 1] is ToolStripSeparator))
@@ -185,7 +195,7 @@ namespace MetApp
 					mnuBar.Dock = DockStyle.Top;
 					((ToolStripMenuItem)mnuBar.Items["File"]).DropDownItems.AddRange(new ToolStripItem[] {
 						new ToolStripMenuItem("Открыть...", ResourceManager.GetImage("Open"), MenuClick, Keys.Control | Keys.O){ Name = "FileOpen", Tag = DBBrowseCommandsEnum.FileOpen },
-						new ToolStripMenuItem("Открыть связанную форму...", ResourceManager.GetImage("OpenRelated"), MenuClick, Keys.F7){ Name = "FileOpenRelated", Tag = DBBrowseCommandsEnum.FileOpenRelated },
+						new ToolStripMenuItem("Открыть связанную форму", ResourceManager.GetImage("OpenRelated"), null, Keys.F7){ Name = "FileOpenRelated", Tag = DBBrowseCommandsEnum.FileOpenRelated },
 						new ToolStripMenuItem("Закрыть", null, MenuClick, Keys.Control | Keys.F4){ Name = "FileOpen", Tag = DBBrowseCommandsEnum.FileClose },
 						new ToolStripSeparator() { Name = "FileSep1" },
 						new ToolStripMenuItem("Расчетный период...", null, MenuClick, Keys.F2){ Name = "FilePeriod", Tag = DBBrowseCommandsEnum.FilePeriod },
@@ -325,8 +335,6 @@ namespace MetApp
 					_dateFinish.Size = new Size((int)(tbTools.Font.SizeInPoints * 12), _dateFinish.Height);
 					_dateFinish.ToolTipText = "Дата окончания периода";
 					tbTools.Items.Add(_dateFinish);
-					_dateStart.Value = rth.DateStart;
-					_dateFinish.Value = rth.DateFinish;
 					_dateFinish.Validating += new CancelEventHandler(dateFinish_Validating);
 					_dateStart.KeyDown += new KeyEventHandler((sender, e) =>
 					{
@@ -403,6 +411,14 @@ namespace MetApp
 		void MenuRun_Click(object sender, EventArgs e)
 		{
 		}
+		void MenuRel_Click(object sender, EventArgs e)
+		{
+			ToolStripItem mi = (sender as ToolStripItem);
+			//!!! Выбирать поле в связанной таблице по релейшенам
+			var filter = $"{_grid.IdColName}{_grid.GetStringForSelected()}";
+			//!!! Сделать закрытие всех форм, при закрытии последней
+			new MainForm(mi.Name, new MainFormOptions() { StartFilter = filter }).Show();
+		}
 
 		void dateFinish_Validating(object sender, CancelEventArgs e)
 		{
@@ -428,6 +444,32 @@ namespace MetApp
 				_dateFinish.Value = rth.DateFinish;
 				_dateStart.Focus();
 			}
+		}
+
+		protected override void OnKeyDown(KeyEventArgs e)
+		{
+			if (e.KeyData == Keys.F9)
+			{
+				var mnuContext = _grid.ContextMenuStrip;
+				mnuContext.Show(_grid.PointToScreen(
+					_grid.GetCellDisplayRectangle(_grid.CurrentCell.ColumnIndex, _grid.CurrentCell.RowIndex, false).Location));
+				ToolStripMenuItem m = (ToolStripMenuItem)mnuContext.Items["EditRun"];
+				m.Select();
+				SendKeys.Send("{RIGHT}");
+			}
+			else if (e.KeyData == Keys.F7)
+			{
+				using (ContextMenuStrip menuRun = new ContextMenuStrip())
+				{
+					menuRun.Items.Add(new ToolStripMenuItem("Данные по счетам", null, MenuRel_Click) { Name = "dbo.DealAc", ToolTipText = "Процедура для вывода данных счетам из таблицы msfodb..DealAcc по одному договору" });
+					menuRun.Items.Add(new ToolStripMenuItem("Данные по потокам", null, MenuRel_Click) { Name = "dbo.CashFlow_NKN", ToolTipText = "Процедура для вывода данных потоков из таблицы msfodb..CashFlow_NKN по одному договору" });
+
+					menuRun.Show(_grid.PointToScreen(
+						_grid.GetCellDisplayRectangle(_grid.CurrentCell.ColumnIndex, _grid.CurrentCell.RowIndex, false).Location));
+				}
+			}
+
+			base.OnKeyDown(e);
 		}
 	}
 }

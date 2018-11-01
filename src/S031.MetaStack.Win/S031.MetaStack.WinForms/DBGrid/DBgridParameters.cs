@@ -54,18 +54,19 @@ namespace S031.MetaStack.WinForms
 						});
 					item.Mask = "lock";
 				}
-				switch (item.ConstName)
+				//!!! Добавить добавление констант в расширениях (class UserConstants.GetConst(), AddConst()
+				switch (item.ConstName.ToLower())
 				{
-					case "BS_DATECURRENT":
+					case "bs_datecurrent":
 						item.Value = vbo.Date();
 						break;
-					case "BS_DATESTART":
+					case "bs_datestart":
 						item.Value = rth.DateStart;
 						break;
-					case "BS_DATEFINISH":
+					case "bs_datefinish":
 						item.Value = rth.DateFinish;
 						break;
-					case "BS_USERNAME":
+					case "bs_username":
 						item.Value = PathHelper.UserName;
 						break;
 					default:
@@ -134,6 +135,12 @@ namespace S031.MetaStack.WinForms
 				cd.Items["MainPanel"].LinkedControl.Add<TableLayoutPanel>(WinFormConfig.StdButtons);
 				cd.Size = new Size(450, (int)(450 / vbo.GoldenRatio));
 				cd.MinimumSize = cd.Size;
+				cd.AcceptButton = null;
+				if (cd.Parent != null)
+					cd.StartPosition = FormStartPosition.CenterParent;
+				else
+					cd.StartPosition = FormStartPosition.CenterScreen;
+
 				if (cd.ShowDialog() == DialogResult.OK)
 				{
 					cd.Save();
@@ -147,6 +154,18 @@ namespace S031.MetaStack.WinForms
 
 		private void save2Cash()
 		{
+			var d = _items.FirstOrDefault(item => item.ConstName.ToLower() == "bs_datestart");
+			if (d != null)
+				rth.DateStart = (DateTime)d.Value;
+
+			d = _items.FirstOrDefault(item => item.ConstName.ToLower() == "bs_datefinish");
+			if (d != null)
+				rth.DateFinish = (DateTime)d.Value;
+
+			if (rth.DateStart > rth.DateFinish)
+				rth.DateStart = rth.DateFinish;
+
+				
 			for (int i = 0; i < _items.Length; i++)
 			{
 				if (_items[i].Value != null)

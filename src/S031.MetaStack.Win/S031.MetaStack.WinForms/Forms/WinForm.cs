@@ -104,7 +104,7 @@ namespace S031.MetaStack.WinForms
 		public WinForm() : this(WinFormStyle.Dialog) { }
 		public WinForm(WinFormStyle ds)
 		{
-			FontManager.Adop(this);
+			//FontManager.Adop(this);
 			this.Id = Guid.NewGuid();
 			this.KeyPreview = true;
 			this.AutoSize = true;

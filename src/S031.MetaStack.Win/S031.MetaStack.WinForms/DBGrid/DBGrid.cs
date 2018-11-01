@@ -38,6 +38,7 @@ namespace S031.MetaStack.WinForms
 		//private string shortcut;
 		private object[] sqlParams;
 		private DataTable dt;
+		private static bool _firstStart = true;
 
 		//Totals
 		private struct totalInfo
@@ -79,7 +80,11 @@ namespace S031.MetaStack.WinForms
 			if (te != null)
 				te(this, e);
 			else
-				this.Schema = ClientGate.GetObjectSchema(e.ObjSchema.ObjectName);
+			{
+				//this.Schema = ClientGate.GetObjectSchema(e.ObjSchema.ObjectName);
+				this.Schema = e.ObjSchema;
+				_firstStart = false;
+			}
 		}
 		protected virtual void OnFormComplete(SchemaEventArgs e)
 		{
@@ -151,7 +156,7 @@ namespace S031.MetaStack.WinForms
 			mnuTotal.Items.Add(new ToolStripSeparator());
 			mnuTotal.Items.Add(new ToolStripMenuItem("Копировать", null, eh) { Name = "mnuTotalCopy" });
 			FooterContextMenu = mnuTotal;
-			FontManager.Adop(mnuTotal);
+			//FontManager.Adop(mnuTotal);
 			// 
 			// DBGrid
 			// 
@@ -209,7 +214,7 @@ namespace S031.MetaStack.WinForms
 
 				//!!! Param dialog
 				DBGridParam param = new DBGridParam(xc, this.ParentRow);
-				if (param.ShowDialog( DBGridParamShowType.ShowAll) == DialogResult.OK)
+				if (param.ShowDialog( _firstStart? DBGridParamShowType.ShowAll: DBGridParamShowType.ShowSmart) == DialogResult.OK)
 				{
 					this.ObjectName = xc.ObjectName;
 					_idColName = Schema.Attributes.FirstOrDefault(a => a.IsPK && GetMacroType(a.DataType) == MacroType.num)?.AttribName;
@@ -276,11 +281,86 @@ namespace S031.MetaStack.WinForms
 		private void GetRecordset()
 		{
 			string _objectName = xc.ObjectName;
-			dt = ClientGate.GetData(this.ObjectName, sqlParams);
+			if (StartFilter.IsEmpty())
+				dt = ClientGate.GetData(this.ObjectName, sqlParams);
+			else
+				dt = ClientGate.GetData(this.ObjectName, sqlParams.Concat(new object[] { "_filter", StartFilter }).ToArray());
+
 		}
 
 		public DataRow ParentRow { get; set; }
 		#endregion Schema Support
+
+		#region Filter Sorting Selection
+		public string IdColName => _idColName;
+
+		public string StartFilter { get; set; }
+
+		public string GetStringForSelected()
+		{
+			return this.GetStringForSelected(_idColName);
+		}
+		public string GetStringForSelected(string fieldName)
+		{
+			if (this.Rows.Count == 0)
+				return string.Empty;
+			else if (this.SelectedRows.Count <= 1)
+			{
+				DataRow row = GetRow(this.SelectedRows.Count == 0 ? this.CurrentCellAddress.Y : this.SelectedRows[0].Index);
+				var att = xc.Attributes.FirstOrDefault(a => a.AttribName == fieldName);
+				if (att == null)
+					throw new ArgumentException("Неверно указан параметр имя поля в методе GetStringForSelected");
+				if (row[fieldName] == DBNull.Value)
+					return " Is Null";
+				switch (GetMacroType(att.DataType))
+				{
+					case MacroType.num:
+						return " = " + row[fieldName].ToString();
+					case MacroType.log:
+						return " = " + row[fieldName].ToString();
+					case MacroType.date:
+						return " = '" + string.Format("yyyyMMdd", row[fieldName]) + "'";
+					default:
+						return " = '" + row[fieldName].ToString() + "'";
+				}
+			}
+			else
+			{
+				var att = xc.Attributes.FirstOrDefault(a => a.AttribName == fieldName);
+				if (att == null)
+					throw new ArgumentException("Неверно указан параметр имя поля в методе GetStringForSelected");
+				MacroType tt = GetMacroType(att.DataType);
+				System.Text.StringBuilder sb = new System.Text.StringBuilder();
+				foreach (DataGridViewRow gridRow in this.SelectedRows)
+				{
+					DataRow row = GetRow(gridRow.Index);
+					if (row[fieldName] != DBNull.Value)
+					{
+						switch (tt)
+						{
+							case MacroType.num:
+								sb.Append("," + row[fieldName].ToString());
+								break;
+							case MacroType.log:
+								sb.Append("," + row[fieldName].ToString());
+								break;
+							case MacroType.date:
+								sb.Append(",'" + string.Format("yyyyMMdd", row[fieldName]) + "'");
+								break;
+							default:
+								sb.Append(",'" + row[fieldName].ToString() + "'");
+								break;
+						}
+					}
+				}
+				if (sb.Length == 0)
+					return " Is Null";
+				else
+					return " In (" + sb.ToString().Substring(1) + ")";
+			}
+		}
+		#endregion Filter Sorting Selection
+
 
 		#region Refresh
 		public override void Reload()
