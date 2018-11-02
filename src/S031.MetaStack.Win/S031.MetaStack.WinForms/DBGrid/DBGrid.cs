@@ -2,6 +2,7 @@
 using S031.MetaStack.WinForms.ORM;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -20,16 +21,13 @@ namespace S031.MetaStack.WinForms
 	{
 		#region Private declarations
 		private const string UserNameField = "UserNameField";
-
 		//Sort & filter support
 		private class sortInfo
 		{
 			public int Index;
 			public bool Ascend;
 		}
-
 		readonly List<sortInfo> sortedColumns = new List<sortInfo>();
-
 		//Form
 		private JMXSchema xc;
 		private JMXSchema xcOriginal;
@@ -300,65 +298,65 @@ namespace S031.MetaStack.WinForms
 		{
 			return this.GetStringForSelected(_idColName);
 		}
-		public string GetStringForSelected(string fieldName)
-		{
-			if (this.Rows.Count == 0)
-				return string.Empty;
-			else if (this.SelectedRows.Count <= 1)
-			{
-				DataRow row = GetRow(this.SelectedRows.Count == 0 ? this.CurrentCellAddress.Y : this.SelectedRows[0].Index);
-				var att = xc.Attributes.FirstOrDefault(a => a.AttribName == fieldName);
-				if (att == null)
-					throw new ArgumentException("Неверно указан параметр имя поля в методе GetStringForSelected");
-				if (row[fieldName] == DBNull.Value)
-					return " Is Null";
-				switch (GetMacroType(att.DataType))
-				{
-					case MacroType.num:
-						return " = " + row[fieldName].ToString();
-					case MacroType.log:
-						return " = " + row[fieldName].ToString();
-					case MacroType.date:
-						return " = '" + string.Format("yyyyMMdd", row[fieldName]) + "'";
-					default:
-						return " = '" + row[fieldName].ToString() + "'";
-				}
-			}
-			else
-			{
-				var att = xc.Attributes.FirstOrDefault(a => a.AttribName == fieldName);
-				if (att == null)
-					throw new ArgumentException("Неверно указан параметр имя поля в методе GetStringForSelected");
-				MacroType tt = GetMacroType(att.DataType);
-				System.Text.StringBuilder sb = new System.Text.StringBuilder();
-				foreach (DataGridViewRow gridRow in this.SelectedRows)
-				{
-					DataRow row = GetRow(gridRow.Index);
-					if (row[fieldName] != DBNull.Value)
-					{
-						switch (tt)
-						{
-							case MacroType.num:
-								sb.Append("," + row[fieldName].ToString());
-								break;
-							case MacroType.log:
-								sb.Append("," + row[fieldName].ToString());
-								break;
-							case MacroType.date:
-								sb.Append(",'" + string.Format("yyyyMMdd", row[fieldName]) + "'");
-								break;
-							default:
-								sb.Append(",'" + row[fieldName].ToString() + "'");
-								break;
-						}
-					}
-				}
-				if (sb.Length == 0)
-					return " Is Null";
-				else
-					return " In (" + sb.ToString().Substring(1) + ")";
-			}
-		}
+		//public string GetStringForSelected(string fieldName)
+		//{
+		//	if (this.Rows.Count == 0)
+		//		return string.Empty;
+		//	else if (this.SelectedRows.Count <= 1)
+		//	{
+		//		DataRow row = GetRow(this.SelectedRows.Count == 0 ? this.CurrentCellAddress.Y : this.SelectedRows[0].Index);
+		//		var att = xc.Attributes.FirstOrDefault(a => a.AttribName == fieldName);
+		//		if (att == null)
+		//			throw new ArgumentException("Неверно указан параметр имя поля в методе GetStringForSelected");
+		//		if (row[fieldName] == DBNull.Value)
+		//			return " Is Null";
+		//		switch (GetMacroType(att.DataType))
+		//		{
+		//			case MacroType.num:
+		//				return " = " + row[fieldName].ToString();
+		//			case MacroType.log:
+		//				return " = " + row[fieldName].ToString();
+		//			case MacroType.date:
+		//				return " = '" + string.Format("yyyyMMdd", row[fieldName]) + "'";
+		//			default:
+		//				return " = '" + row[fieldName].ToString() + "'";
+		//		}
+		//	}
+		//	else
+		//	{
+		//		var att = xc.Attributes.FirstOrDefault(a => a.AttribName == fieldName);
+		//		if (att == null)
+		//			throw new ArgumentException("Неверно указан параметр имя поля в методе GetStringForSelected");
+		//		MacroType tt = GetMacroType(att.DataType);
+		//		System.Text.StringBuilder sb = new System.Text.StringBuilder();
+		//		foreach (DataGridViewRow gridRow in this.SelectedRows)
+		//		{
+		//			DataRow row = GetRow(gridRow.Index);
+		//			if (row[fieldName] != DBNull.Value)
+		//			{
+		//				switch (tt)
+		//				{
+		//					case MacroType.num:
+		//						sb.Append("," + row[fieldName].ToString());
+		//						break;
+		//					case MacroType.log:
+		//						sb.Append("," + row[fieldName].ToString());
+		//						break;
+		//					case MacroType.date:
+		//						sb.Append(",'" + string.Format("yyyyMMdd", row[fieldName]) + "'");
+		//						break;
+		//					default:
+		//						sb.Append(",'" + row[fieldName].ToString() + "'");
+		//						break;
+		//				}
+		//			}
+		//		}
+		//		if (sb.Length == 0)
+		//			return " Is Null";
+		//		else
+		//			return " In (" + sb.ToString().Substring(1) + ")";
+		//	}
+		//}
 		#endregion Filter Sorting Selection
 
 
@@ -519,7 +517,8 @@ namespace S031.MetaStack.WinForms
 		{
 			if (e.KeyCode == Keys.OemMinus)
 			{
-				this.Reload();
+				//this.Reload();
+				FilterClear();
 				return;
 			}
 			base.OnKeyDown(e);

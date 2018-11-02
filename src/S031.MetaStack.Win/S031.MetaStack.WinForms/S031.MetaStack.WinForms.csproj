@@ -185,6 +185,7 @@
     <Compile Include="DBGrid\DBgridParameters.cs" />
     <Compile Include="DBGrid\Formater.cs" />
     <Compile Include="DBGrid\GridSpeedSearch.cs" />
+    <Compile Include="Dialogs\Chooser.cs" />
     <Compile Include="Dialogs\TimeWaitDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -199,7 +200,7 @@
     <Compile Include="Forms\CodeCompletion\CodeCompletionData\CodeCompletionDataVBS.cs" />
     <Compile Include="Forms\CodeCompletion\CodeCompletionProvider.cs" />
     <Compile Include="Forms\ControlExtensions.cs" />
-    <Compile Include="Forms\InputBox.cs" />
+    <Compile Include="Dialogs\InputBox.cs" />
     <Compile Include="Forms\WinForm.cs" />
     <Compile Include="Forms\WinFormItem.cs" />
     <Compile Include="Forms\WinFormStyles.cs" />

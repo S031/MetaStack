@@ -31,7 +31,7 @@ namespace MetApp
 			//_commands[DBBrowseCommandsEnum.EditCut] = () => dbGrid.OnObjectCut(new NewbankEventArgs(dbGrid.ReadObject(false)));
 			//_commands[DBBrowseCommandsEnum.EditPaste] = () => dbGrid.OnObjectPaste(new NewbankEventArgs());
 			//_commands[DBBrowseCommandsEnum.EditDelete] = () => dbGrid.OnObjectDel(new NewbankEventArgs());
-			//_commands[DBBrowseCommandsEnum.EditDoSelected] = () => dbGrid.DoSelected();
+			_commands[DBBrowseCommandsEnum.EditDoSelected] = () => _grid.FilterSelected(_grid.IdColName);
 			_commands[DBBrowseCommandsEnum.EditSelectAll] = () => _grid.SelectAll();
 			//_commands[DBBrowseCommandsEnum.EditStat] = () => DBGridCmd.Statistics(dbGrid);
 			_commands[DBBrowseCommandsEnum.EditCopyCell] = () => _grid.CopyCellValue();

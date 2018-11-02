@@ -50,50 +50,10 @@ namespace S031.MetaStack.WinForms
 				if (cd.ShowDialog() == DialogResult.OK)
 				{
 					cd.Save();
-					return items.Select(i=>i.Value).ToArray();
+					return items.Select(i => i.Value).ToArray();
 				}
 				else
 					return items.Select(i => i.OriginalValue).ToArray();
-			}
-		}
-
-		public static void ShowCells(string caption, DataTable dataSource)
-		{
-			using (WinForm cd = new WinForm(WinFormStyle.Dialog))
-			{
-				cd.Text = caption;
-				cd.Add<Panel>(WinFormConfig.SinglePageForm);
-				TableLayoutPanel tlpRows = cd.Items["FormRowsPanel"].LinkedControl as TableLayoutPanel;
-				DataGridView g = tlpRows.Add<DataGridView>(new WinFormItem("WorkCells"));
-				//g.AutoGenerateColumns = false;
-				//g.Columns.Add("Number", "Номер");
-				//g.Columns.Add("Name", "Наименование");
-				//g.Columns.Add("Data", "Данные");
-				//g.DataSource = new BindingSource(dataSource, null);
-				g.DataSource = dataSource;
-				//g.Columns[0].DataPropertyName = "Col1";
-				//g.CellFormatting += (c, e) =>
-				//  {
-				//	  DataGridView grid = (c as DataGridView);
-				//	  e.Value = (grid.DataSource as DataTable).Rows[e.RowIndex][e.ColumnIndex];
-
-				//  };
-				//g.CellValueChanged += (c, e) =>
-				//  {
-				//	  DataGridView grid = (c as DataGridView);
-				//	  DataTable t = (grid.DataSource as DataTable);
-				//	  t.Rows[e.RowIndex][e.ColumnIndex] = grid[e.ColumnIndex, e.RowIndex].Value;
-
-				//  };
-
-				cd.Items["MainPanel"].LinkedControl.Add<TableLayoutPanel>(WinFormConfig.StdButtons);
-				if (cd.ShowDialog() == DialogResult.OK)
-				{
-					cd.Save();
-					//return items.Select(i=>i.Value).ToArray();
-				}
-				//else
-				//	return items.Select(i => i.OriginalValue).ToArray();
 			}
 		}
 	}

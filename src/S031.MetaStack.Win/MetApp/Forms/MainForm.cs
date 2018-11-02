@@ -7,17 +7,16 @@ using S031.MetaStack.WinForms.ORM;
 using System.Reflection;
 using System.ComponentModel;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MetApp
 {
 	internal sealed partial class MainForm : WinForm
 	{
 		CommandExecuter<DBBrowseCommandsEnum> _commands = new CommandExecuter<DBBrowseCommandsEnum>();
-		private int _curRowIdx = 0;
 		private DBGrid _grid;
 		private string _objectName;
 		private MainFormOptions _formOptions;
-		private GridSpeedSearch _gss;
 
 		ToolStripDateEdit _dateStart;
 		ToolStripDateEdit _dateFinish;
@@ -147,23 +146,6 @@ namespace MetApp
 				buttons.Add(new ToolStripMenuItem("Данные по потокам", null, MenuRel_Click) { Name = "dbo.CashFlow_NKN", ToolTipText = "Процедура для вывода данных потоков из таблицы msfodb..CashFlow_NKN по одному договору" });
 			}
 
-			//foreach (ActionConfig config in configs)
-			//{
-			//	if (config.IncludeForms != null && config.IncludeForms.Count() > 0 &&
-			//		string.IsNullOrEmpty(config.IncludeForms.FirstOrDefault(fn => fn.Equals(this.Form["FormName"], StringComparison.CurrentCultureIgnoreCase))))
-			//		continue;
-			//	else if (config.ExcludeForms != null && config.ExcludeForms.Count() > 0 &&
-			//		!string.IsNullOrEmpty(config.ExcludeForms.FirstOrDefault(fn => fn.Equals(this.Form["FormName"], StringComparison.CurrentCultureIgnoreCase))))
-			//		continue;
-
-			//	if (config.AddContextMenu)
-			//	{
-			//		items.Add(new ToolStripMenuItem(config.Name, config.Image, menuRun_Click) { Name = config.ActionID, ToolTipText = config.Description });
-			//		FontManager.Adop(items[items.Count - 1]);
-			//		buttons.Add(new ToolStripMenuItem(config.Name, config.Image, menuRun_Click) { Name = config.ActionID, ToolTipText = config.Description });
-			//		FontManager.Adop(buttons[buttons.Count - 1]);
-			//	}
-			//}
 			if (items.Count > 0)
 			{
 				menuRun.DropDownItems.AddRange(items.ToArray());
@@ -411,13 +393,19 @@ namespace MetApp
 		void MenuRun_Click(object sender, EventArgs e)
 		{
 		}
+
 		void MenuRel_Click(object sender, EventArgs e)
 		{
 			ToolStripItem mi = (sender as ToolStripItem);
+			OpenRelated(mi.Name);
+		}
+
+		private void OpenRelated(string childFormName)
+		{
 			//!!! Выбирать поле в связанной таблице по релейшенам
 			var filter = $"{_grid.IdColName}{_grid.GetStringForSelected()}";
 			//!!! Сделать закрытие всех форм, при закрытии последней
-			new MainForm(mi.Name, new MainFormOptions() { StartFilter = filter }).Show();
+			new MainForm(childFormName, new MainFormOptions() { StartFilter = filter }).Show();			
 		}
 
 		void dateFinish_Validating(object sender, CancelEventArgs e)
@@ -450,26 +438,46 @@ namespace MetApp
 		{
 			if (e.KeyData == Keys.F9)
 			{
+				//var mnuContext = _grid.ContextMenuStrip;
+				//mnuContext.Show(_grid.PointToScreen(
+				//	_grid.GetCellDisplayRectangle(_grid.CurrentCell.ColumnIndex, _grid.CurrentCell.RowIndex, false).Location));
+				//ToolStripMenuItem m = (ToolStripMenuItem)mnuContext.Items["EditRun"];
+				//m.Select();
+				//SendKeys.Send("{RIGHT}");
+
 				var mnuContext = _grid.ContextMenuStrip;
-				mnuContext.Show(_grid.PointToScreen(
-					_grid.GetCellDisplayRectangle(_grid.CurrentCell.ColumnIndex, _grid.CurrentCell.RowIndex, false).Location));
-				ToolStripMenuItem m = (ToolStripMenuItem)mnuContext.Items["EditRun"];
-				m.Select();
-				SendKeys.Send("{RIGHT}");
+				ToolStripMenuItem menuRun = (ToolStripMenuItem)mnuContext.Items["EditRun"];
+				if (menuRun.HasDropDownItems)
+				{
+					var m = GetFromMenuItems(menuRun.DropDownItems).Where(mi => mi != null);
+					string key = Chooser.Choose(m.Select(mi => new KeyValuePair<string, string>(mi.Name, mi.Text)), 0);
+					if (!key.IsEmpty())
+					{
+						//OpenRelated(m.FirstOrDefault(mi => mi.Text == key).Name);
+					}
+				}
+
 			}
 			else if (e.KeyData == Keys.F7)
 			{
-				using (ContextMenuStrip menuRun = new ContextMenuStrip())
+				ToolStripMenuItem menuRel = (ToolStripMenuItem)(GetControl<MenuStrip>("MenuBar").Items["File"] as ToolStripMenuItem)
+					.DropDownItems["FileOpenRelated"];
+				if (menuRel.HasDropDownItems)
 				{
-					menuRun.Items.Add(new ToolStripMenuItem("Данные по счетам", null, MenuRel_Click) { Name = "dbo.DealAc", ToolTipText = "Процедура для вывода данных счетам из таблицы msfodb..DealAcc по одному договору" });
-					menuRun.Items.Add(new ToolStripMenuItem("Данные по потокам", null, MenuRel_Click) { Name = "dbo.CashFlow_NKN", ToolTipText = "Процедура для вывода данных потоков из таблицы msfodb..CashFlow_NKN по одному договору" });
-
-					menuRun.Show(_grid.PointToScreen(
-						_grid.GetCellDisplayRectangle(_grid.CurrentCell.ColumnIndex, _grid.CurrentCell.RowIndex, false).Location));
+					var m = GetFromMenuItems(menuRel.DropDownItems).Where(mi => mi != null);
+					string key = Chooser.Choose(m.Select(mi => new KeyValuePair<string, string>(mi.Name, mi.Text)), 0);
+					if (!key.IsEmpty())
+						OpenRelated(key);
 				}
 			}
 
 			base.OnKeyDown(e);
+		}
+
+		private IEnumerable<ToolStripMenuItem> GetFromMenuItems(ToolStripItemCollection menuItems)
+		{
+			foreach (var item in menuItems)
+				yield return (item as ToolStripMenuItem);
 		}
 	}
 }

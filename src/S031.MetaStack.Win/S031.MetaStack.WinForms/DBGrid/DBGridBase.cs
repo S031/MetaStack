@@ -45,7 +45,6 @@ namespace S031.MetaStack.WinForms
 
 		#region Private declarations
 		//Data Source
-		BindingSource _bs;
 		private DataTable _dt;
 
 		//GridStyle, RaiseCell
@@ -71,6 +70,10 @@ namespace S031.MetaStack.WinForms
 		private int oldCol = -1;
 		private static List<string> searches = new List<string>();
 		private GridSpeedSearch _sss;
+
+		//Filter && sort
+		private string _listFilterString;
+		private string _textFilterString;
 		#endregion Private declarations
 
 		#region Constructor
@@ -1119,6 +1122,101 @@ namespace S031.MetaStack.WinForms
 
 		#endregion Search
 
+		#region Filter && sort
+		public virtual void FilterClear()
+		{
+			_listFilterString = "";
+			_textFilterString = "";
+			if (_sss != null)
+				_sss.Clear();
+			GetBindingSource().Filter = "";
+		}
+		public virtual void FilterSelected(string idColname)
+		{
+			_textFilterString = "";
+			if (_sss != null)
+				_sss.Clear();
+			_listFilterString = $"{idColname} {GetStringForSelected(idColname)}";
+			FilterApply();
+
+		}
+		public virtual void FilterSetString(string filter)
+		{
+			_textFilterString = filter;
+			FilterApply();
+		}
+		public virtual void FilterApply()
+		{
+			if (!_listFilterString.IsEmpty() && !_textFilterString.IsEmpty())
+				GetBindingSource().Filter = $"({_listFilterString}) AND ({_textFilterString})";
+			else if (!_listFilterString.IsEmpty())
+				GetBindingSource().Filter = $"({_listFilterString})";
+			else if (!_textFilterString.IsEmpty())
+				GetBindingSource().Filter = $"({_textFilterString})";
+			else
+				GetBindingSource().Filter = "";
+			//if (this.Rows.Count > 0)
+			//	this.CurrentCell = this.Rows[0].Cells[this.Columns[colName].Index];
+		}
+
+		public virtual string GetStringForSelected(string fieldName)
+		{
+			if (this.Rows.Count == 0)
+				return string.Empty;
+
+			var col = _dt.Columns[fieldName];
+			if (this.SelectedRows.Count <= 1)
+			{
+				DataRow row = GetRow(this.SelectedRows.Count == 0 ? this.CurrentCellAddress.Y : this.SelectedRows[0].Index);
+				if (row[fieldName] == DBNull.Value)
+					return " Is Null";
+				switch (GetMacroType(col.DataType))
+				{
+					case MacroType.num:
+						return " = " + row[fieldName].ToString();
+					case MacroType.log:
+						return " = " + row[fieldName].ToString();
+					case MacroType.date:
+						return " = '" + string.Format("yyyyMMdd", row[fieldName]) + "'";
+					default:
+						return " = '" + row[fieldName].ToString() + "'";
+				}
+			}
+			else
+			{
+				MacroType tt = GetMacroType(col.DataType);
+				System.Text.StringBuilder sb = new System.Text.StringBuilder();
+				foreach (DataGridViewRow gridRow in this.SelectedRows)
+				{
+					DataRow row = GetRow(gridRow.Index);
+					if (row[fieldName] != DBNull.Value)
+					{
+						switch (tt)
+						{
+							case MacroType.num:
+								sb.Append("," + row[fieldName].ToString());
+								break;
+							case MacroType.log:
+								sb.Append("," + row[fieldName].ToString());
+								break;
+							case MacroType.date:
+								sb.Append(",'" + string.Format("yyyyMMdd", row[fieldName]) + "'");
+								break;
+							default:
+								sb.Append(",'" + row[fieldName].ToString() + "'");
+								break;
+						}
+					}
+				}
+				if (sb.Length == 0)
+					return " Is Null";
+				else
+					return " In (" + sb.ToString().Substring(1) + ")";
+			}
+		}
+		#endregion
+
+
 		#region Row Selection support
 		public DBGridSelectionStyle SelectionStyle
 		{
@@ -1320,7 +1418,7 @@ namespace S031.MetaStack.WinForms
 			}
 			else if (e.KeyCode == Keys.OemMinus)
 			{
-				this.RefreshAll();
+				this.FilterClear();
 			}
 			else if (e.Control || e.Shift || e.Alt) { }
 			else if (e.KeyCode == Keys.F3)
@@ -1386,6 +1484,18 @@ namespace S031.MetaStack.WinForms
 			else
 				return MacroType.str;
 		}
+		public static MacroType GetMacroType(Type t)
+		{
+			if (t.IsNumeric())
+				return MacroType.num;
+			else if (t == typeof(bool))
+				return MacroType.log;
+			else if (t == typeof(DateTime))
+				return MacroType.date;
+			else
+				return MacroType.str;
+		}
+
 		public static DataTable GetItemDataList(List<string> items, List<object> data, MdbType dataType)
 		{
 			DataTable dtList = new DataTable("ListItems");
@@ -1404,7 +1514,7 @@ namespace S031.MetaStack.WinForms
 		#endregion Public Static Methods
 
 		#region Protected Methods
-		protected virtual BindingSource GetBindingSource() => _bs;
+		protected virtual BindingSource GetBindingSource() => (this.DataSource as BindingSource);
 		#endregion Protected Methods
 
 		protected override void OnDataError(bool displayErrorDialogIfNoHandler, DataGridViewDataErrorEventArgs e)

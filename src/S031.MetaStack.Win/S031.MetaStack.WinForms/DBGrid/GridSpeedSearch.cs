@@ -103,14 +103,12 @@ namespace S031.MetaStack.WinForms
 
 			try
 			{
-				datasource.Filter = filter;
+				_grid.FilterSetString(filter);
 			}
 			catch (EvaluateException err)
 			{
 				errToolTip.Show(err.Message, txtFind.TextBox, 2000);
 			}
-			if (_grid.Rows.Count > 0)
-				_grid.CurrentCell = _grid.Rows[0].Cells[_grid.Columns[colName].Index];
 		}
 	}
 }

@@ -29,8 +29,10 @@ namespace MetApp
 					grid.AllowAddObject = true;
 					grid.AllowDelObject = true;
 					grid.AllowEditObject = true;
+					//grid.GridColor = this.BackColor;
+					//grid.BackgroundColor = this.BackColor;
+					//grid.RowHeadersDefaultCellStyle.BackColor = this.BackColor;
 					//grid.MultiSelect = false;
-					grid.BackgroundColor = this.BackColor;
 					//grid.ObjectEditor = () => new Calculator(grid.ObjectName, GetItem("DOGrid").As<DBGridBase>().ReadObject());
 					//grid.DataChanged += Grid_DataChanged;
 					//grid.RowHeadersVisible = false;
