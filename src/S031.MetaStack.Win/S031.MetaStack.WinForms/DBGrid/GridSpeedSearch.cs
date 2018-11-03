@@ -22,7 +22,8 @@ namespace S031.MetaStack.WinForms
 			_grid = gridControl;
 			txtFind = findControl;
 			txtFind.ToolTipText = "Быстрый поиск";
-			txtFind.TextChanged += new EventHandler(txtFind_TextChanged);
+			//txtFind.TextChanged += new EventHandler(txtFind_TextChanged);
+			txtFind.Validated += new EventHandler(txtFind_TextChanged);
 			txtFind.Leave += new EventHandler((sender, e) => { searchColName = string.Empty; });
 			txtFind.KeyDown += new KeyEventHandler((sender, e) =>
 			{
@@ -34,6 +35,8 @@ namespace S031.MetaStack.WinForms
 			{
 				if (char.IsLetterOrDigit(e.KeyChar))
 				{
+					txtFind.Focus();
+					SendKeys.Send("{END}");
 					txtFind.Text += e.KeyChar.ToString();
 				}
 			});
@@ -44,7 +47,11 @@ namespace S031.MetaStack.WinForms
 					int len;
 					string text = txtFind.Text;
 					if ((len = text.Length) > 1)
+					{
 						txtFind.Text = text.Left(len - 1);
+						txtFind.Focus();
+						SendKeys.Send("{END}");
+					}
 					else
 						this.Clear();
 				}
@@ -73,10 +80,10 @@ namespace S031.MetaStack.WinForms
 
 		void txtFind_TextChanged(object sender, EventArgs e)
 		{
-			if (_grid.BaseTable.Rows.Count == 0)
+			if (_grid.Rows.Count == 0)
 				return;
-			BindingSource datasource = _grid.DataSource as BindingSource;
-			if (datasource == null)
+
+			if (!(_grid.DataSource is BindingSource datasource))
 				return;
 
 			string colName;
@@ -97,7 +104,7 @@ namespace S031.MetaStack.WinForms
 			else if (searchColType.IsNumeric())
 				filter = $"(Convert([{colName}], 'System.String') LIKE '%{template}%')";
 			else if (searchColType == typeof(DateTime)) 
-				filter = $"(Convert([{colName}], 'System.String') LIKE '%{template}%')";
+				filter = $"(Convert([{colName}], 'System.String') LIKE '%{template.Replace('.', '-')}%')";
 			else 
 				filter = $"(Convert([{colName}], 'System.String') LIKE '%{template}%')";
 

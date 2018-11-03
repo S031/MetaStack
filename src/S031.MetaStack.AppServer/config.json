@@ -2,7 +2,7 @@
   "appSettings": {
     "auditEnabled": true,
     "language": "ru-RU",
-    "defaultConnection": "bankLocal",
+    "defaultConnection": "test",
     "SysCatConnection": "SQliteDb"
   },
   "ApplicationLogSettings": {
@@ -74,7 +74,7 @@
         },
         "Parameters": {
           "Port": 8001,
-          "MaxReceivedMessageSize": 16384
+          "MaxReceivedMessageSize": 2097152
         }
       }
     ]

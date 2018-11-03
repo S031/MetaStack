@@ -438,13 +438,6 @@ namespace MetApp
 		{
 			if (e.KeyData == Keys.F9)
 			{
-				//var mnuContext = _grid.ContextMenuStrip;
-				//mnuContext.Show(_grid.PointToScreen(
-				//	_grid.GetCellDisplayRectangle(_grid.CurrentCell.ColumnIndex, _grid.CurrentCell.RowIndex, false).Location));
-				//ToolStripMenuItem m = (ToolStripMenuItem)mnuContext.Items["EditRun"];
-				//m.Select();
-				//SendKeys.Send("{RIGHT}");
-
 				var mnuContext = _grid.ContextMenuStrip;
 				ToolStripMenuItem menuRun = (ToolStripMenuItem)mnuContext.Items["EditRun"];
 				if (menuRun.HasDropDownItems)
@@ -472,6 +465,23 @@ namespace MetApp
 			}
 
 			base.OnKeyDown(e);
+		}
+		protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+		{
+			if (keyData == Keys.Escape)
+			{
+				if (_grid.Rows.Count < _grid.BaseTable.Rows.Count)
+				{
+					_grid.FilterClear();
+					return true;
+				}
+				else
+				{
+					this.Close();
+					return true;
+				}
+			}
+			return base.ProcessCmdKey(ref msg, keyData);
 		}
 
 		private IEnumerable<ToolStripMenuItem> GetFromMenuItems(ToolStripItemCollection menuItems)

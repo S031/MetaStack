@@ -1125,12 +1125,17 @@ namespace S031.MetaStack.WinForms
 		#region Filter && sort
 		public virtual void FilterClear()
 		{
+			int colIndex = this.Rows.Count > 0 ? this.CurrentCellAddress.X : 0;
+			string colName = this.Columns[colIndex].Name;
 			_listFilterString = "";
 			_textFilterString = "";
 			if (_sss != null)
 				_sss.Clear();
 			GetBindingSource().Filter = "";
+			if (this.Rows.Count > 0)
+				this.CurrentCell = this.Rows[0].Cells[this.Columns[colName].Index];
 		}
+
 		public virtual void FilterSelected(string idColname)
 		{
 			_textFilterString = "";
@@ -1147,16 +1152,20 @@ namespace S031.MetaStack.WinForms
 		}
 		public virtual void FilterApply()
 		{
-			if (!_listFilterString.IsEmpty() && !_textFilterString.IsEmpty())
-				GetBindingSource().Filter = $"({_listFilterString}) AND ({_textFilterString})";
-			else if (!_listFilterString.IsEmpty())
-				GetBindingSource().Filter = $"({_listFilterString})";
-			else if (!_textFilterString.IsEmpty())
-				GetBindingSource().Filter = $"({_textFilterString})";
-			else
-				GetBindingSource().Filter = "";
-			//if (this.Rows.Count > 0)
-			//	this.CurrentCell = this.Rows[0].Cells[this.Columns[colName].Index];
+			if (this.Rows.Count > 0)
+			{
+				string colName = this.Columns[this.CurrentCellAddress.X].Name;
+				if (!_listFilterString.IsEmpty() && !_textFilterString.IsEmpty())
+					GetBindingSource().Filter = $"({_listFilterString}) AND ({_textFilterString})";
+				else if (!_listFilterString.IsEmpty())
+					GetBindingSource().Filter = $"({_listFilterString})";
+				else if (!_textFilterString.IsEmpty())
+					GetBindingSource().Filter = $"({_textFilterString})";
+				else
+					GetBindingSource().Filter = "";
+				if (this.Rows.Count > 0)
+					this.CurrentCell = this.Rows[0].Cells[this.Columns[colName].Index];
+			}
 		}
 
 		public virtual string GetStringForSelected(string fieldName)
@@ -1279,7 +1288,7 @@ namespace S031.MetaStack.WinForms
 				{
 					CheckRowInternal(r);
 				}
-				this.Refresh();
+				base.Refresh();
 			}
 		}
 

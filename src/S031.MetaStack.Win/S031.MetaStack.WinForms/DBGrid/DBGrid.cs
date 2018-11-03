@@ -265,8 +265,11 @@ namespace S031.MetaStack.WinForms
 					return;
 				}
 			}
-			var bs = new BindingSource();
-			bs.DataSource = dt;
+			var bs = new BindingSource
+			{
+				DataSource = dt,
+			};
+			bs.ListChanged += (c, e) => { MakeTotals(); ShowTotals(); };
 			this.DataSource = bs;
 
 			if (freezeFooter) this.Footer = true;
@@ -394,7 +397,12 @@ namespace S031.MetaStack.WinForms
 		#region Totals
 		private void MakeTotals()
 		{
-			int count = dt.Rows.Count;
+			var bs = GetBindingSource();
+			if (bs == null)
+				return;
+			var list = bs.List;
+
+			int count = list.Count;
 			bool total = false;
 			totals = new totalInfo[xc.Attributes.Count];
 			for (int i = 0; i < xc.Attributes.Count; i++)
@@ -425,44 +433,43 @@ namespace S031.MetaStack.WinForms
 			}
 			if (total)
 			{
-				//System.Threading.Tasks.Parallel.For(0, dt.Rows.Count, (i) =>
-				for (int i = 0; i < dt.Rows.Count; i++)
+				//System.Threading.Tasks.Parallel.For(0, count, (i) =>
+				for (int i = 0; i < count; i++)
 				{
+					var row = (list[i] as DataRowView);
 					for (int j = 0; j < dt.Columns.Count; j++)
 					{
-						switch (totals[j].Agregate)
+						object value = row[j];
+						if (!vbo.IsEmpty(value))
 						{
-							case "sum":
-								totals[j].totalDec += Convert.ToDecimal(dt.Rows[i][j] ?? 0);
-								break;
-							case "ave":
-								totals[j].totalDec += Convert.ToDecimal(dt.Rows[i][j] ?? 0) / count;
-								break;
-							case "vcnt":
-								if (!vbo.IsEmpty(dt.Rows[i][j])) totals[j].totalDec++;
-								break;
-							case "max":
-								if (!vbo.IsEmpty(dt.Rows[i][j]))
-								{
-									if (totals[j].Type == MacroType.num && Convert.ToDecimal(dt.Rows[i][j] ?? 0) > totals[j].totalDec)
-										totals[j].totalDec = Convert.ToDecimal(dt.Rows[i][j] ?? 0);
-									else if (totals[j].Type == MacroType.str && totals[j].totalString.CompareTo(dt.Rows[i][j].ToString()) < 0)
-										totals[j].totalString = dt.Rows[i][j].ToString();
-									else if (totals[j].Type == MacroType.date && (DateTime)dt.Rows[i][j] > totals[j].totalDate)
-										totals[j].totalDate = (DateTime)dt.Rows[i][j];
-								}
-								break;
-							case "min":
-								if (!vbo.IsEmpty(dt.Rows[i][j]))
-								{
-									if (totals[j].Type == MacroType.num && Convert.ToDecimal(dt.Rows[i][j] ?? 0) < totals[j].totalDec)
-										totals[j].totalDec = Convert.ToDecimal(dt.Rows[i][j] ?? 0);
-									else if (totals[j].Type == MacroType.str && totals[j].totalString.CompareTo(dt.Rows[i][j].ToString()) > 0)
-										totals[j].totalString = dt.Rows[i][j].ToString();
-									else if (totals[j].Type == MacroType.date && (DateTime)dt.Rows[i][j] < totals[j].totalDate)
-										totals[j].totalDate = (DateTime)dt.Rows[i][j];
-								}
-								break;
+							switch (totals[j].Agregate)
+							{
+								case "sum":
+									totals[j].totalDec += Convert.ToDecimal(value);
+									break;
+								case "ave":
+									totals[j].totalDec += Convert.ToDecimal(value) / count;
+									break;
+								case "vcnt":
+									if (!vbo.IsEmpty(value)) totals[j].totalDec++;
+									break;
+								case "max":
+										if (totals[j].Type == MacroType.num && Convert.ToDecimal(value) > totals[j].totalDec)
+											totals[j].totalDec = Convert.ToDecimal(value);
+										else if (totals[j].Type == MacroType.str && totals[j].totalString.CompareTo(value.ToString()) < 0)
+											totals[j].totalString = value.ToString();
+										else if (totals[j].Type == MacroType.date && (DateTime)value > totals[j].totalDate)
+											totals[j].totalDate = (DateTime)value;
+									break;
+								case "min":
+										if (totals[j].Type == MacroType.num && Convert.ToDecimal(value) < totals[j].totalDec)
+											totals[j].totalDec = Convert.ToDecimal(value);
+										else if (totals[j].Type == MacroType.str && totals[j].totalString.CompareTo(value.ToString()) > 0)
+											totals[j].totalString = value.ToString();
+										else if (totals[j].Type == MacroType.date && (DateTime)value < totals[j].totalDate)
+											totals[j].totalDate = (DateTime)value;
+									break;
+							}
 						}
 					}
 				}//);
@@ -484,6 +491,8 @@ namespace S031.MetaStack.WinForms
 		}
 		private void ShowTotals()
 		{
+			if (totals == null)
+				return;
 			for (int i = 0; i < totals.Length; i++)
 			{
 				if (totals[i].Check)

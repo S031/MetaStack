@@ -84,7 +84,9 @@ namespace S031.MetaStack.Common
 
 		public static bool IsEmpty(object value)
 		{
-			return value == null || value.Equals(value.GetType().GetDefaultValue());
+			return value == null || 
+				value.Equals(DBNull.Value) ||
+				value.Equals(value.GetType().GetDefaultValue());
 		}
     }
 }

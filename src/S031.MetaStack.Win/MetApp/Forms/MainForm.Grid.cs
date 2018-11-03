@@ -45,6 +45,8 @@ namespace MetApp
 					grid.StartFilter = _formOptions.StartFilter;
 					grid.SchemaName = _objectName;
 					grid.SetSpeedSearch((ToolStripTextBox)GetItem("ToolBar").As<ToolStrip>().Items["txtFind"]);
+					grid.FindFirst += (g, e) => ((ToolStripTextBox)GetItem("ToolBar").As<ToolStrip>().Items["txtFind"]).Focus();
+					grid.FindNext += (g, e) => ((ToolStripTextBox)GetItem("ToolBar").As<ToolStrip>().Items["txtFind"]).Focus();
 					_grid = grid;
 					SetMenuContext();
 				}

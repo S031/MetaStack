@@ -624,11 +624,14 @@ namespace S031.MetaStack.WinForms
 		{
 			if (keyData == (Keys.Tab | Keys.Control))
 			{
-				if (_tc.SelectedIndex == _tc.TabPages.Count - 1)
-					_tc.SelectedIndex = 0;
-				else
-					_tc.SelectedIndex++;
-				return true;
+				if (_tc != null)
+				{
+					if (_tc.SelectedIndex == _tc.TabPages.Count - 1)
+						_tc.SelectedIndex = 0;
+					else
+						_tc.SelectedIndex++;
+					return true;
+				}
 			}
 			else if (keyData == Keys.Escape && _codeCompletionWindow == null)
 			{
