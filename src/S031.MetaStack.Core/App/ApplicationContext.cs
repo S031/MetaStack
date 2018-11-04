@@ -72,7 +72,7 @@ namespace S031.MetaStack.Core.App
 		}
 		private static IServiceCollection ConfigureLoginFactory()
 		{
-			//костыль
+			//костыль!!!
 			//return settings from configuration
 			_loginFactory = new BasicLoginFactory();
 			_services.AddSingleton<ILoginFactory>(_loginFactory );
@@ -91,7 +91,7 @@ namespace S031.MetaStack.Core.App
 		}
 		private static void ConfigureProvidersFromConfigFile()
 		{
-			//костыль
+			//костыль!!!
 			//Remove from project references all plugins and configure publish plugins to project 
 			//output folder
 			//Load to publish folder all plugins whis depencies (after publish plugin progect)
@@ -106,7 +106,7 @@ namespace S031.MetaStack.Core.App
 		}
 		private static void ConfigureDefaultsFromConfigFile()
 		{
-			//костыль
+			//костыль!!!
 			//return settings from configuration
 		}
 		private static Assembly LoadAssembly(string assemblyID)=> AssemblyLoadContext.Default.LoadFromAssemblyPath(

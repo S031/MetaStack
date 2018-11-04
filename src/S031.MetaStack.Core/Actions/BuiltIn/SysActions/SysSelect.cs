@@ -26,7 +26,7 @@ namespace S031.MetaStack.Core.Actions
 			GetParameters(ai, dp);
 			using (MdbContext mdb = new MdbContext(_connectInfo))
 			{
-				//Костыль
+				//Костыль!!!
 				CreateCommandAsync().GetAwaiter().GetResult();
 				return mdb.GetReader(_body, _parameters.ToArray());
 			}

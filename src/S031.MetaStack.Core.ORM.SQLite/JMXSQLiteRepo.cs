@@ -106,7 +106,7 @@ namespace S031.MetaStack.Core.ORM.SQLite
 			if (!mdbContext.ProviderName.Equals(JMXSQLiteFactory.ProviderInvariantName, StringComparison.CurrentCultureIgnoreCase))
 				throw new ArgumentException($"MdbContext must be created using { JMXSQLiteFactory.ProviderInvariantName} provider.");
 			Logger = logger;
-			//Костыль need 	
+			//Костыль!!! need 	
 			TestSysCatAsync()
 				.ConfigureAwait(false)
 				.GetAwaiter()
@@ -1063,7 +1063,7 @@ namespace S031.MetaStack.Core.ORM.SQLite
 				SetAttrType(att, (string)dr["type"]);
 				schema.Attributes.Add(att);
 			}
-			//Костыль доделать
+			//Костыль!!! доделать
 			return null;
 		}
 		private static void SetAttrType(JMXAttribute att, string source)

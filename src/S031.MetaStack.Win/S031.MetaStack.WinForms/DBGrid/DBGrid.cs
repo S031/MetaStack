@@ -21,13 +21,7 @@ namespace S031.MetaStack.WinForms
 	{
 		#region Private declarations
 		private const string UserNameField = "UserNameField";
-		//Sort & filter support
-		private class sortInfo
-		{
-			public int Index;
-			public bool Ascend;
-		}
-		readonly List<sortInfo> sortedColumns = new List<sortInfo>();
+		
 		//Form
 		private JMXSchema xc;
 		private JMXSchema xcOriginal;
@@ -62,9 +56,6 @@ namespace S031.MetaStack.WinForms
 		public event EventHandler<SchemaEventArgs> SchemaNoComplete;
 		public event EventHandler<SchemaExceptionEventArgs> SchemaReadException;
 		public event EventHandler<SchemaExceptionEventArgs> GetDataException;
-		public event EventHandler<ActionEventArgs> Filter;
-		public event EventHandler<DBGridSortEventArgs> SortFirst;
-		public event EventHandler<DBGridSortEventArgs> SortNext;
 
 		protected virtual void OnFormNotRead(EventArgs e)
 		{
@@ -108,33 +99,6 @@ namespace S031.MetaStack.WinForms
 			else
 				MessageBox.Show(e.Exception.Message, "Ошибка выполнения запроса", MessageBoxButtons.OK, MessageBoxIcon.Error);
 		}
-		protected virtual void OnSortFirst(DBGridSortEventArgs e)
-		{
-			EventHandler<DBGridSortEventArgs> te = SortFirst;
-			if (te != null)
-				te(this, e);
-			//!!!
-			//else
-			//	DoSortFirst(e.ColIndex);
-		}
-		protected virtual void OnSortNext(DBGridSortEventArgs e)
-		{
-			EventHandler<DBGridSortEventArgs> te = SortNext;
-			if (te != null)
-				te(this, e);
-			//!!!
-			//else
-			//	DoSortNext(e.ColIndex);
-		}
-		public virtual void OnFilter(ActionEventArgs e)
-		{
-			EventHandler<ActionEventArgs> te = Filter;
-			if (te != null)
-				te(this, e);
-			//!!!
-			//else
-			//	DoFilter();
-		}
 		#endregion Public Events
 
 		#region Constructor
@@ -159,7 +123,7 @@ namespace S031.MetaStack.WinForms
 			// DBGrid
 			// 
 			this.ColumnHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.DBGrid_ColumnHeaderMouseClick);
-			//this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.DBGrid_KeyDown);
+			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.DBGrid_KeyDown);
 			//this.ObjectRead += new EventHandler<ActionEventArgs>(DBGrid_ObjectRead);
 			//this.ObjectReadNew += new EventHandler<ActionEventArgs>(DBGrid_ObjectReadNew);
 			//this.ObjectCopy += new EventHandler<ActionEventArgs>(DBGrid_ObjectCopy);
@@ -301,65 +265,6 @@ namespace S031.MetaStack.WinForms
 		{
 			return this.GetStringForSelected(_idColName);
 		}
-		//public string GetStringForSelected(string fieldName)
-		//{
-		//	if (this.Rows.Count == 0)
-		//		return string.Empty;
-		//	else if (this.SelectedRows.Count <= 1)
-		//	{
-		//		DataRow row = GetRow(this.SelectedRows.Count == 0 ? this.CurrentCellAddress.Y : this.SelectedRows[0].Index);
-		//		var att = xc.Attributes.FirstOrDefault(a => a.AttribName == fieldName);
-		//		if (att == null)
-		//			throw new ArgumentException("Неверно указан параметр имя поля в методе GetStringForSelected");
-		//		if (row[fieldName] == DBNull.Value)
-		//			return " Is Null";
-		//		switch (GetMacroType(att.DataType))
-		//		{
-		//			case MacroType.num:
-		//				return " = " + row[fieldName].ToString();
-		//			case MacroType.log:
-		//				return " = " + row[fieldName].ToString();
-		//			case MacroType.date:
-		//				return " = '" + string.Format("yyyyMMdd", row[fieldName]) + "'";
-		//			default:
-		//				return " = '" + row[fieldName].ToString() + "'";
-		//		}
-		//	}
-		//	else
-		//	{
-		//		var att = xc.Attributes.FirstOrDefault(a => a.AttribName == fieldName);
-		//		if (att == null)
-		//			throw new ArgumentException("Неверно указан параметр имя поля в методе GetStringForSelected");
-		//		MacroType tt = GetMacroType(att.DataType);
-		//		System.Text.StringBuilder sb = new System.Text.StringBuilder();
-		//		foreach (DataGridViewRow gridRow in this.SelectedRows)
-		//		{
-		//			DataRow row = GetRow(gridRow.Index);
-		//			if (row[fieldName] != DBNull.Value)
-		//			{
-		//				switch (tt)
-		//				{
-		//					case MacroType.num:
-		//						sb.Append("," + row[fieldName].ToString());
-		//						break;
-		//					case MacroType.log:
-		//						sb.Append("," + row[fieldName].ToString());
-		//						break;
-		//					case MacroType.date:
-		//						sb.Append(",'" + string.Format("yyyyMMdd", row[fieldName]) + "'");
-		//						break;
-		//					default:
-		//						sb.Append(",'" + row[fieldName].ToString() + "'");
-		//						break;
-		//				}
-		//			}
-		//		}
-		//		if (sb.Length == 0)
-		//			return " Is Null";
-		//		else
-		//			return " In (" + sb.ToString().Substring(1) + ")";
-		//	}
-		//}
 		#endregion Filter Sorting Selection
 
 
@@ -599,10 +504,7 @@ namespace S031.MetaStack.WinForms
 			}
 			else if (e.KeyCode == Keys.End)
 			{
-				if (string.IsNullOrEmpty(dt.DefaultView.RowFilter))
-					this.GoTo(this.Rows.Count - 1);
-				else
-					this.GoTo(dt.DefaultView.Count - 1);
+				this.GoTo(this.Rows.Count - 1);
 				e.SuppressKeyPress = true;
 			}
 			else if (e.KeyCode == Keys.F1)

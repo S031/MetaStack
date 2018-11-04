@@ -39,6 +39,7 @@ namespace S031.MetaStack.WinForms.ORM
 			DisplayWidth = 10;
 			Visible = true;
 			Enabled = true;
+			Sorted = true;
 
 			CollationName = string.Empty;
 			Name = string.Empty;

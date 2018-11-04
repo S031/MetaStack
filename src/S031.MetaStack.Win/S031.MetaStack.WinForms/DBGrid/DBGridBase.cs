@@ -71,7 +71,14 @@ namespace S031.MetaStack.WinForms
 		private static List<string> searches = new List<string>();
 		private GridSpeedSearch _sss;
 
-		//Filter && sort
+		//Sort & filter support
+		private class sortInfo
+		{
+			public int Index;
+			public bool Ascend;
+		}
+		readonly List<sortInfo> sortedColumns = new List<sortInfo>();
+
 		private string _listFilterString;
 		private string _textFilterString;
 		#endregion Private declarations
@@ -246,6 +253,9 @@ namespace S031.MetaStack.WinForms
 		public event EventHandler<ActionEventArgs> ObjectPaste;
 		public event EventHandler<ActionEventArgs> DataChanged;
 		public event EventHandler<ActionEventArgs> DataDeleted;
+		public event EventHandler<ActionEventArgs> Filter;
+		public event EventHandler<DBGridSortEventArgs> SortFirst;
+		public event EventHandler<DBGridSortEventArgs> SortNext;
 
 		public virtual void OnFindFirst(ActionEventArgs e)
 		{
@@ -348,6 +358,26 @@ namespace S031.MetaStack.WinForms
 		public virtual void OnDataChanged(ActionEventArgs e)
 		{
 			DataChanged?.Invoke(this, e);
+		}
+		protected virtual void OnSortFirst(DBGridSortEventArgs e)
+		{
+			EventHandler<DBGridSortEventArgs> te = SortFirst;
+			if (te != null)
+				te(this, e);
+			else
+				DoSortFirst(e.ColIndex);
+		}
+		protected virtual void OnSortNext(DBGridSortEventArgs e)
+		{
+			EventHandler<DBGridSortEventArgs> te = SortNext;
+			if (te != null)
+				te(this, e);
+			else
+				DoSortNext(e.ColIndex);
+		}
+		public virtual void OnFilter(ActionEventArgs e)
+		{
+			Filter?.Invoke(this, e);
 		}
 		public virtual void OnDataDeleted(ActionEventArgs e)
 		{
@@ -1167,7 +1197,6 @@ namespace S031.MetaStack.WinForms
 					this.CurrentCell = this.Rows[0].Cells[this.Columns[colName].Index];
 			}
 		}
-
 		public virtual string GetStringForSelected(string fieldName)
 		{
 			if (this.Rows.Count == 0)
@@ -1221,6 +1250,70 @@ namespace S031.MetaStack.WinForms
 					return " Is Null";
 				else
 					return " In (" + sb.ToString().Substring(1) + ")";
+			}
+		}
+		protected virtual void DoSortFirst(int colIndex)
+		{
+			DataGridViewColumn col = this.Columns[colIndex];
+			string sortString = GetBindingSource().Sort?.Trim() ?? string.Empty;
+
+			if (sortString.StartsWith(col.Name))
+			{
+				if (sortString.Right(5).ToLower() == " desc")
+					sortString = "";
+				else if (sortString.Right(4).ToLower() == " asc")
+					sortString = $"{col.Name} DESC";
+				else
+					sortString = $"{col.Name} ASC";
+			}
+			else
+				sortString = $"{col.Name} ASC";
+			DoSorting(sortString);
+		}
+
+		protected virtual void DoSortNext(int colIndex)
+		{
+			string sortString = GetBindingSource().Sort.Trim();
+			DataGridViewColumn col = this.Columns[colIndex];
+
+			if (sortString.Contains($"{col.Name} ASC"))
+				sortString = sortString.Replace($"{col.Name} ASC", $"{col.Name} DESC");
+			else if (sortString.Contains($"{col.Name} DESC"))
+				sortString = sortString.Replace($"{col.Name} DESC", "").Replace(",,", ",");
+			else if (!sortString.IsEmpty())
+				sortString += $",{col.Name} ASC";
+			else
+				sortString = $"{col.Name} ASC";
+
+			if (!sortString.IsEmpty() && sortString[0] == ',')
+				sortString = sortString.Substring(1);
+			else if (!sortString.IsEmpty() && sortString.Last() == ',')
+				sortString = sortString.Left(sortString.Length - 1);
+
+
+			DoSorting(sortString);
+		}
+		private void DoSorting(string sortString)
+		{
+			GetBindingSource().Sort = sortString;
+			if (sortString.IsEmpty())
+			{
+				foreach (DataGridViewColumn col in this.Columns)
+					col.HeaderCell.SortGlyphDirection = SortOrder.None;
+			}
+			else
+			{
+				string[] sortInfo = sortString.Split(',');
+				foreach (DataGridViewColumn col in this.Columns)
+				{
+					string s = sortInfo.FirstOrDefault(item => item.StartsWith(col.Name));
+					if (!s.IsEmpty() && s.Right(4).ToLower() == " asc")
+						col.HeaderCell.SortGlyphDirection = SortOrder.Ascending;
+					else if (!s.IsEmpty() && s.Right(5).ToLower() == " desc")
+						col.HeaderCell.SortGlyphDirection = SortOrder.Descending;
+					else
+						col.HeaderCell.SortGlyphDirection = SortOrder.None;
+				}
 			}
 		}
 		#endregion
