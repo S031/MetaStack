@@ -75,7 +75,7 @@ namespace S031.MetaStack.Common
 	public static class Declension
 	{
 		/// <summary>
-		/// Функция для склонения одного слова!!! 
+		/// Функция для склонения одного слова 
 		/// </summary>
 		/// <param name="FIO">само слово</param>
 		/// <param name="declansionCase">номер падежа </param>

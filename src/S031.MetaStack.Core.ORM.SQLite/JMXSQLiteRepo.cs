@@ -106,7 +106,6 @@ namespace S031.MetaStack.Core.ORM.SQLite
 			if (!mdbContext.ProviderName.Equals(JMXSQLiteFactory.ProviderInvariantName, StringComparison.CurrentCultureIgnoreCase))
 				throw new ArgumentException($"MdbContext must be created using { JMXSQLiteFactory.ProviderInvariantName} provider.");
 			Logger = logger;
-			//Костыль!!! need 	
 			TestSysCatAsync()
 				.ConfigureAwait(false)
 				.GetAwaiter()

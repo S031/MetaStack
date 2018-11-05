@@ -17,6 +17,7 @@ namespace S031.MetaStack.Core.Actions
 		readonly List<object> _parameters = new List<object>();
 		ConnectInfo _connectInfo;
 		JMXSchema _schema;
+		List<MdbParameter> _mdbParams;
 		List<JMXCondition> _conditions;
 		string _viewName;
 		string _body;
@@ -26,9 +27,8 @@ namespace S031.MetaStack.Core.Actions
 			GetParameters(ai, dp);
 			using (MdbContext mdb = new MdbContext(_connectInfo))
 			{
-				//Костыль!!!
 				CreateCommandAsync().GetAwaiter().GetResult();
-				return mdb.GetReader(_body, _parameters.ToArray());
+				return mdb.GetReader(_body, _mdbParams.ToArray());
 			}
 		}
 
@@ -43,13 +43,10 @@ namespace S031.MetaStack.Core.Actions
 					using (ActionManager am = new ActionManager(mdb) { Logger = ApplicationContext.GetLogger() })
 						return await am.ExecuteAsync(_body, dp);
 				else
-					return await mdb.GetReaderAsync(_body, _parameters.ToArray());
+					return await mdb.GetReaderAsync(_body, _mdbParams.ToArray());
 			}
 		}
-		/// <summary>
-		/// Костыль!!! Check parameters with object schema (aka action execute)
-		/// with NullIfEmpty 
-		/// </summary>
+
 		private void GetParameters(ActionInfo ai, DataPackage dp)
 		{
 			if (!dp.Headers.TryGetValue("ConnectionName", out object connectionName))
@@ -83,6 +80,7 @@ namespace S031.MetaStack.Core.Actions
 			_connectInfo = configuration.GetSection($"connectionStrings:{connectionName}").Get<ConnectInfo>();
 
 		}
+
 		private async Task CreateCommandAsync()
 		{
 			var config = ApplicationContext.GetConfiguration();
@@ -95,10 +93,32 @@ namespace S031.MetaStack.Core.Actions
 			using (SQLStatementWriter writer = new SQLStatementWriter(repo))
 			{
 				_schema = await repo.GetSchemaAsync(_viewName);
+				CreateParameters();
 				_body = writer.WriteSelectStatement(
 					_schema,
 					_conditions.ToArray())
 					.ToString();
+			}
+		}
+		private void CreateParameters()
+		{
+			_mdbParams = new List<MdbParameter>();
+			foreach (JMXParameter p in _schema.Parameters)
+			{
+				int idx = _parameters.IndexOf(p.ParamName);
+				if ((idx < 0 || idx >= _parameters.Count - 1) && p.Required)
+					throw new InvalidOperationException(
+						$"Обязательный параметер схемы '{_schema.ObjectName}.{p.ParamName}', не найден в списке параметров  операции 'SysSelect'");
+				else if (idx > -1 && idx < _parameters.Count - 1)
+				{
+					object value = _parameters[idx + 1];
+					Type type = MdbTypeMap.GetType(p.DataType);
+					if (value.GetType() != type)
+						_mdbParams.Add(new MdbParameter(p.ParamName, value.ToString().ToObjectOf(type)) { NullIfEmpty = p.NullIfEmpty });
+					else
+						_mdbParams.Add(new MdbParameter(p.ParamName, value) { NullIfEmpty = p.NullIfEmpty });
+
+				}
 			}
 		}
 	}

@@ -174,7 +174,6 @@ namespace S031.MetaStack.WinForms
 				if (value == null) return;
 				xc = value;
 
-				//!!! Param dialog
 				DBGridParam param = new DBGridParam(xc, this.ParentRow);
 				if (param.ShowDialog( _firstStart? DBGridParamShowType.ShowAll: DBGridParamShowType.ShowSmart) == DialogResult.OK)
 				{
@@ -183,9 +182,8 @@ namespace S031.MetaStack.WinForms
 					sqlParams = param.GetQueryParameters();
 					MakeFrame();
 					xcOriginal = JMXSchema.Parse(xc.ToString());
-					//!!!
-					//mainform parentForm = (this.FindForm() as DBBrowser);
-					//if (parentForm != null) parentForm.Caption = xc["Name"];
+					var parentForm = this.FindForm();
+					parentForm.Text = xc.Name;
 					OnFormComplete(new SchemaEventArgs(xc));
 				}
 				else
@@ -338,7 +336,7 @@ namespace S031.MetaStack.WinForms
 			}
 			if (total)
 			{
-				//System.Threading.Tasks.Parallel.For(0, count, (i) =>
+				//Parallel.For(0, count, (i) =>
 				for (int i = 0; i < count; i++)
 				{
 					var row = (list[i] as DataRowView);

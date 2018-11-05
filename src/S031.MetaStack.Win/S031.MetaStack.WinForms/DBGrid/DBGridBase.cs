@@ -72,13 +72,6 @@ namespace S031.MetaStack.WinForms
 		private GridSpeedSearch _sss;
 
 		//Sort & filter support
-		private class sortInfo
-		{
-			public int Index;
-			public bool Ascend;
-		}
-		readonly List<sortInfo> sortedColumns = new List<sortInfo>();
-
 		private string _listFilterString;
 		private string _textFilterString;
 		#endregion Private declarations
@@ -946,37 +939,21 @@ namespace S031.MetaStack.WinForms
 		}
 		public virtual void Find(Func<DataRow, bool> fc, int startIndex)
 		{
-			//startIndex += 1;
-			if (string.IsNullOrEmpty(_dt.DefaultView.RowFilter))
+			startIndex += 1;
+			int i = startIndex;
+			foreach (DataRowView row in this.Rows)
 			{
-				DataRowCollection rows = _dt.Rows;
-				//System.Threading.Tasks.Parallel.For(startIndex, rows.Count, (i, loopState) =>
-				for (int i = startIndex; i < rows.Count; i++)
+				if (fc(row.Row))
 				{
-					if (fc(rows[i]))
-					{
-						this.GoTo(i);
-						//loopState.Break();
-						break;
-					}
-				}//);
-			}
-			else
-			{
-				DataView dv = _dt.DefaultView;
-				for (int i = startIndex; i < dv.Count; i++)
-				{
-					if (fc(dv[i].Row))
-					{
-						this.GoTo(i);
-						break;
-					}
+					this.GoTo(i);
+					break;
 				}
+				i++;
 			}
 		}
 		public virtual void RefreshAll()
 		{
-			_dt.DefaultView.RowFilter = "";
+			FilterClear(true);
 			base.Refresh();
 		}
 		public virtual void RefreshAll(object bookmark)
@@ -1125,18 +1102,20 @@ namespace S031.MetaStack.WinForms
 		{
 			if (this.Rows.Count == 0) return;
 			string colName = this.Columns[this.CurrentCellAddress.X].Name;
-			DataView dv = _dt.DefaultView;
+			string filter = string.Empty;
 			if (lastCondition == "Like")
 			{
 				string template = lastSearch.ToString().ToLower();
-				dv.RowFilter = colName + " Like '%" + template + "%'";
+				filter = colName + " Like '%" + template + "%'";
 			}
 			else if (lastSearch.GetType() == typeof(string))
-				dv.RowFilter = colName + " " + lastCondition + " '" + lastSearch.ToString() + "'";
+				filter = colName + " " + lastCondition + " '" + lastSearch.ToString() + "'";
 			else if (lastSearch.GetType() == typeof(DateTime))
-				dv.RowFilter = colName + " " + lastCondition + " #" + ((DateTime)lastSearch).ToString(vbo.SortDateFormat) + "# ";
+				filter = colName + " " + lastCondition + " #" + ((DateTime)lastSearch).ToString(vbo.SortDateFormat) + "# ";
 			else
-				dv.RowFilter = colName + " " + lastCondition + " " + lastSearch.ToString().Replace(',', '.');
+				filter = colName + " " + lastCondition + " " + lastSearch.ToString().Replace(',', '.');
+			FilterSetString(filter);
+
 		}
 		private static void SetAutoComplete(ComboBox tb)
 		{
@@ -1153,7 +1132,7 @@ namespace S031.MetaStack.WinForms
 		#endregion Search
 
 		#region Filter && sort
-		public virtual void FilterClear()
+		public virtual void FilterClear(bool withSorting = true)
 		{
 			int colIndex = this.Rows.Count > 0 ? this.CurrentCellAddress.X : 0;
 			string colName = this.Columns[colIndex].Name;
@@ -1162,6 +1141,8 @@ namespace S031.MetaStack.WinForms
 			if (_sss != null)
 				_sss.Clear();
 			GetBindingSource().Filter = "";
+			if (withSorting)
+				SortingClear();
 			if (this.Rows.Count > 0)
 				this.CurrentCell = this.Rows[0].Cells[this.Columns[colName].Index];
 		}
@@ -1252,6 +1233,7 @@ namespace S031.MetaStack.WinForms
 					return " In (" + sb.ToString().Substring(1) + ")";
 			}
 		}
+
 		protected virtual void DoSortFirst(int colIndex)
 		{
 			DataGridViewColumn col = this.Columns[colIndex];
@@ -1290,19 +1272,17 @@ namespace S031.MetaStack.WinForms
 			else if (!sortString.IsEmpty() && sortString.Last() == ',')
 				sortString = sortString.Left(sortString.Length - 1);
 
-
 			DoSorting(sortString);
 		}
+
 		private void DoSorting(string sortString)
 		{
-			GetBindingSource().Sort = sortString;
+			string colName = this.Columns[this.CurrentCellAddress.X].Name;
 			if (sortString.IsEmpty())
-			{
-				foreach (DataGridViewColumn col in this.Columns)
-					col.HeaderCell.SortGlyphDirection = SortOrder.None;
-			}
+				SortingClear();
 			else
 			{
+				GetBindingSource().Sort = sortString;
 				string[] sortInfo = sortString.Split(',');
 				foreach (DataGridViewColumn col in this.Columns)
 				{
@@ -1315,6 +1295,16 @@ namespace S031.MetaStack.WinForms
 						col.HeaderCell.SortGlyphDirection = SortOrder.None;
 				}
 			}
+			if (this.Rows.Count > 0)
+				this.CurrentCell = this.Rows[0].Cells[this.Columns[colName].Index];
+		}
+
+		public void SortingClear()
+		{
+			GetBindingSource().Sort = string.Empty;
+			foreach (DataGridViewColumn col in this.Columns)
+				col.HeaderCell.SortGlyphDirection = SortOrder.None;
+
 		}
 		#endregion
 
@@ -1355,10 +1345,7 @@ namespace S031.MetaStack.WinForms
 
 		protected DataRow GetRow(int index)
 		{
-			if (string.IsNullOrEmpty(_dt.DefaultView.RowFilter))
-				return _dt.Rows[index];
-			else
-				return _dt.DefaultView[index].Row;
+			return (this.Rows[index].DataBoundItem as DataRowView).Row;
 		}
 
 		public new void SelectAll()
@@ -1366,21 +1353,14 @@ namespace S031.MetaStack.WinForms
 			if (_selectionStyle == DBGridSelectionStyle.Normal)
 			{
 				if (this.Rows.Count > 0)
-				{
-					if (string.IsNullOrEmpty(_dt.DefaultView.RowFilter))
-						this.GoTo(this.Rows.Count - 1);
-					else
-						this.GoTo(_dt.DefaultView.Count - 1);
-				}
+					this.GoTo(this.Rows.Count - 1);
 				base.SelectAll();
 			}
 			else
 			{
 				checkedRows.Clear();
 				foreach (DataGridViewRow r in this.Rows)
-				{
 					CheckRowInternal(r);
-				}
 				base.Refresh();
 			}
 		}
@@ -1520,6 +1500,7 @@ namespace S031.MetaStack.WinForms
 			}
 			else if (e.KeyCode == Keys.OemMinus)
 			{
+
 				this.FilterClear();
 			}
 			else if (e.Control || e.Shift || e.Alt) { }
@@ -1617,6 +1598,12 @@ namespace S031.MetaStack.WinForms
 
 		#region Protected Methods
 		protected virtual BindingSource GetBindingSource() => (this.DataSource as BindingSource);
+
+		protected virtual String GetFilterString()
+		{
+			BindingSource bs = GetBindingSource();
+			return bs != null ? bs.Filter : string.Empty;
+		}
 		#endregion Protected Methods
 
 		protected override void OnDataError(bool displayErrorDialogIfNoHandler, DataGridViewDataErrorEventArgs e)
