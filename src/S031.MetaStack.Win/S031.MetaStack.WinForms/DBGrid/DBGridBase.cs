@@ -1236,6 +1236,9 @@ namespace S031.MetaStack.WinForms
 
 		protected virtual void DoSortFirst(int colIndex)
 		{
+			if (this.Rows.Count == 0)
+				return;
+
 			DataGridViewColumn col = this.Columns[colIndex];
 			string sortString = GetBindingSource().Sort?.Trim() ?? string.Empty;
 
@@ -1255,6 +1258,9 @@ namespace S031.MetaStack.WinForms
 
 		protected virtual void DoSortNext(int colIndex)
 		{
+			if (this.Rows.Count == 0)
+				return;
+
 			string sortString = GetBindingSource().Sort.Trim();
 			DataGridViewColumn col = this.Columns[colIndex];
 

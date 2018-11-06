@@ -402,6 +402,8 @@ namespace MetApp
 
 		private void OpenRelated(string childFormName)
 		{
+			if (_grid.Rows.Count == 0)
+				return;
 			//!!! Выбирать поле в связанной таблице по релейшенам
 			var filter = $"{_grid.IdColName}{_grid.GetStringForSelected()}";
 			//!!! Сделать закрытие всех форм, при закрытии последней

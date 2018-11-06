@@ -203,7 +203,7 @@ namespace S031.MetaStack.WinForms
 
 		private void MakeRecordset()
 		{
-			///!!! from schema
+			///!!! from statistics open form
 			int elapsedTime = 5000;
 			if (elapsedTime < 1001)
 			{

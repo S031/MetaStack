@@ -89,15 +89,15 @@ namespace S031.MetaStack.Common
 		public static bool IsNumeric(this Type type, NumericTypesScope scope = NumericTypesScope.All)
 		{
 			type.NullTest(nameof(type));
-			if (scope == NumericTypesScope.Integral)
+			if (scope == NumericTypesScope.All)
+				return vbo.AllNumericTypes.Contains(type);
+			else if (scope == NumericTypesScope.Integral)
 				return vbo.integralTypes.Contains(type);
 			else if (scope == NumericTypesScope.Long)
 				return type == typeof(long);
 			else if (scope == NumericTypesScope.FloatingPoint)
 				return vbo.floatingPointTypes.Contains(type);
-			else
-				return vbo.integralTypes.Contains(type) ||
-					vbo.floatingPointTypes.Contains(type) || type == typeof(long);
+			return vbo.AllNumericTypes.Contains(type);
 		}
 
 		public static object GetDefaultValue(this Type type)

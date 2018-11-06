@@ -13,8 +13,8 @@ namespace S031.MetaStack.Common
 		FloatingPoint
 	}
 
-    public static class vbo
-    {
+	public static class vbo
+	{
 		public const string s_default = "&&&";
 
 		public const string vbCrLf = "\r\n";
@@ -50,16 +50,37 @@ namespace S031.MetaStack.Common
 		/// </summary>
 		public static readonly double GoldenRatio2 = Math.Sqrt(GoldenRatio * GoldenRatio - 1);
 
-		internal static IEnumerable<Type> integralTypes
+		internal static IEnumerable<Type> AllNumericTypes  //=> integralTypes.Concat(floatingPointTypes).Concat(new Type[] { typeof(long) });
 		{
 			get
 			{
+				yield return typeof(int);
+				yield return typeof(long);
+				yield return typeof(decimal);
+
 				yield return typeof(char);
 				yield return typeof(sbyte);
 				yield return typeof(byte);
 				yield return typeof(short);
+				yield return typeof(ushort);
+				yield return typeof(uint);
+				yield return typeof(ulong);
+				yield return typeof(float);
+				yield return typeof(double);
+			}
+		}
+
+		internal static IEnumerable<Type> integralTypes
+		{
+			get
+			{
 				yield return typeof(int);
 				yield return typeof(long);
+
+				yield return typeof(char);
+				yield return typeof(sbyte);
+				yield return typeof(byte);
+				yield return typeof(short);
 				yield return typeof(ushort);
 				yield return typeof(uint);
 				yield return typeof(ulong);
@@ -70,9 +91,10 @@ namespace S031.MetaStack.Common
 		{
 			get
 			{
+				yield return typeof(decimal);
+
 				yield return typeof(float);
 				yield return typeof(double);
-				yield return typeof(decimal);
 			}
 		}
 
@@ -86,6 +108,7 @@ namespace S031.MetaStack.Common
 		{
 			return value == null || 
 				value.Equals(DBNull.Value) ||
+				(value.GetType().IsNumeric() && Convert.ToDecimal(value).Equals(0)) ||
 				value.Equals(value.GetType().GetDefaultValue());
 		}
     }

@@ -163,6 +163,42 @@ namespace MetaStack.Test.Common
 				l.Debug("Match Return for 1,000,000 runs took " + (stop - start).TotalMilliseconds + "ms");
 			}
 		}
+		[Fact]
+		void DecimalExtensionsTest()
+		{
+			using (FileLog l = new FileLog("DecimalExtensionsTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			{
+				DateTime start = DateTime.Now;
+				for (int i = 0; i < 1000000; i++)
+				{
+					object val = new decimal();
+					//var a = value.GetType().IsNumeric();
+					//var b = decimal.TryParse(value.ToString(), out decimal a) && a == 0;
+					//var b = value.ToString().Equals("0");
+					//value.Equals(0);
+					//var a = vbo.IsEmpty(value);
+					var a = vbo.IsEmpty(val);
+				}
+				object value = 0D;
+				DateTime stop = DateTime.Now;
+				l.Debug("Match Return for 1,000,000 runs took " + (stop - start).TotalMilliseconds + "ms");
+				l.Debug($"String.Empty: {IsEmpty(string.Empty)}");
+				l.Debug($"'0': {IsEmpty("0")}");
+				l.Debug($"'1234567': {IsEmpty("1234567")}");
+				l.Debug($"MinDate: {IsEmpty(DateTime.MinValue)}");
+				l.Debug($"MinDate: {IsEmpty(DateTime.MinValue)}");
+				l.Debug($"Object(decimal): {IsEmpty(value)}");
+				l.Debug($"1234567d: {IsEmpty(1234567d)}");
+				value = new int();
+				l.Debug($"Object(integer): {IsEmpty(value)}");
+				value = new double();
+				l.Debug($"Object(double): {IsEmpty(value)}");
+			}
+		}
+		private static bool IsEmpty(object value)
+		{
+			return vbo.IsEmpty(value);
+		}
 
 	}
 	static class TestExt
