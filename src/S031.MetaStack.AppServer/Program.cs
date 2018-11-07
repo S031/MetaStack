@@ -43,17 +43,20 @@ namespace S031.MetaStack.AppServer
 			var connectionName = config["appSettings:defaultConnection"];
 			var cn = config.GetSection($"connectionStrings:{connectionName}").Get<ConnectInfo>();
 			var log = sp.GetService<ILogger>();
-			//using (MdbContext mdb = new MdbContext(cn))
-			//using (var dr = mdb.GetReader("dbo.fct_select_deal_values", 
-			//	"@Date", "2018-09-30".ToDateOrDefault(),
-			//	"@DealType", "КредЮЛ_КК"))
-			//{
-			//	for (; dr.Read();)
-			//	{
-			//		Console.WriteLine($"{dr[0]}\t{dr[1]}");
-			//		//Console.WriteLine($"{dr[0]}\t{dr[1]}\t{dr[2]}\t{dr[3]}");
-			//	}
-			//}
+
+			using (MdbContext mdb = new MdbContext(cn))
+			using (var dr = mdb.GetReader("select * from mib_msfo_DealValues_Select where Date = @Date",
+				"@Date", "2018-09-30".ToDateOrDefault()))
+			//,
+			//"@DealType", "КредЮЛ_КК"))
+			{
+				for (; dr.Read();)
+				{
+					Console.WriteLine($"{dr[0]}\t{dr[1]}");
+					//Console.WriteLine($"{dr[0]}\t{dr[1]}\t{dr[2]}\t{dr[3]}");
+				}
+			}
+
 			//	DbProviderFactory dbFactory = AseClientFactory.Instance;
 			//	using (DbConnection c = dbFactory.CreateConnection())
 			//	using (DbCommand comm = dbFactory.CreateCommand())
@@ -85,35 +88,35 @@ namespace S031.MetaStack.AppServer
 			//			}
 			//		}
 			//	}
-			using (var connection = new AseConnection(cn.ConnectionString))
-			{
-				connection.Open();
-				using (var command = connection.CreateCommand())
-				{
-					command.CommandText = "exec dbo.fct_select_deal_values @Date, @DealType";
-					command.CommandType = CommandType.Text;
-					command.Parameters.AddWithValue("@Date", "2018-09-30".ToDateOrDefault());
-					command.Parameters.AddWithValue("@DealType", "");
-					//var p = command.CreateParameter();
-					//p.ParameterName = "@Date";
-					//p.AseDbType = AseDbType.SmallDateTime;
-					//p.Value = "2018-09-30".ToDateOrDefault();
-					//command.Parameters.Add(p);
-					//p = command.CreateParameter();
-					//p.AseDbType = AseDbType.VarChar;
-					//p.ParameterName = "@DealType";
-					//p.Value = "КредЮЛ_КК";
-					//command.Parameters.Add(p);
-					using (var reader = command.ExecuteReader())
-					{
-						Console.WriteLine($"{reader.FieldCount}");
-						while (reader.Read())
-						{
-							Console.WriteLine($"{reader[0]}\t{reader[1]}");
-						}
-					}
-				}
-			}
-	}
+			//using (var connection = new AseConnection(cn.ConnectionString))
+			//{
+			//	connection.Open();
+			//	using (var command = connection.CreateCommand())
+			//	{
+			//		command.CommandText = "select * from mib_msfo_DealValues_Select where Date = @Date";
+			//		command.CommandType = CommandType.Text;
+			//		command.Parameters.AddWithValue("@Date", "2018-04-10".ToDateOrDefault());
+			//		command.Parameters.AddWithValue("@DealType", "");
+			//		//var p = command.CreateParameter();
+			//		//p.ParameterName = "@Date";
+			//		//p.AseDbType = AseDbType.SmallDateTime;
+			//		//p.Value = "2018-09-30".ToDateOrDefault();
+			//		//command.Parameters.Add(p);
+			//		//p = command.CreateParameter();
+			//		//p.AseDbType = AseDbType.VarChar;
+			//		//p.ParameterName = "@DealType";
+			//		//p.Value = "КредЮЛ_КК";
+			//		//command.Parameters.Add(p);
+			//		using (var reader = command.ExecuteReader())
+			//		{
+			//			Console.WriteLine($"{reader.FieldCount}");
+			//			while (reader.Read())
+			//			{
+			//				Console.WriteLine($"{reader[0]}\t{reader[1]}");
+			//			}
+			//		}
+			//	}
+			//}
+		}
 	}
 }

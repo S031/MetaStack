@@ -105,6 +105,8 @@ namespace S031.MetaStack.Core.ORM
 				fromSchema = _schema;
 			if (att.Required)
 				WriteLine($"\t{sep}{fromSchema.DbObjectName.ObjectName}.{att.FieldName} {att.AttribName}");
+			else if (att.DataType == MdbType.@object)
+				WriteLine($"\t{sep}'***' {att.AttribName}");
 			else
 			{
 				string emptyValue = MdbTypeMap.GetType(att.DataType).IsNumeric() ? "0" : "''";

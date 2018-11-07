@@ -80,6 +80,7 @@ namespace MetApp
 					}
 				}
 			}
+			//!!! убрать эту херню
 			if (schema.ObjectName == "dbo.V_DealValue")
 			{
 				items.Add(new ToolStripMenuItem("Расчет и выгрузки данных по сделкам и денежным потокам", null, MenuRun_Click) { Name = "mib_msfo_CF_Calc", ToolTipText = "Расчет и выгрузки данных по сделкам и денежным потокам" });
@@ -129,31 +130,18 @@ namespace MetApp
 					JMXSchema rs = ClientGate.GetObjectSchema(att.ObjectName);
 					if (rs.DbObjectType == DbObjectTypes.View)
 					{
-						items.Add(new ToolStripMenuItem(att.Name, null, MenuRel_Click) { Name = att.AttribName, ToolTipText = att.Description });
-						//FontManager.Adop(items[items.Count - 1]);
-						buttons.Add(new ToolStripMenuItem(att.Name, null, MenuRel_Click) { Name = att.AttribName, ToolTipText = att.Description });
-						//FontManager.Adop(buttons[buttons.Count - 1]);
+						items.Add(new ToolStripMenuItem(att.Name, null, MenuRel_Click) { Name = att.ObjectName, ToolTipText = att.Description });
+						buttons.Add(new ToolStripMenuItem(att.Name, null, MenuRel_Click) { Name = att.ObjectName, ToolTipText = att.Description });
 
 					}
 				}
 			}
-			//!!! убрать эту херню
-			if (schema.ObjectName == "dbo.V_DealValue")
-			{
-				items.Add(new ToolStripMenuItem("Данные по счетам", null, MenuRel_Click) { Name = "dbo.DealAc", ToolTipText = "Процедура для вывода данных счетам из таблицы msfodb..DealAcc по одному договору" });
-				buttons.Add(new ToolStripMenuItem("Данные по счетам", null, MenuRel_Click) { Name = "dbo.DealAc", ToolTipText = "Процедура для вывода данных счетам из таблицы msfodb..DealAcc по одному договору" });
-				items.Add(new ToolStripMenuItem("Данные по потокам", null, MenuRel_Click) { Name = "dbo.CashFlow_NKN", ToolTipText = "Процедура для вывода данных потоков из таблицы msfodb..CashFlow_NKN по одному договору" });
-				buttons.Add(new ToolStripMenuItem("Данные по потокам", null, MenuRel_Click) { Name = "dbo.CashFlow_NKN", ToolTipText = "Процедура для вывода данных потоков из таблицы msfodb..CashFlow_NKN по одному договору" });
-			}
-
 			if (items.Count > 0)
 			{
 				menuRun.DropDownItems.AddRange(items.ToArray());
 				menuRun.DropDownItems.Add(new ToolStripSeparator());
 				tsbRun.DropDown.Items.AddRange(buttons.ToArray());
 			}
-			//if ((menuRun.DropDownItems[menuRun.DropDownItems.Count - 1] is ToolStripSeparator))
-			//	menuRun.DropDownItems.Remove(menuRun.DropDownItems[menuRun.DropDownItems.Count - 1]);
 		}
 
 		private WinFormItem SetMenuBar()

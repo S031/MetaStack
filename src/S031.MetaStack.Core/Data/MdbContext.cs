@@ -45,20 +45,14 @@ namespace S031.MetaStack.Core.Data
 		/// </summary>
 		/// <param name="sql">SQL string for command</param>
 		/// <returns></returns>
-		public DataPackage GetReader(string sql)
-		{
-			return GetReader(sql, new MdbParameter[] { });
-		}
+		public DataPackage GetReader(string sql) => GetReader(sql, new MdbParameter[] { });
 		/// <summary>
 		/// Run <see cref="DbCommand.ExecuteReader()"/> and returns the data in the format <see cref="DataPackage"/>
 		/// </summary>
 		/// <param name="sql">SQL string for command</param>
 		/// <param name="parameters">Array of <see cref="MdbAdapters"/></param>
 		/// <returns></returns>
-		public DataPackage GetReader(string sql, params MdbParameter[] parameters)
-		{
-			return GetReaders(sql, parameters)[0];
-		}
+		public DataPackage GetReader(string sql, params MdbParameter[] parameters) => GetReaders(sql, parameters)[0];
 		/// <summary>
 		/// Run <see cref="DbCommand.ExecuteReader()"/> for multiple statements and returns array of <see cref="DataPackage"/>
 		/// </summary>
@@ -67,22 +61,9 @@ namespace S031.MetaStack.Core.Data
 		/// <returns></returns>
 		public DataPackage[] GetReaders(string sql, params MdbParameter[] parameters)
 		{
-			if (Connection.State != ConnectionState.Open)
-				Connection.Open();
 			List<DataPackage> rs = new List<Data.DataPackage>();
-			using (DbCommand command = Factory.CreateCommand(Connection, sql))
+			using (DbCommand command = getCommandInternal(sql, parameters))
 			{
-				if (_transaction != null)
-					command.Transaction = _transaction;
-				if (sql.IndexOf(' ') != -1)
-					command.CommandType = CommandType.Text;
-				else
-					command.CommandType = CommandType.StoredProcedure;
-
-				command.CommandTimeout = MdbContextOptions.GetOptions().CommandTimeout;
-				foreach (var param in parameters)
-					command.AddParameter(param.Name, param.Value);
-
 				using (DbDataReader dr = command.ExecuteReader())
 				{
 					rs.Add(new DataPackage(DataPackage.WriteData(dr)));
@@ -99,12 +80,10 @@ namespace S031.MetaStack.Core.Data
 		/// <param name="ps">param array in sequence as key1, value1, key2, value2 ... 
 		/// where key - parameter name, value - parameter value</param>
 		/// <returns></returns>
-		public DataPackage GetReader(string sql, params object[] ps)
-		{
-			var p = ParamArray2MdbParamArray(sql, ps);
-			return GetReader(p.sql, p.ps);
-		}
-		static (string sql, MdbParameter[] ps) ParamArray2MdbParamArray(string sql, params object[] ps)
+		public DataPackage GetReader(string sql, params object[] ps) =>
+			GetReader(sql, ParamArray2MdbParamArray(ps));
+
+		static MdbParameter[] ParamArray2MdbParamArray(params object[] ps)
 		{
 			int i = 0;
 			string pName = string.Empty;
@@ -115,29 +94,10 @@ namespace S031.MetaStack.Core.Data
 				if (i % 2 == 0)
 					pName = (string)p;
 				else
-				{
-					bool replace = sql.IndexOf(pName) > -1;
-					if (replace)
-					{
-						Type t = p.GetType();
-						if (t.IsNumeric())
-							pValue = p.ToString();
-						else if (t == typeof(string))
-							pValue = "'" + p.ToString().Replace("'", "''") + "'";
-						else if (t != typeof(byte[]) && t.GetInterfaces().FirstOrDefault(type => type.Name == "IEnumerable`1") != null)
-							pValue = array2List(p);
-						else
-							replace = false;
-					}
-
-					if (replace)
-						sql = sql.Replace(pName, pValue);
-					else
-						pList.Add(new MdbParameter(pName, p));
-				}
+					pList.Add(new MdbParameter(pName, p));
 				i++;
 			}
-			return (sql, pList.ToArray());
+			return pList.ToArray();
 		}
 		static string array2List(object a)
 		{
@@ -194,8 +154,6 @@ namespace S031.MetaStack.Core.Data
 		/// <returns><see cref="int"/></returns>
 		public int Execute(string sql, params MdbParameter[] parameters)
 		{
-			if (Connection.State != ConnectionState.Open)
-				Connection.Open();
 			using (DbCommand command = getCommandInternal(sql, parameters))
 			{
 				return command.ExecuteNonQuery();
@@ -210,8 +168,6 @@ namespace S031.MetaStack.Core.Data
 		/// <returns><see cref="int"/></returns>
 		public T Execute<T>(string sql, params MdbParameter[] parameters)
 		{
-			if (Connection.State != ConnectionState.Open)
-				Connection.Open();
 			using (DbCommand command = getCommandInternal(sql, parameters))
 			{
 				return (T)command.ExecuteScalar();
@@ -219,16 +175,47 @@ namespace S031.MetaStack.Core.Data
 		}
 		DbCommand getCommandInternal(string sql, params MdbParameter[] parameters)
 		{
+			if (Connection.State != ConnectionState.Open)
+				Connection.Open();
+			CommandType ct = sql.IndexOf(' ') == -1 ? CommandType.StoredProcedure : CommandType.Text;
+
+			List<MdbParameter> pFact = new List<MdbParameter>();
+			foreach (var param in parameters)
+			{
+				bool replace = sql.IndexOf(param.Name) > -1;
+				if (replace)
+				{
+					object p = param.Value;
+					string pValue = string.Empty;
+					Type t = p.GetType();
+					if (t.IsNumeric())
+						pValue = p.ToString();
+					else if (t == typeof(DateTime))
+						//!!! full date format
+						pValue = "'" + string.Format("{0:yyyyMMdd}", p) + "'";
+					else if (t == typeof(string))
+						pValue = "'" + p.ToString().Replace("'", "''") + "'";
+					else if (t != typeof(byte[]) && t.GetInterfaces().FirstOrDefault(type => type.Name == "IEnumerable`1") != null)
+						pValue = array2List(p);
+					else
+						replace = false;
+
+					if (replace)
+						sql = sql.Replace(param.Name, pValue);
+					else
+						pFact.Add(param);
+				}
+				else
+					pFact.Add(param);
+			}
+
 			DbCommand command = Factory.CreateCommand(Connection, sql);
+			command.CommandType = ct;
+			command.CommandTimeout = MdbContextOptions.GetOptions().CommandTimeout;
 			if (_transaction != null)
 				command.Transaction = _transaction;
-			if (sql.IndexOf(' ') != -1)
-				command.CommandType = CommandType.Text;
-			else
-				command.CommandType = CommandType.StoredProcedure;
 
-			command.CommandTimeout = MdbContextOptions.GetOptions().CommandTimeout;
-			foreach (var param in parameters)
+			foreach (var param in pFact)
 				command.AddParameter(param.Name, param.Value);
 			return command;
 		}
@@ -307,8 +294,6 @@ namespace S031.MetaStack.Core.Data
 		/// </summary>
 		public async Task<int> ExecuteAsync(string sql, params MdbParameter[] parameters)
 		{
-			if (Connection.State != ConnectionState.Open)
-				await Connection.OpenAsync();
 			using (DbCommand command = getCommandInternal(sql, parameters))
 			{
 				return await command.ExecuteNonQueryAsync().ConfigureAwait(false);
@@ -316,8 +301,6 @@ namespace S031.MetaStack.Core.Data
 		}
 		public async Task<T> ExecuteAsync<T>(string sql, params MdbParameter[] parameters)
 		{
-			if (Connection.State != ConnectionState.Open)
-				await Connection.OpenAsync();
 			using (DbCommand command = getCommandInternal(sql, parameters))
 			{
 				var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
@@ -329,22 +312,9 @@ namespace S031.MetaStack.Core.Data
 		/// </summary>
 		public async Task<DataPackage[]> GetReadersAsync(string sql, params MdbParameter[] parameters)
 		{
-			if (Connection.State != ConnectionState.Open)
-				await Connection.OpenAsync();
 			List<DataPackage> rs = new List<Data.DataPackage>();
-			using (DbCommand command = Factory.CreateCommand(Connection, sql))
+			using (DbCommand command = getCommandInternal(sql, parameters))
 			{
-				if (_transaction != null)
-					command.Transaction = _transaction;
-				if (sql.IndexOf(' ') != -1)
-					command.CommandType = CommandType.Text;
-				else
-					command.CommandType = CommandType.StoredProcedure;
-
-				command.CommandTimeout = MdbContextOptions.GetOptions().CommandTimeout;
-				foreach (var param in parameters)
-					command.AddParameter(param.Name, param.Value);
-
 				using (DbDataReader dr = await command.ExecuteReaderAsync().ConfigureAwait(false))
 				{
 					rs.Add(new DataPackage(DataPackage.WriteData(dr)));
@@ -366,11 +336,8 @@ namespace S031.MetaStack.Core.Data
 		/// <summary>
 		/// Async version of <see cref="MdbContext.GetReader(string, object[])"/>
 		/// </summary>
-		public async Task<DataPackage> GetReaderAsync(string sql, params object[] ps)
-		{
-			var p = ParamArray2MdbParamArray(sql, ps);
-			return await GetReaderAsync(p.sql, p.ps).ConfigureAwait(false);
-		}
+		public async Task<DataPackage> GetReaderAsync(string sql, params object[] ps) =>
+			await GetReaderAsync(sql, ParamArray2MdbParamArray(sql, ps)).ConfigureAwait(false);
 		/// <summary>
 		/// Crutch
 		/// https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/asynchronous-programming
