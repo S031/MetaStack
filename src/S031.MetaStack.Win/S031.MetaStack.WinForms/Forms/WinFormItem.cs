@@ -43,7 +43,7 @@ namespace S031.MetaStack.WinForms
 		[System.ComponentModel.Bindable(true)]
 		public object Value
 		{
-			get { return _value ?? this.DataType.GetDefaultValue(); }
+			get => _value.CastOf(DataType);
 			set
 			{
 				_value = value;

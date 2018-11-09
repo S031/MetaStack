@@ -376,7 +376,7 @@ namespace S031.MetaStack.WinForms
 						}
 					}
 				}//);
-				for (int j = 0; j < dt.Columns.Count; j++)
+				for (int j = 0; j < this.Columns.Count; j++)
 				{
 					if (totals[j].Agregate == "min")
 					{

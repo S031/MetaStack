@@ -114,5 +114,7 @@ namespace S031.MetaStack.WinForms.Data
 				return _listTypes[(int)t];
 			return defaultType;
 		}
+
+		public static Type Type(this MdbType mdbType) => GetType(mdbType);
 	}
 }

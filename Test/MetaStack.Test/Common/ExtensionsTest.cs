@@ -171,13 +171,13 @@ namespace MetaStack.Test.Common
 				DateTime start = DateTime.Now;
 				for (int i = 0; i < 1000000; i++)
 				{
-					object val = new decimal();
+					object val = "0";
 					//var a = value.GetType().IsNumeric();
 					//var b = decimal.TryParse(value.ToString(), out decimal a) && a == 0;
 					//var b = value.ToString().Equals("0");
 					//value.Equals(0);
-					//var a = vbo.IsEmpty(value);
-					var a = vbo.IsEmpty(val);
+					var a = val.CastOf(typeof(int));
+					//var a = vbo.IsEmpty(val);
 				}
 				object value = 0D;
 				DateTime stop = DateTime.Now;

@@ -361,6 +361,22 @@ namespace S031.MetaStack.Common
 
 	public static class ObjectExtensions
 	{
+		public static object CastOf(this object source, Type type)
+		{
+			if (source == null || Convert.IsDBNull(source))
+				return type.GetDefaultValue();
+
+			Type t = source.GetType();
+			if (t == type)
+				return source;
+			else if (t.IsPrimitive && type.IsPrimitive)
+				return Convert.ChangeType(source, type);
+			else if (type.IsAssignableFrom(t))
+				return Convert.ChangeType(source, type);
+			else 
+				return source.ToString().ToObjectOf(type);
+		}
+
 		public static void NullTest(this object value, string valueName) =>
 			NullTest(value, valueName, (v, n) => { throw new ArgumentNullException(n); });
 		public static void NullTest(this object value, string valueName, Action<object, string> action)

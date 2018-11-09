@@ -20,11 +20,17 @@ namespace MetApp
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 
-			if (ClientGate.Logon())
+			try
 			{
-				AppDomain.CurrentDomain.ProcessExit += (s, e) => ClientGate.Logout();
-				Application.Run(new MainForm(ConfigurationManager.AppSettings["StartupForm"]));
+				ClientGate.Logon();
 			}
+			catch (Exception ex)
+			{
+				MessageBox.Show($"{ex.Message}\n{ex.StackTrace}", "Logon failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return;
+			}
+			AppDomain.CurrentDomain.ProcessExit += (s, e) => ClientGate.Logout();
+			Application.Run(new MainForm(ConfigurationManager.AppSettings["StartupForm"]));
 		}
 	}
 }

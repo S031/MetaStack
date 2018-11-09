@@ -73,9 +73,7 @@ namespace S031.MetaStack.WinForms
 		private void BackWorker_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
 		{
 			if (e.Error != null)
-			{
-				Error = new Connectors.TCPConnectorException(new DataPackage(DataPackage.CreateErrorPackage(e.Error)));
-			}
+				Error = new Connectors.TCPConnectorException(DataPackage.CreateErrorPackage(e.Error));
 		}
 
 	}

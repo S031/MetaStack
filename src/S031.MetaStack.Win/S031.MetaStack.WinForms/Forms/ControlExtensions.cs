@@ -90,19 +90,22 @@ namespace S031.MetaStack.WinForms
 			{
 
 				winFormItem.PresentationType = typeof(ComboBox);
-				winFormItem.ControlTrigger = (i, c) =>
+				winFormItem.ControlTrigger = (item, c) =>
 				  {
 					  ComboBox cmb = c as ComboBox;
-					  if (i.Mask.ToLower() == "lock") cmb.DropDownStyle = ComboBoxStyle.DropDownList;
-					  if (!string.IsNullOrEmpty(i.Format)) cmb.FormatString = i.Format;
-					  cmb.Items.AddRange(i.ToArray());
-					  cmb.DataSource = i.Select(wfi => wfi.Name).ToList();
-					  cmb.DataBindings.Add("Text", i, "Value");
-					  //int i = winFormItem.IndexOf(winFormItem.Value);
-					  //if (i > -1)
-					  // cmb.Text = winFormItem.ListItems.ElementAt(i);
-					  //else if (winFormItem.ListItems.Count() > 0)
-					  // cmb.Text = winFormItem.ListItems.ElementAt(0);
+					  if (item.Mask.ToLower() == "lock") cmb.DropDownStyle = ComboBoxStyle.DropDownList;
+					  if (!string.IsNullOrEmpty(item.Format)) cmb.FormatString = item.Format;
+					  cmb.Items.AddRange(item.ToArray());
+					  cmb.DataSource = item.Select(wfi => wfi.Name).ToList();
+					  cmb.DataBindings.Add("Text", item, "Value");
+
+					  Type t = winFormItem.DataType;
+					  if (t.IsNumeric())
+					  {
+						  var itemWithData = winFormItem.FirstOrDefault(d => d.Value.Equals(winFormItem.Value));
+						  if (itemWithData != null)
+							  cmb.Text = itemWithData.Caption;
+					  }
 				  };
 			}
 			else if ((winFormItem.PresentationType == typeof(RadioGroup) && winFormItem.Count() > 0 &&

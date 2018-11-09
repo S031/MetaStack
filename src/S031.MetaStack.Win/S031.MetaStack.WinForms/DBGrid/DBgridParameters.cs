@@ -50,6 +50,7 @@ namespace S031.MetaStack.WinForms
 						item.Add(new WinFormItem(p.ListItems[i])
 						{
 							Caption = p.ListItems[i],
+							DataType = item.DataType,
 							Value = p.ListData[i]
 						});
 					item.Mask = "lock";

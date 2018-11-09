@@ -258,7 +258,8 @@ namespace MetApp
 			string tableName = TableAliasDefault; ;
 			StiReport report = new StiReport();
 			report.ScriptLanguage = StiReportLanguageType.CSharp;
-			report.RegData(tableName, dt);
+			//report.RegData(tableName, dt);
+			report.RegData(tableName, grid.GetBindingSource());
 			report.Dictionary.Synchronize();
 			report.Dictionary.DataSources[0].Name = tableName;
 			report.Dictionary.DataSources[0].Alias = tableName;
@@ -541,8 +542,5 @@ namespace MetApp
 			else
 				return new StiCustomFormatService(format);
 		}
-
-
-
 	}
 }

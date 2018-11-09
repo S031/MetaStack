@@ -109,7 +109,7 @@ namespace S031.MetaStack.Core.ORM
 				WriteLine($"\t{sep}'***' {att.AttribName}");
 			else
 			{
-				string emptyValue = MdbTypeMap.GetType(att.DataType).IsNumeric() ? "0" : "''";
+				string emptyValue = att.DataType.Type().IsNumeric() ? "0" : "''";
 				WriteLine($"\t{sep}COALESCE({fromSchema.DbObjectName.ObjectName}.{att.FieldName}, {emptyValue}) as {att.AttribName}");
 			}
 			return this;

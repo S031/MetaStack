@@ -112,12 +112,8 @@ namespace S031.MetaStack.Core.Actions
 				else if (idx > -1 && idx < _parameters.Count - 1)
 				{
 					object value = _parameters[idx + 1];
-					Type type = MdbTypeMap.GetType(p.DataType);
-					if (value.GetType() != type)
-						_mdbParams.Add(new MdbParameter(p.ParamName, value.ToString().ToObjectOf(type)) { NullIfEmpty = p.NullIfEmpty });
-					else
-						_mdbParams.Add(new MdbParameter(p.ParamName, value) { NullIfEmpty = p.NullIfEmpty });
-
+					Type type = p.DataType.Type();
+					_mdbParams.Add(new MdbParameter(p.ParamName, value.CastOf(type)) { NullIfEmpty = p.NullIfEmpty });
 				}
 			}
 		}

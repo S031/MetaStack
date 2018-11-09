@@ -1603,7 +1603,7 @@ namespace S031.MetaStack.WinForms
 		#endregion Public Static Methods
 
 		#region Protected Methods
-		protected virtual BindingSource GetBindingSource() => (this.DataSource as BindingSource);
+		public virtual BindingSource GetBindingSource() => (this.DataSource as BindingSource);
 
 		protected virtual String GetFilterString()
 		{

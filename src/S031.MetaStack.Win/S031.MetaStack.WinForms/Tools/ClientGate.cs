@@ -49,23 +49,28 @@ namespace S031.MetaStack.WinForms
 			}
 			else
 				password = sInfo.Password;
-			try
-			{
+
 				_connector = TCPConnector.Create();
 				_connector.Connect(userName, password);
 				if (isPrompt && savePassword)
 					CredentialManager.WriteCredential(_appName, userName, password);
-			}
-			catch(TCPConnectorException ex)
-			{
-				MessageBox.Show($"{ex.Message}\n{ex.RemoteStackTrace}", "Logon failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				return false;
-			}
-			catch(Exception ex)
-			{
-				MessageBox.Show($"{ex.Message}\n{ex.StackTrace}", "Logon failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				return false;
-			}
+			//try
+			//{
+			//	_connector = TCPConnector.Create();
+			//	_connector.Connect(userName, password);
+			//	if (isPrompt && savePassword)
+			//		CredentialManager.WriteCredential(_appName, userName, password);
+			//}
+			//catch(TCPConnectorException ex)
+			//{
+			//	MessageBox.Show($"{ex.Message}\n{ex.RemoteStackTrace}", "Logon failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			//	return false;
+			//}
+			//catch(Exception ex)
+			//{
+			//	MessageBox.Show($"{ex.Message}\n{ex.StackTrace}", "Logon failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			//	return false;
+			//}
 			return true;
 		}
 
@@ -74,21 +79,23 @@ namespace S031.MetaStack.WinForms
 
 		public static DataPackage Execute(string actionID, DataPackage paramTable)
 		{
-			try
-			{
-				Logon();
-				return _connector.Execute(actionID, paramTable);
-			}
-			catch (TCPConnectorException ex)
-			{
-				MessageBox.Show($"{ex.Message}\n{ex.RemoteStackTrace}", "Logon failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				return null;
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show($"{ex.Message}\n{ex.StackTrace}", "Logon failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-				return null;
-			}
+			Logon();
+			return _connector.Execute(actionID, paramTable);
+			//try
+			//{
+			//	Logon();
+			//	return _connector.Execute(actionID, paramTable);
+			//}
+			//catch (TCPConnectorException ex)
+			//{
+			//	MessageBox.Show($"{ex.Message}\n{ex.RemoteStackTrace}", "Logon failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			//	return null;
+			//}
+			//catch (Exception ex)
+			//{
+			//	MessageBox.Show($"{ex.Message}\n{ex.StackTrace}", "Logon failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+			//	return null;
+			//}
 		}
 
 		public static ActionInfo GetActionInfo(string actionID)

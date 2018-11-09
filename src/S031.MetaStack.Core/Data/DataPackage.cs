@@ -170,7 +170,7 @@ namespace S031.MetaStack.WinForms.Data
 				if (t == MdbType.@null)
 					_headers.Add(key, null);
 				else
-					_headers.Add(key, _dti[MdbTypeMap.GetType(t)].ReadDelegate(_br));
+					_headers.Add(key, _dti[t.Type()].ReadDelegate(_br));
 			}
 			_ms.Seek(_headerSpaceSize + _headerPos -1, SeekOrigin.Begin);
 
@@ -617,7 +617,7 @@ namespace S031.MetaStack.WinForms.Data
 				if (t == MdbType.@null)
 					_dataRow.Add(_indexes[i], null);
 				else
-					_dataRow.Add(_indexes[i], _dti[MdbTypeMap.GetType(t)].ReadDelegate(_br));
+					_dataRow.Add(_indexes[i], _dti[t.Type()].ReadDelegate(_br));
 
 			}
 			return true;
@@ -830,7 +830,7 @@ namespace S031.MetaStack.WinForms.Data
 					headers[key] = null;
 				else
 				{
-					Type tp = MdbTypeMap.GetType(t);
+					Type tp = t.Type();
 					object v = _dti[tp].ReadDelegate(_br);
 					if (tp.IsNumeric(NumericTypesScope.Integral))
 						headers[key] = Convert.ToInt64(v);
