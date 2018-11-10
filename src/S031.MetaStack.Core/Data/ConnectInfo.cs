@@ -47,7 +47,6 @@ namespace S031.MetaStack.Core.Data
 				if (!_csCache.ContainsKey(connectionString))
 					_csCache.TryAdd(connectionString, this);
 			}
-
 		}
 
 		public ConnectInfo(string providerName, string connectionString)

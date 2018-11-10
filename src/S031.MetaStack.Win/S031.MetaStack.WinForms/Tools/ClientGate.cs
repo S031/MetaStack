@@ -80,22 +80,16 @@ namespace S031.MetaStack.WinForms
 		public static DataPackage Execute(string actionID, DataPackage paramTable)
 		{
 			Logon();
-			return _connector.Execute(actionID, paramTable);
-			//try
-			//{
-			//	Logon();
-			//	return _connector.Execute(actionID, paramTable);
-			//}
-			//catch (TCPConnectorException ex)
-			//{
-			//	MessageBox.Show($"{ex.Message}\n{ex.RemoteStackTrace}", "Logon failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-			//	return null;
-			//}
-			//catch (Exception ex)
-			//{
-			//	MessageBox.Show($"{ex.Message}\n{ex.StackTrace}", "Logon failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-			//	return null;
-			//}
+			try
+			{
+				return _connector.Execute(actionID, paramTable);
+			}
+			catch (System.IO.IOException)
+			{
+				//For reuse socket
+				Logon();
+				return _connector.Execute(actionID, paramTable);
+			}
 		}
 
 		public static ActionInfo GetActionInfo(string actionID)

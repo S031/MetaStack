@@ -83,21 +83,30 @@ namespace S031.MetaStack.Core.Actions
 
 		private async Task CreateCommandAsync()
 		{
-			var config = ApplicationContext.GetConfiguration();
-			var connectInfo = config.GetSection($"connectionStrings:{config["appSettings:SysCatConnection"]}").Get<ConnectInfo>();
-
-			//using (MdbContext mdb = await MdbContext.CreateMdbContextAsync(connectInfo))
-			using (MdbContext mdb = new MdbContext(connectInfo))
+			_schema =  await ObtainSchemaAsync(_viewName);
+			using (MdbContext mdb = new MdbContext(_connectInfo))
 			using (JMXFactory f = JMXFactory.Create(mdb, ApplicationContext.GetLogger()))
 			using (JMXRepo repo = (f.CreateJMXRepo() as JMXRepo))
 			using (SQLStatementWriter writer = new SQLStatementWriter(repo))
 			{
-				_schema = await repo.GetSchemaAsync(_viewName);
 				CreateParameters();
 				_body = writer.WriteSelectStatement(
 					_schema,
 					_conditions.ToArray())
 					.ToString();
+			}
+		}
+
+		private static async Task<JMXSchema> ObtainSchemaAsync(string objectName)
+		{
+			var config = ApplicationContext.GetConfiguration();
+			var connectInfo = config.GetSection($"connectionStrings:{config["appSettings:SysCatConnection"]}").Get<ConnectInfo>();
+
+			using (MdbContext mdb = new MdbContext(connectInfo))
+			using (JMXFactory f = JMXFactory.Create(mdb, ApplicationContext.GetLogger()))
+			using (JMXRepo repo = (f.CreateJMXRepo() as JMXRepo))
+			{
+				return await repo.GetSchemaAsync(objectName);
 			}
 		}
 		private void CreateParameters()

@@ -171,6 +171,7 @@ namespace S031.MetaStack.WinForms
 			get { return xc; }
 			set
 			{
+				LoadComplete = false;
 				if (value == null) return;
 				xc = value;
 
@@ -188,6 +189,7 @@ namespace S031.MetaStack.WinForms
 				}
 				else
 					OnFormNoComplete(new SchemaEventArgs(xc));
+				LoadComplete = true;
 			}
 		}
 
@@ -269,11 +271,13 @@ namespace S031.MetaStack.WinForms
 		#region Refresh
 		public override void Reload()
 		{
-			this.Schema = xcOriginal;
+			if (LoadComplete)
+				this.Schema = xcOriginal;
 		}
 		public override void RefreshAll()
 		{
-			MakeRecordset();
+			if (LoadComplete)
+				MakeRecordset();
 		}
 		public void RefreshAll(int handle)
 		{
@@ -295,6 +299,7 @@ namespace S031.MetaStack.WinForms
 		{
 			this.RefreshAll((int)bookmark);
 		}
+		public bool LoadComplete { get; protected set; }
 		#endregion Refresh
 
 		#region Totals
