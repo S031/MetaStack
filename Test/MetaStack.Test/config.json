@@ -1,7 +1,7 @@
 ﻿{
   "appSettings": {
     "auditEnabled": true,
-    "defaultConnection": "SqliteDb",
+    "defaultConnection": "Test",
     "SysCatConnection": "SqliteDb"
   },
   "Connectors": {
@@ -12,14 +12,18 @@
   },
   "connectionStrings": {
     "bankLocal": {
+      "Description": "Local SQL Express 2014 server",
       "providerName": "System.Data.SqlClient",
       "connectionString": "Data Source=localhost;Initial Catalog=MetaStack;Integrated Security=True;"
     },
     "SqliteDb": {
+      "Description": "SQLite connection fo SysCat",
+      "SchemaSupport": false,
       "providerName": "System.Data.Sqlite",
       "connectionString": "Data Source=D:\\Source\\Repos\\MetaStack\\src\\S031.MetaStack.AppServer\\DB\\SysCat.db; Mode=Memory; Cache=Shared"
     },
     "test": {
+      "Description": "Virtual SQL Express 2017 server",
       "providerName": "System.Data.SqlClient",
       "connectionString": "Data Source=SERGEY-SQL2016;Initial Catalog=MetaStack;Integrated Security=True;"
     }

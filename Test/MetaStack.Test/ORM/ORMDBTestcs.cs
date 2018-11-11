@@ -14,6 +14,7 @@ using System.Text;
 using System.Xml.Linq;
 using Newtonsoft.Json.Linq;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 
 namespace MetaStack.Test.ORM
 {
@@ -183,6 +184,33 @@ namespace MetaStack.Test.ORM
 					_logger.Debug("End speed test for SysCat.Get_TableSchema");
 				}
 
+			}
+		}
+
+		[Fact]
+		void CreateFactorySpeedGTest()
+		{
+			var _configuration = ApplicationContext.GetConfiguration();
+			var	_schemaConnectInfo = _configuration.GetSection($"connectionStrings:{_configuration["appSettings:SysCatConnection"]}").Get<ConnectInfo>();
+			var workConnectInfo = _configuration.GetSection($"connectionStrings:Test").Get<ConnectInfo>();
+			MdbContext schemaDb = new MdbContext(_schemaConnectInfo);
+			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			{
+				_logger.Debug("Start speed test for ApplicationContext.CreateJMXFactory");
+
+				for (int i = 0; i < 10000; i++)
+				{
+					//using (MdbContext workDb = new MdbContext(workConnectInfo))
+					//using (JMXFactory f = JMXFactory.Create(schemaDb, workDb, _logger))
+					//{
+
+					//}
+					using (JMXFactory f = ApplicationContext.CreateJMXFactory("Test"))
+					{
+
+					}
+				}
+				_logger.Debug("End speed test for ApplicationContext.CreateJMXFactory");
 			}
 		}
 

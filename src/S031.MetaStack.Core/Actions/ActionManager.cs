@@ -37,7 +37,7 @@ namespace S031.MetaStack.Core.Actions
 							COALESCE(I.Description, '') As Description,
 							I.MultipleRowsParams,
 							I.MultipleRowsResult
-						From Actions QA Inner Join Interfaces I On QA.InterfaceID = I.ID
+						From {1}Actions QA Inner Join {1}Interfaces I On QA.InterfaceID = I.ID
 						Where QA.ActionName = '{0}'";
 		const string _sql_parameters = @"
 							Select ParameterName As ParameterID,
@@ -62,10 +62,14 @@ namespace S031.MetaStack.Core.Actions
 							Coalesce(DefaultValue, '') As DefaultValue,
 							Coalesce(ConstantName, '') As ConstantName,
 							Coalesce(FieldName, '') As FieldName
-						From InterfaceParameters Where InterfaceID = '{0}'";
+						From {1}InterfaceParameters Where InterfaceID = '{0}'";
+
+		private readonly string _schemaName = string.Empty;
 
 		public ActionManager(MdbContext mdbContext) : base(mdbContext)
 		{
+			if (mdbContext.ConnectInfo.SchemaSupport)
+				_schemaName = "SysCat.";
 		}
 
 		public DataPackage Execute(string actionID, DataPackage inParamStor)
@@ -155,7 +159,8 @@ namespace S031.MetaStack.Core.Actions
 			if (!_actions.ContainsKey(actionID))
 			{
 				ActionInfo ai = new ActionInfo();
-				using (var dr = await MdbContext.GetReaderAsync(_sql_actions.ToFormat(actionID)))
+				MdbContext catContext = GetMdbContext(ContextTypes.SysCat);
+				using (var dr = await catContext.GetReaderAsync(_sql_actions.ToFormat(actionID, _schemaName)))
 				{
 					if (dr.Read())
 						SetActionAttributes(ai, dr);
@@ -164,7 +169,7 @@ namespace S031.MetaStack.Core.Actions
 				}
 				if (ai != null)
 				{
-					using (var dr = await MdbContext.GetReaderAsync(_sql_parameters.ToFormat(ai.InterfaceID)))
+					using (var dr = await GetMdbContext().GetReaderAsync(_sql_parameters.ToFormat(ai.InterfaceID, _schemaName)))
 					{
 						ParamInfoList pil = ai.InterfaceParameters;
 						for (; dr.Read();)
@@ -185,7 +190,7 @@ namespace S031.MetaStack.Core.Actions
 			if (!_actions.ContainsKey(actionID))
 			{
 				ActionInfo ai = new ActionInfo();
-				using (var dr = MdbContext.GetReader(_sql_actions.ToFormat(actionID)))
+				using (var dr = GetMdbContext().GetReader(_sql_actions.ToFormat(actionID)))
 				{
 					if (dr.Read())
 						SetActionAttributes(ai, dr);
@@ -194,7 +199,7 @@ namespace S031.MetaStack.Core.Actions
 				}
 				if (ai != null)
 				{
-					using (var dr = MdbContext.GetReader(_sql_parameters.ToFormat(ai.InterfaceID)))
+					using (var dr = GetMdbContext().GetReader(_sql_parameters.ToFormat(ai.InterfaceID)))
 					{
 						ParamInfoList pil = ai.InterfaceParameters;
 						for (; dr.Read();)

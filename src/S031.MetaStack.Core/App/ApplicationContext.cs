@@ -14,6 +14,8 @@ using System.Data.Common;
 using System.Reflection;
 using System.Runtime.Loader;
 using S031.MetaStack.Common;
+using S031.MetaStack.Core.ORM;
+using S031.MetaStack.Core.Data;
 
 namespace S031.MetaStack.Core.App
 {
@@ -28,6 +30,7 @@ namespace S031.MetaStack.Core.App
 		static IConfiguration _configuration;
 		static ILogger _logger;
 		static ILoginFactory _loginFactory;
+		static MdbContext _schemaDb = null;
 
 		public static IConfiguration GetConfiguration() => _configuration;
 		public static ILogger GetLogger() => _logger;
@@ -131,5 +134,28 @@ namespace S031.MetaStack.Core.App
 		}
 
 		public static CancellationToken CancellationToken => _cts.Token;
+
+		/// <summary>
+		/// Recomended for sqlite sys cat
+		/// </summary>
+		/// <param name="workConnectionName"></param>
+		/// <returns></returns>
+		public static JMXFactory CreateJMXFactory(string workConnectionName)
+		{
+			if (_schemaDb == null)
+			{
+				lock (obj4Lock)
+				{
+					var schemaConnectInfo = _configuration.GetSection($"connectionStrings:{_configuration["appSettings:SysCatConnection"]}").Get<ConnectInfo>();
+					_schemaDb = new MdbContext(schemaConnectInfo);
+				}
+			}
+			var workConnectInfo = _configuration.GetSection($"connectionStrings:{workConnectionName}").Get<ConnectInfo>();
+
+			MdbContext workDb = new MdbContext(workConnectInfo);
+			var f = JMXFactory.Create(_schemaDb, workDb, _logger);
+			f.IsLocalContext = true;
+			return f;
+		}
     }
 }

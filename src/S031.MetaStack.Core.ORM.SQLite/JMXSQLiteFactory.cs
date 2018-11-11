@@ -14,14 +14,19 @@ namespace S031.MetaStack.Core.ORM.SQLite
 
 		private readonly JMXSQLiteRepo _repo;
 		private readonly JMXSQLiteProvider _jmx;
-		public JMXSQLiteFactory(MdbContext mdbContext, ILogger logger) : base(mdbContext)
+		public JMXSQLiteFactory(MdbContext mdbContext, ILogger logger) : this(mdbContext, mdbContext, logger)
 		{
-			if (!mdbContext.ProviderName.Equals(ProviderInvariantName, StringComparison.CurrentCultureIgnoreCase))
+		}
+
+		public JMXSQLiteFactory(MdbContext sysCatMdbContext, MdbContext workMdbContext, ILogger logger) : base(sysCatMdbContext, workMdbContext)
+		{
+			if (!sysCatMdbContext.ProviderName.Equals(ProviderInvariantName, StringComparison.CurrentCultureIgnoreCase))
 				throw new ArgumentException($"MdbContext must be created using { ProviderInvariantName} provider.");
 			this.Logger = logger;
-			_repo = new JMXSQLiteRepo(mdbContext, logger);
-			_jmx = new JMXSQLiteProvider(mdbContext, logger);
+			_repo = new JMXSQLiteRepo(sysCatMdbContext, workMdbContext, logger);
+			_jmx = new JMXSQLiteProvider(sysCatMdbContext, workMdbContext, logger);
 		}
+
 		public override IJMXRepo CreateJMXRepo() => _repo;
 
 		public override IJMXProvider CreateJMXProvider() => _jmx;

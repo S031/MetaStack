@@ -47,6 +47,7 @@ namespace S031.MetaStack.Core.Data
 				if (!_csCache.ContainsKey(connectionString))
 					_csCache.TryAdd(connectionString, this);
 			}
+			SchemaSupport = true;
 		}
 
 		public ConnectInfo(string providerName, string connectionString)
@@ -57,6 +58,8 @@ namespace S031.MetaStack.Core.Data
 		public string ProviderName { get; set; }
 		public string DbName { get; }
 		public string ConnectionString { get; set; }
+		public string Description { get; set; }
+		public bool SchemaSupport { get; set; }
 
 		public override string ToString() =>
 			$"{ProviderNameField}={ProviderName};{ConnectionString}";

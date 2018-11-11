@@ -106,16 +106,12 @@ namespace S031.MetaStack.Core.ORM.MsSql
 
 		private static string _sqlVersion = string.Empty;
 
-		public JMXSqlRepo(MdbContext mdbContext, ILogger logger) : base(mdbContext)
+		public JMXSqlRepo(MdbContext sysCatMdbContext, MdbContext workMdbContext, ILogger logger) : base(sysCatMdbContext, workMdbContext)
 		{
-			if (!mdbContext.ProviderName.Equals(JMXSqlFactory.ProviderInvariantName, StringComparison.CurrentCultureIgnoreCase))
+			if (!sysCatMdbContext.ProviderName.Equals(JMXSqlFactory.ProviderInvariantName, StringComparison.CurrentCultureIgnoreCase))
 				throw new ArgumentException($"MdbContext must be created using { JMXSqlFactory.ProviderInvariantName} provider.");
 			Logger = logger;
-			//TestSysCat();
-			TestSysCatAsync()
-				.ConfigureAwait(false)
-				.GetAwaiter()
-				.GetResult();
+			TestSysCat();
 		}
 
 		public override IDictionary<MdbType, string> GetTypeMap() => _typeMap;
@@ -134,7 +130,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 				schema.SchemaRepo = this;
 				return schema;
 			}
-			schema = await GetSchemaAsync(this.MdbContext, name.AreaName, name.ObjectName).ConfigureAwait(false);
+			schema = await GetSchemaAsync(this.GetMdbContext(), name.AreaName, name.ObjectName).ConfigureAwait(false);
 			lock (objLock)
 			{
 				if (!_schemaCache.ContainsKey(name))
@@ -143,33 +139,27 @@ namespace S031.MetaStack.Core.ORM.MsSql
 			return schema;
 		}
 
-		private async Task TestSysCatAsync()
-		{
-			if (_counter == 0)
-			{
-				var result = await this.MdbContext.ExecuteAsync<string>(SqlServer.TestSchema);
-				if (result.IsEmpty())
-				{
-					await CreateDbSchemaAsync(this.MdbContext, this.Logger);
-					_defaultDbSchema = await GetDefaultDbSchemaAsync(this.MdbContext);
-					Interlocked.Increment(ref _counter);
-				}
-			}
-		}
 		private void TestSysCat()
 		{
 			if (_counter == 0)
 			{
-				var result = this.MdbContext.Execute<string>(SqlServer.TestSchema);
-				if (result.IsEmpty())
-				{
-					CreateDbSchemaAsync(this.MdbContext, this.Logger).GetAwaiter().GetResult();
-					_defaultDbSchema = GetDefaultDbSchemaAsync(this.MdbContext).GetAwaiter().GetResult();
-					Interlocked.Increment(ref _counter);
-				}
+				TestSysCatAsync()
+					.ConfigureAwait(false)
+					.GetAwaiter()
+					.GetResult();
+				Interlocked.Increment(ref _counter);
 			}
 		}
 
+		private async Task TestSysCatAsync()
+		{
+			var result = await this.GetMdbContext().ExecuteAsync<string>(SqlServer.TestSchema);
+			if (result.IsEmpty())
+			{
+				await CreateDbSchemaAsync(this.GetMdbContext(), this.Logger);
+				_defaultDbSchema = await GetDefaultDbSchemaAsync(this.GetMdbContext());
+			}
+		}
 		private static async Task<string> GetDefaultDbSchemaAsync(MdbContext mdb)
 		{
 			if (_defaultDbSchema.IsEmpty())
@@ -263,7 +253,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 
 		private async Task DropSchemaAsync(string areaName, string objectName)
 		{
-			MdbContext mdb = this.MdbContext;
+			MdbContext mdb = this.GetMdbContext();
 			ILogger logger = this.Logger;
 			var schema = await GetSchemaAsync(mdb, areaName, objectName);
 			var schemaFromDb = await GetTableSchema(mdb, schema.DbObjectName.ToString());
@@ -310,7 +300,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 
 		private async Task WriteDropStatementsAsync(SQLStatementWriter sb, JMXSchema fromDbSchema)
 		{
-			MdbContext mdb = this.MdbContext;
+			MdbContext mdb = this.GetMdbContext();
 			foreach (var att in fromDbSchema.Attributes.Where(a => a.FieldName.StartsWith(detail_field_prefix)))
 			{
 				string[] names = att.FieldName.Split('_');
@@ -329,14 +319,14 @@ namespace S031.MetaStack.Core.ORM.MsSql
 		#region Clear Catalog
 		public override void ClearCatalog()
 		{
-			DropDbSchemaAsync(this.MdbContext, this.Logger)
+			DropDbSchemaAsync(this.GetMdbContext(), this.Logger)
 				.ConfigureAwait(false)
 				.GetAwaiter()
 				.GetResult();
 		}
 		public override async Task ClearCatalogAsync()
 		{
-			await DropDbSchemaAsync(this.MdbContext, this.Logger).ConfigureAwait(false);
+			await DropDbSchemaAsync(this.GetMdbContext(), this.Logger).ConfigureAwait(false);
 		}
 		private async Task DropDbSchemaAsync(MdbContext mdb, ILogger log)
 		{
@@ -362,7 +352,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 		#region Save Schema
 		public override JMXSchema SaveSchema(JMXSchema schema)
 		{
-			var mdb = this.MdbContext;
+			var mdb = this.GetMdbContext();
 			int id = mdb.Execute<int>(SqlServer.AddSysSchemas,
 					new MdbParameter("@uid", schema.UID),
 					new MdbParameter("@SysAreaSchemaName", schema.ObjectName.AreaName),
@@ -392,7 +382,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 		}
 		public override async Task<JMXSchema> SaveSchemaAsync(JMXSchema schema)
 		{
-			var mdb = this.MdbContext;
+			var mdb = this.GetMdbContext();
 			schema = await NormalizeSchemaAsync(mdb, schema);
 			int id = ((await GetSqlVersion(mdb)).ToIntOrDefault() < _sql_server_2017_version) ?
 				await mdb.ExecuteAsync<int>(SqlServer.AddSysSchemas,
@@ -638,7 +628,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 		}
 		public async Task<JMXSchema> SyncSchemaAsync(string dbSchema, string objectName)
 		{
-			MdbContext mdb = this.MdbContext;
+			MdbContext mdb = this.GetMdbContext();
 			ILogger log = this.Logger;
 			var schema = await GetSchemaInternalAsync(mdb, dbSchema, objectName, 0);
 			//schema was syncronized
@@ -711,7 +701,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 
 		private async Task CompareSchemasStatementsAsync(SQLStatementWriter sb, JMXSchema schema, JMXSchema fromDbSchema)
 		{
-			MdbContext mdb = this.MdbContext;
+			MdbContext mdb = this.GetMdbContext();
 			bool recreate = false;
 			foreach (var att in fromDbSchema.Attributes.Where(a => a.FieldName.StartsWith(detail_field_prefix)))
 			{

@@ -14,6 +14,10 @@ namespace S031.MetaStack.Core.ORM
 		{
 		}
 
+		public JMXProvider(MdbContext sysCatMdbContext, MdbContext workMdbContext) : base(sysCatMdbContext, workMdbContext)
+		{
+		}
+
 		public virtual void Delete(JMXObject jmxObject)
 		{
 			throw new NotImplementedException();

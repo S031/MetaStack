@@ -10,21 +10,47 @@ using System.Threading.Tasks;
 
 namespace S031.MetaStack.Core
 {
+	public enum ContextTypes
+	{
+		SysCat,
+		Work
+	}
 	public abstract class ManagerObjectBase: IDisposable
 	{
 		private ILogger _logger;
 		private bool _isLocalLog;
+		private readonly MdbContext _sc;
+		private readonly MdbContext _wc;
 
-		public ManagerObjectBase(MdbContext mdbContext)
+		internal bool IsLocalContext { get; set; }
+
+		internal ManagerObjectBase(ConnectInfo schemaConnectInfo, ConnectInfo workConnectInfo, ILogger logger)
 		{
-			mdbContext.NullTest(nameof(mdbContext));
-			this.MdbContext = mdbContext;
+			IsLocalContext = true;
+			_sc = new MdbContext(schemaConnectInfo);
+			_wc = new MdbContext(workConnectInfo);
+
+		}
+		public ManagerObjectBase(MdbContext sysCatMdbContext, MdbContext workMdbContext = null)
+		{
+			sysCatMdbContext.NullTest(nameof(sysCatMdbContext));
+			_sc = sysCatMdbContext;
+			if (workMdbContext == null)
+				_wc = _sc;
+			else
+				_wc = workMdbContext;
 		}
 
 		public void Dispose()
 		{
 			if (_isLocalLog)
 				(_logger as IDisposable)?.Dispose();
+
+			if (IsLocalContext)
+			{
+				//_sc?.Dispose();
+				_wc?.Dispose();
+			}
 		}
 
 		public ILogger Logger
@@ -47,6 +73,9 @@ namespace S031.MetaStack.Core
 			}
 		}
 
-		protected MdbContext MdbContext { get; private set; }
+		public MdbContext GetMdbContext() => _sc;
+
+		public MdbContext GetMdbContext(ContextTypes contextType) => 
+			contextType == ContextTypes.SysCat ? _sc : _wc;
 	}
 }

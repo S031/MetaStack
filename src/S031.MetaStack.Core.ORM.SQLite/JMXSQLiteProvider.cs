@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.Extensions.Logging;
 using S031.MetaStack.Common;
 using S031.MetaStack.Core.Data;
 
@@ -8,9 +9,9 @@ namespace S031.MetaStack.Core.ORM.SQLite
 {
 	public class JMXSQLiteProvider : JMXProvider
 	{
-		public JMXSQLiteProvider(MdbContext mdbContext, Microsoft.Extensions.Logging.ILogger logger) : base(mdbContext)
+		public JMXSQLiteProvider(MdbContext sysCatMdbContext, MdbContext workMdbContext, ILogger logger) : base(sysCatMdbContext, workMdbContext)
 		{
-			if (!mdbContext.ProviderName.Equals(JMXSQLiteFactory.ProviderInvariantName, StringComparison.CurrentCultureIgnoreCase))
+			if (!sysCatMdbContext.ProviderName.Equals(JMXSQLiteFactory.ProviderInvariantName, StringComparison.CurrentCultureIgnoreCase))
 				throw new ArgumentException($"MdbContext must be created using { JMXSQLiteFactory.ProviderInvariantName} provider.");
 			this.Logger = logger;
 		}

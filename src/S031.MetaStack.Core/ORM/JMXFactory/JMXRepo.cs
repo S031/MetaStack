@@ -12,7 +12,11 @@ namespace S031.MetaStack.Core.ORM
 {
 	public abstract class JMXRepo : ManagerObjectBase, IJMXRepo, IDisposable
 	{
-		public JMXRepo(MdbContext mdbContext) : base(mdbContext)
+		public JMXRepo(MdbContext sysCatMdbContext) : base(sysCatMdbContext)
+		{
+		}
+
+		public JMXRepo(MdbContext sysCatMdbContext, MdbContext workMdbContext) : base(sysCatMdbContext, workMdbContext)
 		{
 		}
 
@@ -80,7 +84,5 @@ namespace S031.MetaStack.Core.ORM
 		{
 			throw new NotImplementedException();
 		}
-
-		public virtual bool IsSchemaSupport() => true;
 	}
 }

@@ -14,43 +14,68 @@ namespace S031.MetaStack.Core.Actions
 {
 	internal class SysSelect : IAppEvaluator
 	{
-		readonly List<object> _parameters = new List<object>();
-		ConnectInfo _connectInfo;
-		JMXSchema _schema;
-		List<MdbParameter> _mdbParams;
-		List<JMXCondition> _conditions;
+		object _connectionName;
 		string _viewName;
-		string _body;
+		readonly List<object> _parameters = new List<object>();
+		List<JMXCondition> _conditions;
+
 
 		public DataPackage Invoke(ActionInfo ai, DataPackage dp)
 		{
 			GetParameters(ai, dp);
-			using (MdbContext mdb = new MdbContext(_connectInfo))
+			using (JMXFactory f = ApplicationContext.CreateJMXFactory((string)_connectionName))
+			using (JMXRepo repo = (f.CreateJMXRepo() as JMXRepo))
+			using (SQLStatementWriter writer = new SQLStatementWriter(repo))
 			{
-				CreateCommandAsync().GetAwaiter().GetResult();
-				return mdb.GetReader(_body, _mdbParams.ToArray());
+				JMXSchema schema = repo.GetSchema(_viewName);
+				string _body = writer.WriteSelectStatement(
+					schema,
+					_conditions.ToArray())
+					.ToString();
+
+				if (schema.DbObjectType == DbObjectTypes.Action)
+					using (ActionManager am = new ActionManager(f.GetMdbContext(ContextTypes.SysCat))
+					{
+						Logger = ApplicationContext.GetLogger()
+					})
+						return am.Execute(_body, dp);
+				else
+					return f
+						.GetMdbContext(ContextTypes.Work)
+						.GetReader(_body, CreateParameters(schema));
 			}
 		}
 
 		public async Task<DataPackage> InvokeAsync(ActionInfo ai, DataPackage dp)
 		{
 			GetParameters(ai, dp);
-			//using (MdbContext mdb = await MdbContext.CreateMdbContextAsync(_connectInfo))
-			using (MdbContext mdb = new MdbContext(_connectInfo))
+			using (JMXFactory f = ApplicationContext.CreateJMXFactory((string)_connectionName))
+			using (JMXRepo repo = (f.CreateJMXRepo() as JMXRepo))
+			using (SQLStatementWriter writer = new SQLStatementWriter(repo))
 			{
-				await CreateCommandAsync();
-				if (_schema.DbObjectType == DbObjectTypes.Action)
-					using (ActionManager am = new ActionManager(mdb) { Logger = ApplicationContext.GetLogger() })
-						return await am.ExecuteAsync(_body, dp);
+				JMXSchema schema = await repo.GetSchemaAsync(_viewName);
+				string body = writer.WriteSelectStatement(
+					schema,
+					_conditions.ToArray())
+					.ToString();
+
+				if (schema.DbObjectType == DbObjectTypes.Action)
+					using (ActionManager am = new ActionManager(f.GetMdbContext(ContextTypes.SysCat))
+					{
+						Logger = ApplicationContext.GetLogger()
+					})
+						return await am.ExecuteAsync(body, dp);
 				else
-					return await mdb.GetReaderAsync(_body, _mdbParams.ToArray());
+					return await f
+						.GetMdbContext(ContextTypes.Work)
+						.GetReaderAsync(body, CreateParameters(schema));
 			}
 		}
 
 		private void GetParameters(ActionInfo ai, DataPackage dp)
 		{
-			if (!dp.Headers.TryGetValue("ConnectionName", out object connectionName))
-				connectionName = ApplicationContext.GetConfiguration()["appSettings:defaultConnection"]; ;
+			if (!dp.Headers.TryGetValue("ConnectionName", out _connectionName))
+				_connectionName = ApplicationContext.GetConfiguration()["appSettings:defaultConnection"]; ;
 
 			_conditions = new List<JMXCondition>();
 			for (; dp.Read();)
@@ -62,7 +87,7 @@ namespace S031.MetaStack.Core.Actions
 					_parameters.Add(dp["ParamValue"]);
 				}
 				else if (paramName.Equals("_connectionName", StringComparison.CurrentCultureIgnoreCase))
-					connectionName = (string)dp["ParamValue"];
+					_connectionName = (string)dp["ParamValue"];
 				else if (paramName.Equals("_viewName", StringComparison.CurrentCultureIgnoreCase))
 					_viewName = (string)dp["ParamValue"];
 				else if (paramName.Equals("_filter", StringComparison.CurrentCultureIgnoreCase))
@@ -76,55 +101,25 @@ namespace S031.MetaStack.Core.Actions
 				else if (paramName.Equals("_join", StringComparison.CurrentCultureIgnoreCase))
 					_conditions.Add(new JMXCondition(JMXConditionTypes.Join, (string)dp["ParamValue"]));
 			}
-			var configuration = ApplicationContext.GetServices().GetService<IConfiguration>();
-			_connectInfo = configuration.GetSection($"connectionStrings:{connectionName}").Get<ConnectInfo>();
-
 		}
 
-		private async Task CreateCommandAsync()
+		private MdbParameter[] CreateParameters(JMXSchema schema)
 		{
-			_schema =  await ObtainSchemaAsync(_viewName);
-			using (MdbContext mdb = new MdbContext(_connectInfo))
-			using (JMXFactory f = JMXFactory.Create(mdb, ApplicationContext.GetLogger()))
-			using (JMXRepo repo = (f.CreateJMXRepo() as JMXRepo))
-			using (SQLStatementWriter writer = new SQLStatementWriter(repo))
-			{
-				CreateParameters();
-				_body = writer.WriteSelectStatement(
-					_schema,
-					_conditions.ToArray())
-					.ToString();
-			}
-		}
-
-		private static async Task<JMXSchema> ObtainSchemaAsync(string objectName)
-		{
-			var config = ApplicationContext.GetConfiguration();
-			var connectInfo = config.GetSection($"connectionStrings:{config["appSettings:SysCatConnection"]}").Get<ConnectInfo>();
-
-			using (MdbContext mdb = new MdbContext(connectInfo))
-			using (JMXFactory f = JMXFactory.Create(mdb, ApplicationContext.GetLogger()))
-			using (JMXRepo repo = (f.CreateJMXRepo() as JMXRepo))
-			{
-				return await repo.GetSchemaAsync(objectName);
-			}
-		}
-		private void CreateParameters()
-		{
-			_mdbParams = new List<MdbParameter>();
-			foreach (JMXParameter p in _schema.Parameters)
+			var mdbParams = new List<MdbParameter>();
+			foreach (JMXParameter p in schema.Parameters)
 			{
 				int idx = _parameters.IndexOf(p.ParamName);
 				if ((idx < 0 || idx >= _parameters.Count - 1) && p.Required)
 					throw new InvalidOperationException(
-						$"Обязательный параметер схемы '{_schema.ObjectName}.{p.ParamName}', не найден в списке параметров  операции 'SysSelect'");
+						$"Обязательный параметер схемы '{schema.ObjectName}.{p.ParamName}', не найден в списке параметров  операции 'SysSelect'");
 				else if (idx > -1 && idx < _parameters.Count - 1)
 				{
 					object value = _parameters[idx + 1];
 					Type type = p.DataType.Type();
-					_mdbParams.Add(new MdbParameter(p.ParamName, value.CastOf(type)) { NullIfEmpty = p.NullIfEmpty });
+					mdbParams.Add(new MdbParameter(p.ParamName, value.CastOf(type)) { NullIfEmpty = p.NullIfEmpty });
 				}
 			}
+			return mdbParams.ToArray();
 		}
 	}
 }

@@ -11,12 +11,6 @@ using System.Threading.Tasks;
 
 namespace S031.MetaStack.Core.Data
 {
-	public enum MdbAdapters
-	{
-		SqlServer,
-		PostgreSql
-	}
-
 
 	public class MdbContext : IDisposable
 	{
@@ -36,8 +30,16 @@ namespace S031.MetaStack.Core.Data
 			Factory = ObjectFactories.GetFactory<DbProviderFactory>(_connectInfo.ProviderName);
 			Connection = Factory.CreateConnection(_connectInfo.ConnectionString);
 		}
+		public MdbContext(ConnectInfo connectionInfo)
+		{
+			connectionInfo.NullTest(nameof(connectionInfo));
+			_connectInfo = connectionInfo;
+			Factory = ObjectFactories.GetFactory<DbProviderFactory>(_connectInfo.ProviderName);
+			Connection = Factory.CreateConnection(_connectInfo.ConnectionString);
+		}
 		public string ProviderName => _connectInfo.ProviderName;
 		public string DbName => _connectInfo.DbName;
+		public ConnectInfo ConnectInfo => _connectInfo;
 		public DbProviderFactory Factory { get; private set; }
 		public DbConnection Connection { get; private set; }
 		/// <summary>
@@ -50,14 +52,14 @@ namespace S031.MetaStack.Core.Data
 		/// Run <see cref="DbCommand.ExecuteReader()"/> and returns the data in the format <see cref="DataPackage"/>
 		/// </summary>
 		/// <param name="sql">SQL string for command</param>
-		/// <param name="parameters">Array of <see cref="MdbAdapters"/></param>
+		/// <param name="parameters">Array of <see cref="MdbParameter"/></param>
 		/// <returns></returns>
 		public DataPackage GetReader(string sql, params MdbParameter[] parameters) => GetReaders(sql, parameters)[0];
 		/// <summary>
 		/// Run <see cref="DbCommand.ExecuteReader()"/> for multiple statements and returns array of <see cref="DataPackage"/>
 		/// </summary>
 		/// <param name="sql">SQL string for command with multiple statements</param>
-		/// <param name="parameters">Array of <see cref="MdbAdapters"/></param>
+		/// <param name="parameters">Array of <see cref="MdbParameter"/></param>
 		/// <returns></returns>
 		public DataPackage[] GetReaders(string sql, params MdbParameter[] parameters)
 		{
@@ -150,7 +152,7 @@ namespace S031.MetaStack.Core.Data
 		/// Run <see cref="DbCommand.ExecuteNonQuery"/>
 		/// </summary>
 		/// <param name="sql">SQL command</param>
-		/// <param name="parameters">Array of <see cref="MdbAdapters"</param>
+		/// <param name="parameters">Array of <see cref="MdbParameter"</param>
 		/// <returns><see cref="int"/></returns>
 		public int Execute(string sql, params MdbParameter[] parameters)
 		{
@@ -164,7 +166,7 @@ namespace S031.MetaStack.Core.Data
 		/// Returns max lenght 2033
 		/// </summary>
 		/// <param name="sql">SQL command</param>
-		/// <param name="parameters">Array of <see cref="MdbAdapters"</param>
+		/// <param name="parameters">Array of <see cref="MdbParameter"</param>
 		/// <returns><see cref="int"/></returns>
 		public T Execute<T>(string sql, params MdbParameter[] parameters)
 		{

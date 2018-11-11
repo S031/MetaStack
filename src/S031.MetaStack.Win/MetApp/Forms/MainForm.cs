@@ -32,7 +32,7 @@ namespace MetApp
 		}
 		private void InitializeComponent()
 		{
-			FontManager.SetBaseFontSize(12f);
+			//FontManager.SetBaseFontSize(12f);
 			this.SuspendLayout();
 			//main 
 			this.Text = Program.AppName;
