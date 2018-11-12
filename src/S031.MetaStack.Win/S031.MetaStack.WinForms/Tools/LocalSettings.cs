@@ -59,6 +59,22 @@ namespace S031.MetaStack.WinForms
 
 		[global::System.Configuration.UserScopedSettingAttribute()]
 		[global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+		public string FormOpenTimeStatistics
+		{
+			get
+			{
+				if (this["FormOpenTimeStatistics"] == null) this["FormOpenTimeStatistics"] = string.Empty;
+				return (string)(this["FormOpenTimeStatistics"]);
+			}
+			set
+			{
+				this["FormOpenTimeStatistics"] = value;
+				this.Save();
+			}
+		}
+
+		[global::System.Configuration.UserScopedSettingAttribute()]
+		[global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
 		[global::System.Configuration.DefaultSettingValueAttribute("False")]
 		public bool Upgraded
 		{

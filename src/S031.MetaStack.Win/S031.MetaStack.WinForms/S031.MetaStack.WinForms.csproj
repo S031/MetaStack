@@ -184,6 +184,7 @@
     </Compile>
     <Compile Include="DBGrid\DBgridParameters.cs" />
     <Compile Include="DBGrid\Formater.cs" />
+    <Compile Include="DBGrid\FormOpenTimeStatistics.cs" />
     <Compile Include="DBGrid\GridSpeedSearch.cs" />
     <Compile Include="Dialogs\Chooser.cs" />
     <Compile Include="Dialogs\TimeWaitDialog.cs">

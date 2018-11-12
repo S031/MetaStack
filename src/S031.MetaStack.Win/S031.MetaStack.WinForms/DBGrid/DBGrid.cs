@@ -60,8 +60,7 @@ namespace S031.MetaStack.WinForms
 		protected virtual void OnFormNotRead(EventArgs e)
 		{
 			xc = null;
-			EventHandler<EventArgs> te = SchemaNotRead;
-			if (te != null) te(this, e);
+			SchemaNotRead?.Invoke(this, e);
 		}
 		protected virtual void OnFormRead(SchemaEventArgs e)
 		{
@@ -206,7 +205,9 @@ namespace S031.MetaStack.WinForms
 		private void MakeRecordset()
 		{
 			///!!! from statistics open form
-			int elapsedTime = 5000;
+			var fs = new FormOpenTimeStatistics();
+			int elapsedTime = fs.GetTime(SchemaName, 5000);
+			DateTime startTime = DateTime.Now;
 			if (elapsedTime < 1001)
 			{
 				try
@@ -229,6 +230,7 @@ namespace S031.MetaStack.WinForms
 					return;
 				}
 			}
+			fs.SetTime(SchemaName, Convert.ToInt32((DateTime.Now - startTime).TotalMilliseconds));
 			var bs = new BindingSource
 			{
 				DataSource = dt,

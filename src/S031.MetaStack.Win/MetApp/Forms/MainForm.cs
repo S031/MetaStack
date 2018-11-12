@@ -74,10 +74,6 @@ namespace MetApp
 						//FontManager.Adop(buttons[buttons.Count - 1]);
 
 					}
-					else if (rs.DbObjectType == DbObjectTypes.View)
-					{
-
-					}
 				}
 			}
 			//!!! убрать эту херню
