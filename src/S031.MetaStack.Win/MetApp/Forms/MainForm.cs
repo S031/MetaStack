@@ -69,37 +69,10 @@ namespace MetApp
 					if (rs.DbObjectType == DbObjectTypes.Action)
 					{
 						items.Add(new ToolStripMenuItem(att.Name, null, MenuRun_Click) { Name = att.AttribName, ToolTipText = att.Description });
-						//FontManager.Adop(items[items.Count - 1]);
 						buttons.Add(new ToolStripMenuItem(att.Name, null, MenuRun_Click) { Name = att.AttribName, ToolTipText = att.Description });
-						//FontManager.Adop(buttons[buttons.Count - 1]);
-
 					}
 				}
 			}
-			//!!! убрать эту херню
-			if (schema.ObjectName == "dbo.V_DealValue")
-			{
-				items.Add(new ToolStripMenuItem("Расчет и выгрузки данных по сделкам и денежным потокам", null, MenuRun_Click) { Name = "mib_msfo_CF_Calc", ToolTipText = "Расчет и выгрузки данных по сделкам и денежным потокам" });
-				buttons.Add(new ToolStripMenuItem("Расчет и выгрузки данных по сделкам и денежным потокам", null, MenuRun_Click) { Name = "mib_msfo_CF_Calc", ToolTipText = "Расчет и выгрузки данных по сделкам и денежным потокам" });
-			}
-
-			//foreach (ActionConfig config in configs)
-			//{
-			//	if (config.IncludeForms != null && config.IncludeForms.Count() > 0 &&
-			//		string.IsNullOrEmpty(config.IncludeForms.FirstOrDefault(fn => fn.Equals(this.Form["FormName"], StringComparison.CurrentCultureIgnoreCase))))
-			//		continue;
-			//	else if (config.ExcludeForms != null && config.ExcludeForms.Count() > 0 &&
-			//		!string.IsNullOrEmpty(config.ExcludeForms.FirstOrDefault(fn => fn.Equals(this.Form["FormName"], StringComparison.CurrentCultureIgnoreCase))))
-			//		continue;
-
-			//	if (config.AddContextMenu)
-			//	{
-			//		items.Add(new ToolStripMenuItem(config.Name, config.Image, menuRun_Click) { Name = config.ActionID, ToolTipText = config.Description });
-			//		FontManager.Adop(items[items.Count - 1]);
-			//		buttons.Add(new ToolStripMenuItem(config.Name, config.Image, menuRun_Click) { Name = config.ActionID, ToolTipText = config.Description });
-			//		FontManager.Adop(buttons[buttons.Count - 1]);
-			//	}
-			//}
 			if (items.Count > 0)
 			{
 				if (menuRun.DropDownItems.ContainsKey("Blank"))
@@ -111,6 +84,7 @@ namespace MetApp
 			if ((menuRun.DropDownItems[menuRun.DropDownItems.Count - 1] is ToolStripSeparator))
 				menuRun.DropDownItems.Remove(menuRun.DropDownItems[menuRun.DropDownItems.Count - 1]);
 		}
+
 		void loadRelated()
 		{
 			ToolStripMenuItem menuRun = (ToolStripMenuItem)(GetControl<MenuStrip>("MenuBar").Items["File"] as ToolStripMenuItem)
