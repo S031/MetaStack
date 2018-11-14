@@ -70,10 +70,17 @@ namespace S031.MetaStack.WinForms.Actions
 		public bool AuthenticationRequired { get; set; }
 		public bool AuthorizationRequired { get; set; }
 		public bool AsyncMode { get; set; } = false;
+		public int IID { get; set; }
 
 		public override string ToString() => JSONExtensions.SerializeObject(this);
 
 		public static ActionInfo Create(string serializedJsonString) =>
 			JSONExtensions.DeserializeObject<ActionInfo>(serializedJsonString);
+
+#if NETCOREAPP
+		ActionContext _ctx = null;
+		public ActionContext GetContext() => _ctx;
+		public void SetContext(ActionContext context) => _ctx = context;
+#endif
 	}
 }

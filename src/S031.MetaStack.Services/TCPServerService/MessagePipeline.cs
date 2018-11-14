@@ -42,9 +42,9 @@ namespace S031.MetaStack.Services
 			var config = ApplicationContext.GetConfiguration();
 			if (!_message.Headers.TryGetValue("ConnectionName", out object connectionName))
 				connectionName = config["appSettings:defaultConnection"]; ;
+			ActionContext actionContext = new ActionContext() { ConnectionName = (string)connectionName };
 
-			var cs = config.GetSection($"connectionStrings:{connectionName}").Get<ConnectInfo>();
-			//using (MdbContext mdb = await MdbContext.CreateMdbContextAsync(cs))
+			var cs = config.GetSection($"connectionStrings:{config["appSettings:SysCatConnection"]}").Get<ConnectInfo>();
 			using (MdbContext mdb = new MdbContext(cs))
 			using (ActionManager am = new ActionManager(mdb) { Logger = ApplicationContext.GetLogger() })
 			{
@@ -52,6 +52,8 @@ namespace S031.MetaStack.Services
 				ActionInfo ai = am.GetActionInfo(actionID);
 				if (ai.AuthenticationRequired)
 				{
+					actionContext.UserName = (string)_message.Headers["UserName"];
+					actionContext.SessionID = (string)_message.Headers["SessionID"];
 					ApplicationContext
 						.GetLoginFactory()
 						.Logon(
@@ -60,8 +62,7 @@ namespace S031.MetaStack.Services
 						(string)_message.Headers["EncryptedKey"]);
 					//set thread principal
 				}
-				//System.IO.File.WriteAllText(@"c:\source\a123.txt", _message.ToString());
-				//serviceProvider.GetService<ILogger>().LogTrace();
+				ai.SetContext(actionContext);
 				if (ai.AsyncMode)
 					_result = await am.ExecuteAsync(actionID, _message);
 				else

@@ -24,6 +24,11 @@ namespace S031.MetaStack.Common
 			str.NullTest(nameof(str));
 			return int.TryParse(str, out int result) ? result : 0;
 		}
+		public static long ToLongOrDefault(this string str)
+		{
+			str.NullTest(nameof(str));
+			return long.TryParse(str, out long result) ? result : 0;
+		}
 
 		public static double ToDoubleOrDefault(this string str)
 		{
@@ -376,6 +381,8 @@ namespace S031.MetaStack.Common
 			else 
 				return source.ToString().ToObjectOf(type);
 		}
+
+		public static T CastOf<T>(this object source) => (T)CastOf(source, typeof(T));
 
 		public static void NullTest(this object value, string valueName) =>
 			NullTest(value, valueName, (v, n) => { throw new ArgumentNullException(n); });

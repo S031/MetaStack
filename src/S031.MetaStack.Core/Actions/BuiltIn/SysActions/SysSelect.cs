@@ -74,8 +74,7 @@ namespace S031.MetaStack.Core.Actions
 
 		private void GetParameters(ActionInfo ai, DataPackage dp)
 		{
-			if (!dp.Headers.TryGetValue("ConnectionName", out _connectionName))
-				_connectionName = ApplicationContext.GetConfiguration()["appSettings:defaultConnection"]; ;
+			_connectionName = ai.GetContext().ConnectionName;
 
 			_conditions = new List<JMXCondition>();
 			for (; dp.Read();)
@@ -86,8 +85,6 @@ namespace S031.MetaStack.Core.Actions
 					_parameters.Add(dp["ParamName"]);
 					_parameters.Add(dp["ParamValue"]);
 				}
-				else if (paramName.Equals("_connectionName", StringComparison.CurrentCultureIgnoreCase))
-					_connectionName = (string)dp["ParamValue"];
 				else if (paramName.Equals("_viewName", StringComparison.CurrentCultureIgnoreCase))
 					_viewName = (string)dp["ParamValue"];
 				else if (paramName.Equals("_filter", StringComparison.CurrentCultureIgnoreCase))

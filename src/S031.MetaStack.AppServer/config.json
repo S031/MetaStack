@@ -2,7 +2,7 @@
   "appSettings": {
     "auditEnabled": true,
     "language": "ru-RU",
-    "defaultConnection": "SQliteDb",
+    "defaultConnection": "bankLocal",
     "SysCatConnection": "SQliteDb"
   },
   "ApplicationLogSettings": {
@@ -104,6 +104,10 @@
     {
       "AssemblyName": "System.Data.SqlClient",
       "AssemblyPath": ""
+    },
+    {
+      "AssemblyName": "Metib.Business.Msfo",
+      "AssemblyPath": "Metib.Business.Msfo"
     }
   ]
 }

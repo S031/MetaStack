@@ -350,6 +350,16 @@ namespace MetApp
 		}
 		void MenuRun_Click(object sender, EventArgs e)
 		{
+			ToolStripItem mi = (sender as ToolStripItem);
+			var dr = ClientGate.GetActionInfo(mi.Name)
+			   .GetInputParamTable()
+			   .AddNew()
+			   .SetValue("@ObjectName", _grid.SchemaName)
+			   .SetValue("@IDs", string.Join(",", _grid.Selection().Select(r=>r[_grid.IdColName].ToString())))
+			   .Update();
+			var result = ClientGate.Execute(mi.Name, dr);
+			result.Read();
+			MessageBox.Show((string)result[0]);
 		}
 
 		void MenuRel_Click(object sender, EventArgs e)

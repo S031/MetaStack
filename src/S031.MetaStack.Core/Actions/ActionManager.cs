@@ -32,6 +32,7 @@ namespace S031.MetaStack.Core.Actions
 							QA.AsyncMode,
 							QA.TransactionSupport,
 							1 As WebAuthentication,
+							I.ID As IID,
 							I.InterfaceName As InterfaceID,
 							I.Name,
 							COALESCE(I.Description, '') As Description,
@@ -169,7 +170,7 @@ namespace S031.MetaStack.Core.Actions
 				}
 				if (ai != null)
 				{
-					using (var dr = await GetMdbContext().GetReaderAsync(_sql_parameters.ToFormat(ai.InterfaceID, _schemaName)))
+					using (var dr = await GetMdbContext().GetReaderAsync(_sql_parameters.ToFormat(ai.IID, _schemaName)))
 					{
 						ParamInfoList pil = ai.InterfaceParameters;
 						for (; dr.Read();)
@@ -190,7 +191,8 @@ namespace S031.MetaStack.Core.Actions
 			if (!_actions.ContainsKey(actionID))
 			{
 				ActionInfo ai = new ActionInfo();
-				using (var dr = GetMdbContext().GetReader(_sql_actions.ToFormat(actionID)))
+				MdbContext catContext = GetMdbContext(ContextTypes.SysCat);
+				using (var dr = catContext.GetReader(_sql_actions.ToFormat(actionID, _schemaName)))
 				{
 					if (dr.Read())
 						SetActionAttributes(ai, dr);
@@ -199,7 +201,7 @@ namespace S031.MetaStack.Core.Actions
 				}
 				if (ai != null)
 				{
-					using (var dr = GetMdbContext().GetReader(_sql_parameters.ToFormat(ai.InterfaceID)))
+					using (var dr = GetMdbContext().GetReader(_sql_parameters.ToFormat(ai.IID, _schemaName)))
 					{
 						ParamInfoList pil = ai.InterfaceParameters;
 						for (; dr.Read();)
@@ -224,15 +226,17 @@ namespace S031.MetaStack.Core.Actions
 			ai.LogOnError = (bool)dr["LogOnError"];
 			ai.EMailOnError = (bool)dr["EMailOnError"];
 			ai.EMailGroup = (string)dr["EMailGroup"];
+			ai.IID = dr["IID"].CastOf<int>();
 			ai.InterfaceID = (string)dr["InterfaceID"];
-			ai.InterfaceName = (string)dr["InterfaceName"];
+			ai.InterfaceName = (string)dr["Name"];
 			ai.Description = (string)dr["Description"];
 			ai.MultipleRowsParams = (bool)dr["MultipleRowsParams"];
 			ai.MultipleRowsResult = (bool)dr["MultipleRowsResult"];
 			ai.TransactionSupport = (TransactionActionSupport)dr["TransactionSupport"];
-			ai.WebAuthentication = (ActionWebAuthenticationType)dr["WebAuthentication"];
 			ai.AuthenticationRequired = (bool)dr["AuthenticationRequired"];
 			ai.AuthorizationRequired = (bool)dr["AuthorizationRequired"];
+			ai.WebAuthentication = ai.AuthenticationRequired ? ActionWebAuthenticationType.Basic : ActionWebAuthenticationType.None;
+			ai.AsyncMode = (bool)dr["AsyncMode"];
 		}
 		private void SetParamAttributes(ParamInfoList pil, DataPackage dr)
 		{
@@ -240,11 +244,11 @@ namespace S031.MetaStack.Core.Actions
 			{
 				ParameterID = (string)dr["ParameterID"],
 				Dirrect = (ParamDirrect)dr["Dirrect"],
-				Position = (int)dr["Position"],
+				Position = dr["Position"].CastOf<int>(),
 				Name = (string)dr["Name"],
 				DataType = (string)dr["DataType"],
-				Width = (int)dr["Width"],
-				DisplayWidth = (int)dr["DisplayWidth"],
+				Width = dr["Width"].CastOf<int>(),
+				DisplayWidth = dr["DisplayWidth"].CastOf<int>(),
 				PresentationType = (string)dr["PresentationType"],
 				Mask = (string)dr["Mask"],
 				Format = (string)dr["Format"],
