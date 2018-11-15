@@ -44,9 +44,7 @@ namespace S031.MetaStack.Services
 				connectionName = config["appSettings:defaultConnection"]; ;
 			ActionContext actionContext = new ActionContext() { ConnectionName = (string)connectionName };
 
-			var cs = config.GetSection($"connectionStrings:{config["appSettings:SysCatConnection"]}").Get<ConnectInfo>();
-			using (MdbContext mdb = new MdbContext(cs))
-			using (ActionManager am = new ActionManager(mdb) { Logger = ApplicationContext.GetLogger() })
+			using (ActionManager am = ApplicationContext.GetActionManager())
 			{
 				string actionID = (string)_message.Headers["ActionID"];
 				ActionInfo ai = am.GetActionInfo(actionID);

@@ -16,6 +16,7 @@ using System.Runtime.Loader;
 using S031.MetaStack.Common;
 using S031.MetaStack.Core.ORM;
 using S031.MetaStack.Core.Data;
+using S031.MetaStack.Core.Actions;
 
 namespace S031.MetaStack.Core.App
 {
@@ -142,20 +143,30 @@ namespace S031.MetaStack.Core.App
 		/// <returns></returns>
 		public static JMXFactory CreateJMXFactory(string workConnectionName)
 		{
-			if (_schemaDb == null)
-			{
-				lock (obj4Lock)
-				{
-					var schemaConnectInfo = _configuration.GetSection($"connectionStrings:{_configuration["appSettings:SysCatConnection"]}").Get<ConnectInfo>();
-					_schemaDb = new MdbContext(schemaConnectInfo);
-				}
-			}
 			var workConnectInfo = _configuration.GetSection($"connectionStrings:{workConnectionName}").Get<ConnectInfo>();
-
 			MdbContext workDb = new MdbContext(workConnectInfo);
-			var f = JMXFactory.Create(_schemaDb, workDb, _logger);
+			var f = JMXFactory.Create(SchemaDb, workDb, _logger);
 			f.IsLocalContext = true;
 			return f;
+		}
+
+		public static ActionManager GetActionManager() => new ActionManager(SchemaDb) { Logger = GetLogger() };
+
+		private static MdbContext SchemaDb
+		{
+			get
+			{
+				if (_schemaDb == null)
+				{
+					lock (obj4Lock)
+					{
+						var schemaConnectInfo = _configuration.GetSection($"connectionStrings:{_configuration["appSettings:SysCatConnection"]}").Get<ConnectInfo>();
+						_schemaDb = new MdbContext(schemaConnectInfo);
+					}
+				}
+				return _schemaDb;
+			}
+
 		}
     }
 }
