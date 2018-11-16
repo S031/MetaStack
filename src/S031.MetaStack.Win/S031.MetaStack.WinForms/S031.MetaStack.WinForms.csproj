@@ -220,6 +220,8 @@
     <Compile Include="Tools\ClientGate.cs" />
     <Compile Include="Tools\Events.cs" />
     <Compile Include="Tools\LocalSettings.cs" />
+    <Compile Include="Tools\Output\OutputWindow.cs" />
+    <Compile Include="Tools\Output\Pipe.cs" />
     <Compile Include="Tools\PathHelper.cs" />
     <Compile Include="Tools\Reporting\IReportercs.cs" />
     <Compile Include="Tools\Reporting\ReportManager.cs" />

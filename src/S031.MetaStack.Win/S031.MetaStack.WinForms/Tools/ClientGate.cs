@@ -77,7 +77,7 @@ namespace S031.MetaStack.WinForms
 		public static void Logout() =>
 			_connector?.Dispose();
 
-		public static DataPackage Execute(string actionID, DataPackage paramTable)
+		public static DataPackage Execute(string actionID, DataPackage paramTable = null)
 		{
 			Logon();
 			try

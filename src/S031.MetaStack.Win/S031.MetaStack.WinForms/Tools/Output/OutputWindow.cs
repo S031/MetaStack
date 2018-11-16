@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
+using S031.MetaStack.Common.Logging;
 
 using ICSharpCode.TextEditor;
 using ICSharpCode.TextEditor.Document;
@@ -10,85 +11,67 @@ namespace S031.MetaStack.WinForms
 {
 	public static class OutputWindow
 	{
-		static WinForm _cd;
+		private static WinForm _cd;
+		private static CEdit _editor;
 
-		static CDialog wind
+		static OutputWindow()
 		{
-			get
+			_cd = new WinForm(WinFormStyle.Dialog);
+			_cd.Text = "Окно сообщений";
+			_cd.Add<Panel>(WinFormConfig.SinglePageForm);
+			_cd.FormClosing += _cd_FormClosing;
+			TableLayoutPanel tlpRows = _cd.Items["FormRowsPanel"].LinkedControl as TableLayoutPanel;
+			tlpRows.Add(new WinFormItem($"LogView")
 			{
-				if (_cd == null)
+				PresentationType = typeof(CEdit),
+				ControlTrigger = (cdi, ctrl) =>
 				{
-					_cd = new CDialog(CDialogPageStyle.SinglePage, CDialogStyle.Dialog);
-					_cd.Text = "Окно сообщений";
-					TableLayoutPanel tp = _cd.AddCells("WorkTable1", new Size(1, 1));
-					tp.Parent.Dock = DockStyle.Fill;
-					CEdit editor = _cd.AddControl<CEdit>("LogView", tp);
-					editor.SetHighlighting("LOG");
-					editor.Dock = DockStyle.Fill;
-					_cd.Disposed += (ctrl, e) => _cd = null;
-					_cd.ShowInTaskbar = true;
-					_cd.Size = FormSettings.Default.OutputWindow_Size;
-					_cd.Resize += new EventHandler(cd_Resize);
+					_editor = (ctrl as CEdit);
+					_editor.SetHighlighting("LOG");
+					_editor.Dock = DockStyle.Fill;
 				}
-				return _cd;
-			}
+			});
+		}
+
+		private static void _cd_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			Clear();
+			_cd.Visible = false;
+			e.Cancel = true;
 		}
 
 		static void cd_Resize(object sender, EventArgs e)
 		{
 			if (_cd.Visible && _cd.WindowState == FormWindowState.Normal)
 			{
-				FormSettings.Default.OutputWindow_Size = _cd.Size;
-				FormSettings.Default.Save();
+				//FormSettings.Default.OutputWindow_Size = _cd.Size;
+				//FormSettings.Default.Save();
 			}
 		}
 
 		public static void Print(string message)
 		{
-			CDialog cd = wind;
-			CEdit editor = cd.GetControl<CEdit>("LogView");
-			TextArea textArea = editor.TextArea;
-
+			TextArea textArea = _editor.TextArea;
 			textArea.InsertString(message + "\n");
 
-			if (!cd.Visible)
-				cd.Visible = true;
+			if (!_cd.Visible)
+				_cd.Visible = true;
 		}
 
 		public static void GoEnd()
 		{
-			CDialog cd = wind;
-			CEdit editor = cd.GetControl<CEdit>("LogView");
-			IDocument document = editor.Document;
-			editor.TextArea.Caret.Position = document.OffsetToPosition(document.TextContent.Length);
+			IDocument document = _editor.Document;
+			_editor.TextArea.Caret.Position = document.OffsetToPosition(document.TextContent.Length);
 		}
 
 		public static void GoTop()
 		{
-			CDialog cd = wind;
-			CEdit editor = cd.GetControl<CEdit>("LogView");
-			IDocument document = editor.Document;
-			editor.TextArea.Caret.Position = document.OffsetToPosition(0);
+			IDocument document = _editor.Document;
+			_editor.TextArea.Caret.Position = document.OffsetToPosition(0);
 		}
 
-		public static void Print(string message, MessageBoxIcon icon)
-		{
-			switch (icon)
-			{
-				case MessageBoxIcon.Error:
-					Print(Logger.SourceTypeError + " " + message);
-					break;
-				case MessageBoxIcon.Warning:
-					Print(Logger.SourceTypeWarning + " " + message);
-					break;
-				case MessageBoxIcon.Information:
-					Print(Logger.SourceTypeInfo + " " + message);
-					break;
-				default:
-					Print(message);
-					break;
-			}
-		}
+		public static void Print(LogLevels level, string message) =>
+			Print($"{FileLog.Messages[level]} {message}");
 
 		public static void Print(string[] messages)
 		{
@@ -100,14 +83,13 @@ namespace S031.MetaStack.WinForms
 
 		public static void Focus()
 		{
-			wind.Focus();
+			_cd.Focus();
 		}
 
 		public static void Clear()
 		{
-			CDialog cd = wind;
-			CEdit editor = cd.GetControl<CEdit>("LogView");
-			editor.Text = string.Empty;
+			_editor.Text = string.Empty;
 		}
+		public static CEdit GetEditor() => _editor;
 	}
 }

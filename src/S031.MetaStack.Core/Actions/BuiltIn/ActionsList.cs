@@ -396,6 +396,43 @@ namespace S031.MetaStack.Core.Actions
 			ai.InterfaceParameters.Add(pi);
 			actions.Add(ai.ActionID, ai);
 			#endregion
+			
+			#region Sys.PipeRead
+			ai = new ActionInfo()
+			{
+				ActionID = "Sys.PipeRead",
+				AssemblyID = typeof(ActionsList).Assembly.GetWorkName(),
+				AsyncMode = false,
+				AuthenticationRequired = true,
+				AuthorizationRequired = true,
+				ClassName = typeof(SysPipeRead).FullName,
+				Description = "Запустить канал вывода информации для текущей сессии",
+				EMailOnError = false,
+				LogOnError = true,
+				MultipleRowsParams = true,
+				MultipleRowsResult = true,
+				TransactionSupport = TransactionActionSupport.None,
+				Name = "Запустить канал вывода информации для текущей сессии",
+				WebAuthentication = ActionWebAuthenticationType.Basic
+			};
+			pi = new ParamInfo()
+			{
+				AttribName = "Result",
+				FieldName = "Result",
+				ParameterID = "Result",
+				DataType = "string",
+				Dirrect = ParamDirrect.Output,
+				Enabled = true,
+				Name = "Результат операции",
+				Position = 1,
+				PresentationType = "TextBox",
+				Visible = true,
+				Width = 60,
+				Required = true
+			};
+			ai.InterfaceParameters.Add(pi);
+			actions.Add(ai.ActionID, ai);
+			#endregion
 
 			return actions;
 		}

@@ -32,6 +32,7 @@ namespace S031.MetaStack.Core.App
 		static ILogger _logger;
 		static ILoginFactory _loginFactory;
 		static MdbContext _schemaDb = null;
+		static readonly PipeService _pipeChannel = new PipeService();
 
 		public static IConfiguration GetConfiguration() => _configuration;
 		public static ILogger GetLogger() => _logger;
@@ -168,5 +169,7 @@ namespace S031.MetaStack.Core.App
 			}
 
 		}
+
+		public static PipeService GetPipe() => _pipeChannel;
     }
 }

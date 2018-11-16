@@ -38,6 +38,7 @@ namespace S031.MetaStack.Common.Logging
 			{ LogLevels.None, Translater.GetString("S031.MetaStack.Common.Logging.LogLevel.Trace") },
 			{ LogLevels.Trace, Translater.GetString("S031.MetaStack.Common.Logging.LogLevel.None") }
 		};
+
 		static readonly ConcurrentDictionary<string, Queue<string>> _queues = 
 			new ConcurrentDictionary<string, Queue<string>>();
 
@@ -45,6 +46,8 @@ namespace S031.MetaStack.Common.Logging
 		private FileLogSettings _settings;
 		private Queue<string> _queue;
 		private readonly object _lockObj = new object();
+
+		public static Dictionary<LogLevels, string> Messages => _msgs;
 
 		public FileLog(string logName) : this(logName, FileLogSettings.Default)
 		{

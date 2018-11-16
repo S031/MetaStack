@@ -32,7 +32,7 @@ namespace Metib.Business.Msfo
 				.GetConfiguration()
 				.GetSection($"connectionStrings:{ctx.ConnectionName}").Get<ConnectInfo>();
 
-
+			var pipe = ApplicationContext.GetPipe();
 			StringBuilder sb = new StringBuilder();
 			foreach (long i in ids)
 			{
@@ -40,7 +40,10 @@ namespace Metib.Business.Msfo
 				{
 					try
 					{
-						sb.AppendLine(await mdb.ExecuteAsync<string>($"exec kalv_TestForFct {i}"));
+						string result = await mdb.ExecuteAsync<string>($"exec kalv_TestForFct {i}");
+						pipe.Write(ctx, result);
+						System.Threading.Thread.Sleep(100);
+						sb.AppendLine(result);
 					}
 					catch (Exception ex)
 					{

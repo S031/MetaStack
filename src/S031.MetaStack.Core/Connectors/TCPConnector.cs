@@ -93,8 +93,10 @@ namespace S031.MetaStack.WinForms.Connectors
 				return;
 			Execute("Sys.Logout", new DataPackage("Col1"));
 		}
-		public DataPackage Execute(string actionID, DataPackage paramTable)
+		public DataPackage Execute(string actionID, DataPackage paramTable = null)
 		{
+			if (paramTable == null)
+				paramTable = new DataPackage(new string[] { "Default.String.10" });
 			//for paranoya mode
 			//var request = new DataPackage(paramTable.ToArray());
 			paramTable.Headers["ActionID"] = actionID;

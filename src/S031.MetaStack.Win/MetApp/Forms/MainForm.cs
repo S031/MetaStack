@@ -357,9 +357,11 @@ namespace MetApp
 			   .SetValue("@ObjectName", _grid.SchemaName)
 			   .SetValue("@IDs", string.Join(",", _grid.Selection().Select(r=>r[_grid.IdColName].ToString())))
 			   .Update();
-			var result = ClientGate.Execute(mi.Name, dr);
-			result.Read();
-			MessageBox.Show((string)result[0]);
+			OutputWindow.Print("Start...");
+			Pipe.Start();
+			ClientGate.Execute(mi.Name, dr);
+			Pipe.End();
+			OutputWindow.Print("Finish...");
 		}
 
 		void MenuRel_Click(object sender, EventArgs e)
