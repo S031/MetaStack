@@ -13,6 +13,7 @@ namespace S031.MetaStack.WinForms
 	{
 		private static WinForm _cd;
 		private static DataTable _dt = null;
+		private static DataGridView _grid = null;
 
 
 		static OutputWindow()
@@ -25,12 +26,13 @@ namespace S031.MetaStack.WinForms
 			TableLayoutPanel tlpRows = _cd.Items["FormRowsPanel"].LinkedControl as TableLayoutPanel;
 			tlpRows.Add(new WinFormItem($"LogView")
 			{
-				PresentationType = typeof(DBGridBase),
+				PresentationType = typeof(DataGridView),
 				ControlTrigger = (cdi, ctrl) =>
 				{
-					DBGridBase grid = (ctrl as DBGridBase);
-					grid.AllowAddObject = false;
-					grid.AllowDelObject = false;
+					DataGridView grid = (ctrl as DataGridView);
+					grid.AllowUserToAddRows = false;
+					grid.AllowUserToDeleteRows = false;
+					grid.ScrollBars = ScrollBars.None;
 					int i = grid.Columns.Add("MessageTime", "Время");
 					var col = grid.Columns[i];
 					col.DataPropertyName = "MessageTime";
@@ -40,9 +42,14 @@ namespace S031.MetaStack.WinForms
 					grid.Columns[i].DataPropertyName = "Message";
 					grid.Columns[i].Width = _cd.Width - grid.Columns[0].Width - grid.Columns[1].Width - 60;
 					grid.DataSource = GetDataSource();
+					_dt.RowChanged += GoToEnd;
+					_grid = grid;
 				}
 			});
 		}
+
+		private static void GoToEnd(object sender, DataRowChangeEventArgs e) =>
+			_grid.CurrentCell = _grid[_grid.CurrentCellAddress.X, _grid.RowCount - 1];
 
 		private static void _cd_FormClosing(object sender, FormClosingEventArgs e)
 		{
@@ -51,7 +58,7 @@ namespace S031.MetaStack.WinForms
 			e.Cancel = true;
 		}
 
-		static void cd_Resize(object sender, EventArgs e)
+		private static void _cd_Resize(object sender, EventArgs e)
 		{
 			if (_cd.Visible && _cd.WindowState == FormWindowState.Normal)
 			{
@@ -77,15 +84,21 @@ namespace S031.MetaStack.WinForms
 
 		public static void Print(LogLevels level, string message)
 		{
-			_dt.Rows.Add(DateTime.Now, FileLog.Messages[level], message);
-			System.Windows.Forms.Application.DoEvents();
-
+			DataRow dr = _dt.NewRow();
+			dr["MessageTime"] = DateTime.Now;
+			dr["MessageSource"] = FileLog.Messages[level];
+			dr["Message"] = message;
+			_dt.Rows.Add(dr);
+			//_dt.Rows.Add(DateTime.Now, FileLog.Messages[level], message);
 		}
 
 		public static void Print(LogLevels level, string[] messages)
 		{
+			_dt.RowChanged -= GoToEnd;
 			foreach (string item in messages)
 				Print(level, item);
+			GoToEnd(_grid, null);
+			_dt.RowChanged += GoToEnd;
 		}
 
 		public static void Focus()
@@ -99,6 +112,5 @@ namespace S031.MetaStack.WinForms
 		}
 
 		public static void Show() => _cd.Visible = true;
-
 	}
 }

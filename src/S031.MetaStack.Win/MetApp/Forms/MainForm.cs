@@ -27,8 +27,8 @@ namespace MetApp
 			_formOptions = options ?? new MainFormOptions();
 			InitializeComponent();
 			SetCommands();
-			loadActions();
-			loadRelated();
+			LoadActions();
+			LoadRelated();
 		}
 		private void InitializeComponent()
 		{
@@ -54,7 +54,7 @@ namespace MetApp
 			this.ResumeLayout();
 		}
 
-		void loadActions()
+		private void LoadActions()
 		{
 			ToolStripMenuItem menuRun = (ToolStripMenuItem)_grid.ContextMenuStrip.Items["EditRun"];
 			ToolStripDropDownButton tsbRun = (ToolStripDropDownButton)GetControl<ToolStrip>("Toolbar").Items["Run"];
@@ -85,7 +85,7 @@ namespace MetApp
 				menuRun.DropDownItems.Remove(menuRun.DropDownItems[menuRun.DropDownItems.Count - 1]);
 		}
 
-		void loadRelated()
+		private void LoadRelated()
 		{
 			ToolStripMenuItem menuRun = (ToolStripMenuItem)(GetControl<MenuStrip>("MenuBar").Items["File"] as ToolStripMenuItem)
 				.DropDownItems["FileOpenRelated"];
@@ -275,7 +275,7 @@ namespace MetApp
 					_dateFinish.Size = new Size((int)(tbTools.Font.SizeInPoints * 12), _dateFinish.Height);
 					_dateFinish.ToolTipText = "Дата окончания периода";
 					tbTools.Items.Add(_dateFinish);
-					_dateFinish.Validating += new CancelEventHandler(dateFinish_Validating);
+					_dateFinish.Validating += new CancelEventHandler(DateFinish_Validating);
 					_dateStart.KeyDown += new KeyEventHandler((sender, e) =>
 					{
 						if (e.KeyCode == Keys.Enter)
@@ -359,19 +359,16 @@ namespace MetApp
 			   .Update();
 			OutputWindow.Show();
 			OutputWindow.Print("Start...");
-			System.Threading.Tasks.Task.Factory.StartNew(() =>
+			new System.Threading.Thread(() =>
 			{
 				Pipe.Start();
 				ClientGate.Execute(mi.Name, dr);
 				Pipe.End();
 				OutputWindow.Print("Finish...");
-			});
-				//.GetAwaiter()
-				//.GetResult();
-			//Pipe.End();
+			}).Start();
 		}
 
-		void MenuRel_Click(object sender, EventArgs e)
+		private void MenuRel_Click(object sender, EventArgs e)
 		{
 			ToolStripItem mi = (sender as ToolStripItem);
 			OpenRelated(mi.Name);
@@ -387,7 +384,7 @@ namespace MetApp
 			new MainForm(childFormName, new MainFormOptions() { StartFilter = filter }).Show();			
 		}
 
-		void dateFinish_Validating(object sender, CancelEventArgs e)
+		private void DateFinish_Validating(object sender, CancelEventArgs e)
 		{
 			try
 			{

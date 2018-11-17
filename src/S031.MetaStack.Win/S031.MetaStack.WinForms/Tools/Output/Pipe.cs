@@ -13,16 +13,20 @@ namespace S031.MetaStack.WinForms
 {
 	public static class Pipe
 	{
-		private const int _dueue = 1000;
+		private const int _dueue = 5000;
 		private static Timer _timer = null;
 
-		public static void Start() =>
-			_timer = new Timer(Tick, OutputWindow.GetDataSource(), _dueue, _dueue);
+		/// <summary>
+		/// Start reading from server pipe channal
+		/// </summary>
+		/// <param name="dueue">period for request server process state</param>
+		public static void Start(int dueue = _dueue) =>
+			_timer = new Timer(Tick, null, _dueue, _dueue);
 
 		public static void End(bool force = false)
 		{
 			if (!force)
-				Read(OutputWindow.GetDataSource());
+				Read();
 
 			_timer?.Dispose();
 			_timer = null;
@@ -32,19 +36,14 @@ namespace S031.MetaStack.WinForms
 
 		private static void Tick(object state)
 		{
-			Read((DataTable)state);
+			Read();
 		}
 
-		private static void Read(DataTable dt)
+		private static void Read()
 		{
 			var result = ClientGate.Execute("Sys.PipeRead");
 			if (result.Read())
-			{
-				foreach (string messsage in ((string)result[0]).Split("\r\n".ToCharArray()))
-					if (!messsage.IsEmpty())
-						//dt.Rows.Add(DateTime.Now, LogLevels.Information, messsage);
-						OutputWindow.Print(LogLevels.Information, messsage);
-			}
+				OutputWindow.Print(LogLevels.Information, ((string)result[0]).Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries));
 		}
 	}
 }

@@ -1,10 +1,10 @@
-﻿S031.MetaStack.Common.Logging.LogLevel.Critical = "{CRITICAL}";
-S031.MetaStack.Common.Logging.LogLevel.Error = "{ERROR}";
-S031.MetaStack.Common.Logging.LogLevel.Warning = "{WARNING}";
-S031.MetaStack.Common.Logging.LogLevel.Info = "{INFO}";
-S031.MetaStack.Common.Logging.LogLevel.Debug = "{DEBUG}";
-S031.MetaStack.Common.Logging.LogLevel.Trace = "{TRACE}";
-S031.MetaStack.Common.Logging.LogLevel.None = "";
+﻿S031.MetaStack.Common.Logging.LogLevel.Critical={CRITICAL}
+S031.MetaStack.Common.Logging.LogLevel.Error={ERROR}
+S031.MetaStack.Common.Logging.LogLevel.Warning={WARNING}
+S031.MetaStack.Common.Logging.LogLevel.Info={INFO}
+S031.MetaStack.Common.Logging.LogLevel.Debug={DEBUG}
+S031.MetaStack.Common.Logging.LogLevel.Trace={TRACE}
+S031.MetaStack.Common.Logging.LogLevel.None=;
 
 S031.MetaStack.Common.PasswordGenerator.Generate.1=Password length can not be less than 6 characters
 S031.MetaStack.Common.PasswordGenerator.Generate.2=For specified conditions (PasswordGeneratorOptions), the password length can not be less than {0} characters

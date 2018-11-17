@@ -108,7 +108,7 @@ namespace S031.MetaStack.WinForms
 			// mnuTotal
 			//
 			ContextMenuStrip mnuTotal = new ContextMenuStrip();
-			EventHandler eh = new EventHandler(mnuTotal_Click);
+			EventHandler eh = new EventHandler(MnuTotal_Click);
 			mnuTotal.Items.Add(new ToolStripMenuItem("Сумма", null, eh) { Name = "mnuTotalSum" });
 			mnuTotal.Items.Add(new ToolStripMenuItem("Количество", null, eh) { Name = "mnuTotalCount" });
 			mnuTotal.Items.Add(new ToolStripMenuItem("Среднее", null, eh) { Name = "mnuTotalAverage" });
@@ -442,7 +442,7 @@ namespace S031.MetaStack.WinForms
 			}
 			base.OnKeyDown(e);
 		}
-		void mnuTotal_Click(object sender, EventArgs e)
+		private void MnuTotal_Click(object sender, EventArgs e)
 		{
 			ToolStripMenuItem mi = (sender as ToolStripMenuItem);
 			ContextMenuStrip ms = (mi.Owner as ContextMenuStrip);

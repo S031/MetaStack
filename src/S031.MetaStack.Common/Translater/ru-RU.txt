@@ -1,10 +1,10 @@
-﻿S031.MetaStack.Common.Logging.LogLevel.Critical = "{КАТАСТРОФА}";
-S031.MetaStack.Common.Logging.LogLevel.Error = "{ОШИБКА}";
-S031.MetaStack.Common.Logging.LogLevel.Warning = "{ВНИМАНИЕ}";
-S031.MetaStack.Common.Logging.LogLevel.Info = "{СООБЩЕНИЕ}";
-S031.MetaStack.Common.Logging.LogLevel.Debug = "{ОТЛАДКА}";
-S031.MetaStack.Common.Logging.LogLevel.Trace = "{ТРАССИРОВКА}";
-S031.MetaStack.Common.Logging.LogLevel.None = "";
+﻿S031.MetaStack.Common.Logging.LogLevel.Critical={КАТАСТРОФА}
+S031.MetaStack.Common.Logging.LogLevel.Error={ОШИБКА}
+S031.MetaStack.Common.Logging.LogLevel.Warning={ВНИМАНИЕ}
+S031.MetaStack.Common.Logging.LogLevel.Info={СООБЩЕНИЕ}
+S031.MetaStack.Common.Logging.LogLevel.Debug={ОТЛАДКА}
+S031.MetaStack.Common.Logging.LogLevel.Trace={ТРАССИРОВКА}
+S031.MetaStack.Common.Logging.LogLevel.None=;
 
 S031.MetaStack.Common.PasswordGenerator.Generate.1=Длинна пароля не может быть менее 6 символов
 S031.MetaStack.Common.PasswordGenerator.Generate.2=Для заданных условий (PasswordGeneratorOptions) длинна пароля не может быть менее {0} символов
