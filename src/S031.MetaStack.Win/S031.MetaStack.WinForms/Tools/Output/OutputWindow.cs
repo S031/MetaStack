@@ -5,30 +5,41 @@ using S031.MetaStack.Common.Logging;
 
 using ICSharpCode.TextEditor;
 using ICSharpCode.TextEditor.Document;
-
+using System.Data;
 
 namespace S031.MetaStack.WinForms
 {
 	public static class OutputWindow
 	{
 		private static WinForm _cd;
-		private static CEdit _editor;
+		private static DataTable _dt = null;
+
 
 		static OutputWindow()
 		{
 			_cd = new WinForm(WinFormStyle.Dialog);
+			_cd.Size = new Size(Screen.FromControl(_cd).WorkingArea.Width / 2, Screen.FromControl(_cd).WorkingArea.Height / 3); 
 			_cd.Text = "Окно сообщений";
 			_cd.Add<Panel>(WinFormConfig.SinglePageForm);
 			_cd.FormClosing += _cd_FormClosing;
 			TableLayoutPanel tlpRows = _cd.Items["FormRowsPanel"].LinkedControl as TableLayoutPanel;
 			tlpRows.Add(new WinFormItem($"LogView")
 			{
-				PresentationType = typeof(CEdit),
+				PresentationType = typeof(DBGridBase),
 				ControlTrigger = (cdi, ctrl) =>
 				{
-					_editor = (ctrl as CEdit);
-					_editor.SetHighlighting("LOG");
-					_editor.Dock = DockStyle.Fill;
+					DBGridBase grid = (ctrl as DBGridBase);
+					grid.AllowAddObject = false;
+					grid.AllowDelObject = false;
+					int i = grid.Columns.Add("MessageTime", "Время");
+					var col = grid.Columns[i];
+					col.DataPropertyName = "MessageTime";
+					i = grid.Columns.Add("MessageSource", "Статус");
+					grid.Columns[i].DataPropertyName = "MessageSource";
+					i = grid.Columns.Add("Message", "Описание события");
+					grid.Columns[i].DataPropertyName = "Message";
+					grid.Columns[i].Width = _cd.Width - grid.Columns[0].Width - grid.Columns[1].Width - 60;
+					grid.DataSource = GetDataSource();
 				}
 			});
 		}
@@ -49,36 +60,32 @@ namespace S031.MetaStack.WinForms
 			}
 		}
 
-		public static void Print(string message)
+		public static DataTable GetDataSource()
 		{
-			TextArea textArea = _editor.TextArea;
-			textArea.InsertString(message + "\n");
-
-			if (!_cd.Visible)
-				_cd.Visible = true;
+			if (_dt == null)
+			{
+				_dt = new DataTable("PipeReadData");
+				_dt.Columns.Add("MessageTime", typeof(DateTime));
+				_dt.Columns.Add(new DataColumn("MessageSource", typeof(string)) { MaxLength = 16 });
+				_dt.Columns.Add(new DataColumn("Message", typeof(string)) { MaxLength = 2048*1024 });
+			}
+			return _dt;
 		}
 
-		public static void GoEnd()
+
+		public static void Print(string message) => Print(LogLevels.None, message);
+
+		public static void Print(LogLevels level, string message)
 		{
-			IDocument document = _editor.Document;
-			_editor.TextArea.Caret.Position = document.OffsetToPosition(document.TextContent.Length);
+			_dt.Rows.Add(DateTime.Now, FileLog.Messages[level], message);
+			System.Windows.Forms.Application.DoEvents();
+
 		}
 
-		public static void GoTop()
+		public static void Print(LogLevels level, string[] messages)
 		{
-			IDocument document = _editor.Document;
-			_editor.TextArea.Caret.Position = document.OffsetToPosition(0);
-		}
-
-		public static void Print(LogLevels level, string message) =>
-			Print($"{FileLog.Messages[level]} {message}");
-
-		public static void Print(string[] messages)
-		{
-			System.Text.StringBuilder sb = new System.Text.StringBuilder();
 			foreach (string item in messages)
-				sb.AppendLine(item);
-			Print(sb.ToString());
+				Print(level, item);
 		}
 
 		public static void Focus()
@@ -88,8 +95,10 @@ namespace S031.MetaStack.WinForms
 
 		public static void Clear()
 		{
-			_editor.Text = string.Empty;
+			_dt.Rows.Clear();
 		}
-		public static CEdit GetEditor() => _editor;
+
+		public static void Show() => _cd.Visible = true;
+
 	}
 }

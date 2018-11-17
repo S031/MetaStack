@@ -42,7 +42,7 @@ namespace Metib.Business.Msfo
 					{
 						string result = await mdb.ExecuteAsync<string>($"exec kalv_TestForFct {i}");
 						pipe.Write(ctx, result);
-						System.Threading.Thread.Sleep(100);
+						//System.Threading.Thread.Sleep(50);
 						sb.AppendLine(result);
 					}
 					catch (Exception ex)

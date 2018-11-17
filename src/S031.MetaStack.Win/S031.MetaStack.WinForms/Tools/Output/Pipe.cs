@@ -4,23 +4,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-
+using System.Threading;
+using System.Data;
+using S031.MetaStack.Common.Logging;
+using S031.MetaStack.Common;
 
 namespace S031.MetaStack.WinForms
 {
 	public static class Pipe
 	{
-		private const int _dueue = 3000;
+		private const int _dueue = 1000;
 		private static Timer _timer = null;
 
 		public static void Start() =>
-			_timer = new Timer(Tick, OutputWindow.GetEditor(), _dueue, _dueue);
+			_timer = new Timer(Tick, OutputWindow.GetDataSource(), _dueue, _dueue);
 
 		public static void End(bool force = false)
 		{
 			if (!force)
-				Read(OutputWindow.GetEditor());
+				Read(OutputWindow.GetDataSource());
 
 			_timer?.Dispose();
 			_timer = null;
@@ -30,17 +32,18 @@ namespace S031.MetaStack.WinForms
 
 		private static void Tick(object state)
 		{
-			Read((CEdit)state);
+			Read((DataTable)state);
 		}
 
-		private static void Read(CEdit editor)
+		private static void Read(DataTable dt)
 		{
 			var result = ClientGate.Execute("Sys.PipeRead");
 			if (result.Read())
 			{
-				TextArea textArea = editor.TextArea;
-				textArea.InsertString((string)result[0] + "\n");
-				System.Windows.Forms.Application.DoEvents();
+				foreach (string messsage in ((string)result[0]).Split("\r\n".ToCharArray()))
+					if (!messsage.IsEmpty())
+						//dt.Rows.Add(DateTime.Now, LogLevels.Information, messsage);
+						OutputWindow.Print(LogLevels.Information, messsage);
 			}
 		}
 	}

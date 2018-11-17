@@ -19,51 +19,47 @@ namespace MetaStack.Win.TestConsole
 			//var connectionName = "SqliteDb";
 			using (FileLog l = new FileLog("TCPConnectorConnectTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
+				ClientGate.Logon();
 				l.Debug("Start performance test for Sys.Select");
-				int i = 0;
-				for (i = 0; i < 10000; i++)
+				//int i = 0;
+				//for (int i = 0; i < 10000; i++)
+				Parallel.For(0, 10000, (i) =>
 				{
-					var dr = ClientGate.Execute("Sys.Select",
-					   ClientGate.GetActionInfo("Sys.Select")
+					var dr = ClientGate.GetActionInfo("A_TestForFct")
 					   .GetInputParamTable()
-					   .SetHeader("ConnectionName", "Test")
-					   .UpdateHeaders()
 					   .AddNew()
-					   .SetValue("ParamName", "_viewName")
-					   .SetValue("ParamValue", "SysCat.SysSchema")
-					   .Update()
-					   .AddNew()
-					   .SetValue("ParamName", "_filter")
-					   .SetValue("ParamValue", "ObjectName = 'SysSchema'")
-					   .Update()
-					   );
+					   .SetValue("@ObjectName", "SysCat.SysSchemas")
+					   .SetValue("@IDs", "1")
+					   .Update();
+					ClientGate.Execute("A_TestForFct", dr);
 
 					if (i % 1000 == 0)
 					{
 						dr.Read();
-						Console.WriteLine($"{i}\t{dr["ObjectName"]}{DateTime.Now.Second}");
+						Console.WriteLine($"{i}\t{dr[0]}{DateTime.Now.Second}");
 					}
-				}
-				l.Debug($"End performance test for {i} Sys.Select");
+				});
+				l.Debug($"End performance test for {100} Sys.Select");
+				ClientGate.Logout();
 
-				l.Debug("Start performance test for logins");
-				for (i = 0; i < 10000; i++)
-				{
-					DataPackage dr = new DataPackage("ObjectName.String.64");
-					dr.SetHeader("ConnectionName", "Test");
-					dr.AddNew();
-					dr["ObjectName"] = "SysCat.SysSchema";
-					dr.Update();
+				//l.Debug("Start performance test for logins");
+				//for (i = 0; i < 10000; i++)
+				//{
+				//	DataPackage dr = new DataPackage("ObjectName.String.64");
+				//	dr.SetHeader("ConnectionName", "Test");
+				//	dr.AddNew();
+				//	dr["ObjectName"] = "SysCat.SysSchema";
+				//	dr.Update();
 
-					dr = ClientGate.Execute("Sys.GetSchema", dr);
-					if (i % 1000 == 0)
-					{
-						dr.Read();
-						Console.WriteLine($"{i}\t{DateTime.Now.Second}");
-						//Console.WriteLine(i);
-					}
-				}
-				l.Debug($"End performance test for {i} logins");
+				//	dr = ClientGate.Execute("Sys.GetSchema", dr);
+				//	if (i % 1000 == 0)
+				//	{
+				//		dr.Read();
+				//		Console.WriteLine($"{i}\t{DateTime.Now.Second}");
+				//		//Console.WriteLine(i);
+				//	}
+				//}
+				//l.Debug($"End performance test for {i} logins");
 			}
 		}
 	}

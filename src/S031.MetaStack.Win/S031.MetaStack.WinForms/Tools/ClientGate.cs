@@ -50,27 +50,10 @@ namespace S031.MetaStack.WinForms
 			else
 				password = sInfo.Password;
 
-				_connector = TCPConnector.Create();
-				_connector.Connect(userName, password);
-				if (isPrompt && savePassword)
-					CredentialManager.WriteCredential(_appName, userName, password);
-			//try
-			//{
-			//	_connector = TCPConnector.Create();
-			//	_connector.Connect(userName, password);
-			//	if (isPrompt && savePassword)
-			//		CredentialManager.WriteCredential(_appName, userName, password);
-			//}
-			//catch(TCPConnectorException ex)
-			//{
-			//	MessageBox.Show($"{ex.Message}\n{ex.RemoteStackTrace}", "Logon failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-			//	return false;
-			//}
-			//catch(Exception ex)
-			//{
-			//	MessageBox.Show($"{ex.Message}\n{ex.StackTrace}", "Logon failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-			//	return false;
-			//}
+			_connector = TCPConnector.Create();
+			_connector.Connect(userName, password);
+			if (isPrompt && savePassword)
+				CredentialManager.WriteCredential(_appName, userName, password);
 			return true;
 		}
 

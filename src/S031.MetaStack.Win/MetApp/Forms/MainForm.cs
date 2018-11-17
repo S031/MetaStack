@@ -357,11 +357,18 @@ namespace MetApp
 			   .SetValue("@ObjectName", _grid.SchemaName)
 			   .SetValue("@IDs", string.Join(",", _grid.Selection().Select(r=>r[_grid.IdColName].ToString())))
 			   .Update();
+			OutputWindow.Show();
 			OutputWindow.Print("Start...");
-			Pipe.Start();
-			ClientGate.Execute(mi.Name, dr);
-			Pipe.End();
-			OutputWindow.Print("Finish...");
+			System.Threading.Tasks.Task.Factory.StartNew(() =>
+			{
+				Pipe.Start();
+				ClientGate.Execute(mi.Name, dr);
+				Pipe.End();
+				OutputWindow.Print("Finish...");
+			});
+				//.GetAwaiter()
+				//.GetResult();
+			//Pipe.End();
 		}
 
 		void MenuRel_Click(object sender, EventArgs e)

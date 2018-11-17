@@ -28,8 +28,8 @@ namespace S031.MetaStack.WinForms.Connectors
 		const string _endPointConfigName = "TCPConnector";
 		static readonly RSAEncryptionPadding _padding = RSAEncryptionPadding.OaepSHA256;
 
-		private Socket _socket;
-		private NetworkStream _stream;
+		//private Socket _socket;
+		//private NetworkStream _stream;
 		private readonly string _host;
 		private readonly int _port;
 		//Connection info
@@ -60,35 +60,35 @@ namespace S031.MetaStack.WinForms.Connectors
 
 		private void InitSocket()
 		{
-			_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-			_socket.Connect(_host, _port);
-			_stream = new NetworkStream(_socket);
+			//_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+			//_socket.Connect(_host, _port);
+			//_stream = new NetworkStream(_socket);
 			_connected = false;
 		}
 
-		public bool Connected => _socket != null && _socket.Connected && _connected;
+		public bool Connected => _connected; // _socket != null && _socket.Connected && _connected;
 
 		public void Dispose()
 		{
 			Disconnect();
-			_stream.Close();
-			_socket.Close();
-			_stream.Dispose();
-			_socket.Dispose();
+			//_stream.Close();
+			//_socket.Close();
+			//_stream.Dispose();
+			//_socket.Dispose();
 		}
 
 		public TCPConnector Connect(string userName, string password)
 		{
-			if (_socket == null || !_socket.Connected)
-				InitSocket();
+			//if (_socket == null || !_socket.Connected)
+			//	InitSocket();
 			if (!_connected)
 				Connecting(userName, password);
 			return this;
 		}
 		private void Disconnect()
 		{
-			if (_socket == null || !_socket.Connected)
-				return;
+			//if (_socket == null || !_socket.Connected)
+			//	return;
 			if (!_connected)
 				return;
 			Execute("Sys.Logout", new DataPackage("Col1"));
@@ -109,7 +109,7 @@ namespace S031.MetaStack.WinForms.Connectors
 					.Concat(BitConverter.GetBytes(DateTime.Now.Millisecond)).ToArray())
 					.ToBASE64String();
 			paramTable.UpdateHeaders();
-			var response = SendAndRecieve(_stream, paramTable);
+			var response = SendAndRecieve(paramTable);
 			if (response.Headers.ContainsKey("Status") &&
 				(string)response.Headers["Status"] == "ERROR")
 				throw new TCPConnectorException(response);
@@ -132,7 +132,7 @@ namespace S031.MetaStack.WinForms.Connectors
 			request["UserName"] = userName;
 			request["PublicKey"] = clientPK;
 			request.Update();
-			var response = SendAndRecieve(_stream, request);
+			var response = SendAndRecieve(request);
 			if (response.Headers.ContainsKey("Status") &&
 				(string)response.Headers["Status"] == "ERROR")
 				throw new TCPConnectorException(response);
@@ -155,7 +155,7 @@ namespace S031.MetaStack.WinForms.Connectors
 					.EncryptBin(Encoding.UTF8.GetBytes(password))
 					.ToBASE64String();
 			request.Update();
-			response = SendAndRecieve(_stream, request);
+			response = SendAndRecieve(request);
 			if (response.Headers.ContainsKey("Status") &&
 				(string)response.Headers["Status"] == "ERROR")
 				throw new TCPConnectorException(response);
@@ -168,19 +168,44 @@ namespace S031.MetaStack.WinForms.Connectors
 			_connected = true;
 		}
 
-		//private static DataPackage SendAndRecieve(NetworkStream stream, DataPackage p)
-		//{
-		//	var data = p.ToArray();
-		//	stream.Write(BitConverter.GetBytes(data.Length), 0, 4);
-		//	stream.Write(data, 0, data.Length);
-		//	var buffer = new byte[4];
+		private DataPackage SendAndRecieve(DataPackage p)
+		{
+			using (var socket = CreateSocket(_host, _port))
+			using (var stream = new NetworkStream(socket))
+			{
+				var data = p.ToArray();
+				stream.Write(BitConverter.GetBytes(data.Length), 0, 4);
+				stream.Write(data, 0, data.Length);
 
-		//	stream.Read(buffer, 0, 4);
-		//	var byteCount = BitConverter.ToInt32(buffer, 0);
-		//	var res = new byte[byteCount];
-		//	stream.Read(res, 0, byteCount);
-		//	return new DataPackage(res);
-		//}
+				var buffer = new byte[4];
+				int ReadBytes = 0;
+				while (4 > ReadBytes)
+				{
+					ReadBytes += stream.Read(buffer, ReadBytes, 4 - ReadBytes);
+					if (ReadBytes == 0)
+						break;
+				}
+
+				var byteCount = BitConverter.ToInt32(buffer, 0);
+				var res = new byte[byteCount];
+				ReadBytes = 0;
+				while (byteCount > ReadBytes)
+				{
+					ReadBytes += stream.Read(res, ReadBytes, byteCount - ReadBytes);
+					if (ReadBytes == 0)
+						break;
+				}
+				socket.Shutdown(SocketShutdown.Both);
+				socket.Disconnect(false);
+				return new DataPackage(res);
+			}
+		}
+		private static Socket CreateSocket(string host, int port)
+		{
+			var _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+			_socket.Connect(host, port);
+			return _socket;
+		}
 
 		private static DataPackage SendAndRecieve(NetworkStream stream, DataPackage p)
 		{

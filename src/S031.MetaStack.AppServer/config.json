@@ -2,7 +2,7 @@
   "appSettings": {
     "auditEnabled": true,
     "language": "ru-RU",
-    "defaultConnection": "bankLocal",
+    "defaultConnection": "test",
     "SysCatConnection": "SQliteDb"
   },
   "ApplicationLogSettings": {
@@ -44,7 +44,7 @@
     "test": {
       "Description": "Virtual SQL Express 2017 server",
       "providerName": "System.Data.SqLClient",
-      "connectionString": "Data Source=SERGEY-SQL2016;Initial Catalog=MetaStack;Integrated Security=True;"
+      "connectionString": "Data Source=SERGEY-SQL2016;Initial Catalog=msfodb;Integrated Security=True;"
     },
     "AseDb": {
       "Description": "Sybase ASE 15 server",
