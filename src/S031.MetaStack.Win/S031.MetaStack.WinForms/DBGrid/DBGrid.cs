@@ -33,7 +33,7 @@ namespace S031.MetaStack.WinForms
 		private static bool _firstStart = true;
 
 		//Totals
-		private struct totalInfo
+		private struct TotalInfo
 		{
 			public bool Check;
 			public MacroType Type;
@@ -42,7 +42,7 @@ namespace S031.MetaStack.WinForms
 			public string totalString;
 			public DateTime totalDate;
 		}
-		private totalInfo[] totals;
+		private TotalInfo[] totals;
 		private bool freezeFooter;
 
 		//Clipboard Support
@@ -314,7 +314,7 @@ namespace S031.MetaStack.WinForms
 
 			int count = list.Count;
 			bool total = false;
-			totals = new totalInfo[xc.Attributes.Count];
+			totals = new TotalInfo[xc.Attributes.Count];
 			for (int i = 0; i < xc.Attributes.Count; i++)
 			{
 				totals[i].Check = false;

@@ -213,7 +213,7 @@ namespace MetApp
 					((ToolStripMenuItem)mnuBar.Items["Help"]).DropDownItems.AddRange(new ToolStripItem[] {
 						new ToolStripMenuItem("О программе...", ResourceManager.GetImage("Help"), MenuClick) { Name = "HelpAbout", Tag = DBBrowseCommandsEnum.HelpAbout },
 					});
-					showFavorites();
+					ShowFavorites();
 				}
 			};
 		}
@@ -351,7 +351,12 @@ namespace MetApp
 		void MenuRun_Click(object sender, EventArgs e)
 		{
 			ToolStripItem mi = (sender as ToolStripItem);
-			var dr = ClientGate.GetActionInfo(mi.Name)
+			ExecuteAction(mi.Name);
+		}
+
+		private void ExecuteAction(string actionId)
+		{
+			var dr = ClientGate.GetActionInfo(actionId)
 			   .GetInputParamTable()
 			   .AddNew()
 			   .SetValue("@ObjectName", _grid.SchemaName)
@@ -362,7 +367,7 @@ namespace MetApp
 			new System.Threading.Thread(() =>
 			{
 				Pipe.Start();
-				ClientGate.Execute(mi.Name, dr);
+				ClientGate.Execute(actionId, dr);
 				Pipe.End();
 				OutputWindow.Print("Finish...");
 			}).Start();
@@ -421,11 +426,8 @@ namespace MetApp
 					var m = GetFromMenuItems(menuRun.DropDownItems).Where(mi => mi != null);
 					string key = Chooser.Choose(m.Select(mi => new KeyValuePair<string, string>(mi.Name, mi.Text)), 0);
 					if (!key.IsEmpty())
-					{
-						//OpenRelated(m.FirstOrDefault(mi => mi.Text == key).Name);
-					}
+						ExecuteAction(key);
 				}
-
 			}
 			else if (e.KeyData == Keys.F7)
 			{

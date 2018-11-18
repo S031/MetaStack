@@ -22,7 +22,7 @@ namespace S031.MetaStack.WinForms
 					DataType = typeof(T),
 					Value = value,
 				});
-				cd.Items["MainPanel"].LinkedControl.Add<TableLayoutPanel>(WinFormConfig.StdButtons);
+				cd.Items["MainPanel"].LinkedControl.Add<TableLayoutPanel>(WinFormConfig.StdButtons());
 				if (cd.ShowDialog() == DialogResult.OK)
 				{
 					cd.Save();
@@ -46,7 +46,7 @@ namespace S031.MetaStack.WinForms
 				p.ColumnStyles[1].Width = 62;
 				foreach (var item in items)
 					p.Add(item);
-				cd.Items["MainPanel"].LinkedControl.Add<TableLayoutPanel>(WinFormConfig.StdButtons);
+				cd.Items["MainPanel"].LinkedControl.Add<TableLayoutPanel>(WinFormConfig.StdButtons());
 				if (cd.ShowDialog() == DialogResult.OK)
 				{
 					cd.Save();

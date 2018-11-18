@@ -11,7 +11,7 @@ using S031.MetaStack.Common;
 
 namespace S031.MetaStack.WinForms
 {
-	public static class WinFormConfig
+	public  static partial class WinFormConfig
 	{
 		public static WinFormItem SinglePageForm =>
 			new WinFormItem("MainPanel",
@@ -30,7 +30,6 @@ namespace S031.MetaStack.WinForms
 						{
 							(ctrl as TableLayoutPanel)?.RowStyles.Add(new RowStyle(SizeType.AutoSize, 100));
 						};
-
 					}
 				})
 			{
@@ -43,13 +42,13 @@ namespace S031.MetaStack.WinForms
 					mainPanel.BorderStyle = BorderStyle.FixedSingle;
 				}
 			};
-		public static WinFormItem StdButtons =>
+		public static WinFormItem StdButtons(string OKCaption = "&Запись", string CancelCaption = "&Отмена") =>
 			new WinFormItem("FormRowsBottomPanel",
 				new WinFormItem("StdButtonsCells",
 					new WinFormItem("OK")
 					{
 						PresentationType = typeof(Button),
-						Value = "&Запись",
+						Value = OKCaption,
 						CellAddress = new Pair<int>(1, 0),
 						ControlTrigger = (i, c) =>
 						{
@@ -76,7 +75,7 @@ namespace S031.MetaStack.WinForms
 					new WinFormItem("Cancel")
 					{
 						PresentationType = typeof(Button),
-						Value = "&Отмена",
+						Value = CancelCaption,
 						CellAddress = new Pair<int>(2, 0),
 						ControlTrigger = (i, c) =>
 						{

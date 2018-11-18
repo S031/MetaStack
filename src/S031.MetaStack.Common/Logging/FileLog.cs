@@ -35,8 +35,8 @@ namespace S031.MetaStack.Common.Logging
 			{ LogLevels.Warning, Translater.GetString("S031.MetaStack.Common.Logging.LogLevel.Warning") },
 			{ LogLevels.Information, Translater.GetString("S031.MetaStack.Common.Logging.LogLevel.Info") },
 			{ LogLevels.Debug, Translater.GetString("S031.MetaStack.Common.Logging.LogLevel.Debug") },
-			{ LogLevels.None, Translater.GetString("S031.MetaStack.Common.Logging.LogLevel.Trace") },
-			{ LogLevels.Trace, Translater.GetString("S031.MetaStack.Common.Logging.LogLevel.None") }
+			{ LogLevels.None, Translater.GetString("S031.MetaStack.Common.Logging.LogLevel.None") },
+			{ LogLevels.Trace, Translater.GetString("S031.MetaStack.Common.Logging.LogLevel.Trace") }
 		};
 
 		static readonly ConcurrentDictionary<string, Queue<string>> _queues = 
@@ -65,11 +65,11 @@ namespace S031.MetaStack.Common.Logging
 		public void Write(LogLevels level, string message) => Write(level, "", message);
 		public void Write(LogLevels level, string source, string message)
 		{
-			putMessage(level, source, message);
+			PutMessage(level, source, message);
 			if (_queue.Count > _settings.CacheSize || level >= _settings.LevelToFlush)
 				Flush();
 		}
-		private void putMessage(LogLevels level, string source, string message)
+		private void PutMessage(LogLevels level, string source, string message)
 		{
 			if (_settings.Filter(_logName, level))
 			{
@@ -87,7 +87,7 @@ namespace S031.MetaStack.Common.Logging
 		{
 			if (_queue.Count > 0)
 			{
-				string filePath = obtainPath();
+				string filePath = ObtainPath();
 				lock (_lockObj)
 				{
 					using (FileStream sourceStream = new FileStream(filePath,
@@ -115,7 +115,7 @@ namespace S031.MetaStack.Common.Logging
 			}
 		}
 
-		string obtainPath()
+		string ObtainPath()
 		{
 			string path = _settings.DateFolderMask.IsEmpty() ? _settings.BasePath :
 				Path.Combine(_settings.BasePath, DateTime.Now.ToString(_settings.DateFolderMask));

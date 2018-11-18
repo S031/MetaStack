@@ -282,6 +282,7 @@ namespace S031.MetaStack.WinForms
 		protected virtual object[] ShowBrowse(WinFormItem cdi, string filter, params string[] fieldListToReturn)
 		{
 			object[] result = null;
+			//!!!
 			//XMLForm xf = new XMLForm();
 
 			//if (xf.Read(cdi.SuperForm))
@@ -586,35 +587,43 @@ namespace S031.MetaStack.WinForms
 		public static string ShowStringDialog(string source, string language)
 		{
 			string destination = null;
-			//using (WinForm cd = new WinForm(WinFormStyle.Dialog))
-			//{
-			//	cd.Width = 680;
-			//	cd.Height = (int)(cd.Width / vbo.GoldenRatio);
-			//	TableLayoutPanel tp = cd.AddCells("WorkTable1", 0, new Size(1, 1), WinFormCellStyle.AutoSize);
-			//	tp.Parent.Dock = DockStyle.Fill;
-			//	CEdit ce = cd.AddControl<CEdit>("Source", tp);
-			//	ce.Dock = DockStyle.Fill;
-			//	ce.Text = source;
-			//	if (!string.IsNullOrEmpty(language))
-			//	{
-			//		ce.SetHighlighting(language);
-			//		cd.AddCodeCompletion("Source", language);
-			//	}
-			//	ce.ExitOnEscape = true;
-			//	cd.AddStdButtons();
-			//	Button btn = cd.AddControl<Button>("Wrap", cd.ButtonTablePanel, new WinFormAddress(0, 0));
-			//	btn.Text = "&Перенос строк";
-			//	btn.Click += new EventHandler((sender, e) =>
-			//	{
-			//		int len = Convert.ToInt32(ce.Width / ce.Font.SizeInPoints);
-			//		string s = ce.Text.Wrap(len);
-			//		ce.Text = s;
-			//		ce.Refresh();
+			WinFormItem browser = new WinFormItem($"Source")
+			{
+				PresentationType = typeof(CEdit),
+				ControlTrigger = (cdi, ctrl) =>
+				{
+					var editor = (ctrl as CEdit);
+					if (!string.IsNullOrEmpty(language))
+					{
+						editor.SetHighlighting(language);
+						cdi.Parent.AddCodeCompletion("Source", language);
+					}
+					editor.Dock = DockStyle.Fill;
+					editor.Text = source;
+					editor.ExitOnEscape = true;
+				}
+			};
 
-			//	});
-			//	if (cd.ShowDialog() == DialogResult.OK)
-			//		destination = ce.Text;
-			//}
+			using (WinForm cd = new BaseViewForm(browser))
+			{
+				var ce = cd.GetItem("Source").As<CEdit>();
+				Button btn = cd
+					.GetControl<TableLayoutPanel>("StdButtonsCells")
+					.Add<Button>(new WinFormItem("Wrap") { CellAddress = new Pair<int>(0, 0) });
+				btn.Width = ButtonWidth * 2;
+				btn.Text = "Перенос строк";
+				btn.Dock = DockStyle.Left;
+				btn.Click += new EventHandler((sender, e) =>
+				{
+					int len = Convert.ToInt32(ce.Width / ce.Font.SizeInPoints);
+					string s = ce.Text.Wrap(len);
+					ce.Text = s;
+					ce.Refresh();
+
+				});
+				if (cd.ShowDialog() == DialogResult.OK)
+					destination = ce.Text;
+			}
 			return destination;
 		}
 		#endregion PrivateMembers

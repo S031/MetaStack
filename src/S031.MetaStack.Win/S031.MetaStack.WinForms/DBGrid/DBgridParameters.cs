@@ -133,7 +133,7 @@ namespace S031.MetaStack.WinForms
 					if (showType == DBGridParamShowType.ShowAll || item.Visible)
 						p.Add(item);
 
-				cd.Items["MainPanel"].LinkedControl.Add<TableLayoutPanel>(WinFormConfig.StdButtons);
+				cd.Items["MainPanel"].LinkedControl.Add<TableLayoutPanel>(WinFormConfig.StdButtons());
 				cd.Size = new Size(450, (int)(450 / vbo.GoldenRatio));
 				cd.MinimumSize = cd.Size;
 				cd.AcceptButton = null;
@@ -145,7 +145,7 @@ namespace S031.MetaStack.WinForms
 				if (cd.ShowDialog() == DialogResult.OK)
 				{
 					cd.Save();
-					save2Cash();
+					Save2Cash();
 					return DialogResult.OK;
 				}
 				else
@@ -153,7 +153,7 @@ namespace S031.MetaStack.WinForms
 			}
 		}
 
-		private void save2Cash()
+		private void Save2Cash()
 		{
 			var d = _items.FirstOrDefault(item => item.ConstName.ToLower() == "bs_datestart");
 			if (d != null)

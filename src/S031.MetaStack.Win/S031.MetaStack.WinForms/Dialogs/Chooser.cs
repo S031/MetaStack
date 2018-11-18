@@ -39,9 +39,8 @@ namespace S031.MetaStack.WinForms
 					});
 					i++;
 				}
-				cd.Items["MainPanel"].LinkedControl.Add<TableLayoutPanel>(WinFormConfig.StdButtons);
+				cd.Items["MainPanel"].LinkedControl.Add<TableLayoutPanel>(WinFormConfig.StdButtons("&Выбор"));
 				Button btn = cd.GetControl<Button>("OK");
-				btn.Text = "Выбор";
 				cd.AcceptButton = btn;
 
 				cd.StartPosition = FormStartPosition.CenterParent;
@@ -54,7 +53,7 @@ namespace S031.MetaStack.WinForms
 						.FirstOrDefault(rb => rb != null && rb.Checked).Tag;
 				}
 				else
-					return default(TKey);
+					return default;
 			}
 		}
 	}

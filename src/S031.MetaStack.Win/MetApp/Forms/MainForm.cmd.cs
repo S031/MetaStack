@@ -17,7 +17,7 @@ namespace MetApp
 			_commands[DBBrowseCommandsEnum.FilePrintCurrentForm] = () => ReportManager.PrintCurrentForm(_grid);
 			//_commands[DBBrowseCommandsEnum.FilePrint] = cmdFilePrint;
 			//_commands[DBBrowseCommandsEnum.FileExportObjects] = cmdFileExportObjects;
-			_commands[DBBrowseCommandsEnum.FileExportResults] = cmdFileExportResults;
+			_commands[DBBrowseCommandsEnum.FileExportResults] = CmdFileExportResults;
 			//_commands[DBBrowseCommandsEnum.FileImportObjects] = cmdFileImportObjects;
 
 			_commands[DBBrowseCommandsEnum.EditFind] = () => _grid.OnFindFirst(new ActionEventArgs());
@@ -46,7 +46,7 @@ namespace MetApp
 			//_commands[DBBrowseCommandsEnum.ToolsReportDesigner] = () => ReportManager.Design(dbGrid);
 			//_commands[DBBrowseCommandsEnum.ToolsRunFromAll] = cmdRunFromAll;
 
-			_commands[DBBrowseCommandsEnum.FavoritesAdd] = cmdFavoritesAdd;
+			_commands[DBBrowseCommandsEnum.FavoritesAdd] = CmdFavoritesAdd;
 			//_commands[DBBrowseCommandsEnum.FavoritesEdit] = cmdFavoritesEdit;
 
 			_commands[DBBrowseCommandsEnum.HelpAbout] = () => MessageBox.Show(
@@ -55,13 +55,13 @@ namespace MetApp
 				MessageBoxIcon.Information);
 		}
 
-		void cmdFavoritesAdd()
+		void CmdFavoritesAdd()
 		{
 			//Favorites.Add(dbGrid.Form["FormName"], this.Caption);
-			showFavorites();
+			ShowFavorites();
 		}
 
-		void showFavorites()
+		void ShowFavorites()
 		{
 			ToolStripMenuItem mi = (this.GetControl<MenuStrip>("MenuBar").Items["Favorites"] as ToolStripMenuItem);
 			mi.DropDownItems.Clear();
@@ -80,7 +80,7 @@ namespace MetApp
 			//}
 		}
 
-		void cmdFileExportResults()
+		void CmdFileExportResults()
 		{
 			string fileName = _grid.Schema.Name.Replace(".", "-");
 			ReportExportFormat format = ReportManager.GetExportReportFormat(fileName, ReportExportFormats.Formats.First().Value.ID);

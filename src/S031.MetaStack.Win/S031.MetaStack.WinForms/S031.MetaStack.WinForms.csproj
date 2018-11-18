@@ -30,6 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -202,9 +203,12 @@
     <Compile Include="Forms\CodeCompletion\CodeCompletionProvider.cs" />
     <Compile Include="Forms\ControlExtensions.cs" />
     <Compile Include="Dialogs\InputBox.cs" />
+    <Compile Include="Forms\Styles\BaseViewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\WinForm.cs" />
     <Compile Include="Forms\WinFormItem.cs" />
-    <Compile Include="Forms\WinFormStyles.cs" />
+    <Compile Include="Forms\Styles\WinFormStyles.cs" />
     <Compile Include="Interfaces\IObjectAction.cs" />
     <Compile Include="Interfaces\IObjectBase.cs" />
     <Compile Include="Interfaces\IObjectEditor.cs" />

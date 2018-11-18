@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using S031.MetaStack.Common;
+using S031.MetaStack.Common.Logging;
 using S031.MetaStack.Core.Actions;
 using S031.MetaStack.Core.App;
 using S031.MetaStack.Core.Data;
@@ -47,7 +48,7 @@ namespace Metib.Business.Msfo
 					}
 					catch (Exception ex)
 					{
-						return DataPackage.CreateErrorPackage(ex);
+						sb.AppendLine($"{LogLevels.Error} {ex.Message}");
 					}
 				}
 			}

@@ -28,7 +28,7 @@ namespace S031.MetaStack.WinForms
 				.CreateJMXRepo()
 				.GetSchema(objectName);
 			this.Add<Panel>(WinFormConfig.SinglePageForm);
-			this.LoadDataComplete += (c, e) => addSTDButtons();
+			this.LoadDataComplete += (c, e) => AddSTDButtons();
 		}
 
 
@@ -159,14 +159,12 @@ namespace S031.MetaStack.WinForms
 			}
 			return item;
 		}
-		private void addSTDButtons()
+		private void AddSTDButtons()
 		{
-			Items["MainPanel"].LinkedControl.Add<TableLayoutPanel>(WinFormConfig.StdButtons);
+			Items["MainPanel"].LinkedControl.Add<TableLayoutPanel>(WinFormConfig.StdButtons("&Сохранить","&Закрыть" ));
 			Button okButton = GetItem("OK").As<Button>();
 			Button cancelButton = GetItem("Cancel").As<Button>();
 			okButton.Enabled = (IsNew && _objectSource != null && _objectSource.ID != 0);
-			okButton.Text = "&Сохранить";
-			cancelButton.Text = "&Закрыть";
 
 			GetItem("OK").DisabledSTDActions.Add("Click");
 			okButton.Click += new EventHandler((sender, e) =>
