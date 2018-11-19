@@ -20,8 +20,8 @@ namespace ICSharpCode.TextEditor.Gui.CompletionWindow
 		VScrollBar vScrollBar = new VScrollBar();
 		ICompletionDataProvider dataProvider;
 		IDocument document;
-		bool showDeclarationWindow = true;
-		bool fixedListViewWidth = true;
+		readonly bool showDeclarationWindow = true;
+		readonly bool fixedListViewWidth = true;
 		const int ScrollbarWidth = 16;
 		const int MaxListLength = 10;
 
@@ -41,8 +41,10 @@ namespace ICSharpCode.TextEditor.Gui.CompletionWindow
 			if (completionData == null || completionData.Length == 0) {
 				return null;
 			}
-			CodeCompletionWindow codeCompletionWindow = new CodeCompletionWindow(completionDataProvider, completionData, parent, control, showDeclarationWindow, fixedListViewWidth);
-			codeCompletionWindow.CloseWhenCaretAtBeginning = firstChar == '\0';
+			CodeCompletionWindow codeCompletionWindow = new CodeCompletionWindow(completionDataProvider, completionData, parent, control, showDeclarationWindow, fixedListViewWidth)
+			{
+				CloseWhenCaretAtBeginning = firstChar == '\0'
+			};
 			codeCompletionWindow.ShowCompletionWindow();
 			return codeCompletionWindow;
 		}
@@ -62,10 +64,12 @@ namespace ICSharpCode.TextEditor.Gui.CompletionWindow
 				startOffset -= completionDataProvider.PreSelection.Length + 1;
 				endOffset--;
 			}
-			
-			codeCompletionListView = new CodeCompletionListView(completionData);
-			codeCompletionListView.ImageList = completionDataProvider.ImageList;
-			codeCompletionListView.Dock = DockStyle.Fill;
+
+			codeCompletionListView = new CodeCompletionListView(completionData)
+			{
+				ImageList = completionDataProvider.ImageList,
+				Dock = DockStyle.Fill
+			};
 			codeCompletionListView.SelectedItemChanged += new EventHandler(CodeCompletionListViewSelectedItemChanged);
 			codeCompletionListView.DoubleClick += new EventHandler(CodeCompletionListViewDoubleClick);
 			codeCompletionListView.Click  += new EventHandler(CodeCompletionListViewClick);

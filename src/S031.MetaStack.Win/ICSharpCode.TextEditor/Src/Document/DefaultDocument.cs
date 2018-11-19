@@ -394,16 +394,12 @@ namespace ICSharpCode.TextEditor.Document
 		
 		void OnDocumentAboutToBeChanged(DocumentEventArgs e)
 		{
-			if (DocumentAboutToBeChanged != null) {
-				DocumentAboutToBeChanged(this, e);
-			}
+			DocumentAboutToBeChanged?.Invoke(this, e);
 		}
 		
 		void OnDocumentChanged(DocumentEventArgs e)
 		{
-			if (DocumentChanged != null) {
-				DocumentChanged(this, e);
-			}
+			DocumentChanged?.Invoke(this, e);
 		}
 		
 		public event DocumentEventHandler DocumentAboutToBeChanged;
@@ -433,16 +429,12 @@ namespace ICSharpCode.TextEditor.Document
 		
 		public void CommitUpdate()
 		{
-			if (UpdateCommited != null) {
-				UpdateCommited(this, EventArgs.Empty);
-			}
+			UpdateCommited?.Invoke(this, EventArgs.Empty);
 		}
 		
 		void OnTextContentChanged(EventArgs e)
 		{
-			if (TextContentChanged != null) {
-				TextContentChanged(this, e);
-			}
+			TextContentChanged?.Invoke(this, e);
 		}
 		
 		public event EventHandler UpdateCommited;

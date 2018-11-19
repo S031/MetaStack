@@ -68,7 +68,7 @@ namespace S031.MetaStack.WinForms
 
 	public static class ReportExportFormats
 	{
-		static Dictionary<string, ReportExportFormat> formats = new Dictionary<string, ReportExportFormat>(System.StringComparer.CurrentCultureIgnoreCase)
+		private static readonly Dictionary<string, ReportExportFormat> formats = new Dictionary<string, ReportExportFormat>(System.StringComparer.CurrentCultureIgnoreCase)
 		{
 			{"xls",new ReportExportFormat(){ID = "xls", Description = "MS Excel", FileMask="*.xls", FileMaskDescription="(*.xls)",
 				CreateParam=new ReportCreateParam(){ Border=2, Period=true, MultiLine=true, Sign=false, TitleOnPage=false}}},

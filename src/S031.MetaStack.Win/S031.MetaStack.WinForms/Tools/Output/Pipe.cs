@@ -19,7 +19,7 @@ namespace S031.MetaStack.WinForms
 		/// <summary>
 		/// Start reading from server pipe channal
 		/// </summary>
-		/// <param name="dueue">period for request server process state</param>
+		/// <param name="dueue">period for request server process state default 5 sec</param>
 		public static void Start(int dueue = _dueue) =>
 			_timer = new Timer(Tick, null, _dueue, _dueue);
 

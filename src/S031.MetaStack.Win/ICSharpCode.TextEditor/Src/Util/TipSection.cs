@@ -14,7 +14,7 @@ namespace ICSharpCode.TextEditor.Util
 	abstract class TipSection
 	{
 		SizeF    tipAllocatedSize;
-		Graphics tipGraphics;
+		readonly Graphics tipGraphics;
 		SizeF    tipMaxSize;
 		SizeF    tipRequiredSize;
 		

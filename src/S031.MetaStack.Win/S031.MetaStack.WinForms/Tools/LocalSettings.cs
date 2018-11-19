@@ -6,7 +6,7 @@ namespace S031.MetaStack.WinForms
 	[global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
 	internal sealed class LocalSettings : global::System.Configuration.ApplicationSettingsBase
 	{
-		private static LocalSettings defaultInstance = ((LocalSettings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new LocalSettings())));
+		private static readonly LocalSettings defaultInstance = ((LocalSettings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new LocalSettings())));
 
 		LocalSettings()
 		{

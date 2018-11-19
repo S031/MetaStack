@@ -15,7 +15,7 @@ namespace ICSharpCode.TextEditor.Document
 {
 	public class FileSyntaxModeProvider : ISyntaxModeFileProvider
 	{
-		string    directory;
+		readonly string    directory;
 		List<SyntaxMode> syntaxModes = null;
 		
 		public ICollection<SyntaxMode> SyntaxModes {

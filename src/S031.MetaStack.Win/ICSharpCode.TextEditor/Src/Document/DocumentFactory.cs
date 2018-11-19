@@ -22,12 +22,16 @@ namespace ICSharpCode.TextEditor.Document
 		/// </remarks>
 		public IDocument CreateDocument()
 		{
-			DefaultDocument doc = new DefaultDocument();
-			doc.TextBufferStrategy  = new GapTextBufferStrategy();
-			doc.FormattingStrategy  = new DefaultFormattingStrategy();
+			DefaultDocument doc = new DefaultDocument
+			{
+				TextBufferStrategy = new GapTextBufferStrategy(),
+				FormattingStrategy = new DefaultFormattingStrategy()
+			};
 			doc.LineManager         = new LineManager(doc, null);
-			doc.FoldingManager      = new FoldingManager(doc, doc.LineManager);
-			doc.FoldingManager.FoldingStrategy       = null; //new ParserFoldingStrategy();
+			doc.FoldingManager = new FoldingManager(doc, doc.LineManager)
+			{
+				FoldingStrategy = null //new ParserFoldingStrategy();
+			};
 			doc.MarkerStrategy      = new MarkerStrategy(doc);
 			doc.BookmarkManager     = new BookmarkManager(doc, doc.LineManager);
 			return doc;

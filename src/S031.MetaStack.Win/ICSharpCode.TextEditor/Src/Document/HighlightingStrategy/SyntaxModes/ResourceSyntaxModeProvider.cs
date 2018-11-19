@@ -15,7 +15,7 @@ namespace ICSharpCode.TextEditor.Document
 {
 	public class ResourceSyntaxModeProvider : ISyntaxModeFileProvider
 	{
-		List<SyntaxMode> syntaxModes = null;
+		readonly List<SyntaxMode> syntaxModes = null;
 		
 		public ICollection<SyntaxMode> SyntaxModes {
 			get {

@@ -212,10 +212,12 @@ namespace ICSharpCode.TextEditor.Document
 		
 		public LineSegment InsertSegmentAfter(LineSegment segment, int length)
 		{
-			LineSegment newSegment = new LineSegment();
-			newSegment.TotalLength = length;
-			newSegment.DelimiterLength = segment.DelimiterLength;
-			
+			LineSegment newSegment = new LineSegment
+			{
+				TotalLength = length,
+				DelimiterLength = segment.DelimiterLength
+			};
+
 			newSegment.treeEntry = InsertAfter(segment.treeEntry.it.node, newSegment);
 			return newSegment;
 		}
@@ -322,9 +324,11 @@ namespace ICSharpCode.TextEditor.Document
 		public void Clear()
 		{
 			tree.Clear();
-			LineSegment emptySegment = new LineSegment();
-			emptySegment.TotalLength = 0;
-			emptySegment.DelimiterLength = 0;
+			LineSegment emptySegment = new LineSegment
+			{
+				TotalLength = 0,
+				DelimiterLength = 0
+			};
 			tree.Add(new RBNode(emptySegment));
 			emptySegment.treeEntry = GetEnumeratorForIndex(0);
 			#if DEBUG
@@ -381,7 +385,7 @@ namespace ICSharpCode.TextEditor.Document
 			/// An invalid enumerator value. Calling MoveNext on the invalid enumerator
 			/// will always return false, accessing Current will throw an exception.
 			/// </summary>
-			public static readonly Enumerator Invalid = default(Enumerator);
+			public static readonly Enumerator Invalid = default;
 			
 			internal RedBlackTreeIterator<RBNode> it;
 			

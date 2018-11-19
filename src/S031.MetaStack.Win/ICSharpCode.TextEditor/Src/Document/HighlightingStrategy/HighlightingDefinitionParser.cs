@@ -64,11 +64,14 @@ namespace ICSharpCode.TextEditor.Document
 				XmlElement environment = doc.DocumentElement["Environment"];
 				if (environment != null) {
 					foreach (XmlNode node in environment.ChildNodes) {
-						if (node is XmlElement) {
-							XmlElement el = (XmlElement)node;
-							if (el.Name == "Custom") {
+						if (node is XmlElement el)
+						{
+							if (el.Name == "Custom")
+							{
 								highlighter.SetColorFor(el.GetAttribute("name"), el.HasAttribute("bgcolor") ? new HighlightBackground(el) : new HighlightColor(el));
-							} else {
+							}
+							else
+							{
 								highlighter.SetColorFor(el.Name, el.HasAttribute("bgcolor") ? new HighlightBackground(el) : new HighlightColor(el));
 							}
 						}

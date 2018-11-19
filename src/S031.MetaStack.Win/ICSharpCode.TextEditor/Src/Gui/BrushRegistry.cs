@@ -26,8 +26,8 @@ namespace ICSharpCode.TextEditor
 		public static Brush GetBrush(Color color)
 		{
 			lock (brushes) {
-				Brush brush;
-				if (!brushes.TryGetValue(color, out brush)) {
+				if (!brushes.TryGetValue(color, out Brush brush))
+				{
 					brush = new SolidBrush(color);
 					brushes.Add(color, brush);
 				}
@@ -38,8 +38,8 @@ namespace ICSharpCode.TextEditor
 		public static Pen GetPen(Color color)
 		{
 			lock (pens) {
-				Pen pen;
-				if (!pens.TryGetValue(color, out pen)) {
+				if (!pens.TryGetValue(color, out Pen pen))
+				{
 					pen = new Pen(color);
 					pens.Add(color, pen);
 				}
@@ -52,10 +52,12 @@ namespace ICSharpCode.TextEditor
 		public static Pen GetDotPen(Color color)
 		{
 			lock (dotPens) {
-				Pen pen;
-				if (!dotPens.TryGetValue(color, out pen)) {
-					pen = new Pen(color);
-					pen.DashPattern = dotPattern;
+				if (!dotPens.TryGetValue(color, out Pen pen))
+				{
+					pen = new Pen(color)
+					{
+						DashPattern = dotPattern
+					};
 					dotPens.Add(color, pen);
 				}
 				return pen;

@@ -20,12 +20,11 @@ namespace ICSharpCode.TextEditor.Document
 	public class HighlightColor
 	{
 		Color  color;
-		Color  backgroundcolor = System.Drawing.Color.WhiteSmoke;
-		
-		bool   bold   = false;
-		bool   italic = false;
-		bool   hasForeground = false;
-		bool   hasBackground = false;
+		readonly Color  backgroundcolor = System.Drawing.Color.WhiteSmoke;
+		readonly bool   bold   = false;
+		readonly bool   italic = false;
+		readonly bool   hasForeground = false;
+		readonly bool   hasBackground = false;
 		
 		public bool HasForeground {
 			get {

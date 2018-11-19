@@ -79,9 +79,7 @@ namespace ICSharpCode.TextEditor.Document
 		
 		protected virtual void OnDocumentChanged(EventArgs e)
 		{
-			if (DocumentChanged != null) {
-				DocumentChanged(this, e);
-			}
+			DocumentChanged?.Invoke(this, e);
 		}
 		
 		public bool IsEnabled {
@@ -104,9 +102,7 @@ namespace ICSharpCode.TextEditor.Document
 		
 		protected virtual void OnIsEnabledChanged(EventArgs e)
 		{
-			if (IsEnabledChanged != null) {
-				IsEnabledChanged(this, e);
-			}
+			IsEnabledChanged?.Invoke(this, e);
 		}
 		
 		public int LineNumber {

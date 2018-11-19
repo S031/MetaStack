@@ -12,8 +12,8 @@ namespace ICSharpCode.TextEditor.Document
 {
 	public class GapTextBufferStrategy : ITextBufferStrategy
 	{
-		#if DEBUG
-		int creatorThread = System.Threading.Thread.CurrentThread.ManagedThreadId;
+#if DEBUG
+		readonly int creatorThread = System.Threading.Thread.CurrentThread.ManagedThreadId;
 		
 		void CheckThread()
 		{

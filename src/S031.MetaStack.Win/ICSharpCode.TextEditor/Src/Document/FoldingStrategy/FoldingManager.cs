@@ -322,9 +322,7 @@ namespace ICSharpCode.TextEditor.Document
 		
 		public void NotifyFoldingsChanged(EventArgs e)
 		{
-			if (FoldingsChanged != null) {
-				FoldingsChanged(this, e);
-			}
+			FoldingsChanged?.Invoke(this, e);
 		}
 		
 		

@@ -337,23 +337,17 @@ namespace ICSharpCode.TextEditor.Document
 		
 		void OnLineCountChanged(LineCountChangeEventArgs e)
 		{
-			if (LineCountChanged != null) {
-				LineCountChanged(this, e);
-			}
+			LineCountChanged?.Invoke(this, e);
 		}
 		
 		void OnLineLengthChanged(LineLengthChangeEventArgs e)
 		{
-			if (LineLengthChanged != null) {
-				LineLengthChanged(this, e);
-			}
+			LineLengthChanged?.Invoke(this, e);
 		}
 		
 		void OnLineDeleted(LineEventArgs e)
 		{
-			if (LineDeleted != null) {
-				LineDeleted(this, e);
-			}
+			LineDeleted?.Invoke(this, e);
 		}
 		
 		public event EventHandler<LineLengthChangeEventArgs> LineLengthChanged;

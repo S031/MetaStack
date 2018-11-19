@@ -25,9 +25,7 @@ namespace ICSharpCode.TextEditor.Util
 		
 		public CheckedList(IList<T> baseList)
 		{
-			if (baseList == null)
-				throw new ArgumentNullException("baseList");
-			this.baseList = baseList;
+			this.baseList = baseList ?? throw new ArgumentNullException("baseList");
 			this.threadID = Thread.CurrentThread.ManagedThreadId;
 		}
 		

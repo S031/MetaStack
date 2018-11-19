@@ -52,7 +52,7 @@ namespace MetApp
 				Sign = (bool)setup["Sign"]
 			};
 
-			StiReport report = makeReport(grid, rcp);
+			StiReport report = MakeReport(grid, rcp);
 			PrepareReport(report);
 			report.Render(true);
 			report.Show(false);
@@ -74,7 +74,7 @@ namespace MetApp
 				Sign = (bool)setup["Sign"]
 			};
 
-			StiReport report = makeReport(grid, rcp);
+			StiReport report = MakeReport(grid, rcp);
 			PrepareReport(report);
 			report.Design(false);
 		}
@@ -102,12 +102,12 @@ namespace MetApp
 			if (grid == null)
 				return;
 
-			StiReport report = makeReport(grid, format.CreateParam);
+			StiReport report = MakeReport(grid, format.CreateParam);
 			report.Render(true);
-			report.ExportDocument(getExportFormat(format.ID), format.CreateParam.ExportFileName);
+			report.ExportDocument(GetExportFormat(format.ID), format.CreateParam.ExportFileName);
 		}
 
-		static StiExportFormat getExportFormat(string ID)
+		static StiExportFormat GetExportFormat(string ID)
 		{
 			StiExportFormat stiFormat = StiExportFormat.Text;
 			switch (ID)
@@ -232,10 +232,10 @@ namespace MetApp
 					{
 						report.Render(true);
 						if (format.CreateParam.Charset == ReportExportCharsets.Windows_1251)
-							report.ExportDocument(getExportFormat(format.ID), format.CreateParam.ExportFileName, 
+							report.ExportDocument(GetExportFormat(format.ID), format.CreateParam.ExportFileName, 
 								new Stimulsoft.Report.Export.StiHtmlExportSettings() { Encoding = System.Text.Encoding.Default });
 						else
-							report.ExportDocument(getExportFormat(format.ID), format.CreateParam.ExportFileName);
+							report.ExportDocument(GetExportFormat(format.ID), format.CreateParam.ExportFileName);
 					}
 				}
 				else
@@ -248,7 +248,7 @@ namespace MetApp
 
 		#endregion
 
-		static StiReport makeReport(DBGrid grid, ReportCreateParam param)
+		static StiReport MakeReport(DBGrid grid, ReportCreateParam param)
 		{
 			JMXSchema schema = grid.Schema;
 			DataTable dt = grid.BaseTable;
@@ -256,14 +256,16 @@ namespace MetApp
 			float fontSize = param.FontSize;
 
 			string tableName = TableAliasDefault; ;
-			StiReport report = new StiReport();
-			report.ScriptLanguage = StiReportLanguageType.CSharp;
+			StiReport report = new StiReport
+			{
+				ScriptLanguage = StiReportLanguageType.CSharp,
+				ReportName = schema.Name
+			};
 			//report.RegData(tableName, dt);
 			report.RegData(tableName, grid.GetBindingSource());
 			report.Dictionary.Synchronize();
 			report.Dictionary.DataSources[0].Name = tableName;
 			report.Dictionary.DataSources[0].Alias = tableName;
-			report.ReportName = schema.Name;
 			
 			StiPage page = report.Pages.Items[0];
 			page.Margins.Left = 1;
@@ -273,10 +275,12 @@ namespace MetApp
 
 			//ReportTitle
 			bool titleOnPage = param.TitleOnPage;
-			StiReportTitleBand titleBand = new StiReportTitleBand();
-			titleBand.Height = 0.5f;
-			titleBand.CanGrow = true;
-			titleBand.Name = "TitleBand";
+			StiReportTitleBand titleBand = new StiReportTitleBand
+			{
+				Height = 0.5f,
+				CanGrow = true,
+				Name = "TitleBand"
+			};
 			page.Components.Add(titleBand);
 
 			//Period
@@ -308,9 +312,11 @@ namespace MetApp
 
 			//Create HeaderBand
 			StiBand headBand;
-			StiHeaderBand headerBand = new StiHeaderBand();
-			headerBand.Height = 0.5f;
-			headerBand.Name = "HeaderBand";
+			StiHeaderBand headerBand = new StiHeaderBand
+			{
+				Height = 0.5f,
+				Name = "HeaderBand"
+			};
 			if (titleOnPage)
 			{
 				page.Components.Add(headerBand);
@@ -321,18 +327,22 @@ namespace MetApp
 
 
 			//Create Databand
-			StiDataBand dataBand = new StiDataBand();
-			dataBand.DataSourceName = tableName;
-			dataBand.Height = 0.5f;
-			dataBand.Name = "DataBand";
+			StiDataBand dataBand = new StiDataBand
+			{
+				DataSourceName = tableName,
+				Height = 0.5f,
+				Name = "DataBand"
+			};
 			page.Components.Add(dataBand);
 
 			//Create FooterBand
-			StiFooterBand footerBand = new StiFooterBand();
-			footerBand.Height = 0.5f;
-			footerBand.CanGrow = true;
-			footerBand.Name = "FooterBand";
-			footerBand.CanBreak = false;
+			StiFooterBand footerBand = new StiFooterBand
+			{
+				Height = 0.5f,
+				CanGrow = true,
+				Name = "FooterBand",
+				CanBreak = false
+			};
 			page.Components.Add(footerBand);
 
 			Double pos = 0;
@@ -414,7 +424,7 @@ namespace MetApp
 					else
 						dataText.Font = new Font(grid.RowsDefaultCellStyle.Font.FontFamily.Name, fontSize);
 
-					dataText.TextFormat = parseFormat(format);
+					dataText.TextFormat = ParseFormat(format);
 					if (tt == MacroType.num)
 						dataText.ExcelValue.Value = "{" + field + "}";
 					dataBand.Components.Add(dataText);
@@ -535,7 +545,7 @@ namespace MetApp
 			return report;
 		}
 
-		static StiFormatService parseFormat(string format)
+		static StiFormatService ParseFormat(string format)
 		{
 			if (string.IsNullOrEmpty(format))
 				return new StiGeneralFormatService();

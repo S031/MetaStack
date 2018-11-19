@@ -16,7 +16,7 @@ namespace ICSharpCode.TextEditor
 	{
 		Point mousePosition;
 		TextLocation logicalPosition;
-		bool inDocument;
+		readonly bool inDocument;
 		
 		public Point MousePosition {
 			get {

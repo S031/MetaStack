@@ -53,10 +53,8 @@ namespace ICSharpCode.TextEditor
 		{
 			if (activeTextAreaControl != value) {
 				activeTextAreaControl = value;
-				
-				if (ActiveTextAreaControlChanged != null) {
-					ActiveTextAreaControlChanged(this, EventArgs.Empty);
-				}
+
+				ActiveTextAreaControlChanged?.Invoke(this, EventArgs.Empty);
 			}
 		}
 		
@@ -100,18 +98,22 @@ namespace ICSharpCode.TextEditor
 		public void Split()
 		{
 			if (secondaryTextArea == null) {
-				secondaryTextArea = new TextAreaControl(this);
-				secondaryTextArea.Dock = DockStyle.Bottom;
-				secondaryTextArea.Height = Height / 2;
-				
+				secondaryTextArea = new TextAreaControl(this)
+				{
+					Dock = DockStyle.Bottom,
+					Height = Height / 2
+				};
+
 				secondaryTextArea.TextArea.GotFocus += delegate {
 					SetActiveTextAreaControl(secondaryTextArea);
 				};
-				
-				textAreaSplitter =  new Splitter();
-				textAreaSplitter.BorderStyle = BorderStyle.FixedSingle ;
-				textAreaSplitter.Height = 8;
-				textAreaSplitter.Dock = DockStyle.Bottom;
+
+				textAreaSplitter = new Splitter
+				{
+					BorderStyle = BorderStyle.FixedSingle,
+					Height = 8,
+					Dock = DockStyle.Bottom
+				};
 				textAreaPanel.Controls.Add(textAreaSplitter);
 				textAreaPanel.Controls.Add(secondaryTextArea);
 				InitializeTextAreaControl(secondaryTextArea);

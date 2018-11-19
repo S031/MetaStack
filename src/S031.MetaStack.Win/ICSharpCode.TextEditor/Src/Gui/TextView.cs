@@ -411,8 +411,7 @@ namespace ICSharpCode.TextEditor
 				}
 				int currentWordEndOffset = currentWordOffset + currentWord.Length - 1;
 				TextWordType currentWordType = currentWord.Type;
-				
-				IList<TextMarker> markers;
+
 				Color wordForeColor;
 				if (currentWordType == TextWordType.Space)
 					wordForeColor = spaceMarkerColor.Color;
@@ -420,7 +419,7 @@ namespace ICSharpCode.TextEditor
 					wordForeColor = tabMarkerColor.Color;
 				else
 					wordForeColor = currentWord.Color;
-				Brush wordBackBrush = GetMarkerBrushAt(currentLine.Offset + currentWordOffset, currentWord.Length, ref wordForeColor, out markers);
+				Brush wordBackBrush = GetMarkerBrushAt(currentLine.Offset + currentWordOffset, currentWord.Length, ref wordForeColor, out IList<TextMarker> markers);
 				
 				// It is possible that we have to split the current word because a marker/the selection begins/ends inside it
 				if (currentWord.Length > 1) {
@@ -725,8 +724,7 @@ namespace ICSharpCode.TextEditor
 		/// </summary>
 		public TextLocation GetLogicalPosition(Point mousePosition)
 		{
-			FoldMarker dummy;
-			return GetLogicalColumn(GetLogicalLine(mousePosition.Y), mousePosition.X, out dummy);
+			return GetLogicalColumn(GetLogicalLine(mousePosition.Y), mousePosition.X, out FoldMarker dummy);
 		}
 		
 		/// <summary>
@@ -734,8 +732,7 @@ namespace ICSharpCode.TextEditor
 		/// </summary>
 		public TextLocation GetLogicalPosition(int visualPosX, int visualPosY)
 		{
-			FoldMarker dummy;
-			return GetLogicalColumn(GetLogicalLine(visualPosY), visualPosX, out dummy);
+			return GetLogicalColumn(GetLogicalLine(visualPosY), visualPosX, out FoldMarker dummy);
 		}
 		
 		/// <summary>
@@ -743,8 +740,7 @@ namespace ICSharpCode.TextEditor
 		/// </summary>
 		public FoldMarker GetFoldMarkerFromPosition(int visualPosX, int visualPosY)
 		{
-			FoldMarker foldMarker;
-			GetLogicalColumn(GetLogicalLine(visualPosY), visualPosX, out foldMarker);
+			GetLogicalColumn(GetLogicalLine(visualPosY), visualPosX, out FoldMarker foldMarker);
 			return foldMarker;
 		}
 		

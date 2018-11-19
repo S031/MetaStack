@@ -535,8 +535,7 @@ namespace ICSharpCode.TextEditor.Actions
 		
 		public override bool Equals(object obj)
 		{
-			BlockCommentRegion other = obj as BlockCommentRegion;
-			if (other == null) return false;
+			if (!(obj is BlockCommentRegion other)) return false;
 			return this.commentStart == other.commentStart && this.commentEnd == other.commentEnd && this.startOffset == other.startOffset && this.endOffset == other.endOffset;
 		}
 	}

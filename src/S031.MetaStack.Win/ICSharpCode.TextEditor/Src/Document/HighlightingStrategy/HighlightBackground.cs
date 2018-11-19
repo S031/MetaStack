@@ -16,7 +16,7 @@ namespace ICSharpCode.TextEditor.Document
 	/// </summary>
 	public class HighlightBackground : HighlightColor
 	{
-		Image backgroundImage;
+		readonly Image backgroundImage;
 		
 		/// <value>
 		/// The image used as background

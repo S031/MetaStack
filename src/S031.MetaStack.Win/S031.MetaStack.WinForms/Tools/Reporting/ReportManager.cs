@@ -11,9 +11,9 @@ namespace S031.MetaStack.WinForms
 {
 	public static class ReportManager
 	{
-		static string assemblyID = "MetApp.Report";
+		const string _assemblyID = "MetApp.Report";
 
-		static IReporter _reporter = loadReporter();
+		static IReporter _reporter = LoadReporter();
 
 		public static void PrintCurrentForm(DBGrid grid)
 		{
@@ -70,16 +70,16 @@ namespace S031.MetaStack.WinForms
 				_reporter.OutputReport(reportName, dataSource, format, reportParameters);
 		}
 
-		static IReporter loadReporter()
+		static IReporter LoadReporter()
 		{
 
 			Assembly assembly;
 			try
 			{
-				assembly = Assembly.Load(assemblyID);
+				assembly = Assembly.Load(_assemblyID);
 				if (assembly == null)
 				{
-					MessageBox.Show("Не установлен файл интерфейса отчетов: " + assemblyID + ".dll",
+					MessageBox.Show("Не установлен файл интерфейса отчетов: " + _assemblyID + ".dll",
 						"Newbank.Forms.ReportManager", MessageBoxButtons.OK, MessageBoxIcon.Error);
 					return null;
 				}

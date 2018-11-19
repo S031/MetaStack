@@ -55,8 +55,10 @@ namespace ICSharpCode.TextEditor.Document
 		
 		public SpanStack Clone()
 		{
-			SpanStack n = new SpanStack();
-			n.top = this.top;
+			SpanStack n = new SpanStack
+			{
+				top = this.top
+			};
 			return n;
 		}
 		object ICloneable.Clone()

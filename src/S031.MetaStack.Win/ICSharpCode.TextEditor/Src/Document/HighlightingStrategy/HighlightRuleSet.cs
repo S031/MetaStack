@@ -15,18 +15,16 @@ namespace ICSharpCode.TextEditor.Document
 {
 	public class HighlightRuleSet
 	{
-		LookupTable keyWords;
+		readonly LookupTable keyWords;
 		ArrayList   spans = new ArrayList();
-		LookupTable prevMarkers;
-		LookupTable nextMarkers;
-		char escapeCharacter;
-		
-		bool ignoreCase = false;
+		readonly LookupTable prevMarkers;
+		readonly LookupTable nextMarkers;
+		readonly char escapeCharacter;
+		readonly bool ignoreCase = false;
 		string name     = null;
 		
 		bool[] delimiters = new bool[256];
-		
-		string      reference  = null;
+		readonly string      reference  = null;
 		
 		public ArrayList Spans {
 			get {

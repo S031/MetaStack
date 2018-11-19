@@ -94,12 +94,10 @@ namespace ICSharpCode.TextEditor
 				return document;
 			}
 			set {
-				if (value == null)
-					throw new ArgumentNullException("value");
 				if (document != null) {
 					document.DocumentChanged -= OnDocumentChanged;
 				}
-				document = value;
+				document = value ?? throw new ArgumentNullException("value");
 				document.UndoStack.TextEditorControl = this;
 				document.DocumentChanged += OnDocumentChanged;
 			}
@@ -748,9 +746,7 @@ namespace ICSharpCode.TextEditor
 		
 		protected virtual void OnFileNameChanged(EventArgs e)
 		{
-			if (FileNameChanged != null) {
-				FileNameChanged(this, e);
-			}
+			FileNameChanged?.Invoke(this, e);
 		}
 		
 		public event EventHandler FileNameChanged;

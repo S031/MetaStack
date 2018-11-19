@@ -14,37 +14,45 @@ namespace S031.MetaStack.WinForms
 
 		public static TKey Choose<TKey, TText>(IEnumerable<KeyValuePair<TKey, TText>> items, int selected)
 		{
-			using (WinForm cd = new WinForm(WinFormStyle.Dialog))
+			WinFormItem selector = new WinFormItem("RadioGropPanel")
 			{
-				cd.Add<Panel>(WinFormConfig.SinglePageForm);
-				TableLayoutPanel tlpRows = cd.Items["FormRowsPanel"].LinkedControl as TableLayoutPanel;
-				TableLayoutPanel tp = tlpRows.Add<TableLayoutPanel>(new WinFormItem("WorkCells") { CellsSize = new Pair<int>(1, 1) });
-				int i = 0;
-				foreach (var item in items)
+				PresentationType = typeof(TableLayoutPanel),
+				ControlTrigger = (c, e) =>
 				{
-					tp.Add(new WinFormItem($"P{i}")
-					{
-						PresentationType = typeof(RadioButton),
-						ControlTrigger = (cdi, ctrl) =>
-						{
-							RadioButton rb = (ctrl as RadioButton);
-							rb.UseVisualStyleBackColor = true;
-							rb.Text = item.Value.ToString();
-							rb.Tag = item.Key;
-							rb.Dock = DockStyle.Top;
-							rb.Checked = (i == selected);
-							rb.MouseClick += (c, e) => cd.DialogResult = System.Windows.Forms.DialogResult.OK;
-							rb.MouseMove += (c, e) => rb.Cursor = Cursors.Hand;
-						}
-					});
-					i++;
+					e.Dock = DockStyle.Fill;
 				}
-				cd.Items["MainPanel"].LinkedControl.Add<TableLayoutPanel>(WinFormConfig.StdButtons("&Выбор"));
+			};
+			int i = 0;
+			foreach (var item in items)
+			{
+				selector.Add(new WinFormItem($"P{i}")
+				{
+					PresentationType = typeof(RadioButton),
+					ControlTrigger = (cdi, ctrl) =>
+					{
+						RadioButton rb = (ctrl as RadioButton);
+						rb.UseVisualStyleBackColor = true;
+						rb.Text = item.Value.ToString();
+						rb.Tag = item.Key;
+						rb.Dock = DockStyle.Top;
+						rb.MouseClick += (c, e) => cdi
+							.LinkedControl
+							.FindForm()
+							.DialogResult = System.Windows.Forms.DialogResult.OK;
+						rb.MouseMove += (c, e) => rb.Cursor = Cursors.Hand;
+						rb.TabIndex = i;
+					}
+				});
+				i++;
+			}
+
+			using (WinForm cd = new BaseViewForm(selector))
+			{
+				cd.GetControl<RadioButton>($"P{selected}").Checked = true;
 				Button btn = cd.GetControl<Button>("OK");
 				cd.AcceptButton = btn;
 
 				cd.StartPosition = FormStartPosition.CenterParent;
-				cd.Height = tp.Height + 100;
 				if (cd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
 				{
 					cd.Save();

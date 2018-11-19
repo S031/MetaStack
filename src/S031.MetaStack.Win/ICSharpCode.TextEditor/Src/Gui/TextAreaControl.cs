@@ -357,8 +357,8 @@ namespace ICSharpCode.TextEditor
 				}
 			}
 		}
-		
-		int scrollMarginHeight  = 3;
+
+		readonly int scrollMarginHeight  = 3;
 		
 		/// <summary>
 		/// Ensure that <paramref name="line"/> is visible.

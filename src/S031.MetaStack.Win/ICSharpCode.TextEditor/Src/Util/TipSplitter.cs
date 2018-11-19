@@ -13,8 +13,8 @@ namespace ICSharpCode.TextEditor.Util
 {
 	class TipSplitter: TipSection
 	{
-		bool         isHorizontal;
-		float     [] offsets;
+		readonly bool         isHorizontal;
+		readonly float     [] offsets;
 		TipSection[] tipSections;
 		
 		public TipSplitter(Graphics graphics, bool horizontal, params TipSection[] sections): base(graphics)

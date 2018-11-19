@@ -41,15 +41,15 @@ namespace ICSharpCode.TextEditor
 		TextEditorControl       motherTextEditorControl;
 		
 		List<BracketHighlightingSheme> bracketshemes  = new List<BracketHighlightingSheme>();
-		TextAreaClipboardHandler  textAreaClipboardHandler;
+		readonly TextAreaClipboardHandler  textAreaClipboardHandler;
 		bool autoClearSelection = false;
 		
 		List<AbstractMargin> leftMargins = new List<AbstractMargin>();
 		
 		TextView      textView;
-		GutterMargin  gutterMargin;
-		FoldMargin    foldMargin;
-		IconBarMargin iconBarMargin;
+		readonly GutterMargin  gutterMargin;
+		readonly FoldMargin    foldMargin;
+		readonly IconBarMargin iconBarMargin;
 		
 		SelectionManager selectionManager;
 		Caret            caret;
@@ -273,8 +273,7 @@ namespace ICSharpCode.TextEditor
 		
 		public void SetCaretToDesiredColumn()
 		{
-			FoldMarker dummy;
-			Caret.Position = textView.GetLogicalColumn(Caret.Line, Caret.DesiredColumn + VirtualTop.X, out dummy);
+			Caret.Position = textView.GetLogicalColumn(Caret.Line, Caret.DesiredColumn + VirtualTop.X, out FoldMarker dummy);
 		}
 		
 		public void OptionsChanged()
@@ -366,9 +365,7 @@ namespace ICSharpCode.TextEditor
 		
 		protected virtual void OnToolTipRequest(ToolTipRequestEventArgs e)
 		{
-			if (ToolTipRequest != null) {
-				ToolTipRequest(this, e);
-			}
+			ToolTipRequest?.Invoke(this, e);
 		}
 		
 		bool toolTipActive;

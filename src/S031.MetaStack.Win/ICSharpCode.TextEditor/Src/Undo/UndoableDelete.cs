@@ -17,8 +17,9 @@ namespace ICSharpCode.TextEditor.Undo
 	public class UndoableDelete : IUndoableOperation
 	{
 		IDocument document;
-//		int      oldCaretPos;
-		int      offset;
+
+		//		int      oldCaretPos;
+		readonly int      offset;
 		string   text;
 		
 		/// <summary>

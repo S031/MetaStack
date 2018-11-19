@@ -493,7 +493,7 @@ namespace ICSharpCode.TextEditor.Util
 					return it;
 				it.MoveNext();
 			}
-			return default(RedBlackTreeIterator<T>);
+			return default;
 		}
 		
 		/// <summary>
@@ -531,7 +531,7 @@ namespace ICSharpCode.TextEditor.Util
 		/// </summary>
 		public RedBlackTreeIterator<T> Begin()
 		{
-			if (root == null) return default(RedBlackTreeIterator<T>);
+			if (root == null) return default;
 			return new RedBlackTreeIterator<T>(root.LeftMost);
 		}
 		
@@ -540,9 +540,11 @@ namespace ICSharpCode.TextEditor.Util
 		/// </summary>
 		public RedBlackTreeIterator<T> GetEnumerator()
 		{
-			if (root == null) return default(RedBlackTreeIterator<T>);
-			RedBlackTreeNode<T> dummyNode = new RedBlackTreeNode<T>(default(T));
-			dummyNode.right = root;
+			if (root == null) return default;
+			RedBlackTreeNode<T> dummyNode = new RedBlackTreeNode<T>(default)
+			{
+				right = root
+			};
 			return new RedBlackTreeIterator<T>(dummyNode);
 		}
 		#endregion

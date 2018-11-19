@@ -16,7 +16,7 @@ namespace ICSharpCode.TextEditor.Document
 	/// </summary>
 	public class BookmarkEventArgs : EventArgs
 	{
-		Bookmark bookmark;
+		readonly Bookmark bookmark;
 		
 		public Bookmark Bookmark {
 			get {

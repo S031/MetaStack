@@ -16,8 +16,8 @@ namespace ICSharpCode.TextEditor.Util
 	/// </summary>
 	public class LookupTable
 	{
-		Node root = new Node(null, null);
-		bool casesensitive;
+		readonly Node root = new Node(null, null);
+		readonly bool casesensitive;
 		int  length;
 		
 		/// <value>

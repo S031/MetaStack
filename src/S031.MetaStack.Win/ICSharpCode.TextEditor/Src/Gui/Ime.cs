@@ -146,14 +146,18 @@ namespace ICSharpCode.TextEditor
 		{
 			if (disableIME || hIMEWnd == IntPtr.Zero) return;
 
-			POINT p = new POINT();
-			p.x = x;
-			p.y = y;
+			POINT p = new POINT
+			{
+				x = x,
+				y = y
+			};
 
-			COMPOSITIONFORM lParam = new COMPOSITIONFORM();
-			lParam.dwStyle = CFS_POINT;
-			lParam.ptCurrentPos = p;
-			lParam.rcArea = new RECT();
+			COMPOSITIONFORM lParam = new COMPOSITIONFORM
+			{
+				dwStyle = CFS_POINT,
+				ptCurrentPos = p,
+				rcArea = new RECT()
+			};
 
 			try {
 				SendMessage(

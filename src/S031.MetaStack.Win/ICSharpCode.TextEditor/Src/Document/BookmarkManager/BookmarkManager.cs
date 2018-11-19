@@ -22,7 +22,7 @@ namespace ICSharpCode.TextEditor.Document
 	/// </summary>
 	public class BookmarkManager
 	{
-		IDocument      document;
+		readonly IDocument      document;
 		#if DEBUG
 		IList<Bookmark> bookmark = new CheckedList<Bookmark>();
 		#else
@@ -228,16 +228,12 @@ namespace ICSharpCode.TextEditor.Document
 		
 		protected virtual void OnRemoved(BookmarkEventArgs e)
 		{
-			if (Removed != null) {
-				Removed(this, e);
-			}
+			Removed?.Invoke(this, e);
 		}
 		
 		protected virtual void OnAdded(BookmarkEventArgs e)
 		{
-			if (Added != null) {
-				Added(this, e);
-			}
+			Added?.Invoke(this, e);
 		}
 		
 		public event BookmarkEventHandler Removed;

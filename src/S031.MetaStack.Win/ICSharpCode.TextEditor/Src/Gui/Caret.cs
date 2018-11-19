@@ -478,18 +478,14 @@ namespace ICSharpCode.TextEditor
 			if (shouldUpdate) {
 				textArea.Document.FoldingManager.NotifyFoldingsChanged(EventArgs.Empty);
 			}
-			
-			if (PositionChanged != null) {
-				PositionChanged(this, e);
-			}
+
+			PositionChanged?.Invoke(this, e);
 			textArea.ScrollToCaret();
 		}
 		
 		protected virtual void OnCaretModeChanged(EventArgs e)
 		{
-			if (CaretModeChanged != null) {
-				CaretModeChanged(this, e);
-			}
+			CaretModeChanged?.Invoke(this, e);
 			caretImplementation.Hide();
 			caretImplementation.Destroy();
 			caretCreated = false;

@@ -12,8 +12,8 @@ namespace ICSharpCode.TextEditor.Util
 {
 	class CountTipText: TipText
 	{
-		float triHeight = 10;
-		float triWidth  = 10;
+		readonly float triHeight = 10;
+		readonly float triWidth  = 10;
 		
 		public CountTipText(Graphics graphics, Font font, string text) : base(graphics, font, text)
 		{

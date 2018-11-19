@@ -89,8 +89,8 @@ namespace ICSharpCode.TextEditor.Document
 			}
 		}
 		
-		static TextWord spaceWord = new SpaceTextWord();
-		static TextWord tabWord   = new TabTextWord();
+		static readonly TextWord spaceWord = new SpaceTextWord();
+		static readonly TextWord tabWord   = new TabTextWord();
 		
 		bool hasDefaultColor;
 		

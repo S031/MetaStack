@@ -48,8 +48,8 @@ namespace ICSharpCode.TextEditor.Gui.CompletionWindow
 	public class DefaultCompletionData : ICompletionData
 	{
 		string text;
-		string description;
-		int imageIndex;
+		readonly string description;
+		readonly int imageIndex;
 		
 		public int ImageIndex {
 			get {

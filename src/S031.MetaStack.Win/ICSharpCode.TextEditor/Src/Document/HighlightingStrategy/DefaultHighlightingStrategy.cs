@@ -212,8 +212,7 @@ namespace ICSharpCode.TextEditor.Document
 
 		public HighlightColor GetColorFor(string name)
 		{
-			HighlightColor color;
-			if (environmentColors.TryGetValue(name, out color))
+			if (environmentColors.TryGetValue(name, out HighlightColor color))
 				return color;
 			else
 				return defaultTextColor;
@@ -743,9 +742,9 @@ namespace ICSharpCode.TextEditor.Document
 						}
 						hasDefaultColor = true;
 					}
-					words.Add(new TextWord(document, currentLine, currentOffset, currentLength, markNext != null ? markNext : c, hasDefaultColor));
+					words.Add(new TextWord(document, currentLine, currentOffset, currentLength, markNext ?? c, hasDefaultColor));
 				} else {
-					HighlightColor c = markNext != null ? markNext : GetColor(activeRuleSet, document, currentLine, currentOffset, currentLength);
+					HighlightColor c = markNext ?? GetColor(activeRuleSet, document, currentLine, currentOffset, currentLength);
 					if (c == null) {
 						words.Add(new TextWord(document, currentLine, currentOffset, currentLength, this.DefaultTextColor, true));
 					} else {

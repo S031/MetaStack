@@ -385,9 +385,11 @@ namespace ICSharpCode.TextEditor
 						} else {
 							textArea.SelectionManager.ClearSelection();
 							if (mousepos.Y > 0 && mousepos.Y < textArea.TextView.DrawingPosition.Height) {
-								TextLocation pos = new TextLocation();
-								pos.Y = Math.Min(textArea.Document.TotalNumberOfLines - 1,  realmousepos.Y);
-								pos.X = realmousepos.X;
+								TextLocation pos = new TextLocation
+								{
+									Y = Math.Min(textArea.Document.TotalNumberOfLines - 1, realmousepos.Y),
+									X = realmousepos.X
+								};
 								textArea.Caret.Position = pos;
 								textArea.SetDesiredColumn();
 							}
@@ -403,9 +405,11 @@ namespace ICSharpCode.TextEditor
 					{
 						textArea.SelectionManager.ClearSelection();
 						if (mousepos.Y > 0 && mousepos.Y < textArea.TextView.DrawingPosition.Height) {
-							TextLocation pos = new TextLocation();
-							pos.Y = Math.Min(textArea.Document.TotalNumberOfLines - 1,  realmousepos.Y);
-							pos.X = realmousepos.X;
+							TextLocation pos = new TextLocation
+							{
+								Y = Math.Min(textArea.Document.TotalNumberOfLines - 1, realmousepos.Y),
+								X = realmousepos.X
+							};
 							textArea.Caret.Position = pos;
 							textArea.SetDesiredColumn();
 						}

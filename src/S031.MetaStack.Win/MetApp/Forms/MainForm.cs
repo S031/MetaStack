@@ -363,13 +363,13 @@ namespace MetApp
 			   .SetValue("@IDs", string.Join(",", _grid.Selection().Select(r=>r[_grid.IdColName].ToString())))
 			   .Update();
 			OutputWindow.Show();
-			OutputWindow.Print("Start...");
+			OutputWindow.Print($"Start {actionId}...");
 			new System.Threading.Thread(() =>
 			{
 				Pipe.Start();
 				ClientGate.Execute(actionId, dr);
 				Pipe.End();
-				OutputWindow.Print("Finish...");
+				OutputWindow.Print($"Finish {actionId}");
 			}).Start();
 		}
 
@@ -423,10 +423,13 @@ namespace MetApp
 				ToolStripMenuItem menuRun = (ToolStripMenuItem)mnuContext.Items["EditRun"];
 				if (menuRun.HasDropDownItems)
 				{
-					var m = GetFromMenuItems(menuRun.DropDownItems).Where(mi => mi != null);
-					string key = Chooser.Choose(m.Select(mi => new KeyValuePair<string, string>(mi.Name, mi.Text)), 0);
-					if (!key.IsEmpty())
-						ExecuteAction(key);
+					var m = GetFromMenuItems(menuRun.DropDownItems).Where(mi => mi != null && mi.Name != "Blank");
+					if (m != null && m.Count() > 0)
+					{
+						string key = Chooser.Choose(m.Select(mi => new KeyValuePair<string, string>(mi.Name, mi.Text)), 0);
+						if (!key.IsEmpty())
+							ExecuteAction(key);
+					}
 				}
 			}
 			else if (e.KeyData == Keys.F7)

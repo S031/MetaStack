@@ -122,8 +122,10 @@ namespace ICSharpCode.TextEditor
 			try {
 				Clipboard.SetDataObject(dataObject, true);
 			} catch (ExternalException) {
-				Timer timer = new Timer();
-				timer.Interval = 100;
+				Timer timer = new Timer
+				{
+					Interval = 100
+				};
 				timer.Tick += delegate {
 					timer.Stop();
 					timer.Dispose();
@@ -241,9 +243,7 @@ namespace ICSharpCode.TextEditor
 		
 		protected virtual void OnCopyText(CopyTextEventArgs e)
 		{
-			if (CopyText != null) {
-				CopyText(this, e);
-			}
+			CopyText?.Invoke(this, e);
 		}
 		
 		public event CopyTextEventHandler CopyText;
@@ -252,7 +252,7 @@ namespace ICSharpCode.TextEditor
 	public delegate void CopyTextEventHandler(object sender, CopyTextEventArgs e);
 	public class CopyTextEventArgs : EventArgs
 	{
-		string text;
+		readonly string text;
 		
 		public string Text {
 			get {

@@ -23,11 +23,11 @@ namespace ICSharpCode.TextEditor.Document
 	/// </summary>
 	public class TextMarker : AbstractSegment
 	{
-		TextMarkerType textMarkerType;
-		Color          color;
-		Color          foreColor;
+		readonly TextMarkerType textMarkerType;
+		readonly Color          color;
+		readonly Color          foreColor;
 		string         toolTip = null;
-		bool           overrideForeColor = false;
+		readonly bool           overrideForeColor = false;
 		
 		public TextMarkerType TextMarkerType {
 			get {

@@ -83,8 +83,10 @@ namespace ICSharpCode.TextEditor.Document
 		
 		void CreateDefaultHighlightingStrategy()
 		{
-			DefaultHighlightingStrategy defaultHighlightingStrategy = new DefaultHighlightingStrategy();
-			defaultHighlightingStrategy.Extensions = new string[] {};
+			DefaultHighlightingStrategy defaultHighlightingStrategy = new DefaultHighlightingStrategy
+			{
+				Extensions = new string[] { }
+			};
 			defaultHighlightingStrategy.Rules.Add(new HighlightRuleSet());
 			highlightingDefs["Default"] = defaultHighlightingStrategy;
 		}
@@ -156,9 +158,7 @@ namespace ICSharpCode.TextEditor.Document
 		
 		protected virtual void OnReloadSyntaxHighlighting(EventArgs e)
 		{
-			if (ReloadSyntaxHighlighting != null) {
-				ReloadSyntaxHighlighting(this, e);
-			}
+			ReloadSyntaxHighlighting?.Invoke(this, e);
 		}
 		
 		public event EventHandler ReloadSyntaxHighlighting;

@@ -439,9 +439,7 @@ namespace ICSharpCode.TextEditor.Document
 		}
 		protected virtual void OnSelectionChanged(EventArgs e)
 		{
-			if (SelectionChanged != null) {
-				SelectionChanged(this, e);
-			}
+			SelectionChanged?.Invoke(this, e);
 		}
 		
 		public event EventHandler SelectionChanged;
