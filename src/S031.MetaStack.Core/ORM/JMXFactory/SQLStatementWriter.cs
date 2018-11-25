@@ -13,21 +13,21 @@ namespace S031.MetaStack.Core.ORM
 	{
 		const string detail_field_prefix = "$1_";
 		private readonly JMXSchema _schema;
-		private JMXRepo _repo;
+		private IJMXTypeMapping _typeMapping;
 		private readonly bool _schemaSupport = true;
 
 
-		public SQLStatementWriter(JMXRepo repo)
+		public SQLStatementWriter(IJMXTypeMapping typeMapping)
 		{
-			_repo = repo;
-			_schemaSupport = repo.GetMdbContext(ContextTypes.Work).ConnectInfo.SchemaSupport;
+			_typeMapping = typeMapping;
+			_schemaSupport = true;
 		}
 
-		public SQLStatementWriter(JMXRepo repo, JMXSchema schema)
+		public SQLStatementWriter(IJMXTypeMapping typeMapping, JMXSchema schema, bool schemaSupport = true)
 		{
-			_repo = repo;
+			_typeMapping = typeMapping;
 			_schema = schema;
-			_schemaSupport = repo.GetMdbContext(ContextTypes.Work).ConnectInfo.SchemaSupport;
+			_schemaSupport = schemaSupport;
 		}
 		public SQLStatementWriter WriteSelectStatement(JMXSchema fromSchema,
 			params JMXCondition[] conditions)
@@ -145,10 +145,10 @@ namespace S031.MetaStack.Core.ORM
 				var att = fromSchema.Attributes[i];
 				Write($"[{att.FieldName}]\t{att.ServerDataType}");
 
-				MdbTypeInfo ti = _repo.GetServerTypeMap()[att.ServerDataType];
+				MdbTypeInfo ti = _typeMapping.GetServerTypeMap()[att.ServerDataType];
 				if (att.DataType == MdbType.@decimal && !ti.FixedSize && !att.DataSize.IsEmpty())
 					Write($"({att.DataSize.Precision},{att.DataSize.Scale})");
-				else if (_repo.GetVariableLenghtDataTypes().Contains(att.ServerDataType))
+				else if (_typeMapping.GetVariableLenghtDataTypes().Contains(att.ServerDataType))
 					if (att.DataSize.Size == -1)
 						Write("(max)");
 					else
@@ -340,10 +340,10 @@ namespace S031.MetaStack.Core.ORM
 			string action = addNew ? "add" : "alter column";
 			Write($"alter table [{fromSchema.DbObjectName.AreaName}].[{fromSchema.DbObjectName.ObjectName}] {action} [{att.FieldName}]\t{att.ServerDataType}");
 
-			MdbTypeInfo ti = _repo.GetServerTypeMap()[att.ServerDataType];
+			MdbTypeInfo ti = _typeMapping.GetServerTypeMap()[att.ServerDataType];
 			if (att.DataType == MdbType.@decimal && !ti.FixedSize && !att.DataSize.IsEmpty())
 				Write($"({att.DataSize.Precision},{att.DataSize.Scale})");
-			else if (_repo.GetVariableLenghtDataTypes().Contains(att.ServerDataType))
+			else if (_typeMapping.GetVariableLenghtDataTypes().Contains(att.ServerDataType))
 				if (att.DataSize.Size == -1)
 					Write("(max)");
 				else

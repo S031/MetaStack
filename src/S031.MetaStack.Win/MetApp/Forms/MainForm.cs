@@ -451,7 +451,7 @@ namespace MetApp
 		{
 			if (keyData == Keys.Escape)
 			{
-				if (_grid.Rows.Count < _grid.BaseTable.Rows.Count)
+				if (_grid.BaseTable != null && _grid.Rows.Count < _grid.BaseTable.Rows.Count)
 				{
 					_grid.FilterClear();
 					return true;

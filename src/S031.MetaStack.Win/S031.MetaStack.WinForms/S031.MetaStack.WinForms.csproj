@@ -102,6 +102,9 @@
     <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXFactory\Interfaces\IJMXRepo.cs">
       <Link>ORM\JMXFactory\Interfaces\IJMXRepo.cs</Link>
     </Compile>
+    <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXFactory\Interfaces\IJMXTypeMapping.cs">
+      <Link>ORM\JMXFactory\Interfaces\IJMXTypeMapping.cs</Link>
+    </Compile>
     <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXForeignKey.cs">
       <Link>ORM\JMXForeignKey.cs</Link>
     </Compile>

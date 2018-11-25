@@ -8,6 +8,7 @@ namespace S031.MetaStack.WinForms.ORM
 	{
 		IJMXRepo CreateJMXRepo();
 		IJMXProvider CreateJMXProvider();
+		IJMXTypeMapping CreateJMXTypeMapping();
 		JMXObject CreateObject(string objectName);
 	}
 }

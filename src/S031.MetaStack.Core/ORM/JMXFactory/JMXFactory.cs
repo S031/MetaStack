@@ -18,18 +18,9 @@ namespace S031.MetaStack.Core.ORM
 		public JMXFactory(MdbContext sysCatMdbContext, MdbContext workMdbContext) : base(sysCatMdbContext, workMdbContext)
 		{
 		}
-		public virtual IJMXRepo CreateJMXRepo()
-		{
-			throw new NotImplementedException();
-		}
-		public virtual IJMXProvider CreateJMXProvider()
-		{
-			throw new NotImplementedException();
-		}
-		public virtual JMXObject CreateObject(string objectName)
-		{
-			throw new NotImplementedException();
-		}
+		public virtual IJMXRepo CreateJMXRepo() => throw new NotImplementedException();
+		public virtual IJMXProvider CreateJMXProvider() => throw new NotImplementedException();
+		public virtual JMXObject CreateObject(string objectName) => throw new NotImplementedException();
 
 		public static JMXFactory Create(MdbContext mdb, ILogger logger) => Create(mdb, mdb, logger);
 
@@ -49,5 +40,9 @@ namespace S031.MetaStack.Core.ORM
 			}
 			throw new InvalidOperationException("No class inherited from JMXFactory contained attribute of type SchemaDBSyncAttribute  defined");
 		}
+
+		public virtual SQLStatementWriter CreateSQLStatementWriter() => new SQLStatementWriter(new JMXTypeMappingAnsi());
+
+		public IJMXTypeMapping CreateJMXTypeMapping() => new JMXTypeMappingAnsi();
 	}
 }

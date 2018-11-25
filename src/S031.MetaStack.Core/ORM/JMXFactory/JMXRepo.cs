@@ -20,21 +20,6 @@ namespace S031.MetaStack.Core.ORM
 		{
 		}
 
-		public virtual IDictionary<MdbType, string> GetTypeMap()
-		{
-			throw new NotImplementedException();
-		}
-
-		public virtual IDictionary<string, MdbTypeInfo> GetServerTypeMap()
-		{
-			throw new NotImplementedException();
-		}
-
-		public virtual string[] GetVariableLenghtDataTypes()
-		{
-			throw new NotImplementedException();
-		}
-
 		public virtual IEnumerable<string> GetChildObjects(string objectName)
 		{
 			throw new NotImplementedException();

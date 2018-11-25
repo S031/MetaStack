@@ -25,7 +25,7 @@ namespace S031.MetaStack.Core.Actions
 			GetParameters(ai, dp);
 			using (JMXFactory f = ApplicationContext.CreateJMXFactory((string)_connectionName))
 			using (JMXRepo repo = (f.CreateJMXRepo() as JMXRepo))
-			using (SQLStatementWriter writer = new SQLStatementWriter(repo))
+			using (SQLStatementWriter writer = f.CreateSQLStatementWriter())
 			{
 				JMXSchema schema = repo.GetSchema(_viewName);
 				string _body = writer.WriteSelectStatement(
@@ -51,7 +51,7 @@ namespace S031.MetaStack.Core.Actions
 			GetParameters(ai, dp);
 			using (JMXFactory f = ApplicationContext.CreateJMXFactory((string)_connectionName))
 			using (JMXRepo repo = (f.CreateJMXRepo() as JMXRepo))
-			using (SQLStatementWriter writer = new SQLStatementWriter(repo))
+			using (SQLStatementWriter writer = f.CreateSQLStatementWriter())
 			{
 				JMXSchema schema = await repo.GetSchemaAsync(_viewName);
 				string body = writer.WriteSelectStatement(
