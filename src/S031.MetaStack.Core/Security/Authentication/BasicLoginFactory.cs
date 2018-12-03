@@ -59,7 +59,7 @@ namespace S031.MetaStack.Core.Security
 		}
 
 		/// <summary>
-		/// !!! Add solt
+		/// <see cref="Logon(string, string, string)"/>
 		/// </summary>
 		/// <param name="userName">User name</param>
 		/// <param name="encryptedKey">Base64 string, must be a session ticket with solt or password</param>
@@ -82,7 +82,7 @@ namespace S031.MetaStack.Core.Security
 				if (!CheckTicket(userName, loginInfo, encryptedKey.ToByteArray()))
 					throw new AuthenticationExceptions($"Invaliod session ticked for user {userName}");
 			}
-			else if (CheckPasswordAsync(userName, loginInfo, encryptedKey.ToByteArray()))
+			else if (CheckPassword(userName, loginInfo, encryptedKey.ToByteArray()))
 				loginInfo.EmmitTicket();
 
 			return Aes.Create()
@@ -141,7 +141,7 @@ namespace S031.MetaStack.Core.Security
 			}
 		}
 
-		private static bool CheckPasswordAsync(string userName, LoginInfo loginInfo, byte[] encryptedTicketData)
+		private static bool CheckPassword(string userName, LoginInfo loginInfo, byte[] encryptedTicketData)
 		{
 
 			try
