@@ -102,11 +102,11 @@ namespace S031.MetaStack.WinForms.Connectors
 			paramTable.Headers["ActionID"] = actionID;
 			paramTable.Headers["UserName"] = _userName;
 			paramTable.Headers["SessionID"] = _loginInfo.SessionID.ToString();
-			//Костыль!!! Необходимо использовать таймстамп в сообщении и проверять его на сервере
+			//Использовать таймстамп в сообщении и проверять его на сервере
 			paramTable.Headers["EncryptedKey"] = _clientAes
 					.EncryptBin(_ticket
 					.ToByteArray()
-					.Concat(BitConverter.GetBytes(DateTime.Now.Millisecond)).ToArray())
+					.Concat(BitConverter.GetBytes((DateTime.Now - DateTime.Now.Date).TotalMilliseconds)).ToArray())
 					.ToBASE64String();
 			paramTable.UpdateHeaders();
 			var response = SendAndRecieve(paramTable);

@@ -38,7 +38,6 @@ namespace MetApp
 					//grid.RowHeadersVisible = false;
 					grid.ColumnHeadersVisible = true;
 					//grid.Font = new Font(grid.Font.FontFamily, 10f);
-					//grid.Columns[grid.Columns.Count - 1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
 					//grid.ObjectDel += _grid_ObjectDel;
 					//grid.ObjectRead += _grid_ObjectRead;
 					//grid.CellFormatting += _grid_CellFormatting;
@@ -47,6 +46,8 @@ namespace MetApp
 					grid.SetSpeedSearch((ToolStripTextBox)GetItem("ToolBar").As<ToolStrip>().Items["txtFind"]);
 					grid.FindFirst += (g, e) => ((ToolStripTextBox)GetItem("ToolBar").As<ToolStrip>().Items["txtFind"]).Focus();
 					grid.FindNext += (g, e) => ((ToolStripTextBox)GetItem("ToolBar").As<ToolStrip>().Items["txtFind"]).Focus();
+					grid.SchemaComplete += (g, e) => grid.Columns[grid.Columns.Count - 1].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+
 					_grid = grid;
 					SetMenuContext();
 				}

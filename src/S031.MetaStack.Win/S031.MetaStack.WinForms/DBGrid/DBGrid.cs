@@ -204,7 +204,6 @@ namespace S031.MetaStack.WinForms
 
 		private void MakeRecordset()
 		{
-			///!!! from statistics open form
 			var fs = new FormOpenTimeStatistics();
 			int elapsedTime = fs.GetTime(SchemaName, 5000);
 			DateTime startTime = DateTime.Now;
@@ -230,7 +229,9 @@ namespace S031.MetaStack.WinForms
 					return;
 				}
 			}
-			fs.SetTime(SchemaName, Convert.ToInt32((DateTime.Now - startTime).TotalMilliseconds));
+			int factTime = Convert.ToInt32((DateTime.Now - startTime).TotalMilliseconds);
+			if (factTime > elapsedTime)
+				fs.SetTime(SchemaName, factTime);
 			var bs = new BindingSource
 			{
 				DataSource = dt,

@@ -25,12 +25,11 @@ namespace S031.MetaStack.WinForms
 
 		public static void End(bool force = false)
 		{
-			if (!force)
-				Read();
-
 			_timer?.Dispose();
 			_timer = null;
 
+			if (!force)
+				Read();
 		}
 		public static bool IsStarted() => _timer != null;
 

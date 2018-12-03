@@ -99,7 +99,7 @@ namespace S031.MetaStack.Core.App
 			//костыль!!!
 			//Remove from project references all plugins and configure publish plugins to project 
 			//output folder
-			//Load to publish folder all plugins whis depencies (after publish plugin progect)
+			//Load to publish folder all plugins with depencies (after publish plugin progect)
 			var serviceList = _configuration.GetSection("Dependencies").GetChildren();
 			foreach (var section in serviceList)
 			{

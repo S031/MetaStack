@@ -22,7 +22,6 @@ namespace S031.MetaStack.WinForms
 			_cd = new WinForm(WinFormStyle.Dialog) { Text = "Окно сообщений" };
 			_cd.Add<Panel>(WinFormConfig.SinglePageForm);
 			_cd.FormClosing += _cd_FormClosing;
-			_cd.Resize += _cd_Resize;
 			TableLayoutPanel tlpRows = _cd.Items["FormRowsPanel"].LinkedControl as TableLayoutPanel;
 			tlpRows.Add(new WinFormItem($"LogView")
 			{
@@ -45,6 +44,7 @@ namespace S031.MetaStack.WinForms
 					col = grid.Columns[i];
 					col.DataPropertyName = "Message";
 					col.DefaultCellStyle.WrapMode = DataGridViewTriState.True;
+					col.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
 					var b = new DataGridViewButtonColumn()
 					{
 						Name = "BtnView",
@@ -61,11 +61,6 @@ namespace S031.MetaStack.WinForms
 				}
 			});
 			_cd.Size = new Size(Convert.ToInt32(Screen.FromControl(_cd).WorkingArea.Width / vbo.GoldenRatio), Screen.FromControl(_cd).WorkingArea.Height / 3); 
-		}
-
-		private static void _cd_Resize(object sender, EventArgs e)
-		{
-			_grid.Columns["Message"].Width = _cd.Width - _grid.Columns["MessageTime"].Width - _grid.Columns["MessageSource"].Width - 90;
 		}
 
 		private static void Grid_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -122,5 +117,6 @@ namespace S031.MetaStack.WinForms
 		}
 
 		public static void Show() => _cd.Visible = true;
+
 	}
 }

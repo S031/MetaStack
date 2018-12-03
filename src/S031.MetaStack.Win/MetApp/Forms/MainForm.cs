@@ -383,10 +383,15 @@ namespace MetApp
 		{
 			if (_grid.Rows.Count == 0)
 				return;
-			//!!! Выбирать поле в связанной таблице по релейшенам
-			var filter = $"{_grid.IdColName}{_grid.GetStringForSelected()}";
-			//!!! Сделать закрытие всех форм, при закрытии последней
-			new MainForm(childFormName, new MainFormOptions() { StartFilter = filter }).Show();			
+
+			var colID = _grid.Schema.Attributes.FirstOrDefault(att => att.ObjectName == childFormName
+				&& att.DataType == S031.MetaStack.WinForms.Data.MdbType.@object)?.FieldName;
+			if (colID != null)
+			{
+				var filter = $"{colID}{_grid.GetStringForSelected()}";
+				//!!! Сделать закрытие всех форм, при закрытии последней
+				new MainForm(childFormName, new MainFormOptions() { StartFilter = filter }).Show();
+			}
 		}
 
 		private void DateFinish_Validating(object sender, CancelEventArgs e)

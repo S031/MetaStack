@@ -125,15 +125,15 @@ namespace S031.MetaStack.Core.Security
 		{
 			try
 			{
-				//Костыль!!! Необходимо в Тикет добавить проверяемое значение (таимстамп или хэщ сообщения)
-				return loginInfo.Ticket.Equals(
-						new Guid(
-							Aes.Create()
+				//В Тикет добавили проверяемое значение (таимстамп)
+				byte[] data = Aes.Create()
 							.ImportBin(loginInfo.CryptoKey)
-							.DecryptBin(encryptedTicketData)
-							.Take(16)
-							.ToArray()
-						));
+							.DecryptBin(encryptedTicketData);
+				Guid ticket = new Guid(data.Take(16).ToArray());
+				double ms = BitConverter.ToDouble(data, 16);
+				if (Math.Abs((DateTime.Now - DateTime.Now.Date).TotalMilliseconds - ms) > 5000)
+					throw new AuthenticationExceptions("Bad message timestamp");
+				return loginInfo.Ticket.Equals(ticket);
 			}
 			catch (Exception ex)
 			{

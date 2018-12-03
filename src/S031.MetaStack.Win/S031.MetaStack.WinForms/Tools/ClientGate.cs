@@ -30,7 +30,7 @@ namespace S031.MetaStack.WinForms
 
 		public static TCPConnector Connector =>_connector;
 
-		public static bool Logon()
+		public static bool Logon(bool forcePassword = false)
 		{
 			if (_connector != null && _connector.Connected)
 				return true;
@@ -40,7 +40,8 @@ namespace S031.MetaStack.WinForms
 			bool savePassword = ConfigurationManager.AppSettings["SavePassword"].ToBoolOrDefault();
 			bool isPrompt = false;
 			var sInfo = CredentialManager.ReadCredential(_appName);
-			if (sInfo == null || sInfo.Password.IsEmpty() || !savePassword)
+			forcePassword = forcePassword || sInfo == null || sInfo.Password.IsEmpty() || !savePassword;
+			if (forcePassword)
 			{
 				password = SecureRequest(userName);
 				if (password.IsEmpty())

@@ -1,4 +1,5 @@
 ﻿using S031.MetaStack.WinForms;
+using S031.MetaStack.WinForms.Connectors;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -22,7 +23,7 @@ namespace MetApp
 
 			try
 			{
-				ClientGate.Logon();
+				Logon();
 			}
 			catch (Exception ex)
 			{
@@ -31,6 +32,22 @@ namespace MetApp
 			}
 			AppDomain.CurrentDomain.ProcessExit += (s, e) => ClientGate.Logout();
 			Application.Run(new MainForm(ConfigurationManager.AppSettings["StartupForm"]));
+		}
+
+		private static void Logon()
+		{
+			try
+			{
+				ClientGate.Logon();
+			}
+			catch (Exception ex)
+			{
+				if (ex.GetType() == typeof(TCPConnectorException))
+					ClientGate.Logon(true);
+				else
+					throw; 
+			}
+
 		}
 	}
 }
