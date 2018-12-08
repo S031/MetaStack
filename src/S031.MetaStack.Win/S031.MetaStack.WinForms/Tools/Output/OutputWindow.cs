@@ -1,21 +1,21 @@
-﻿using System;
+﻿using S031.MetaStack.Common;
+using S031.MetaStack.Common.Logging;
+using System;
+using System.Collections.Concurrent;
+using System.ComponentModel;
+using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
-using S031.MetaStack.Common.Logging;
-
-using ICSharpCode.TextEditor;
-using ICSharpCode.TextEditor.Document;
-using System.Data;
-using S031.MetaStack.Common;
 
 namespace S031.MetaStack.WinForms
 {
 	public static class OutputWindow
 	{
-		private static WinForm _cd;
-		private static DataTable _dt = null;
-		private static DataGridView _grid = null;
-
+		private static readonly WinForm _cd;
+		private static DataTable _dt;
+		private static DataGridView _grid;
+		private static readonly ConcurrentQueue<Tuple<DateTime, string, string>> _queue = new ConcurrentQueue<Tuple<DateTime, string, string>>(); 
+		private static readonly Timer _timer;
 
 		static OutputWindow()
 		{
@@ -29,9 +29,12 @@ namespace S031.MetaStack.WinForms
 				ControlTrigger = (cdi, ctrl) =>
 				{
 					DataGridView grid = (ctrl as DataGridView);
+					grid.Dock = DockStyle.Fill;
 					grid.AllowUserToAddRows = false;
 					grid.AllowUserToDeleteRows = false;
-					grid.ScrollBars = ScrollBars.None;
+					grid.AutoGenerateColumns = false;
+					grid.VirtualMode = true;
+					//grid.ScrollBars = ScrollBars.Both;
 					grid.RowHeadersWidth = 30;
 					int i = grid.Columns.Add("MessageTime", "Время");
 					var col = grid.Columns[i];
@@ -54,27 +57,45 @@ namespace S031.MetaStack.WinForms
 						UseColumnTextForButtonValue = true
 					};
 					grid.Columns.Add(b);
-					grid.DataSource = GetDataSource();
 					grid.CellClick += Grid_CellClick;
-					_dt.RowChanged += GoToEnd;
 					_grid = grid;
 				}
 			});
-			_cd.Size = new Size(Convert.ToInt32(Screen.FromControl(_cd).WorkingArea.Width / vbo.GoldenRatio), Screen.FromControl(_cd).WorkingArea.Height / 3); 
+			_cd.Size = new Size(Convert.ToInt32(Screen.FromControl(_cd).WorkingArea.Width / vbo.GoldenRatio), Screen.FromControl(_cd).WorkingArea.Height / 3);
+			_timer = new Timer { Interval = 1000 };
+			_timer.Tick += (c, e) =>
+			{
+				int cnt = _queue.Count;
+				for (; _queue.TryDequeue(out Tuple<DateTime, string, string> item);)
+					_dt.Rows.Add(item.Item1, item.Item2, item.Item3);
+				if (cnt > 0)
+				{
+					_grid.Refresh();
+					Application.DoEvents();
+				}
+			};
+			_cd.Disposed += (c, e) =>
+			{
+				_timer?.Dispose();
+			};
+			_grid.DataSource = GetDataSource();
 		}
 
 		private static void Grid_CellClick(object sender, DataGridViewCellEventArgs e)
 		{
 			if (e.RowIndex < 0 || e.ColumnIndex !=
 				_grid.Columns["BtnView"].Index) return;
-			WinForm.ShowStringDialog(_grid[3, e.RowIndex].Value.ToString(), "");
+			WinForm.ShowStringDialog(_grid[2, e.RowIndex].Value.ToString(), "");
 		}
 
-		private static void GoToEnd(object sender, DataRowChangeEventArgs e) =>
+
+		private static void GoToEnd() =>
 			_grid.CurrentCell = _grid[_grid.CurrentCellAddress.X, _grid.RowCount - 1];
+
 
 		private static void _cd_FormClosing(object sender, FormClosingEventArgs e)
 		{
+			_timer.Stop();
 			Clear();
 			_cd.Visible = false;
 			e.Cancel = true;
@@ -95,15 +116,12 @@ namespace S031.MetaStack.WinForms
 		public static void Print(string message) => Print(LogLevels.None, message);
 
 		public static void Print(LogLevels level, string message)=>
-			_dt.Rows.Add(DateTime.Now, FileLog.Messages[level], message);
+			_queue.Enqueue(new Tuple<DateTime, string, string>(DateTime.Now, FileLog.Messages[level], message));
 
 		public static void Print(LogLevels level, string[] messages)
 		{
-			_dt.RowChanged -= GoToEnd;
 			foreach (string item in messages)
 				Print(level, item);
-			GoToEnd(_grid, null);
-			_dt.RowChanged += GoToEnd;
 		}
 
 		public static void Focus()
@@ -116,7 +134,11 @@ namespace S031.MetaStack.WinForms
 			_dt.Rows.Clear();
 		}
 
-		public static void Show() => _cd.Visible = true;
+		public static void Show()
+		{
+			_cd.Visible = true;
+			_timer.Start();
+		}
 
 	}
 }
