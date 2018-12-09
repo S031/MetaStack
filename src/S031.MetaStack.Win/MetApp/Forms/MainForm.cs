@@ -9,6 +9,7 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using System.Linq;
 using S031.MetaStack.WinForms.Connectors;
+using S031.MetaStack.Common.Logging;
 
 namespace MetApp
 {
@@ -381,11 +382,11 @@ namespace MetApp
 						}
 						catch (TCPConnectorException ex)
 						{
-							OutputWindow.Print($"Error: {ex.Message}\n{ex.RemoteSource}\n{ex.RemoteStackTrace}");
+							OutputWindow.Print(LogLevels.Error, $"{ex.Message}\n{ex.RemoteSource}\n{ex.RemoteStackTrace}");
 						}
 						catch (Exception ex)
 						{
-							OutputWindow.Print($"Error: {ex.Message}\n{ex.StackTrace}");
+							OutputWindow.Print(LogLevels.Error, $"{ex.Message}\n{ex.StackTrace}");
 						}
 						Pipe.End();
 						OutputWindow.Print($"Finish {actionId}");
