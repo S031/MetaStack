@@ -19,7 +19,7 @@ namespace S031.MetaStack.WinForms
 			{
 				PresentationType = typeof(T)
 			};
-			return (T)add(parent, wfi);
+			return (T)AddInternal(parent, wfi);
 		}
 		public static T Add<T>(this Control parent, string name) where T : Control
 		{
@@ -28,7 +28,7 @@ namespace S031.MetaStack.WinForms
 			{
 				PresentationType = typeof(T)
 			};
-			return (T)add(parent, wfi);
+			return (T)AddInternal(parent, wfi);
 		}
 
 		public static T Add<T>(this Control parent, WinFormItem winFormItem) where T : Control
@@ -36,7 +36,7 @@ namespace S031.MetaStack.WinForms
 			Type t = typeof(T);
 			winFormItem.NullTest(nameof(winFormItem));
 			winFormItem.PresentationType = t;
-			return (T)add(parent, winFormItem);
+			return (T)AddInternal(parent, winFormItem);
 		}
 
 		public static object Add(this Control parent, WinFormItem winFormItem)
@@ -86,7 +86,7 @@ namespace S031.MetaStack.WinForms
 				}
 			}
 			if ((winFormItem.PresentationType == null || winFormItem.PresentationType.IsSubclassOf(typeof(ListBox))) &&
-				winFormItem.Count() > 0 && winFormItem.SuperForm.IsEmpty() && isSimpleType(winFormItem.DataType))
+				winFormItem.Count() > 0 && winFormItem.SuperForm.IsEmpty() && IsSimpleType(winFormItem.DataType))
 			{
 
 				winFormItem.PresentationType = typeof(ComboBox);
@@ -109,7 +109,7 @@ namespace S031.MetaStack.WinForms
 				  };
 			}
 			else if ((winFormItem.PresentationType == typeof(RadioGroup) && winFormItem.Count() > 0 &&
-				winFormItem.SuperForm.IsEmpty() && isSimpleType(winFormItem.DataType)))
+				winFormItem.SuperForm.IsEmpty() && IsSimpleType(winFormItem.DataType)))
 			{
 				winFormItem.ControlTrigger = (i, c) =>
 				  {
@@ -126,13 +126,13 @@ namespace S031.MetaStack.WinForms
 			}
 			else if (winFormItem.PresentationType == null)
 				winFormItem.PresentationType = typeof(TextBox);
-			return add(parent, winFormItem);
+			return AddInternal(parent, winFormItem);
 		}
 		public static WinFormRef Tag(this Control c)
 		{
 			return c.Tag as WinFormRef;
 		}
-		static object add(Control parent, WinFormItem winFormItem)
+		static object AddInternal(Control parent, WinFormItem winFormItem)
 		{
 			parent.SuspendLayout();
 			WinForm wf = parent.GetOwner();
@@ -161,12 +161,12 @@ namespace S031.MetaStack.WinForms
 			if (instance is TextBoxBase || tbux != null)
 			{
 				instance.TextChanged += new EventHandler(dataChanged);
-				instance.GotFocus += textBox_GotFocus;
-				instance.KeyDown += enter_KeyDown;
+				instance.GotFocus += TextBox_GotFocus;
+				instance.KeyDown += Enter_KeyDown;
 				if (tbux != null)
 				{
-					tbux.Click += cmdTB_Click;
-					tbux.TextBox.GotFocus += textBox_GotFocus;
+					tbux.Click += CmdTB_Click;
+					tbux.TextBox.GotFocus += TextBox_GotFocus;
 					if (winFormItem.DataType.IsNumeric(NumericTypesScope.All))
 					{
 						tbux.TextAlign = HorizontalAlignment.Right;
@@ -199,7 +199,7 @@ namespace S031.MetaStack.WinForms
 			else if (typeof(ListControl).IsInstanceOfType(instance) || instance is CheckBox || instance is TabControl || instance is DateTimePicker)
 			{
 				instance.TextChanged += new EventHandler(dataChanged);
-				instance.KeyDown += enter_KeyDown;
+				instance.KeyDown += Enter_KeyDown;
 				ListControl lc = (instance as ListControl);
 				if (lc != null)
 				{
@@ -243,7 +243,7 @@ namespace S031.MetaStack.WinForms
 			foreach (WinFormItem item in winFormItem)
 			{
 				if (item.PresentationType != null && typeof(Control).IsAssignableFrom(item.PresentationType))
-					add(instance, item);
+					AddInternal(instance, item);
 			}
 			if (winFormItem.ReadOnly)
 				instance.Enabled = false;
@@ -251,7 +251,7 @@ namespace S031.MetaStack.WinForms
 			wf.OnItemAdded(winFormItem);
 			return instance;
 		}
-		static void enter_KeyDown(object sender, KeyEventArgs e)
+		static void Enter_KeyDown(object sender, KeyEventArgs e)
 		{
 			if (!(sender as Control).GetSTDAction("KeyDown"))
 				return;
@@ -261,12 +261,12 @@ namespace S031.MetaStack.WinForms
 				e.SuppressKeyPress = true;
 			}
 		}
-		static void cmdTB_Click(object sender, EventArgs e)
+		static void CmdTB_Click(object sender, EventArgs e)
 		{
 			TextBuX cmd = (sender as TextBuX);
 			cmd.GetOwner().OnItemButtonClick(cmd.GetItem());
 		}
-		static void textBox_GotFocus(object sender, EventArgs e)
+		static void TextBox_GotFocus(object sender, EventArgs e)
 		{
 			TextBoxBase tb = (sender as TextBoxBase);
 			if (tb != null && tb.GetSTDAction("GotFocus"))
@@ -283,7 +283,7 @@ namespace S031.MetaStack.WinForms
 			else if ((e.KeyChar == '.' || e.KeyChar == ',') && tb.Text.IndexOf(',') == -1) e.KeyChar = ',';
 			else if (e.KeyChar != 8) e.KeyChar = char.MinValue;
 		}
-		static bool isSimpleType(Type type)
+		static bool IsSimpleType(Type type)
 		{
 			if (type == typeof(string))
 				return true;

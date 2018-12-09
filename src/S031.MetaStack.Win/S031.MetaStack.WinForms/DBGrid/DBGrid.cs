@@ -174,7 +174,7 @@ namespace S031.MetaStack.WinForms
 				if (value == null) return;
 				xc = value;
 
-				DBGridParam param = new DBGridParam(xc, this.ParentRow);
+				DBGridParam param = new DBGridParam(xc, this);
 				if (param.ShowDialog( _firstStart? DBGridParamShowType.ShowAll: DBGridParamShowType.ShowSmart) == DialogResult.OK)
 				{
 					this.ObjectName = xc.ObjectName;

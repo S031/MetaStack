@@ -1366,7 +1366,8 @@ namespace S031.MetaStack.WinForms
 			{
 				checkedRows.Clear();
 				foreach (DataGridViewRow r in this.Rows)
-					CheckRowInternal(r);
+					checkedRows.Add(r);
+					//CheckRowInternal(r);
 				base.Refresh();
 			}
 		}

@@ -8,6 +8,7 @@ using System.Reflection;
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Linq;
+using S031.MetaStack.WinForms.Connectors;
 
 namespace MetApp
 {
@@ -356,21 +357,41 @@ namespace MetApp
 
 		private void ExecuteAction(string actionId)
 		{
-			var dr = ClientGate.GetActionInfo(actionId)
-			   .GetInputParamTable()
-			   .AddNew()
-			   .SetValue("@ObjectName", _grid.SchemaName)
-			   .SetValue("@IDs", string.Join(",", _grid.Selection().Select(r=>r[_grid.IdColName].ToString())))
-			   .Update();
-			OutputWindow.Show();
-			OutputWindow.Print($"Start {actionId}...");
-			new System.Threading.Thread(() =>
+			//var dr = ClientGate.GetActionInfo(actionId)
+			//   .GetInputParamTable()
+			//   .AddNew()
+			//   .SetValue("@ObjectName", _grid.SchemaName)
+			//   .SetValue("@IDs", string.Join(",", _grid.Selection().Select(r=>r[_grid.IdColName].ToString())))
+			//   .Update();
+
+			using (var cd = new S031.MetaStack.WinForms.Actions.ActionExecuteForm(_grid, actionId))
 			{
-				Pipe.Start();
-				ClientGate.Execute(actionId, dr);
-				Pipe.End();
-				OutputWindow.Print($"Finish {actionId}");
-			}).Start();
+				if (cd.ShowDialog() == DialogResult.OK)
+				{
+					OutputWindow.Show();
+					OutputWindow.Print($"Start {actionId}...");
+					new System.Threading.Thread(() =>
+					{
+						Pipe.Start();
+						try
+						{
+							var dr = ClientGate.Execute(actionId, cd.GetInputParamTable());
+							if (dr.Read())
+								OutputWindow.Print($"Result {dr[0]}");
+						}
+						catch (TCPConnectorException ex)
+						{
+							OutputWindow.Print($"Error: {ex.Message}\n{ex.RemoteSource}\n{ex.RemoteStackTrace}");
+						}
+						catch (Exception ex)
+						{
+							OutputWindow.Print($"Error: {ex.Message}\n{ex.StackTrace}");
+						}
+						Pipe.End();
+						OutputWindow.Print($"Finish {actionId}");
+					}).Start();
+				}
+			}
 		}
 
 		private void MenuRel_Click(object sender, EventArgs e)

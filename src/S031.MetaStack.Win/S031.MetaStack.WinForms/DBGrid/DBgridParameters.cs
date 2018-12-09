@@ -20,14 +20,13 @@ namespace S031.MetaStack.WinForms
 	}
 	public sealed class DBGridParam
 	{
-		private const string setPath = "Newbank;Setup;";
 		private static Dictionary<string, object> _paramCash = new Dictionary<string, object>(16, System.StringComparer.CurrentCultureIgnoreCase);
 		private WinFormItem[] _items;
+		private DBGrid _grid;
 		
-		//public DBGridParam(XMLForm form): this(form, null){}
-
-		public DBGridParam(JMXSchema schema, DataRow parentRow)
+		public DBGridParam(JMXSchema schema, DBGrid grid)
 		{
+			_grid = grid;
 			int count = schema.Parameters.Count;
 			List<WinFormItem> listItems = new List<WinFormItem>(count);
 			foreach (var p in schema.Parameters)
@@ -91,11 +90,11 @@ namespace S031.MetaStack.WinForms
 						}
 						break;
 				}
-				if (item.OriginalValue == null && parentRow != null && !string.IsNullOrEmpty(p.FieldName))
+				if (item.OriginalValue == null && _grid.ParentRow != null && !string.IsNullOrEmpty(p.FieldName))
 				{
 					try
 					{
-						item.Value = parentRow[p.FieldName];
+						item.Value = _grid.ParentRow[p.FieldName];
 					}
 					finally
 					{
