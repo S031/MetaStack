@@ -358,19 +358,12 @@ namespace MetApp
 
 		private void ExecuteAction(string actionId)
 		{
-			//var dr = ClientGate.GetActionInfo(actionId)
-			//   .GetInputParamTable()
-			//   .AddNew()
-			//   .SetValue("@ObjectName", _grid.SchemaName)
-			//   .SetValue("@IDs", string.Join(",", _grid.Selection().Select(r=>r[_grid.IdColName].ToString())))
-			//   .Update();
-
 			using (var cd = new S031.MetaStack.WinForms.Actions.ActionExecuteForm(_grid, actionId))
 			{
 				if (cd.ShowDialog() == DialogResult.OK)
 				{
 					OutputWindow.Show();
-					OutputWindow.Print($"Start {actionId}...");
+					OutputWindow.Print(LogLevels.Information, $"Start {actionId}...");
 					new System.Threading.Thread(() =>
 					{
 						Pipe.Start();
@@ -378,7 +371,7 @@ namespace MetApp
 						{
 							var dr = ClientGate.Execute(actionId, cd.GetInputParamTable());
 							if (dr.Read())
-								OutputWindow.Print($"Result {dr[0]}");
+								OutputWindow.Print(LogLevels.Information, $"Result {dr[0]}");
 						}
 						catch (TCPConnectorException ex)
 						{
@@ -389,7 +382,7 @@ namespace MetApp
 							OutputWindow.Print(LogLevels.Error, $"{ex.Message}\n{ex.StackTrace}");
 						}
 						Pipe.End();
-						OutputWindow.Print($"Finish {actionId}");
+						OutputWindow.Print(LogLevels.Information, $"Finish {actionId}");
 					}).Start();
 				}
 			}

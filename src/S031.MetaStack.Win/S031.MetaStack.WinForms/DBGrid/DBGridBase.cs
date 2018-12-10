@@ -1387,6 +1387,8 @@ namespace S031.MetaStack.WinForms
 				return rr;
 			}
 		}
+		public DataRow[] CheckedRows => checkedRows.Select(r => GetRow(r.Index)).ToArray();
+
 		#endregion Row Selection support
 
 		#region Read&Edit Objects

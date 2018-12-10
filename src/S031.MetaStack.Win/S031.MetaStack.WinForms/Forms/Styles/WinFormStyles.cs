@@ -128,6 +128,7 @@ namespace S031.MetaStack.WinForms
 					{
 						(ctrl as TableLayoutPanel)?.RowStyles.Add(new RowStyle(SizeType.AutoSize, 100));
 					};
+					tlpRows.Height = WinForm.ButtonHeight + 20;
 				}
 			};
 	}

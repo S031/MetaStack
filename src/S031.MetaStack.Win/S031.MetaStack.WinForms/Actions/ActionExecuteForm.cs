@@ -22,8 +22,9 @@ namespace S031.MetaStack.WinForms.Actions
 			tp.ColumnStyles[1].SizeType = SizeType.Percent;
 			tp.ColumnStyles[1].Width = 62;
 
-			int maxWidth = 0;
+			int maxWidth = 480;
 			_ai = ClientGate.GetActionInfo(actionID);
+			this.Text = _ai.Name;
 			foreach (var p in _ai.InterfaceParameters
 				.Where(param=>param.Value.Dirrect == ParamDirrect.Input)
 				.OrderBy(param=>param.Value.Position)
@@ -69,7 +70,7 @@ namespace S031.MetaStack.WinForms.Actions
 						item.Value = PathHelper.UserName;
 						break;
 					case "bs_selection":
-						item.Value = string.Join(",", grid.Selection().Select(r => r[grid.IdColName].ToString()));
+						item.Value = string.Join(",", grid.CheckedRows.Select(r => r[grid.IdColName].ToString()));
 						break;
 					case "bs_objectname":
 						item.Value = grid.SchemaName;
