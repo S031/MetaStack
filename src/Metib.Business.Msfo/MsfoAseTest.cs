@@ -41,7 +41,12 @@ namespace Metib.Business.Msfo
 				{
 					try
 					{
-						string result = await mdb.ExecuteAsync<string>($"exec kalv_TestForFct {i}");
+						string result = await mdb.ExecuteAsync<string>($@"
+							select 'Session ID = ' + cast(@@SPID as varchar(10))
+							+ ' User Name = ' + '{ctx.UserName}'
+							+ ' Connection Name = ' + '{ctx.ConnectionName}'
+							+ ' Param Value = ' + '{i}'");
+
 						pipe.Write(ctx, result);
 						sb.AppendLine(result);
 					}
