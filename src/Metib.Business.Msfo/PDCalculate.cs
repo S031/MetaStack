@@ -44,18 +44,18 @@ namespace Metib.Business.Msfo
 					{
 						try
 						{
-							await mdb.ExecuteAsync<string>($@"
+							await mdb.ExecuteAsync($@"
 							exec workdb..mib_msfo_pd_calc 
 								@Date = '{date.ToString("yyyyMMdd")}'
 								,@BranchID = {filial}
 								,@DealType = '{dtype}'");
-							string result = $"Success mib_msfo_pd_calc {date} filial={branchID} deal type={dealType}";
+							string result = $"Success mib_msfo_pd_calc {date} filial={filial} deal type={dtype}";
 							pipe.Write(ctx, result);
 							sb.AppendLine(result);
 						}
 						catch (Exception ex)
 						{
-							string message = $"{LogLevels.Error} {ex.Message}";
+							string message = $"{LogLevels.Error} {ex.Message}\n{ex.StackTrace}";
 							pipe.Write(ctx, message);
 							sb.AppendLine(message);
 						}

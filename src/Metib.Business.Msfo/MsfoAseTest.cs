@@ -52,7 +52,7 @@ namespace Metib.Business.Msfo
 					}
 					catch (Exception ex)
 					{
-						sb.AppendLine($"{LogLevels.Error} {ex.Message}");
+						string message = $"{LogLevels.Error} {ex.Message}\n{ex.StackTrace}";
 					}
 				}
 			}
