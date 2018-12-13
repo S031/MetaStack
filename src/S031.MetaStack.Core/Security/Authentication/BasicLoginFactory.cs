@@ -12,6 +12,7 @@ namespace S031.MetaStack.Core.Security
 {
 	public class BasicLoginFactory : ILoginFactory
 	{
+		const int _checkTicketTimeout = 5000;
 		const int _expirePeriod = 3000;
 		const int _expirePeriod4Loged = 7200000;
 		const int _maxUserSessions = 64;
@@ -29,7 +30,12 @@ namespace S031.MetaStack.Core.Security
 		public BasicLoginFactory()
 		{
 		}
-		
+
+		/// <summary>
+		/// Set timeout in milliseconds for expire client message timestamp (0-disable check)
+		/// </summary>
+		public int CheckTicketTimeout { get; set; } = _checkTicketTimeout;		
+
 		/// <summary>
 		/// Login request
 		/// </summary>
@@ -79,7 +85,7 @@ namespace S031.MetaStack.Core.Security
 
 			if (loginInfo.IsLogedOn())
 			{
-				if (!CheckTicket(userName, loginInfo, encryptedKey.ToByteArray()))
+				if (!CheckTicket(userName, loginInfo, encryptedKey.ToByteArray(), this.CheckTicketTimeout))
 					throw new AuthenticationExceptions($"Invaliod session ticked for user {userName}");
 			}
 			else if (CheckPassword(userName, loginInfo, encryptedKey.ToByteArray()))
@@ -114,14 +120,14 @@ namespace S031.MetaStack.Core.Security
 
 			if (!loginInfo.IsLogedOn())
 				RemoveSession(userName, sessionUID);
-			else if (CheckTicket(userName, loginInfo, encryptedKey.ToByteArray()))
+			else if (CheckTicket(userName, loginInfo, encryptedKey.ToByteArray(), this.CheckTicketTimeout))
 				RemoveSession(userName, sessionUID);
 			else
 				throw new AuthenticationExceptions($"Invaliod session ticked");
 
 		}
 
-		private static bool CheckTicket(string userName, LoginInfo loginInfo, byte[] encryptedTicketData)
+		private static bool CheckTicket(string userName, LoginInfo loginInfo, byte[] encryptedTicketData, int checkTicketTimeout)
 		{
 			try
 			{
@@ -130,9 +136,12 @@ namespace S031.MetaStack.Core.Security
 							.ImportBin(loginInfo.CryptoKey)
 							.DecryptBin(encryptedTicketData);
 				Guid ticket = new Guid(data.Take(16).ToArray());
-				double ms = BitConverter.ToDouble(data, 16);
-				if (Math.Abs((DateTime.Now - DateTime.Now.Date).TotalMilliseconds - ms) > 5000)
-					throw new AuthenticationExceptions("Bad message timestamp");
+				if (checkTicketTimeout > 0)
+				{
+					double ms = BitConverter.ToDouble(data, 16);
+					if (Math.Abs((DateTime.Now - DateTime.Now.Date).TotalMilliseconds - ms) > checkTicketTimeout)
+						throw new AuthenticationExceptions("Bad message timestamp");
+				}
 				return loginInfo.Ticket.Equals(ticket);
 			}
 			catch (Exception ex)
