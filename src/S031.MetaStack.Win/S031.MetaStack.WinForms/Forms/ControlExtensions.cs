@@ -172,6 +172,13 @@ namespace S031.MetaStack.WinForms
 						tbux.TextAlign = HorizontalAlignment.Right;
 						tbux.KeyPress += new KeyPressEventHandler(Num_KeyPress);
 					}
+					else if (winFormItem.DataType == typeof(string) && winFormItem.SuperForm == WinForm.StrViewFormList)
+					{
+						//tbux.TextBox.Enabled = false;
+						tbux.TextBox.Multiline = true;
+						tbux.TextBox.WordWrap = false;
+						tbux.TextBox.MaxLength = winFormItem.DataSize;
+					}
 				}
 				else if (instance is TextBox && winFormItem.DataType.IsNumeric(NumericTypesScope.All))
 				{

@@ -57,6 +57,7 @@ namespace S031.MetaStack.WinForms
 		public string Mask { get; set; }
 		public string Format { get; set; }
 		public int Width { get; set; }
+		public int DataSize { get; set; } = 256;
 		public bool ReadOnly { get; set; }
 		public bool Visible { get; set; }
 		public string SuperForm { get; set; }

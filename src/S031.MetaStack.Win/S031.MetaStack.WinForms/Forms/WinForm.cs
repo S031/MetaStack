@@ -245,12 +245,12 @@ namespace S031.MetaStack.WinForms
 				string buff;
 				if (cdi.SuperForm.Length == WinForm.StrViewForm.Length)
 				{
-					if ((buff = ShowStringDialog(cdi.LinkedControl.Text, string.Empty)) != null)
+					if ((buff = ShowStringDialog(cdi.LinkedControl.Text, string.Empty, this)) != null)
 						cdi.LinkedControl.Text = buff;
 				}
 				else if (cdi.SuperForm.Equals(WinForm.StrViewFormList, StringComparison.CurrentCultureIgnoreCase))
 				{
-					if ((buff = WinForm.ShowStringDialog(cdi.LinkedControl.Text.Replace(",", vbo.vbCrLf), string.Empty)) != null)
+					if ((buff = WinForm.ShowStringDialog(cdi.LinkedControl.Text.Replace(",", vbo.vbCrLf), string.Empty, this)) != null)
 					{
 						buff = buff.Replace(vbo.vbCrLf, ",");
 						for (; buff.Contains(",,");)
@@ -269,7 +269,7 @@ namespace S031.MetaStack.WinForms
 					string language = cdi.SuperForm.Substring(WinForm.StrViewForm.Length).ToUpper();
 					if (language == "BASIC")
 						language = "VBNET";
-					if ((buff = ShowStringDialog(cdi.LinkedControl.Text, language)) != null)
+					if ((buff = ShowStringDialog(cdi.LinkedControl.Text, language, this)) != null)
 						cdi.LinkedControl.Text = buff;
 				}
 			}
@@ -584,45 +584,65 @@ namespace S031.MetaStack.WinForms
 		#endregion CodeCompletion
 
 		#region PrivateMembers
-		public static string ShowStringDialog(string source, string language)
+		public static string ShowStringDialog(string source, string language, Form owner=null)
 		{
 			string destination = null;
+			bool simple = string.IsNullOrEmpty(language);
 			WinFormItem browser = new WinFormItem($"Source")
 			{
-				PresentationType = typeof(CEdit),
+				PresentationType = simple ? typeof(TextBox) : typeof(CEdit),
 				ControlTrigger = (cdi, ctrl) =>
 				{
 					var editor = (ctrl as CEdit);
-					if (!string.IsNullOrEmpty(language))
+					var tb = (ctrl as TextBox);
+					if (editor != null)
 					{
-						editor.SetHighlighting(language);
-						cdi.Parent.AddCodeCompletion("Source", language);
+						if (!string.IsNullOrEmpty(language))
+						{
+							editor.SetHighlighting(language);
+							cdi.Parent.AddCodeCompletion("Source", language);
+						}
+						editor.Dock = DockStyle.Fill;
+						editor.Text = source;
+						editor.ExitOnEscape = true;
 					}
-					editor.Dock = DockStyle.Fill;
-					editor.Text = source;
-					editor.ExitOnEscape = true;
+					else
+					{
+						tb.Multiline = true;
+						tb.WordWrap = false;
+						tb.ScrollBars = ScrollBars.Both;
+						tb.Text = source;
+					}
 				}
 			};
 
 			using (WinForm cd = new BaseViewForm(browser))
 			{
-				var ce = cd.GetItem("Source").As<CEdit>();
-				Button btn = cd
-					.GetControl<TableLayoutPanel>("StdButtonsCells")
-					.Add<Button>(new WinFormItem("Wrap") { CellAddress = new Pair<int>(0, 0) });
-				btn.Width = ButtonWidth * 2;
-				btn.Text = "Перенос строк";
-				btn.Dock = DockStyle.Left;
-				btn.Click += new EventHandler((sender, e) =>
+				Control editor = null;
+				if (!simple)
 				{
-					int len = Convert.ToInt32(ce.Width / ce.Font.SizeInPoints);
-					string s = ce.Text.Wrap(len);
-					ce.Text = s;
-					ce.Refresh();
+					var ce = cd.GetItem("Source").As<CEdit>();
+					Button btn = cd
+						.GetControl<TableLayoutPanel>("StdButtonsCells")
+						.Add<Button>(new WinFormItem("Wrap") { CellAddress = new Pair<int>(0, 0) });
+					btn.Width = ButtonWidth * 2;
+					btn.Text = "Перенос строк";
+					btn.Dock = DockStyle.Left;
+					btn.Click += new EventHandler((sender, e) =>
+					{
+						int len = Convert.ToInt32(ce.Width / ce.Font.SizeInPoints);
+						string s = ce.Text.Wrap(len);
+						ce.Text = s;
+						ce.Refresh();
 
-				});
-				if (cd.ShowDialog() == DialogResult.OK)
-					destination = ce.Text;
+					});
+					editor = ce;
+				}
+				else
+					editor = cd.GetItem("Source").As<TextBox>();
+				cd.TopLevel = true;
+				if (cd.ShowDialog(owner) == DialogResult.OK)
+					destination = editor.Text;
 			}
 			return destination;
 		}

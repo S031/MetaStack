@@ -35,6 +35,7 @@ namespace S031.MetaStack.WinForms.Actions
 					Caption = p.Name,
 					DataType = MdbTypeMap.GetType(p.DataType),
 					Width = p.DisplayWidth,
+					DataSize = p.Width,
 					Format = p.Format,
 					SuperForm = p.SuperForm,
 					SuperMethod = p.SuperMethod,

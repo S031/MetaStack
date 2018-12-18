@@ -51,8 +51,8 @@ namespace Metib.Business.Msfo
 								@Date = '{date.ToString("yyyyMMdd")}'
 								,@BranchID = {filial}
 								,@DealType = '{dtype}'
-			`					,@Confirmed = {confirmed}
-								,@Batch = {batch}");
+								,@Confirmed = {confirmed}
+								,@Batch = '{batch}'");
 							string result = $"Success mib_msfo_Reserve_OperGen {date} filial={filial} deal type={dtype}";
 							pipe.Write(ctx, result);
 							sb.AppendLine(result);
