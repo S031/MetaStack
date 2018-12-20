@@ -140,5 +140,10 @@ namespace S031.MetaStack.WinForms
 			_timer.Start();
 		}
 
+		public static void Exit()
+		{
+			_cd?.Close();
+			_cd.Dispose();
+		}
 	}
 }

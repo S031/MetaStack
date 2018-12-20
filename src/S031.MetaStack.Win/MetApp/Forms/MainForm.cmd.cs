@@ -12,7 +12,11 @@ namespace MetApp
 			//_commands[DBBrowseCommandsEnum.FileOpen] = cmdFileOpen;
 			//_commands[DBBrowseCommandsEnum.FileOpenRelated] = cmdFileOpenRelated;
 			_commands[DBBrowseCommandsEnum.FileClose] = this.Close;
-			_commands[DBBrowseCommandsEnum.FileExit] = Application.Exit;
+			_commands[DBBrowseCommandsEnum.FileExit] = () =>
+				{
+					OutputWindow.Exit();
+					Application.Exit();
+				};
 			_commands[DBBrowseCommandsEnum.FilePeriod] = _dateStart.Focus;
 			_commands[DBBrowseCommandsEnum.FilePrintCurrentForm] = () => ReportManager.PrintCurrentForm(_grid);
 			//_commands[DBBrowseCommandsEnum.FilePrint] = cmdFilePrint;
