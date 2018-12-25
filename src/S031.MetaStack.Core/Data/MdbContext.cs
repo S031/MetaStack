@@ -190,7 +190,9 @@ namespace S031.MetaStack.Core.Data
 					object p = param.Value;
 					string pValue = string.Empty;
 					Type t = p.GetType();
-					if (t.IsNumeric())
+					if (t.IsNumeric(NumericTypesScope.FloatingPoint))
+						pValue = p.ToString().Replace(',', '.');
+					else if (t.IsNumeric())
 						pValue = p.ToString();
 					else if (t == typeof(DateTime))
 						//!!! full date format
