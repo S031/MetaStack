@@ -23,13 +23,14 @@ namespace S031.MetaStack.WinForms
 		private const string UserNameField = "UserNameField";
 		
 		//Form
-		private JMXSchema xc;
-		private JMXSchema xcOriginal;
+		private JMXSchema _xc;
+		private JMXSchema _xcOriginal;
 		private string _idColName;
 
 		//private string shortcut;
-		private object[] sqlParams;
-		private DataTable dt;
+		private object[] _sqlParams;
+		private DataTable _dt;
+		private string _connectioName;
 		private static bool _firstStart = true;
 
 		//Totals
@@ -42,8 +43,8 @@ namespace S031.MetaStack.WinForms
 			public string totalString;
 			public DateTime totalDate;
 		}
-		private TotalInfo[] totals;
-		private bool freezeFooter;
+		private TotalInfo[] _totals;
+		private bool _freezeFooter;
 
 		//Clipboard Support
 		private static bool delObj;
@@ -59,7 +60,7 @@ namespace S031.MetaStack.WinForms
 
 		protected virtual void OnFormNotRead(EventArgs e)
 		{
-			xc = null;
+			_xc = null;
 			SchemaNotRead?.Invoke(this, e);
 		}
 		protected virtual void OnFormRead(SchemaEventArgs e)
@@ -136,10 +137,10 @@ namespace S031.MetaStack.WinForms
 		{
 			get
 			{
-				if (xc == null)
+				if (_xc == null)
 					return "";
 				else
-					return xc.ObjectName;
+					return _xc.ObjectName;
 			}
 			set
 			{
@@ -148,12 +149,12 @@ namespace S031.MetaStack.WinForms
 				JMXSchema s = null;
 				try
 				{
-					s = ClientGate.GetObjectSchema(value);
+					s = ClientGate.GetObjectSchema(ParseObjectName(value));
 					read = true;
 				}
 				catch (Connectors.TCPConnectorException e)
 				{
-					OnFormReadException(new SchemaExceptionEventArgs(e, xc));
+					OnFormReadException(new SchemaExceptionEventArgs(e, _xc));
 					return;
 				}
 				if (read)
@@ -164,37 +165,50 @@ namespace S031.MetaStack.WinForms
 					OnFormNotRead(new EventArgs());
 			}
 		}
+		private string ParseObjectName(string value)
+		{
+			string[] name = (".." + value).Split('.');
+			int i = name.Length - 1;
+			string objectName = name[i];
+			string owner = name[i - 1];
+			string connectionName = name[i - 2];
 
+			if (!connectionName.IsEmpty())
+				_connectioName = connectionName;
+			if (!owner.IsEmpty())
+				objectName = owner + '.' + objectName;
+			return objectName;
+		}
 		public JMXSchema Schema
 		{
-			get { return xc; }
+			get { return _xc; }
 			set
 			{
 				LoadComplete = false;
 				if (value == null) return;
-				xc = value;
+				_xc = value;
 
-				DBGridParam param = new DBGridParam(xc, this);
+				DBGridParam param = new DBGridParam(_xc, this);
 				if (param.ShowDialog( _firstStart? DBGridParamShowType.ShowAll: DBGridParamShowType.ShowSmart) == DialogResult.OK)
 				{
-					this.ObjectName = xc.ObjectName;
+					this.ObjectName = _xc.ObjectName;
 					_idColName = Schema.Attributes.FirstOrDefault(a => a.IsPK && GetMacroType(a.DataType) == MacroType.num)?.AttribName;
-					sqlParams = param.GetQueryParameters();
+					_sqlParams = param.GetQueryParameters();
 					MakeFrame();
-					xcOriginal = JMXSchema.Parse(xc.ToString());
+					_xcOriginal = JMXSchema.Parse(_xc.ToString());
 					var parentForm = this.FindForm();
-					parentForm.Text = xc.Name;
-					OnFormComplete(new SchemaEventArgs(xc));
+					parentForm.Text = _xc.Name;
+					OnFormComplete(new SchemaEventArgs(_xc));
 				}
 				else
-					OnFormNoComplete(new SchemaEventArgs(xc));
+					OnFormNoComplete(new SchemaEventArgs(_xc));
 				LoadComplete = true;
 			}
 		}
 
 		private void MakeFrame()
 		{
-			freezeFooter = this.Footer;
+			_freezeFooter = this.Footer;
 			this.Footer = false;
 			for (; this.Columns.Count > 0;) { this.Columns.Remove(this.Columns[0]); }
 			this.AddColumnsFromObjectSchema();
@@ -215,7 +229,7 @@ namespace S031.MetaStack.WinForms
 				}
 				catch (Connectors.TCPConnectorException e)
 				{
-					OnGetDataException(new SchemaExceptionEventArgs(e, xc));
+					OnGetDataException(new SchemaExceptionEventArgs(e, _xc));
 					return;
 				}
 			}
@@ -225,7 +239,7 @@ namespace S031.MetaStack.WinForms
 				tw.Show(this, GetRecordset);
 				if (tw.Error != null)
 				{
-					OnGetDataException(new SchemaExceptionEventArgs(tw.Error, xc));
+					OnGetDataException(new SchemaExceptionEventArgs(tw.Error, _xc));
 					return;
 				}
 			}
@@ -234,13 +248,13 @@ namespace S031.MetaStack.WinForms
 				fs.SetTime(SchemaName, factTime);
 			var bs = new BindingSource
 			{
-				DataSource = dt,
+				DataSource = _dt,
 			};
 			bs.ListChanged += (c, e) => { MakeTotals(); ShowTotals(); };
 			this.DataSource = bs;
 
-			if (freezeFooter) this.Footer = true;
-			freezeFooter = false;
+			if (_freezeFooter) this.Footer = true;
+			_freezeFooter = false;
 			MakeTotals();
 			ShowTotals();
 			this.Refresh();
@@ -248,11 +262,15 @@ namespace S031.MetaStack.WinForms
 
 		private void GetRecordset()
 		{
-			string _objectName = xc.ObjectName;
-			if (StartFilter.IsEmpty())
-				dt = ClientGate.GetData(this.ObjectName, sqlParams);
-			else
-				dt = ClientGate.GetData(this.ObjectName, sqlParams.Concat(new object[] { "_filter", StartFilter }).ToArray());
+			string _objectName = _xc.ObjectName;
+			var parameters = _sqlParams.AsEnumerable();
+
+			if (!StartFilter.IsEmpty())
+				parameters = parameters.Concat(new object[] { "_filter", StartFilter });
+			if (!_connectioName.IsEmpty())
+				parameters = parameters.Concat(new object[] { "_connectionName", _connectioName });
+
+			_dt = ClientGate.GetData(this.ObjectName, parameters.ToArray());
 
 		}
 
@@ -275,7 +293,7 @@ namespace S031.MetaStack.WinForms
 		public override void Reload()
 		{
 			if (LoadComplete)
-				this.Schema = xcOriginal;
+				this.Schema = _xcOriginal;
 		}
 		public override void RefreshAll()
 		{
@@ -315,31 +333,31 @@ namespace S031.MetaStack.WinForms
 
 			int count = list.Count;
 			bool total = false;
-			totals = new TotalInfo[xc.Attributes.Count];
-			for (int i = 0; i < xc.Attributes.Count; i++)
+			_totals = new TotalInfo[_xc.Attributes.Count];
+			for (int i = 0; i < _xc.Attributes.Count; i++)
 			{
-				totals[i].Check = false;
-				totals[i].Agregate = "";
-				totals[i].Type = GetMacroType(xc.Attributes[i].DataType);
-				totals[i].totalDec = 0;
-				totals[i].totalString = "";
-				totals[i].totalDate = DateTime.MinValue;
+				_totals[i].Check = false;
+				_totals[i].Agregate = "";
+				_totals[i].Type = GetMacroType(_xc.Attributes[i].DataType);
+				_totals[i].totalDec = 0;
+				_totals[i].totalString = "";
+				_totals[i].totalDate = DateTime.MinValue;
 
-				string agr = xc.Attributes[i].Agregate.ToLower();
-				if (TotalValid(totals[i].Type, agr))
+				string agr = _xc.Attributes[i].Agregate.ToLower();
+				if (TotalValid(_totals[i].Type, agr))
 				{
-					totals[i].Check = true;
-					totals[i].Agregate = agr;
+					_totals[i].Check = true;
+					_totals[i].Agregate = agr;
 					total = true;
-					if (totals[i].Agregate == "rcnt")
-						totals[i].totalDec = count;
-					else if (totals[i].Agregate == "min")
-						if (totals[i].Type == MacroType.date)
-							totals[i].totalDate = DateTime.MaxValue;
-						else if (totals[i].Type == MacroType.num)
-							totals[i].totalDec = decimal.MaxValue;
-						else if (totals[i].Type == MacroType.str)
-							totals[i].totalString = ((char)12293).ToString();
+					if (_totals[i].Agregate == "rcnt")
+						_totals[i].totalDec = count;
+					else if (_totals[i].Agregate == "min")
+						if (_totals[i].Type == MacroType.date)
+							_totals[i].totalDate = DateTime.MaxValue;
+						else if (_totals[i].Type == MacroType.num)
+							_totals[i].totalDec = decimal.MaxValue;
+						else if (_totals[i].Type == MacroType.str)
+							_totals[i].totalString = ((char)12293).ToString();
 				}
 			}
 			if (total)
@@ -348,37 +366,37 @@ namespace S031.MetaStack.WinForms
 				for (int i = 0; i < count; i++)
 				{
 					var row = (list[i] as DataRowView);
-					for (int j = 0; j < dt.Columns.Count; j++)
+					for (int j = 0; j < _dt.Columns.Count; j++)
 					{
 						object value = row[j];
 						if (!vbo.IsEmpty(value))
 						{
-							switch (totals[j].Agregate)
+							switch (_totals[j].Agregate)
 							{
 								case "sum":
-									totals[j].totalDec += Convert.ToDecimal(value);
+									_totals[j].totalDec += Convert.ToDecimal(value);
 									break;
 								case "ave":
-									totals[j].totalDec += Convert.ToDecimal(value) / count;
+									_totals[j].totalDec += Convert.ToDecimal(value) / count;
 									break;
 								case "vcnt":
-									if (!vbo.IsEmpty(value)) totals[j].totalDec++;
+									if (!vbo.IsEmpty(value)) _totals[j].totalDec++;
 									break;
 								case "max":
-										if (totals[j].Type == MacroType.num && Convert.ToDecimal(value) > totals[j].totalDec)
-											totals[j].totalDec = Convert.ToDecimal(value);
-										else if (totals[j].Type == MacroType.str && totals[j].totalString.CompareTo(value.ToString()) < 0)
-											totals[j].totalString = value.ToString();
-										else if (totals[j].Type == MacroType.date && (DateTime)value > totals[j].totalDate)
-											totals[j].totalDate = (DateTime)value;
+										if (_totals[j].Type == MacroType.num && Convert.ToDecimal(value) > _totals[j].totalDec)
+											_totals[j].totalDec = Convert.ToDecimal(value);
+										else if (_totals[j].Type == MacroType.str && _totals[j].totalString.CompareTo(value.ToString()) < 0)
+											_totals[j].totalString = value.ToString();
+										else if (_totals[j].Type == MacroType.date && (DateTime)value > _totals[j].totalDate)
+											_totals[j].totalDate = (DateTime)value;
 									break;
 								case "min":
-										if (totals[j].Type == MacroType.num && Convert.ToDecimal(value) < totals[j].totalDec)
-											totals[j].totalDec = Convert.ToDecimal(value);
-										else if (totals[j].Type == MacroType.str && totals[j].totalString.CompareTo(value.ToString()) > 0)
-											totals[j].totalString = value.ToString();
-										else if (totals[j].Type == MacroType.date && (DateTime)value < totals[j].totalDate)
-											totals[j].totalDate = (DateTime)value;
+										if (_totals[j].Type == MacroType.num && Convert.ToDecimal(value) < _totals[j].totalDec)
+											_totals[j].totalDec = Convert.ToDecimal(value);
+										else if (_totals[j].Type == MacroType.str && _totals[j].totalString.CompareTo(value.ToString()) > 0)
+											_totals[j].totalString = value.ToString();
+										else if (_totals[j].Type == MacroType.date && (DateTime)value < _totals[j].totalDate)
+											_totals[j].totalDate = (DateTime)value;
 									break;
 							}
 						}
@@ -386,14 +404,14 @@ namespace S031.MetaStack.WinForms
 				}//);
 				for (int j = 0; j < this.Columns.Count; j++)
 				{
-					if (totals[j].Agregate == "min")
+					if (_totals[j].Agregate == "min")
 					{
-						if (totals[j].totalDec == decimal.MaxValue)
-							totals[j].totalDec = 0;
-						if (totals[j].totalDate == DateTime.MaxValue)
-							totals[j].totalDate = DateTime.MinValue;
-						if (totals[j].totalString == ((char)12293).ToString())
-							totals[j].totalString = string.Empty;
+						if (_totals[j].totalDec == decimal.MaxValue)
+							_totals[j].totalDec = 0;
+						if (_totals[j].totalDate == DateTime.MaxValue)
+							_totals[j].totalDate = DateTime.MinValue;
+						if (_totals[j].totalString == ((char)12293).ToString())
+							_totals[j].totalString = string.Empty;
 					}
 
 
@@ -402,20 +420,20 @@ namespace S031.MetaStack.WinForms
 		}
 		private void ShowTotals()
 		{
-			if (totals == null)
+			if (_totals == null)
 				return;
-			for (int i = 0; i < totals.Length; i++)
+			for (int i = 0; i < _totals.Length; i++)
 			{
-				if (totals[i].Check)
+				if (_totals[i].Check)
 				{
-					if (totals[i].Agregate == "rcnt")
-						this.FooterText(i, totals[i].totalDec.ToString("##0"));
-					else if (totals[i].Type == MacroType.num)
-						this.FooterText(i, totals[i].totalDec.ToString(this.Columns[i].DefaultCellStyle.Format));
-					else if (totals[i].Type == MacroType.date)
-						this.FooterText(i, totals[i].totalDate.ToString(vbo.DateFormat));
+					if (_totals[i].Agregate == "rcnt")
+						this.FooterText(i, _totals[i].totalDec.ToString("##0"));
+					else if (_totals[i].Type == MacroType.num)
+						this.FooterText(i, _totals[i].totalDec.ToString(this.Columns[i].DefaultCellStyle.Format));
+					else if (_totals[i].Type == MacroType.date)
+						this.FooterText(i, _totals[i].totalDate.ToString(vbo.DateFormat));
 					else
-						this.FooterText(i, totals[i].totalString);
+						this.FooterText(i, _totals[i].totalString);
 				}
 			}
 		}
@@ -474,11 +492,11 @@ namespace S031.MetaStack.WinForms
 					return;
 			}
 
-			JMXAttribute att = xc.Attributes[col.Index];
+			JMXAttribute att = _xc.Attributes[col.Index];
 			if (TotalValid(GetMacroType(att.DataType), totalFunc))
 			{
 				att.Agregate = totalFunc;
-				xcOriginal.Attributes[col.Index].Agregate = totalFunc;
+				_xcOriginal.Attributes[col.Index].Agregate = totalFunc;
 				MakeTotals();
 				ShowTotals();
 			}

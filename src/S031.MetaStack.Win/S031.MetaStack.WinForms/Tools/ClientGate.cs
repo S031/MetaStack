@@ -115,7 +115,7 @@ namespace S031.MetaStack.WinForms
 				object p = parameters[i];
 				if (i % 2 == 0)
 				{
-					if (p.ToString().EndsWith("ConnectionName"))
+					if (p.ToString().EndsWith("ConnectionName", StringComparison.CurrentCultureIgnoreCase))
 						c = true;
 					else
 					{
