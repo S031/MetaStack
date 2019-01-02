@@ -22,6 +22,11 @@ namespace S031.MetaStack.Core.ORM
 			_typeMapping = typeMapping;
 			_schemaSupport = true;
 		}
+		public SQLStatementWriter(IJMXTypeMapping typeMapping, bool schemaSupport)
+		{
+			_typeMapping = typeMapping;
+			_schemaSupport = schemaSupport;
+		}
 
 		public SQLStatementWriter(IJMXTypeMapping typeMapping, JMXSchema schema, bool schemaSupport = true)
 		{

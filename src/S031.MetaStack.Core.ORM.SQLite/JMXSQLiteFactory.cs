@@ -33,6 +33,6 @@ namespace S031.MetaStack.Core.ORM.SQLite
 
 		public override JMXObject CreateObject(string objectName) => new JMXObject(objectName, this);
 
-		public override SQLStatementWriter CreateSQLStatementWriter() => new SQLStatementWriter(new JMXSQLiteTypeMapping());
+		public override SQLStatementWriter CreateSQLStatementWriter() => new SQLStatementWriter(new JMXSQLiteTypeMapping(), false);
 	}
 }

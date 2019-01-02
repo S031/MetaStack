@@ -88,4 +88,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy $(TargetDir)*.dll $(SolutionDir)src\S031.MetaStack.Win\\MetApp\Bin\$(ConfigurationName) /s /d /y</PostBuildEvent>
+  </PropertyGroup>
 </Project>
