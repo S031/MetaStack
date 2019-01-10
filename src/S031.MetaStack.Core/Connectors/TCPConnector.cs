@@ -44,7 +44,10 @@ namespace S031.MetaStack.WinForms.Connectors
 		TCPConnector(string endPointConfigName)
 		{
 #if NETCOREAPP
-			var config = ApplicationContext.GetServices().GetService<IConfiguration>().GetSection($"Connectors:{endPointConfigName}");
+			var config = ApplicationContext
+				.GetServices()
+				.GetService<IConfiguration>()
+				.GetSection($"Connectors:{endPointConfigName}");
 			_host = config.GetValue<string>("Host");
 			_port = config.GetValue<int>("Port");
 #else

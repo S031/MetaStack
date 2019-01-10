@@ -38,7 +38,7 @@ namespace S031.MetaStack.Services
 		}
 		async Task Accept(Task<TcpClient> task)
 		{
-			using (var client = task.Result)
+			using (var client = await task)
 			using (var stream = client.GetStream())
 			{
 				var buffer = new byte[4];
