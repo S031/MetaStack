@@ -63,7 +63,36 @@ namespace S031.MetaStack.Core.ORM
 					else
 						WriteSelectColumnStatement(fromSchema, att, ",");
 
+				foreach (var fk in fromSchema.ForeignKeys)
+				{
+					foreach (var m in fk.MigrateKeyMembers)
+					{
+						//Migrated attribute may be not null
+						WriteLine($"\t,{fk.KeyName}.{m.FieldName} [{fk.KeyName}.{m.FieldName}]");
+					}
+				}
 				WriteLine($"FROM {target} AS {fromSchema.DbObjectName.ObjectName}");
+				foreach (var fk in fromSchema.ForeignKeys)
+				{
+					if (fk.MigrateKeyMembers.Count > 0)
+					{
+						bool required = fk.KeyMembers
+							.Any(m => fromSchema.Attributes
+								.Any(a => a.FieldName.Equals(m.FieldName, StringComparison.CurrentCultureIgnoreCase) && a.Required));
+
+						string fkObj = _schemaSupport ?
+							fk.RefDbObjectName.ToString() :
+							fk.RefDbObjectName.ObjectName;
+
+						if (required)
+							Write($"INNER JOIN ");
+						else 
+							Write("LEFT JOIN ");
+						Write($"{fkObj} AS {fk.KeyName} ON ");
+						for (int i = 0; i < fk.KeyMembers.Count; i++)
+							WriteLine($"{fromSchema.DbObjectName.ObjectName}.{fk.KeyMembers[i].FieldName} == {fk.KeyName}.{fk.RefKeyMembers[i].FieldName}");
+					}
+				}
 				var cs = fromSchema.Conditions.Concat(conditions);
 				if (cs.Count() > 0)
 				{

@@ -18,6 +18,7 @@ namespace S031.MetaStack.WinForms.ORM
 		private string _dbObjectName;
 		List<JMXKeyMember> _keyMembers;
 		List<JMXKeyMember> _refKeyMembers;
+		List<JMXKeyMember> _migrateKeyMembers;
 
 		public JMXForeignKey(string keyName)
 		{
@@ -28,6 +29,7 @@ namespace S031.MetaStack.WinForms.ORM
 			UpdateRefAction = string.Empty;
 			_keyMembers = new List<JMXKeyMember>();
 			_refKeyMembers = new List<JMXKeyMember>();
+			_migrateKeyMembers = new List<JMXKeyMember>();
 		}
 
 		public int ID { get; set; }
@@ -55,8 +57,9 @@ namespace S031.MetaStack.WinForms.ORM
 				_dbObjectName = value.ObjectName;
 			}
 		}
-		public List<JMXKeyMember> KeyMembers { get => _keyMembers; }
-		public List<JMXKeyMember> RefKeyMembers { get => _refKeyMembers; }
+		public List<JMXKeyMember> KeyMembers => _keyMembers;
+		public List<JMXKeyMember> RefKeyMembers => _refKeyMembers;
+		public List<JMXKeyMember> MigrateKeyMembers => _migrateKeyMembers;
 		public void AddKeyMember(params JMXKeyMember[] members)
 		{
 			foreach (var m in members)
@@ -82,6 +85,20 @@ namespace S031.MetaStack.WinForms.ORM
 			foreach (var n in attribNames)
 			{
 				_refKeyMembers.Add(new JMXKeyMember() { FieldName = n, Position = position });
+				position++;
+			}
+		}
+		public void AddMigrateKeyMember(params JMXKeyMember[] members)
+		{
+			foreach (var m in members)
+				_migrateKeyMembers.Add(m);
+		}
+		public void AddMigrateKeyMember(params string[] attribNames)
+		{
+			int position = _migrateKeyMembers.Count + 1;
+			foreach (var n in attribNames)
+			{
+				_migrateKeyMembers.Add(new JMXKeyMember() { FieldName = n, Position = position });
 				position++;
 			}
 		}
@@ -134,6 +151,18 @@ namespace S031.MetaStack.WinForms.ORM
 					writer.WriteEndObject();
 				}
 				writer.WriteEnd();
+
+				writer.WritePropertyName("MigrateKeyMembers");
+				writer.WriteStartArray();
+				foreach (var item in _migrateKeyMembers)
+				{
+					writer.WriteStartObject();
+					writer.WriteProperty("FieldName", item.FieldName);
+					writer.WriteProperty("Position", item.Position);
+					writer.WriteEndObject();
+				}
+				writer.WriteEnd();
+
 				writer.WriteEndObject();
 				return sb.ToString();
 			}
