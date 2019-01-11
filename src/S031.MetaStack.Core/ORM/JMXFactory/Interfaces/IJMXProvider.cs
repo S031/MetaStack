@@ -12,7 +12,7 @@ namespace S031.MetaStack.WinForms.ORM
 	public interface IJMXProvider
     {
 		JMXObject Read(JMXObjectName objectName, int id);
-		JMXObject Read(JMXObjectName objectName, string alternameIndexName, params object[] parameters);
+		JMXObject Read(JMXObjectName objectName, string alterKeyIndexName, params object[] parameters);
 		void Delete(JMXObject jmxObject);
 		void Delete(JMXObjectName objectName, int id);
 		int Save(JMXObject jmxObject, bool isNew);

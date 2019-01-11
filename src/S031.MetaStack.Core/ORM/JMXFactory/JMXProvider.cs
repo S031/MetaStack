@@ -43,7 +43,7 @@ namespace S031.MetaStack.Core.ORM
 			throw new NotImplementedException();
 		}
 
-		public virtual JMXObject Read(JMXObjectName objectName, string alternameIndexName, params object[] parameters)
+		public virtual JMXObject Read(JMXObjectName objectName, string alterKeyIndexName, params object[] parameters)
 		{
 			throw new NotImplementedException();
 		}
