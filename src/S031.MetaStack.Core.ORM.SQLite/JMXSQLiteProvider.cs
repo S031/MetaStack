@@ -9,11 +9,10 @@ namespace S031.MetaStack.Core.ORM.SQLite
 {
 	public class JMXSQLiteProvider : JMXProvider
 	{
-		public JMXSQLiteProvider(MdbContext sysCatMdbContext, MdbContext workMdbContext, ILogger logger) : base(sysCatMdbContext, workMdbContext)
+		private readonly JMXSQLiteFactory _factory;
+		public JMXSQLiteProvider(JMXSQLiteFactory factory) : base(factory)
 		{
-			if (!sysCatMdbContext.ProviderName.Equals(JMXSQLiteFactory.ProviderInvariantName, StringComparison.CurrentCultureIgnoreCase))
-				throw new ArgumentException($"MdbContext must be created using { JMXSQLiteFactory.ProviderInvariantName} provider.");
-			this.Logger = logger;
+			_factory = factory;
 		}
 
 	}

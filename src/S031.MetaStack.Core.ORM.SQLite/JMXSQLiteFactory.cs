@@ -24,7 +24,7 @@ namespace S031.MetaStack.Core.ORM.SQLite
 				throw new ArgumentException($"MdbContext must be created using { ProviderInvariantName} provider.");
 			this.Logger = logger;
 			_repo = new JMXSQLiteRepo(sysCatMdbContext, workMdbContext, logger);
-			_jmx = new JMXSQLiteProvider(sysCatMdbContext, workMdbContext, logger);
+			_jmx = new JMXSQLiteProvider(this);
 		}
 
 		public override IJMXRepo CreateJMXRepo() => _repo;

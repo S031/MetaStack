@@ -10,28 +10,22 @@ namespace S031.MetaStack.Core.ORM
 {
 	public class JMXProvider : ManagerObjectBase, IJMXProvider, IDisposable
 	{
-		public JMXProvider(MdbContext mdbContext) : base(mdbContext)
+		JMXFactory _factory;
+		public JMXProvider(JMXFactory factory) : 
+			base(factory.GetMdbContext(ContextTypes.SysCat), factory.GetMdbContext(ContextTypes.Work))
 		{
+			_factory = factory;
+			base.Logger = factory.Logger;
 		}
 
-		public JMXProvider(MdbContext sysCatMdbContext, MdbContext workMdbContext) : base(sysCatMdbContext, workMdbContext)
-		{
-		}
-
-		public virtual void Delete(JMXObject jmxObject)
-		{
-			throw new NotImplementedException();
-		}
+		public virtual void Delete(JMXObject jmxObject) 
+			=> Delete(jmxObject.ObjectName, jmxObject.ID);
 
 		public virtual void Delete(JMXObjectName objectName, int id)
-		{
-			throw new NotImplementedException();
-		}
+			=> DeleteAsync(objectName, id).GetAwaiter().GetResult();
 
-		public Task DeleteAsync(JMXObject jmxObject)
-		{
-			throw new NotImplementedException();
-		}
+		public virtual async Task DeleteAsync(JMXObject jmxObject)
+			=> await DeleteAsync(jmxObject.ObjectName, jmxObject.ID);
 
 		public virtual Task DeleteAsync(JMXObjectName objectName, int id)
 		{
