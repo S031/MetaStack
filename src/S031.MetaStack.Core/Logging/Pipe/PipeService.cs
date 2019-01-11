@@ -30,7 +30,7 @@ namespace S031.MetaStack.Core
 			StringBuilder sb = new StringBuilder();
 			for (; ; )
 				if (data.TryDequeue(out string message))
-					sb.AppendLine(message);
+					sb.Append(message + '\f');
 				else
 					break;
 			return sb.ToString();

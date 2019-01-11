@@ -44,7 +44,7 @@ namespace S031.MetaStack.WinForms
 			{
 				var result = ClientGate.Execute("Sys.PipeRead");
 				if (result.Read())
-					OutputWindow.Print(LogLevels.Trace, ((string)result[0]).Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries));
+					OutputWindow.Print(LogLevels.Trace, ((string)result[0]).Split(new string[] { "\f" }, StringSplitOptions.RemoveEmptyEntries));
 			}
 			catch (Exception ex)
 			{
