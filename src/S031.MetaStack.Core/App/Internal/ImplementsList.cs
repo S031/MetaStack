@@ -57,9 +57,7 @@ namespace S031.MetaStack.WinForms
 				foreach (Type t in a.GetTypes().Where(t => type.IsAssignableFrom(t) && !type.Equals(t)))
 					yield return t;
 		}
-		private static IEnumerable<Assembly> getAssemblies()
-		{
-			return AppDomain.CurrentDomain.GetAssemblies();
-		}
+
+		private static IEnumerable<Assembly> getAssemblies() => AppDomain.CurrentDomain.GetAssemblies();
 	}
 }

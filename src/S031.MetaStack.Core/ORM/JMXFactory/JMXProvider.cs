@@ -10,7 +10,7 @@ namespace S031.MetaStack.Core.ORM
 {
 	public class JMXProvider : ManagerObjectBase, IJMXProvider, IDisposable
 	{
-		JMXFactory _factory;
+		private readonly JMXFactory _factory;
 		public JMXProvider(JMXFactory factory) : 
 			base(factory.GetMdbContext(ContextTypes.SysCat), factory.GetMdbContext(ContextTypes.Work))
 		{

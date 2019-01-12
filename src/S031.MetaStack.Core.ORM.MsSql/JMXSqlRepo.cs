@@ -51,11 +51,10 @@ namespace S031.MetaStack.Core.ORM.MsSql
 		private static IDictionary<MdbType, string> _typeMap => _typeMapping.GetTypeMap();
 		private static IDictionary<string, MdbTypeInfo> _typeInfo => _typeMapping.GetServerTypeMap();
 
-		public JMXSqlRepo(MdbContext sysCatMdbContext, MdbContext workMdbContext, ILogger logger) : base(sysCatMdbContext, workMdbContext)
+		private readonly JMXSqlFactory _factory;
+		public JMXSqlRepo(JMXSqlFactory factory) : base(factory)
 		{
-			if (!sysCatMdbContext.ProviderName.Equals(JMXSqlFactory.ProviderInvariantName, StringComparison.CurrentCultureIgnoreCase))
-				throw new ArgumentException($"MdbContext must be created using { JMXSqlFactory.ProviderInvariantName} provider.");
-			Logger = logger;
+			_factory = factory;
 			TestSysCat();
 		}
 

@@ -12,12 +12,12 @@ namespace S031.MetaStack.Core.ORM
 {
 	public abstract class JMXRepo : ManagerObjectBase, IJMXRepo, IDisposable
 	{
-		public JMXRepo(MdbContext sysCatMdbContext) : base(sysCatMdbContext)
+		private readonly JMXFactory _factory;
+		public JMXRepo(JMXFactory factory) :
+			base(factory.GetMdbContext(ContextTypes.SysCat), factory.GetMdbContext(ContextTypes.Work))
 		{
-		}
-
-		public JMXRepo(MdbContext sysCatMdbContext, MdbContext workMdbContext) : base(sysCatMdbContext, workMdbContext)
-		{
+			_factory = factory;
+			base.Logger = factory.Logger;
 		}
 
 		public virtual IEnumerable<string> GetChildObjects(string objectName)
