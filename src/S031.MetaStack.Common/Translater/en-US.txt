@@ -36,3 +36,5 @@ S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.2=For an object type attri
 S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.3=The FieldName '{0}' specified in the {1} is not in the attribute list
 S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.4=The field '{0}' has an invalid data type
 S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.5=A primary key is required for a table '{0}' that includes columns of type 'object'
+
+S031.MetaStack.Core.ORM.JMXProvider.ObjectNotFound=Object '{0}' with specified id = '{1}' not found in the database

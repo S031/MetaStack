@@ -9,10 +9,8 @@ namespace S031.MetaStack.Core.ORM.SQLite
 {
 	public class JMXSQLiteProvider : JMXProvider
 	{
-		private readonly JMXSQLiteFactory _factory;
 		public JMXSQLiteProvider(JMXSQLiteFactory factory) : base(factory)
 		{
-			_factory = factory;
 		}
 
 	}

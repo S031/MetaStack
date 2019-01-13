@@ -51,10 +51,8 @@ namespace S031.MetaStack.Core.ORM.MsSql
 		private static IDictionary<MdbType, string> _typeMap => _typeMapping.GetTypeMap();
 		private static IDictionary<string, MdbTypeInfo> _typeInfo => _typeMapping.GetServerTypeMap();
 
-		private readonly JMXSqlFactory _factory;
 		public JMXSqlRepo(JMXSqlFactory factory) : base(factory)
 		{
-			_factory = factory;
 			TestSysCat();
 		}
 

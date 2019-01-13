@@ -24,12 +24,17 @@ namespace S031.MetaStack.Core.ORM
 		public virtual void Delete(JMXObjectName objectName, int id)
 			=> DeleteAsync(objectName, id).GetAwaiter().GetResult();
 
-		public virtual async Task DeleteAsync(JMXObject jmxObject)
-			=> await DeleteAsync(jmxObject.ObjectName, jmxObject.ID);
-
-		public virtual Task DeleteAsync(JMXObjectName objectName, int id)
+		public virtual Task DeleteAsync(JMXObject jmxObject)
 		{
 			throw new NotImplementedException();
+		}
+
+		public async virtual Task DeleteAsync(JMXObjectName objectName, int id)
+		{
+			JMXObject jo = await ReadAsync(objectName, id);
+			if (jo == null)
+				throw new InvalidOperationException("S031.MetaStack.Core.ORM.JMXProvider.ObjectNotFound".GetTranslate());
+			await DeleteAsync(jo);
 		}
 
 		public virtual JMXObject Read(JMXObjectName objectName, int id)

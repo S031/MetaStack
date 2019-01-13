@@ -46,10 +46,8 @@ namespace S031.MetaStack.Core.ORM.SQLite
 		private static string _defaultDbSchema = string.Empty;
 		private static string _sqlVersion = string.Empty;
 
-		private readonly JMXSQLiteFactory _factory;
 		public JMXSQLiteRepo(JMXSQLiteFactory factory) : base(factory)
 		{
-			_factory = factory;
 			TestSysCat();
 		}
 
