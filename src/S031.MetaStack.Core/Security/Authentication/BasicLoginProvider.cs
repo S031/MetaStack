@@ -5,12 +5,11 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using S031.MetaStack.Common;
 
 namespace S031.MetaStack.Core.Security
 {
-	public class BasicLoginFactory : ILoginFactory
+	public class BasicLoginProvider : ILoginProvider
 	{
 		const int _checkTicketTimeout = 5000;
 		const int _expirePeriod = 3000;
@@ -27,7 +26,7 @@ namespace S031.MetaStack.Core.Security
 		static readonly Random _random = new Random(Guid.NewGuid().GetHashCode());
 		static readonly Dictionary<string, Dictionary<Guid, LoginInfo>> _users = new Dictionary<string, Dictionary<Guid, LoginInfo>>();
 
-		public BasicLoginFactory()
+		public BasicLoginProvider()
 		{
 		}
 

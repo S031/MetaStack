@@ -1,4 +1,6 @@
-﻿using System;
+﻿using S031.MetaStack.Common;
+using S031.MetaStack.Core.Actions;
+using System;
 
 #if NETCOREAPP
 namespace S031.MetaStack.Core.Security
@@ -14,6 +16,10 @@ namespace S031.MetaStack.WinForms.Security
 	}
 	public class AuthorizationExceptions : Exception
 	{
+		/// <summary>
+		/// <see cref="S031.MetaStack.Core.App.AuthorizationExceptionsExtension.GetAuthorizationExceptionsMessage(ActionInfo, string)"/>
+		/// </summary>
+		/// <param name="message"></param>
 		public AuthorizationExceptions(string message) : base(message)
 		{
 		}

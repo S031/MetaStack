@@ -17,6 +17,7 @@ namespace S031.MetaStack.Core.ORM
 			_factory = factory;
 			base.Logger = factory.Logger;
 		}
+		protected virtual JMXFactory Factory => _factory;
 
 		public virtual void Delete(JMXObject jmxObject) 
 			=> Delete(jmxObject.ObjectName, jmxObject.ID);
@@ -33,7 +34,7 @@ namespace S031.MetaStack.Core.ORM
 		{
 			JMXObject jo = await ReadAsync(objectName, id);
 			if (jo == null)
-				throw new InvalidOperationException("S031.MetaStack.Core.ORM.JMXProvider.ObjectNotFound".GetTranslate());
+				throw new InvalidOperationException("S031.MetaStack.Core.ORM.JMXProvider.ObjectNotFound".GetTranslate(objectName, id));
 			await DeleteAsync(jo);
 		}
 

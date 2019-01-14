@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace S031.MetaStack.Core.Security
 {
-	public interface ILoginFactory
+	public interface ILoginProvider
 	{
 		Task<string> LoginRequestAsync(string userName, string clientPublicKey);
 		string LoginRequest(string userName, string clientPublicKey);

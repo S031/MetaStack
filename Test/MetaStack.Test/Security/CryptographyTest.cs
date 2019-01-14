@@ -71,7 +71,7 @@ namespace MetaStack.Test.Security
 
 				var clientRSA = RSA.Create();
 				var clientPK = clientRSA.Export();
-				var loginFactory = svcProv.GetService<ILoginFactory>();
+				var loginFactory = svcProv.GetService<ILoginProvider>();
 				var secretData = loginFactory.LoginRequest(userName, clientPK)
 					.ToByteArray();
 

@@ -19,6 +19,7 @@ namespace S031.MetaStack.Core.ORM
 			_factory = factory;
 			base.Logger = factory.Logger;
 		}
+		protected virtual JMXFactory Factory => _factory;
 
 		public virtual IEnumerable<string> GetChildObjects(string objectName)
 		{

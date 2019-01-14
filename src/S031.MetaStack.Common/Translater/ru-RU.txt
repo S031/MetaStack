@@ -36,4 +36,6 @@ S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.3=Имя поля (FieldNa
 S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.4=Тип данных поля '{0}' указан неверно
 S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.5=Требуется первичный ключ для таблицы '{0}', включающей столбцы типа 'object'
 
+S031.MetaStack.Core.SecurityAuthorizationExceptions.GetMessage.1=Полномочий пользователя {0} недостаточно для выполнения метода '{1}' объекта '{2}'
+
 S031.MetaStack.Core.ORM.JMXProvider.ObjectNotFound=Объект '{0}' с указанным идентификатором '{0}' не найден в базе данных

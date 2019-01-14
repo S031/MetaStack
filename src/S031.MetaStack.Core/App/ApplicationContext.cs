@@ -30,13 +30,13 @@ namespace S031.MetaStack.Core.App
 		static IServiceCollection _services;
 		static IConfiguration _configuration;
 		static ILogger _logger;
-		static ILoginFactory _loginFactory;
+		static ILoginProvider _loginFactory;
 		static MdbContext _schemaDb = null;
 		static readonly PipeService _pipeChannel = new PipeService();
 
 		public static IConfiguration GetConfiguration() => _configuration;
 		public static ILogger GetLogger() => _logger;
-		public static ILoginFactory GetLoginFactory() => _loginFactory;
+		public static ILoginProvider GetLoginFactory() => _loginFactory;
 
 		public static IHostBuilder UseApplicationContext(this IHostBuilder host, IConfiguration configuration)
 		{
@@ -79,8 +79,8 @@ namespace S031.MetaStack.Core.App
 		{
 			//костыль!!!
 			//return settings from configuration
-			_loginFactory = new BasicLoginFactory() { CheckTicketTimeout = _configuration["LoginFactory:CheckTicketTimeout"].ToIntOrDefault() };
-			_services.AddSingleton<ILoginFactory>(_loginFactory );
+			_loginFactory = new BasicLoginProvider() { CheckTicketTimeout = _configuration["LoginFactory:CheckTicketTimeout"].ToIntOrDefault() };
+			_services.AddSingleton<ILoginProvider>(_loginFactory );
 			return _services;
 		}
 

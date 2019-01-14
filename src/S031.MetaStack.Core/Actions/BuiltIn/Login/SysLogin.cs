@@ -14,7 +14,7 @@ namespace S031.MetaStack.Core.Actions
 			string publicKey = (string)dp["PublicKey"];
 			var key = App.ApplicationContext
 				.GetServices()
-				.GetService<ILoginFactory>()
+				.GetService<ILoginProvider>()
 				.LoginRequest(userName, publicKey);
 
 			return ai.GetOutputParamTable()
@@ -37,7 +37,7 @@ namespace S031.MetaStack.Core.Actions
 			string encryptedKey = (string)dp["EncryptedKey"];
 			var key = App.ApplicationContext
 				.GetServices()
-				.GetService<ILoginFactory>()
+				.GetService<ILoginProvider>()
 				.Logon(userName, sessionID, encryptedKey);
 
 			return ai.GetOutputParamTable()
@@ -60,7 +60,7 @@ namespace S031.MetaStack.Core.Actions
 			string encryptedKey = (string)dp.Headers["EncryptedKey"];
 			App.ApplicationContext
 				.GetServices()
-				.GetService<ILoginFactory>()
+				.GetService<ILoginProvider>()
 				.Logout(userName, sessionID, encryptedKey);
 			return DataPackage.CreateOKPackage();
 		}
