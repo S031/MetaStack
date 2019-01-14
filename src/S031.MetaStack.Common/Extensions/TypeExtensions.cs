@@ -12,7 +12,6 @@ namespace S031.MetaStack.Common
 		static readonly Dictionary<string, Func<object[], object>> _ctorCache =
 			new Dictionary<string, Func<object[], object>>();
 		static readonly Dictionary<Type, object> _instancesList = new Dictionary<Type, object>();
-
 		static readonly Dictionary<string, ConstructorInfo> _ctorCache2 = new Dictionary<string, ConstructorInfo>();
 
 		/// <summary>
@@ -102,13 +101,31 @@ namespace S031.MetaStack.Common
 
 		public static object GetDefaultValue(this Type type)
 		{
-			if (type == typeof(string)) { return ""; }
-			else if (type.IsNumeric()) { return 0; }
-			else if (type == typeof(DateTime)) { return DateTime.MinValue; }
-			else if (type == typeof(bool)) { return false; }
-			else { return null; }
-
+			if (_defaults.TryGetValue(type, out object result))
+				return result;
+			else if (type.IsValueType || type.IsPrimitive)
+				return CreateInstance(type);
+			return null;
 		}
+		private static readonly Dictionary<Type, object> _defaults = new Dictionary<Type, object>()
+		{
+			{ typeof(string), string.Empty }
+			,{ typeof(DateTime), DateTime.MinValue }
+			,{ typeof(bool), false }
+			,{ typeof(byte), 0 }
+			,{ typeof(char), '\0' }
+			,{ typeof(decimal), 0m }
+			,{ typeof(double), 0d }
+			,{ typeof(float), 0f }
+			,{ typeof(int), 0 }
+			,{ typeof(long), 0l }
+			,{ typeof(sbyte), 0 }
+			,{ typeof(short), 0 }
+			,{ typeof(uint), 0 }
+			,{ typeof(ulong), 0 }
+			,{ typeof(ushort), 0 }
+			,{ typeof(Guid), Guid.Empty }
+		};
 
 		public static IEnumerable<Type> GetImplements(this Type type, Assembly assembly = null)
 		{

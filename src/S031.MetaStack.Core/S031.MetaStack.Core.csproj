@@ -51,8 +51,4 @@
     <ProjectReference Include="..\S031.MetaStack.Common\S031.MetaStack.Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Security\Authorization\" />
-  </ItemGroup>
-
 </Project>

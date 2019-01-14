@@ -30,13 +30,16 @@ namespace S031.MetaStack.Core.App
 		static IServiceCollection _services;
 		static IConfiguration _configuration;
 		static ILogger _logger;
-		static ILoginProvider _loginFactory;
+		static ILoginProvider _loginProvider;
+		static IAuthorizationProvider _authorizationProvider;
 		static MdbContext _schemaDb = null;
 		static readonly PipeService _pipeChannel = new PipeService();
 
 		public static IConfiguration GetConfiguration() => _configuration;
 		public static ILogger GetLogger() => _logger;
-		public static ILoginProvider GetLoginFactory() => _loginFactory;
+		public static ILoginProvider GetLoginProvider() => _loginProvider;
+		public static IAuthorizationProvider GetAuthorizationProvider()
+			=> _authorizationProvider;
 
 		public static IHostBuilder UseApplicationContext(this IHostBuilder host, IConfiguration configuration)
 		{
@@ -48,7 +51,7 @@ namespace S031.MetaStack.Core.App
 
 		private static void DisposeMe(object sender, EventArgs e)
 		{
-			(_loginFactory as IDisposable)?.Dispose();
+			(_loginProvider as IDisposable)?.Dispose();
 			(_logger as IDisposable)?.Dispose();
 		}
 
@@ -59,7 +62,8 @@ namespace S031.MetaStack.Core.App
 				.AddSingleton<CancellationTokenSource>(_cts)
 				.AddSingleton<IConfiguration>(_configuration);
 			ConfigureLogging();
-			ConfigureLoginFactory();
+			ConfigureLoginProvider();
+			ConfigureAuthorizationProvider();
 			ConfigureServicesFromConfigFile();
 			ConfigureProvidersFromConfigFile();
 			ConfigureDefaultsFromConfigFile();
@@ -75,12 +79,20 @@ namespace S031.MetaStack.Core.App
 			_services.AddSingleton<ILogger>(_logger);
 			return _services;
 		}
-		private static IServiceCollection ConfigureLoginFactory()
+		private static IServiceCollection ConfigureLoginProvider()
 		{
 			//костыль!!!
 			//return settings from configuration
-			_loginFactory = new BasicLoginProvider() { CheckTicketTimeout = _configuration["LoginFactory:CheckTicketTimeout"].ToIntOrDefault() };
-			_services.AddSingleton<ILoginProvider>(_loginFactory );
+			_loginProvider = new BasicLoginProvider() { CheckTicketTimeout = _configuration["LoginFactory:CheckTicketTimeout"].ToIntOrDefault() };
+			_services.AddSingleton<ILoginProvider>(_loginProvider );
+			return _services;
+		}
+		private static IServiceCollection ConfigureAuthorizationProvider()
+		{
+			//костыль!!!
+			//return settings from configuration
+			_authorizationProvider = new BasicAuthorizationProvider(_schemaDb);
+			_services.AddSingleton<IAuthorizationProvider>(_authorizationProvider);
 			return _services;
 		}
 

@@ -354,7 +354,7 @@ namespace S031.MetaStack.Common
 		public static T GetValue<T>(this IDictionary<string, object> d, string key, object defaultValue = null)
 		{
 			if (d != null && d.TryGetValue(key, out object result))
-				return result.ToString().To<T>();
+				return result.CastOf<T>();
 			return (T)defaultValue;
 		}
 	}

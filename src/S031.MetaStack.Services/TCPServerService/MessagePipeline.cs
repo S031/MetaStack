@@ -53,7 +53,7 @@ namespace S031.MetaStack.Services
 					actionContext.UserName = (string)_message.Headers["UserName"];
 					actionContext.SessionID = (string)_message.Headers["SessionID"];
 					ApplicationContext
-						.GetLoginFactory()
+						.GetLoginProvider()
 						.Logon(
 						(string)_message.Headers["UserName"],
 						(string)_message.Headers["SessionID"],

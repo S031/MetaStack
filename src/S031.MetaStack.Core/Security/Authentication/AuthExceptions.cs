@@ -1,10 +1,12 @@
 ﻿using S031.MetaStack.Common;
-using S031.MetaStack.Core.Actions;
 using System;
-
 #if NETCOREAPP
+using S031.MetaStack.Core.Actions;
+
 namespace S031.MetaStack.Core.Security
 #else
+using S031.MetaStack.WinForms.Actions;
+
 namespace S031.MetaStack.WinForms.Security
 #endif
 {

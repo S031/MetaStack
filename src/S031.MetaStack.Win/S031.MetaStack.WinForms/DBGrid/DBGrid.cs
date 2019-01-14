@@ -366,7 +366,7 @@ namespace S031.MetaStack.WinForms
 				for (int i = 0; i < count; i++)
 				{
 					var row = (list[i] as DataRowView);
-					for (int j = 0; j < _dt.Columns.Count; j++)
+					for (int j = 0; j < _xc.Attributes.Count; j++)
 					{
 						object value = row[j];
 						if (!vbo.IsEmpty(value))
@@ -383,20 +383,28 @@ namespace S031.MetaStack.WinForms
 									if (!vbo.IsEmpty(value)) _totals[j].totalDec++;
 									break;
 								case "max":
-										if (_totals[j].Type == MacroType.num && Convert.ToDecimal(value) > _totals[j].totalDec)
-											_totals[j].totalDec = Convert.ToDecimal(value);
-										else if (_totals[j].Type == MacroType.str && _totals[j].totalString.CompareTo(value.ToString()) < 0)
-											_totals[j].totalString = value.ToString();
-										else if (_totals[j].Type == MacroType.date && (DateTime)value > _totals[j].totalDate)
-											_totals[j].totalDate = (DateTime)value;
+									if (_totals[j].Type == MacroType.num && Convert.ToDecimal(value) > _totals[j].totalDec)
+										_totals[j].totalDec = Convert.ToDecimal(value);
+									else if (_totals[j].Type == MacroType.str && _totals[j].totalString.CompareTo(value.ToString()) < 0)
+										_totals[j].totalString = value.ToString();
+									else if (_totals[j].Type == MacroType.date)
+									{
+										DateTime d = value.CastOf<DateTime>();
+										if (d > _totals[j].totalDate)
+											_totals[j].totalDate = d;
+									}
 									break;
 								case "min":
-										if (_totals[j].Type == MacroType.num && Convert.ToDecimal(value) < _totals[j].totalDec)
-											_totals[j].totalDec = Convert.ToDecimal(value);
-										else if (_totals[j].Type == MacroType.str && _totals[j].totalString.CompareTo(value.ToString()) > 0)
-											_totals[j].totalString = value.ToString();
-										else if (_totals[j].Type == MacroType.date && (DateTime)value < _totals[j].totalDate)
-											_totals[j].totalDate = (DateTime)value;
+									if (_totals[j].Type == MacroType.num && Convert.ToDecimal(value) < _totals[j].totalDec)
+										_totals[j].totalDec = Convert.ToDecimal(value);
+									else if (_totals[j].Type == MacroType.str && _totals[j].totalString.CompareTo(value.ToString()) > 0)
+										_totals[j].totalString = value.ToString();
+									else if (_totals[j].Type == MacroType.date)
+									{
+										DateTime d = value.CastOf<DateTime>();
+										if (d < _totals[j].totalDate)
+											_totals[j].totalDate = d;
+									}
 									break;
 							}
 						}
