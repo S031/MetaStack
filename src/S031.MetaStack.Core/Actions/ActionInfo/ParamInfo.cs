@@ -32,6 +32,7 @@ namespace S031.MetaStack.WinForms.Actions
 		public string PresentationType { get; set; }
 		public bool Required { get; set; }
 		public string DefaultValue { get; set; }
+		public bool IsObjectName { get; set; }
 	}
 
 	public class ParamInfoList : SortedList<int, ParamInfo>
@@ -40,7 +41,6 @@ namespace S031.MetaStack.WinForms.Actions
 		{
 			base.Add((int)pi.Dirrect + pi.Position, pi);
 		}
-
 		public IEnumerable<ParamInfo> InputParameters()
 		{
 			return this.Where(kvp => kvp.Key < (int)ParamDirrect.Output).Select(kvp => kvp.Value);
@@ -49,6 +49,11 @@ namespace S031.MetaStack.WinForms.Actions
 		{
 			return this.Where(kvp => kvp.Key > (int)ParamDirrect.Output).Select(kvp => kvp.Value);
 		}
+		public ParamInfo GetObjectNameParamInfo(ParamDirrect dirrect = ParamDirrect.Input)
+			=>
+			dirrect == ParamDirrect.Input
+			? InputParameters().FirstOrDefault(p => p.IsObjectName)
+			: OutputParameters().FirstOrDefault(p => p.IsObjectName);
 	}
 
 }

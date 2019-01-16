@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Reflection;
 using S031.MetaStack.Common;
 using System.Linq;
+using S031.MetaStack.Core.Security;
 
 namespace S031.MetaStack.Core.Actions
 {
@@ -62,7 +63,8 @@ namespace S031.MetaStack.Core.Actions
 							Visible,
 							Coalesce(DefaultValue, '') As DefaultValue,
 							Coalesce(ConstantName, '') As ConstantName,
-							Coalesce(FieldName, '') As FieldName
+							Coalesce(FieldName, '') As FieldName,
+							Case When SuperObject Like '%SysSchema%' and SuperMethod = 'ObjectName' then 1 else 0 end as IsObjectName
 						From {1}InterfaceParameters Where InterfaceID = '{0}'";
 
 		private readonly string _schemaName = string.Empty;
@@ -117,6 +119,17 @@ namespace S031.MetaStack.Core.Actions
 		private static async Task<DataPackage> ExecuteInternalAsync(ActionInfo ai, DataPackage inParamStor)
 		{
 			var se = CreateEvaluator(ai, inParamStor);
+			//!!! AuthorizationRequired remove from sys action list and add test authentication in procedure
+			if (ai.AuthorizationRequired)
+			{
+				string objectNameAttribute = ai.InterfaceParameters.GetObjectNameParamInfo()?.AttribName ?? ai.ActionID;
+				inParamStor.GoDataTop();
+				if (!ApplicationContext
+					.GetAuthorizationProvider()
+					.HasPermission(ai, objectNameAttribute))
+					throw new AuthorizationExceptions(ai.GetAuthorizationExceptionsMessage(objectNameAttribute));
+				inParamStor.GoDataTop();
+			}
 			return await se.InvokeAsync(ai, inParamStor);
 		}
 
@@ -263,7 +276,8 @@ namespace S031.MetaStack.Core.Actions
 				Visible = (bool)dr["Visible"],
 				DefaultValue = (string)dr["DefaultValue"],
 				ConstName = (string)dr["ConstantName"],
-				FieldName = (string)dr["FieldName"]
+				FieldName = (string)dr["FieldName"],
+				IsObjectName = (bool)dr["IsObjectName"]
 			});
 		}
 	}

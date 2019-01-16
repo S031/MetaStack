@@ -224,7 +224,7 @@ namespace S031.MetaStack.Core.Actions
 				AssemblyID = typeof(ActionsList).Assembly.GetWorkName(),
 				AsyncMode = true,
 				AuthenticationRequired = true,
-				AuthorizationRequired = true,
+				AuthorizationRequired = false,
 				ClassName = typeof(SysGetSchema).FullName,
 				Description = "Получить схему объекта",
 				EMailOnError = false,
@@ -248,7 +248,8 @@ namespace S031.MetaStack.Core.Actions
 				PresentationType = "TextBox",
 				Visible = true,
 				Width = 60,
-				Required = true
+				Required = true,
+				IsObjectName = true
 			};
 			ai.InterfaceParameters.Add(pi);
 			pi = new ParamInfo()
