@@ -63,10 +63,10 @@ namespace S031.MetaStack.Core.App
 				.AddSingleton<IConfiguration>(_configuration);
 			ConfigureLogging();
 			ConfigureLoginProvider();
-			ConfigureAuthorizationProvider();
 			ConfigureServicesFromConfigFile();
 			ConfigureProvidersFromConfigFile();
 			ConfigureDefaultsFromConfigFile();
+			ConfigureAuthorizationProvider();
 			return _services;
 		}
 
@@ -91,7 +91,7 @@ namespace S031.MetaStack.Core.App
 		{
 			//костыль!!!
 			//return settings from configuration
-			_authorizationProvider = new BasicAuthorizationProvider(_schemaDb);
+			_authorizationProvider = new BasicAuthorizationProvider(SchemaDb);
 			_services.AddSingleton<IAuthorizationProvider>(_authorizationProvider);
 			return _services;
 		}

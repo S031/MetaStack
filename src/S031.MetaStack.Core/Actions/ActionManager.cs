@@ -121,16 +121,26 @@ namespace S031.MetaStack.Core.Actions
 			var se = CreateEvaluator(ai, inParamStor);
 			//!!! AuthorizationRequired remove from sys action list and add test authentication in procedure
 			if (ai.AuthorizationRequired)
+				await AuthorizationAsync(ai, inParamStor);
+			return await se.InvokeAsync(ai, inParamStor);
+		}
+
+		private static async Task AuthorizationAsync(ActionInfo ai, DataPackage inParamStor)
+		{
+			ParamInfo objectNameParamInfo = ai.InterfaceParameters.GetObjectNameParamInfo();
+			string objectName = ai.ActionID;
+			if (objectNameParamInfo != null)
 			{
-				string objectNameAttribute = ai.InterfaceParameters.GetObjectNameParamInfo()?.AttribName ?? ai.ActionID;
 				inParamStor.GoDataTop();
-				if (!ApplicationContext
-					.GetAuthorizationProvider()
-					.HasPermission(ai, objectNameAttribute))
-					throw new AuthorizationExceptions(ai.GetAuthorizationExceptionsMessage(objectNameAttribute));
+				if (inParamStor.Read())
+					objectName = (string)inParamStor[objectNameParamInfo.AttribName];
 				inParamStor.GoDataTop();
 			}
-			return await se.InvokeAsync(ai, inParamStor);
+			if (!await ApplicationContext
+				.GetAuthorizationProvider()
+				.HasPermissionAsync(ai, objectName))
+				//!!! GetSchema for objectName && put name of object to message
+				throw new AuthorizationExceptions(ai.GetAuthorizationExceptionsMessage(objectName));
 		}
 
 		private static IAppEvaluator CreateEvaluator(ActionInfo ai, DataPackage inParamStor)

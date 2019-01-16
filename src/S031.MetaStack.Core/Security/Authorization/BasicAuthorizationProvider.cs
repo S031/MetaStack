@@ -33,8 +33,9 @@ namespace S031.MetaStack.Core.Security
 
 		public async Task<bool> HasPermissionAsync(ActionInfo actionInfo, string objectName)
 		{
-			//!!! add body && Everyone role
-			return await new Task<bool>(() => true);
+			if (await IsAdminAsync(actionInfo.GetContext().UserName))
+				return true;
+			return false;
 		}
 
 		public bool IsAdmin(string userName)
@@ -64,7 +65,7 @@ namespace S031.MetaStack.Core.Security
 				from Users u
 				inner join Users2Roles ur on u.ID = ur.UserID
 				inner join Roles r on r.ID = ur.RoleID
-				where u.UserName = '{userName}'"))
+				where u.UserName LIKE '{userName}'"))
 				{
 					if (!_user2RolesCache.ContainsKey(userName))
 					{
