@@ -8,6 +8,15 @@ using S031.MetaStack.Core.Data;
 
 namespace S031.MetaStack.Core.Security
 {
+	/// <summary>
+	/// !!!
+	/// Добавить функционал создания администратора:
+	/// Добавить функционал создания администратора безопасности:
+	/// если в роли security_admin_role пользователей нет то администратор может добавить пользователя в эту роль
+	/// затем все манипуляции с ролями может делать только администратор безопасности
+	/// одновременно пользователь не может быть членом ролей Sys.Admin и Sys.SecurityAdmin
+	/// аудит таблиц Пользователи, Роли, Права доступа всегда включен
+	/// </summary>
 	public class BasicAuthorizationProvider : IAuthorizationProvider
 	{
 		public const string admin_role = "Sys.Admin";
