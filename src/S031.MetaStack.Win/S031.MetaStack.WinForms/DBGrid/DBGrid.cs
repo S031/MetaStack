@@ -1,6 +1,7 @@
 ﻿using S031.MetaStack.Common;
 using S031.MetaStack.WinForms.ORM;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -362,10 +363,10 @@ namespace S031.MetaStack.WinForms
 			}
 			if (total)
 			{
-				//Parallel.For(0, count, (i) =>
-				for (int i = 0; i < count; i++)
+				Parallel.ForEach(Partitioner.Create(list.Cast<DataRowView>()), row =>
+				//for (int i = 0; i < count; i++)
 				{
-					var row = (list[i] as DataRowView);
+					//var row = (list[i] as DataRowView);
 					for (int j = 0; j < _xc.Attributes.Count; j++)
 					{
 						object value = row[j];
@@ -409,7 +410,7 @@ namespace S031.MetaStack.WinForms
 							}
 						}
 					}
-				}//);
+				});
 				for (int j = 0; j < this.Columns.Count; j++)
 				{
 					if (_totals[j].Agregate == "min")
