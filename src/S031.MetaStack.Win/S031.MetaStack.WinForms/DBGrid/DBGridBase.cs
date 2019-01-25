@@ -88,6 +88,7 @@ namespace S031.MetaStack.WinForms
 			this.AllowDelObject = true;
 			this.AllowEditObject = true;
 			this.StandardTab = true;
+			this.VirtualMode = true;
 		}
 
 		private void InitializeComponent()
