@@ -50,13 +50,13 @@ namespace S031.MetaStack.Common
 					return instance;
 				}
 
-				ctor = getCtor(type.GetConstructor(args.Select(o => o.GetType()).ToArray()));
+				ctor = GetCtor(type.GetConstructor(args.Select(o => o.GetType()).ToArray()));
 				_ctorCache[key] = ctor;
 				return ctor(args);
 			}
 		}
 
-		static Func<object[], object> getCtor(ConstructorInfo ctorInfo)
+		private static Func<object[], object> GetCtor(ConstructorInfo ctorInfo)
 		{
 			var argumentsExpression = Expression.Parameter(typeof(object[]), "arguments");
 			var argumentExpressions = new List<Expression>();
@@ -118,7 +118,7 @@ namespace S031.MetaStack.Common
 			,{ typeof(double), 0d }
 			,{ typeof(float), 0f }
 			,{ typeof(int), 0 }
-			,{ typeof(long), 0l }
+			,{ typeof(long), 0L }
 			,{ typeof(sbyte), 0 }
 			,{ typeof(short), 0 }
 			,{ typeof(uint), 0 }

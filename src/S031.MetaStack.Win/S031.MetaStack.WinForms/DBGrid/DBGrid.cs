@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -40,15 +41,27 @@ namespace S031.MetaStack.WinForms
 			public bool Check;
 			public MacroType Type;
 			public string Agregate;
-			public decimal totalDec;
+			public double totalValue;
 			public string totalString;
 			public DateTime totalDate;
+			public double AddToTotal(double addend)
+			{
+				double initialValue, computedValue;
+				do
+				{
+					initialValue = totalValue;
+					computedValue = initialValue + addend;
+				}
+				while (initialValue != Interlocked.CompareExchange(ref totalValue,
+					computedValue, initialValue));
+				return computedValue;
+			}
 		}
 		private TotalInfo[] _totals;
 		private bool _freezeFooter;
 
 		//Clipboard Support
-		private static bool delObj;
+		//private static bool delObj;
 		#endregion Private declarations
 
 		#region Public Events
@@ -325,6 +338,7 @@ namespace S031.MetaStack.WinForms
 		#endregion Refresh
 
 		#region Totals
+		private readonly object _obj4lock = new object();
 		private void MakeTotals()
 		{
 			var bs = GetBindingSource();
@@ -340,7 +354,7 @@ namespace S031.MetaStack.WinForms
 				_totals[i].Check = false;
 				_totals[i].Agregate = "";
 				_totals[i].Type = GetMacroType(_xc.Attributes[i].DataType);
-				_totals[i].totalDec = 0;
+				_totals[i].totalValue = 0;
 				_totals[i].totalString = "";
 				_totals[i].totalDate = DateTime.MinValue;
 
@@ -351,12 +365,12 @@ namespace S031.MetaStack.WinForms
 					_totals[i].Agregate = agr;
 					total = true;
 					if (_totals[i].Agregate == "rcnt")
-						_totals[i].totalDec = count;
+						_totals[i].totalValue = count;
 					else if (_totals[i].Agregate == "min")
 						if (_totals[i].Type == MacroType.date)
 							_totals[i].totalDate = DateTime.MaxValue;
 						else if (_totals[i].Type == MacroType.num)
-							_totals[i].totalDec = decimal.MaxValue;
+							_totals[i].totalValue = double.MaxValue;
 						else if (_totals[i].Type == MacroType.str)
 							_totals[i].totalString = ((char)12293).ToString();
 				}
@@ -375,36 +389,42 @@ namespace S031.MetaStack.WinForms
 							switch (_totals[j].Agregate)
 							{
 								case "sum":
-									_totals[j].totalDec += Convert.ToDecimal(value);
+									_totals[j].AddToTotal(Convert.ToDouble(value));
 									break;
 								case "ave":
-									_totals[j].totalDec += Convert.ToDecimal(value) / count;
+									_totals[j].AddToTotal(Convert.ToDouble(value) / count);
 									break;
 								case "vcnt":
-									if (!vbo.IsEmpty(value)) _totals[j].totalDec++;
+									if (!vbo.IsEmpty(value)) _totals[j].AddToTotal(1d);
 									break;
 								case "max":
-									if (_totals[j].Type == MacroType.num && Convert.ToDecimal(value) > _totals[j].totalDec)
-										_totals[j].totalDec = Convert.ToDecimal(value);
+									if (_totals[j].Type == MacroType.num && Convert.ToDouble(value) > _totals[j].totalValue)
+										lock (_obj4lock)
+											_totals[j].totalValue = Convert.ToDouble(value);
 									else if (_totals[j].Type == MacroType.str && _totals[j].totalString.CompareTo(value.ToString()) < 0)
-										_totals[j].totalString = value.ToString();
+										lock (_obj4lock)
+											_totals[j].totalString = value.ToString();
 									else if (_totals[j].Type == MacroType.date)
 									{
 										DateTime d = value.CastOf<DateTime>();
 										if (d > _totals[j].totalDate)
-											_totals[j].totalDate = d;
+											lock (_obj4lock)
+												_totals[j].totalDate = d;
 									}
 									break;
 								case "min":
-									if (_totals[j].Type == MacroType.num && Convert.ToDecimal(value) < _totals[j].totalDec)
-										_totals[j].totalDec = Convert.ToDecimal(value);
+									if (_totals[j].Type == MacroType.num && Convert.ToDouble(value) < _totals[j].totalValue)
+										lock (_obj4lock)
+											_totals[j].totalValue = Convert.ToDouble(value);
 									else if (_totals[j].Type == MacroType.str && _totals[j].totalString.CompareTo(value.ToString()) > 0)
-										_totals[j].totalString = value.ToString();
+										lock (_obj4lock)
+											_totals[j].totalString = value.ToString();
 									else if (_totals[j].Type == MacroType.date)
 									{
 										DateTime d = value.CastOf<DateTime>();
 										if (d < _totals[j].totalDate)
-											_totals[j].totalDate = d;
+											lock (_obj4lock)
+												_totals[j].totalDate = d;
 									}
 									break;
 							}
@@ -415,8 +435,8 @@ namespace S031.MetaStack.WinForms
 				{
 					if (_totals[j].Agregate == "min")
 					{
-						if (_totals[j].totalDec == decimal.MaxValue)
-							_totals[j].totalDec = 0;
+						if (_totals[j].totalValue == double.MaxValue)
+							_totals[j].totalValue = 0;
 						if (_totals[j].totalDate == DateTime.MaxValue)
 							_totals[j].totalDate = DateTime.MinValue;
 						if (_totals[j].totalString == ((char)12293).ToString())
@@ -436,9 +456,9 @@ namespace S031.MetaStack.WinForms
 				if (_totals[i].Check)
 				{
 					if (_totals[i].Agregate == "rcnt")
-						this.FooterText(i, _totals[i].totalDec.ToString("##0"));
+						this.FooterText(i, _totals[i].totalValue.ToString("###,##0"));
 					else if (_totals[i].Type == MacroType.num)
-						this.FooterText(i, _totals[i].totalDec.ToString(this.Columns[i].DefaultCellStyle.Format));
+						this.FooterText(i, _totals[i].totalValue.ToString(this.Columns[i].DefaultCellStyle.Format));
 					else if (_totals[i].Type == MacroType.date)
 						this.FooterText(i, _totals[i].totalDate.ToString(vbo.DateFormat));
 					else

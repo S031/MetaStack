@@ -5,14 +5,14 @@ namespace S031.MetaStack.WinForms
 {
 	internal static partial class CodeCompletionData
 	{
-		static ICompletionData[] _sqlTables = loadTables();
+		static ICompletionData[] _sqlTables = LoadTables();
 
 		public static ICompletionData[] SQLTables
 		{
 			get { return _sqlTables; }
 		}
 
-		static ICompletionData[] loadTables()
+		private static ICompletionData[] LoadTables()
 		{
 			List<ICompletionData> sqlTables = new List<ICompletionData>();
 			//DataTable dt = dbs.GetRecordset(@"Select T.TABLE_NAME As TableName, IsNull(G.Name, '') As Name from INFORMATION_SCHEMA.TABLES T 
