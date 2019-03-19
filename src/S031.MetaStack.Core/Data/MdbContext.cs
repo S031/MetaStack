@@ -120,6 +120,11 @@ namespace S031.MetaStack.Core.Data
 				IEnumerable<int> aInt = (IEnumerable<int>)a;
 				return "(" + string.Join(",", aInt.Select(i => i.ToString())) + ")";
 			}
+			else if (t == typeof(long))
+			{
+				IEnumerable<long> aLong = (IEnumerable<long>)a;
+				return "(" + string.Join(",", aLong.Select(i => i.ToString())) + ")";
+			}
 			else if (t == typeof(byte))
 			{
 				IEnumerable<byte> aByte = (IEnumerable<byte>)a;
@@ -134,6 +139,11 @@ namespace S031.MetaStack.Core.Data
 			{
 				IEnumerable<double> aDouble = (IEnumerable<double>)a;
 				return "(" + string.Join(",", aDouble.Select(i => i.ToString())) + ")";
+			}
+			else if (t == typeof(Single))
+			{
+				IEnumerable<Single> aSingle = (IEnumerable<Single>)a;
+				return "(" + string.Join(",", aSingle.Select(i => i.ToString())) + ")";
 			}
 			else if (t == typeof(DateTime))
 			{
