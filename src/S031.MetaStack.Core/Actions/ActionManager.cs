@@ -14,6 +14,20 @@ using S031.MetaStack.Core.Security;
 
 namespace S031.MetaStack.Core.Actions
 {
+	/// <summary>
+	/// !!! ToDo
+	/// Authorization Methot должен проверять для объектов:
+	///		ObjectType = 'Table' 
+	///			Sys.Read
+	///			Sys.Save
+	///			Sys.Delete
+	///			Sys.Select
+	///		ObjectType = 'View'	
+	///			Sys.Select
+	///		ObjectType = 'Action'		
+	///			Sys.Execute???
+	///	Созхдать V_Permissions для запроса прав
+	/// </summary>
 	public class ActionManager : ManagerObjectBase, IDisposable
 	{
 		private static readonly object obj4Lock = new object();
