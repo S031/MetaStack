@@ -10,6 +10,8 @@ namespace MetaStack.Test.ORM
 {
 	public class BaseDocument : JObject
 	{
+		const string connection_string = "Data Source=localhost;Initial Catalog=Msfodb;Integrated Security=True";
+
 		static readonly Dictionary<string, JObject> _schemaCache = new Dictionary<string, JObject>();
 		private readonly JObject _schema;
 		private static object obj4Lock = new object();
@@ -24,9 +26,15 @@ namespace MetaStack.Test.ORM
 			}
 		}
 
+		public int Save(bool IsNew)
+		{
+			string sql = new StatementWriter(_schema).WriteInsertStatement();
+			return 0;
+		}
+
 		private static JObject GetSchema(string dbObjectName)
 		{
-			using (MdbContext mdb = new MdbContext(""))
+			using (MdbContext mdb = new MdbContext(connection_string))
 			{
 				string s = mdb.Execute<string>(@"[HQ\SVOSTRIKOV].Get_TableSchema",
 					new MdbParameter("@table_name", dbObjectName));

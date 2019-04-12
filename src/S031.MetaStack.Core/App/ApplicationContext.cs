@@ -83,7 +83,7 @@ namespace S031.MetaStack.Core.App
 		{
 			//костыль!!!
 			//return settings from configuration
-			_loginProvider = new BasicLoginProvider() { CheckTicketTimeout = _configuration["LoginFactory:CheckTicketTimeout"].ToIntOrDefault() };
+			_loginProvider = new BasicLoginProvider() { CheckTicketTimeout = _configuration["LoginFactory:CheckTicketTimeout"]?.ToIntOrDefault() ?? 0 };
 			_services.AddSingleton<ILoginProvider>(_loginProvider );
 			return _services;
 		}

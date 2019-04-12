@@ -235,6 +235,13 @@ namespace MetaStack.Test.ORM
 
 		}
 
+		[Fact]
+		void BaseDocumentTest()
+		{
+			BaseDocument basedocument = new BaseDocument("DealAcc");
+			basedocument.Save(true);
+		}
+
 		JMXSchema CreateTestSchema()
 		{
 

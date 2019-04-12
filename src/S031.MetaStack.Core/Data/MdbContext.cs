@@ -199,20 +199,24 @@ namespace S031.MetaStack.Core.Data
 				{
 					object p = param.Value;
 					string pValue = string.Empty;
-					Type t = p.GetType();
-					if (t.IsNumeric(NumericTypesScope.FloatingPoint))
-						pValue = p.ToString().Replace(',', '.');
-					else if (t.IsNumeric())
-						pValue = p.ToString();
-					else if (t == typeof(DateTime))
-						//!!! full date format
-						pValue = "'" + string.Format("{0:yyyyMMdd}", p) + "'";
-					else if (t == typeof(string))
-						pValue = "'" + p.ToString().Replace("'", "''") + "'";
-					else if (t != typeof(byte[]) && t.GetInterfaces().FirstOrDefault(type => type.Name == "IEnumerable`1") != null)
-						pValue = array2List(p);
+					if (p == null)
+						pValue = "NULL";
 					else
-						replace = false;
+					{
+						Type t = p.GetType();
+						if (t.IsNumeric(NumericTypesScope.FloatingPoint))
+							pValue = p.ToString().Replace(',', '.');
+						else if (t.IsNumeric())
+							pValue = p.ToString();
+						else if (t == typeof(DateTime))
+							replace = false;
+						else if (t == typeof(string))
+							pValue = "'" + p.ToString().Replace("'", "''") + "'";
+						else if (t != typeof(byte[]) && t.GetInterfaces().FirstOrDefault(type => type.Name == "IEnumerable`1") != null)
+							pValue = array2List(p);
+						else
+							replace = false;
+					}
 
 					if (replace)
 						sql = sql.Replace(param.Name, pValue);
