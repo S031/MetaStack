@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)src\S031.MetaStack.AppServer\bin\$(ConfigurationName)\netcoreapp2.1&quot; /Y" />
+    <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)src\S031.MetaStack.AppServer\bin\$(ConfigurationName)\netcoreapp2.2&quot; /Y" />
   </Target>
 
 </Project>
