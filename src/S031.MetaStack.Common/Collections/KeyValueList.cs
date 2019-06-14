@@ -78,11 +78,7 @@ namespace S031.MetaStack.Common
 		/// <param name="source">Source string for parse</param>
 		/// <param name="listSep">List separator</param>
 		/// <param name="valueSep">Values separator</param>
-#if NETCOREAPP
-	public KeyValueList(IEnumerable<KeyValuePair<string, string>> source, string listSep, string valueSep)
-#else
-	public KeyValueList(IDictionary<string, string> source, string listSep, string valueSep)
-#endif
+		public KeyValueList(IDictionary<string, string> source, string listSep, string valueSep)
 			: base(source, StringComparer.CurrentCultureIgnoreCase)
 		{
 			_listSep = listSep;

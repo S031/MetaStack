@@ -50,8 +50,6 @@
       "Description": "Sybase ASE 15 server",
       "providerName": "AdoNetCore.AseClient",
       "connectionString": "Data Source=dias-db01,5050;Initial Catalog=msfodb;User ID=LoaderF;Password=;Max Pool Size=200;"
-      //"connectionString": "Data Source=canopus,5000;Initial Catalog=msfodb;User ID=LoaderF;Password=;Max Pool Size=200;"
-      //"connectionString": "Data Source=barium,5000;Initial Catalog=workdb;User ID=LoaderF;Password=;"
     }
 
   },
