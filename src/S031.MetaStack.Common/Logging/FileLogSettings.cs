@@ -6,21 +6,31 @@ namespace S031.MetaStack.Common.Logging
 	public class FileLogSettings
     {
 		private LogLevels _logLevel = LogLevels.Information;
-		private static readonly FileLogSettings _default = new FileLogSettings(true);
+
+		private static readonly FileLogSettings _default = new FileLogSettings(
+			basePath : Path.Combine(System.AppContext.BaseDirectory, "Log"),
+			cacheSize : 100,
+			dateFolderMask : "yyyy-MM",
+			filter : (s, l) => l >= LogLevels.Information,
+			levelToFlush : LogLevels.Critical,
+			formater : (l, s, d) =>
+				$"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}\t[{l.ToString()}]\t{s}\t{d}{Environment.NewLine}"
+		);
+
 		public static FileLogSettings Default => _default;
-		private FileLogSettings(bool isStatic)
+
+		private FileLogSettings(	string basePath, int cacheSize, string dateFolderMask,
+			Func<string, LogLevels, bool> filter, LogLevels levelToFlush,
+			Func<LogLevels, object, object, string> formater)
 		{
-			// Directory.GetCurrentDirectory()
-			// Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)
-			// ASP NET IHostingEnvironment.ApplicationBasePath;
-			BasePath = Path.Combine(System.AppContext.BaseDirectory, "Log");
-			CacheSize = 100;
-			DateFolderMask = "yyyy-MM";
-			Filter = (s, l) => l >= LogLevels.Information;
-			LevelToFlush = LogLevels.Critical;
-			Formater = (l, s, d) => 
-				$"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}\t[{l.ToString()}]\t{s}\t{d}{Environment.NewLine}";
+			BasePath = basePath;
+			CacheSize = cacheSize;
+			DateFolderMask = dateFolderMask;
+			Filter = filter;
+			LevelToFlush = levelToFlush;
+			Formater = formater;
 		}
+
 		public FileLogSettings()
 		{
 			BasePath = _default.BasePath;

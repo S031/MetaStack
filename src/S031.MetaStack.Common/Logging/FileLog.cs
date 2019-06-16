@@ -5,6 +5,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using SA = S031.MetaStack.Common.Properties.Strings;
 
 namespace S031.MetaStack.Common.Logging
 {
@@ -20,34 +21,13 @@ namespace S031.MetaStack.Common.Logging
 	}
 	public class FileLog : IDisposable
 	{
-		//public const string SourceTypeCritical = "{КАТАСТРОФА}";
-		//public const string SourceTypeError = "{ОШИБКА}";
-		//public const string SourceTypeWarning = "{ВНИМАНИЕ}";
-		//public const string SourceTypeInfo = "{СООБЩЕНИЕ}";
-		//public const string SourceTypeDebug = "{ОТЛАДКА}";
-		//public const string SourceTypeTrace = "{ТРАССИРОВКА}";
-		//public const string SourceTypeNone = "";
-
-		static readonly Dictionary<LogLevels, string> _msgs = new Dictionary<LogLevels, string>()
-		{
-			{ LogLevels.Critical, Translater.GetString("S031.MetaStack.Common.Logging.LogLevel.Critical")},
-			{ LogLevels.Error, Translater.GetString("S031.MetaStack.Common.Logging.LogLevel.Error") },
-			{ LogLevels.Warning, Translater.GetString("S031.MetaStack.Common.Logging.LogLevel.Warning") },
-			{ LogLevels.Information, Translater.GetString("S031.MetaStack.Common.Logging.LogLevel.Info") },
-			{ LogLevels.Debug, Translater.GetString("S031.MetaStack.Common.Logging.LogLevel.Debug") },
-			{ LogLevels.None, Translater.GetString("S031.MetaStack.Common.Logging.LogLevel.None") },
-			{ LogLevels.Trace, Translater.GetString("S031.MetaStack.Common.Logging.LogLevel.Trace") }
-		};
-
 		static readonly ConcurrentDictionary<string, Queue<string>> _queues = 
 			new ConcurrentDictionary<string, Queue<string>>();
 
 		private readonly string _logName;
-		private FileLogSettings _settings;
-		private Queue<string> _queue;
+		private readonly FileLogSettings _settings;
+		private readonly Queue<string> _queue;
 		private readonly object _lockObj = new object();
-
-		public static Dictionary<LogLevels, string> Messages => _msgs;
 
 		public FileLog(string logName) : this(logName, FileLogSettings.Default)
 		{

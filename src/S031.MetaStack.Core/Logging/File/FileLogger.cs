@@ -38,7 +38,7 @@ namespace S031.MetaStack.Core.Logging
 		public IDisposable BeginScope<TState>(TState state) => new NoopDisposable(this);
 		private class NoopDisposable : IDisposable
 		{
-			FileLogger _fl;
+			readonly FileLogger _fl;
 			internal NoopDisposable(FileLogger l)
 			{
 				_fl = l;

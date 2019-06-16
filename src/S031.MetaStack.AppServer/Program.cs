@@ -1,19 +1,11 @@
-﻿using AdoNetCore.AseClient;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using S031.MetaStack.Common;
 using S031.MetaStack.Core.App;
-using S031.MetaStack.Core.Data;
-using System;
-using System.Data;
-using System.Data.Common;
 using System.Threading.Tasks;
 
 namespace S031.MetaStack.AppServer
 {
-	class Program
+	internal class Program
 	{
 		/// <summary>
 		////Костыль!!! Исключить из ссылок рантайм dll (aka \ORM\*.dll
@@ -26,7 +18,7 @@ namespace S031.MetaStack.AppServer
 				.AddJsonFile("config.json", optional: false, reloadOnChange: true)
 				.Build();
 
-			using (var host = new HostBuilder()
+			using (IHost host = new HostBuilder()
 				.UseConsoleLifetime()
 				.UseApplicationContext(configuration)
 				.Build())
