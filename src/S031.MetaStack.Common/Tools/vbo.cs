@@ -70,7 +70,7 @@ namespace S031.MetaStack.Common
 			}
 		}
 
-		internal static IEnumerable<Type> integralTypes
+		internal static IEnumerable<Type> IntegralTypes
 		{
 			get
 			{
@@ -87,7 +87,7 @@ namespace S031.MetaStack.Common
 			}
 		}
 
-		internal static IEnumerable<Type> floatingPointTypes
+		internal static IEnumerable<Type> FloatingPointTypes
 		{
 			get
 			{

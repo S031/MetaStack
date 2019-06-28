@@ -5,11 +5,13 @@ using System;
 using System.Linq;
 using S031.MetaStack.Common.Logging;
 using System.Collections.Generic;
+using pair = System.Collections.Generic.KeyValuePair<System.Type, System.ValueType>;
+using System.Collections;
 
 namespace MetaStack.Test.Common
 {
 	public class ExtensionsTest
-    {
+	{
 		public ExtensionsTest()
 		{
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
@@ -123,7 +125,7 @@ namespace MetaStack.Test.Common
 		void ByteArrayExtensionsTest()
 		{
 			Assert.True("0KHQtdGA0LPQtdC5INCS0LjRgtCw0LvRjNC10LLQuNGHINCS0L7RgdGC0YDQuNC60L7Qsg==".IsBase64String());
-			Assert.Equal(new byte[] { 1, 2, 3, 4, 5 }.ToBASE64String().ToByteArray().ToBASE64String(), 
+			Assert.Equal(new byte[] { 1, 2, 3, 4, 5 }.ToBASE64String().ToByteArray().ToBASE64String(),
 				new byte[] { 1, 2, 3, 4, 5 }.ToBASE64String());
 		}
 		[Fact]
@@ -195,6 +197,90 @@ namespace MetaStack.Test.Common
 				l.Debug($"Object(double): {IsEmpty(value)}");
 			}
 		}
+		[Fact]
+		void TypeExtensionsTest()
+		{
+			using (FileLog l = new FileLog("TypeExtensionsTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			{
+				DateTime start = DateTime.Now;
+				for (int i = 0; i < 1000000; i++)
+				{
+					object value = typeof(int).GetDefaultValue();
+				}
+				DateTime stop = DateTime.Now;
+				l.Debug("GetDefaultValue Return for 1,000,000 runs took " + (stop - start).TotalMilliseconds + "ms");
+
+				start = DateTime.Now;
+				for (int i = 0; i < 1000000; i++)
+				{
+					var value = GetDefaultValue(typeof(int));
+				}
+				stop = DateTime.Now;
+				l.Debug("GetDefaultValue Return for 1,000,000 runs took " + (stop - start).TotalMilliseconds + "ms");
+
+				start = DateTime.Now;
+				for (int i = 0; i < 10000000; i++)
+				{
+					int j = '7'.ToIntOrDefault2();
+				}
+				stop = DateTime.Now;
+				l.Debug("Char To Int Return for 1,000,000 runs took " + (stop - start).TotalMilliseconds + "ms");
+
+				start = DateTime.Now;
+				for (int i = 0; i < 10000000; i++)
+				{
+					int j = '7'.ToIntOrDefault();
+				}
+				stop = DateTime.Now;
+				l.Debug("Char To Int 2 Return for 1,000,000 runs took " + (stop - start).TotalMilliseconds + "ms");
+			}
+		}
+
+		public static System.ValueType GetDefaultValue(Type type) => _defaults[type];
+		//public static object GetDefaultValue(Type type) => _defaults.FirstOrDefault(p => p.Key == type).Value;
+
+
+		private static readonly ReadOnlyCache<Type, System.ValueType> _defaults = new ReadOnlyCache<Type, System.ValueType>(32)
+			.Add(typeof(string), '\0')
+			.Add(typeof(DateTime), DateTime.MinValue)
+			.Add(typeof(bool), false)
+			.Add(typeof(byte), 0)
+			.Add(typeof(char), '\0')
+			.Add(typeof(decimal), 0m)
+			.Add(typeof(double), 0d)
+			.Add(typeof(float), 0f)
+			.Add(typeof(int), 0)
+			.Add(typeof(long), 0L)
+			.Add(typeof(sbyte), 0)
+			.Add(typeof(short), 0)
+			.Add(typeof(uint), 0)
+			.Add(typeof(ulong), 0)
+			.Add(typeof(ushort), 0)
+			.Add(typeof(Guid), Guid.Empty)
+			.Sort();
+
+		private static HashSet<Type> _types = new HashSet<Type>()
+		{
+			typeof(string)
+			,typeof(DateTime)
+			,typeof(bool)
+			,typeof(byte)
+			,typeof(char)
+			,typeof(decimal)
+			,typeof(double)
+			,typeof(float)
+			,typeof(int)
+			,typeof(long)
+			,typeof(sbyte)
+			,typeof(short)
+			,typeof(uint)
+			,typeof(ulong)
+			,typeof(ushort)
+			,typeof(Guid)
+		};
+
+		private static object[] _values = new object[] { "", DateTime.MinValue, false, 0, '\0', 0m, 0d, 0f, 0, 0L, 0, 0, 0, 0, 0, Guid.Empty };
+
 		private static bool IsEmpty(object value)
 		{
 			return vbo.IsEmpty(value);
@@ -203,6 +289,34 @@ namespace MetaStack.Test.Common
 	}
 	static class TestExt
 	{
+		public static int BinarySearch(this pair[] array, int searchFor)
+		{ 
+			int high = array.Length - 1;
+			int low = 0;
+			int mid;
+
+			if (array[0].Equals(searchFor))
+				return 0;
+			else if (array[high].Equals(searchFor))
+				return high;
+			else
+			{
+				while (low <= high)
+				{
+					mid = (high + low) / 2;
+					int key = array[mid].Key.GetHashCode();
+					int result =  key - searchFor;
+					if (result == 0)
+						return mid;
+					else if (result > 0)
+						high = mid--;
+					else
+						low = mid++;
+				}
+				return -1;
+			}
+		}
+
 		public static void ForEach(this int n, Action<int> action)
 		{
 			for (int i = 0; i < n; i++)

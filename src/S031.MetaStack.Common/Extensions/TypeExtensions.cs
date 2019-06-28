@@ -91,11 +91,11 @@ namespace S031.MetaStack.Common
 			if (scope == NumericTypesScope.All)
 				return vbo.AllNumericTypes.Contains(type);
 			else if (scope == NumericTypesScope.Integral)
-				return vbo.integralTypes.Contains(type);
+				return vbo.IntegralTypes.Contains(type);
 			else if (scope == NumericTypesScope.Long)
 				return type == typeof(long);
 			else if (scope == NumericTypesScope.FloatingPoint)
-				return vbo.floatingPointTypes.Contains(type);
+				return vbo.FloatingPointTypes.Contains(type);
 			return vbo.AllNumericTypes.Contains(type);
 		}
 

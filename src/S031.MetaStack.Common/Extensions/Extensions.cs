@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace S031.MetaStack.Common
 {
 	public static class StringExtension
 	{
+		private static readonly Func<int, string> FastAllocateString =
+					(Func<int, string>)typeof(string).GetMethods(BindingFlags.NonPublic | BindingFlags.Static)
+						.First(x => x.Name == "FastAllocateString").CreateDelegate(typeof(Func<int, string>));
+
 		public static string Left(this string str, int lenght)
 		{
 			str.NullTest(nameof(str));
@@ -262,6 +267,12 @@ namespace S031.MetaStack.Common
 	{
 		public static int ToIntOrDefault(this char c)
 		{
+			if (char.IsDigit(c))
+				return (int)(c - '0');
+			return 0;
+		}
+		public static int ToIntOrDefault2(this char c)
+		{
 			int i = "0123456789".IndexOf(c);
 			if (i == -1)
 				return 0;
@@ -281,7 +292,7 @@ namespace S031.MetaStack.Common
 
 	public static class EnumerableExtension
 	{
-		public static int IndexOf<T>(this IEnumerable<T> source, T element)
+		public static int IndexOf<T>(this IEnumerable<T> source, T element, IEqualityComparer<T> comparer = null)
 		{
 			IList<T> list = (source as IList<T>);
 			if (list == null)
@@ -290,10 +301,12 @@ namespace S031.MetaStack.Common
 					return -1;
 				if (element == null)
 					return -1;
+
 				int i = 0;
+				comparer = comparer ?? EqualityComparer<T>.Default;
 				foreach (T item in source)
 				{
-					if (item.Equals(element))
+					if (comparer.Equals(item, element))
 						return i;
 					i++;
 				}

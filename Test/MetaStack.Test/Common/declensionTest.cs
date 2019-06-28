@@ -7,15 +7,15 @@ using Xunit;
 
 namespace MetaStack.Test.Common
 {
-	public class declensionTest
+	public class DeclensionTest
     {
-		public declensionTest()
+		public DeclensionTest()
 		{
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
 		}
 
 		[Fact]
-		void declensionFileTest()
+		void DeclensionFileTest()
 		{
 			using (FileLog l = new FileLog("declensionFileTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
