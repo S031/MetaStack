@@ -115,6 +115,15 @@ namespace S031.MetaStack.Common.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {WARNING}.
+        /// </summary>
+        internal static string LogLevel_Warning {
+            get {
+                return ResourceManager.GetString("LogLevel.Warning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Password length can not be less than 6 characters.
         /// </summary>
         internal static string PasswordGenerator_Generate_1 {
@@ -129,15 +138,6 @@ namespace S031.MetaStack.Common.Properties {
         internal static string PasswordGenerator_Generate_2 {
             get {
                 return ResourceManager.GetString("PasswordGenerator.Generate.2", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to {WARNING}.
-        /// </summary>
-        internal static string Warning {
-            get {
-                return ResourceManager.GetString("Warning", resourceCulture);
             }
         }
     }

@@ -216,7 +216,7 @@ namespace MetaStack.Test.Common
 					var value = GetDefaultValue(typeof(int));
 				}
 				stop = DateTime.Now;
-				l.Debug("GetDefaultValue Return for 1,000,000 runs took " + (stop - start).TotalMilliseconds + "ms");
+				l.Debug($"GetDefaultValue Return for 1,000,000 runs took value = {GetDefaultValue(typeof(int))} {(stop - start).TotalMilliseconds} ms");
 
 				start = DateTime.Now;
 				for (int i = 0; i < 10000000; i++)
@@ -240,24 +240,24 @@ namespace MetaStack.Test.Common
 		//public static object GetDefaultValue(Type type) => _defaults.FirstOrDefault(p => p.Key == type).Value;
 
 
-		private static readonly ReadOnlyCache<Type, System.ValueType> _defaults = new ReadOnlyCache<Type, System.ValueType>(32)
-			.Add(typeof(string), '\0')
-			.Add(typeof(DateTime), DateTime.MinValue)
-			.Add(typeof(bool), false)
-			.Add(typeof(byte), 0)
-			.Add(typeof(char), '\0')
-			.Add(typeof(decimal), 0m)
-			.Add(typeof(double), 0d)
-			.Add(typeof(float), 0f)
-			.Add(typeof(int), 0)
-			.Add(typeof(long), 0L)
-			.Add(typeof(sbyte), 0)
-			.Add(typeof(short), 0)
-			.Add(typeof(uint), 0)
-			.Add(typeof(ulong), 0)
-			.Add(typeof(ushort), 0)
-			.Add(typeof(Guid), Guid.Empty)
-			.Sort();
+		private static readonly ReadOnlyCache<Type, System.ValueType> _defaults = new ReadOnlyCache<Type, System.ValueType>(
+			(typeof(string), '\0'),
+			(typeof(DateTime), DateTime.MinValue),
+			(typeof(bool), false),
+			(typeof(byte), 0),
+			(typeof(char), '\0'),
+			(typeof(decimal), 0m),
+			(typeof(double), 0d),
+			(typeof(float), 0f),
+			(typeof(int), 0),
+			(typeof(long), 0L),
+			(typeof(sbyte), 0),
+			(typeof(short), 0),
+			(typeof(uint), 0),
+			(typeof(ulong), 0),
+			(typeof(ushort), 0),
+			(typeof(Guid), Guid.Empty)
+			);
 
 		private static HashSet<Type> _types = new HashSet<Type>()
 		{

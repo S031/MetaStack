@@ -22,12 +22,12 @@ namespace S031.MetaStack.Common
 		{
 			if (options.ValidLen < 6)
 				//Password length can not be less than 6 characters
-				throw new ArgumentException("S031.MetaStack.Common.PasswordGenerator.Generate.1".GetTranslate());
+				throw new ArgumentException(Properties.Strings.PasswordGenerator_Generate_1);
 
 			int totalReqs = options.MinUpper + options.MinLower + options.MinDigit + options.MinSpecial;
 			if (options.ValidLen < totalReqs)
 				//For specified conditions (PasswordGeneratorOptions), the password length can not be less than {totalReqs} characters
-				throw new ArgumentException("S031.MetaStack.Common.PasswordGenerator.Generate.2".GetTranslate(totalReqs));
+				throw new ArgumentException(Properties.Strings.PasswordGenerator_Generate_2.ToFormat(totalReqs));
 
 			char[] reqChars = new char[totalReqs];
 			Random r = new Random(Guid.NewGuid().GetHashCode());

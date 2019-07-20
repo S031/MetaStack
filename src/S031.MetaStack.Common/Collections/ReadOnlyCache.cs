@@ -7,90 +7,38 @@ using System.Text;
 namespace S031.MetaStack.Common
 {
 	/// <summary>
-	/// Class for stor readonly array of data with binary search by key hesh code
+	/// Class for stor readonly array of data with binary search by key hash code
 	/// fastest and smaller then readonly dictionary
 	/// </summary>
 	/// <typeparam name="TKey"></typeparam>
 	/// <typeparam name="TValue"></typeparam>
-	public sealed class ReadOnlyCache<TKey, TValue> : IEnumerable<Pair<TKey, TValue>>
+	public readonly struct ReadOnlyCache<TKey, TValue>
 	{
-		private Pair<int, TValue>[] _data;
-		private int _free;
-		private int _size;
-
-		private static readonly Comparer<int> _comparer = Comparer<int>.Default;
-
-		private int BinarySearch(int searchFor)
-		{
-			var array = _data;
-			int high = _size - 1;
-			int low = 0;
-			int mid;
-
-			while (low <= high)
-			{
-				mid = (high + low) / 2;
-				int result = _comparer.Compare(array[mid].Key, searchFor);
-				if (result == 0)
-					return mid;
-				else if (result > 0)
-					high = mid--;
-				else
-					low = mid++;
-			}
-			return -1;
-		}
+		private readonly TValue[] _data;
+		private readonly int[] _keys;
 
 		public TValue this[TKey index] =>
-			_data[BinarySearch(index.GetHashCode())].Value;
+			_data[Array.BinarySearch<int>(_keys, index.GetHashCode())];
 
 		public bool TryGetValue(TKey key, out TValue value)
 		{
-			int i = BinarySearch(key.GetHashCode());
+			int i = Array.BinarySearch<int>(_keys, key.GetHashCode());
 			if (i > 0)
 			{
-				value = _data[i].Value;
+				value = _data[i];
 				return true;
 			}
 			value = default;
 			return false;
 		}
 
-		public ReadOnlyCache(int size)
+		public ReadOnlyCache(params (TKey key, TValue value)[] data)
 		{
-			_data = new Pair<int, TValue>[size];
-			_free = size;
-			_size = size;
+			_data = data.Select(p => p.value).ToArray();
+			_keys = data.Select(p => p.key.GetHashCode()).ToArray();
+			Array.Sort(_keys, _data);
 		}
 
-		public IEnumerator<Pair<TKey, TValue>> GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return (IEnumerator<Pair<TKey, TValue>>)_data.GetEnumerator();
-		}
-
-		public ReadOnlyCache<TKey, TValue> Add(TKey key, TValue value)
-		{
-			int index = _size - _free;
-			_data[index] = new Pair<int, TValue>(key.GetHashCode(), value);
-			_free--;
-			return this;
-		}
-
-		public ReadOnlyCache<TKey, TValue> Sort()
-		{
-			_size -= _free;
-			_free = 0;
-			_data = _data
-				.Take(_size)
-				.OrderBy(p => p.Key)
-				.ToArray();
-			return this;
-		}
 	}
 	public readonly struct Pair<TKey, TValue>
 	{

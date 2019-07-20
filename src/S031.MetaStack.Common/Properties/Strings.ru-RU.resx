@@ -118,30 +118,30 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="LogLevel.Critical" xml:space="preserve">
-    <value>{CRITICAL}</value>
+    <value>{КАТАСТРОФА}</value>
   </data>
   <data name="LogLevel.Debug" xml:space="preserve">
-    <value>{DEBUG}</value>
+    <value>{ОТЛАДКА}</value>
   </data>
   <data name="LogLevel.Error" xml:space="preserve">
-    <value>{ERROR}</value>
+    <value>{ОШИБКА}</value>
   </data>
   <data name="LogLevel.Info" xml:space="preserve">
-    <value>{INFO}</value>
+    <value>{СООБЩЕНИЕ}</value>
   </data>
   <data name="LogLevel.None" xml:space="preserve">
     <value />
   </data>
   <data name="LogLevel.Trace" xml:space="preserve">
-    <value>{TRACE}</value>
+    <value>{ТРАССИРОВКА}</value>
   </data>
   <data name="LogLevel.Warning" xml:space="preserve">
-    <value>{WARNING}</value>
+    <value>{ПРЕДУПРЕЖДЕНИЕ}</value>
   </data>
   <data name="PasswordGenerator.Generate.1" xml:space="preserve">
-    <value>Password length can not be less than 6 characters</value>
+    <value>Длинна пароля не может быть менее 6 символов</value>
   </data>
   <data name="PasswordGenerator.Generate.2" xml:space="preserve">
-    <value>For specified conditions (PasswordGeneratorOptions), the password length can not be less than {0} characters</value>
+    <value>Для заданных условий (PasswordGeneratorOptions) длинна пароля не может быть менее {0} символов</value>
   </data>
 </root>
