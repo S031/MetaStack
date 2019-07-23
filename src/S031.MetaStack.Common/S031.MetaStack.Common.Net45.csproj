@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>S031.MetaStack.Common</RootNamespace>
     <AssemblyName>S031.MetaStack.Common</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -22,6 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -37,12 +38,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collections\KeyValueList.cs" />
+    <Compile Include="Collections\ReadOnlyCache.cs" />
     <Compile Include="Extensions\Extensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Logging\FileLog.cs" />
+    <Compile Include="Logging\FileLogExtensions.cs" />
     <Compile Include="Logging\FileLogSettings.cs" />
     <Compile Include="Padeg\Declension.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Strings.Designer.cs" />
     <Compile Include="Tools\MatchsMaker.cs" />
     <Compile Include="Tools\Numeric.cs" />
     <Compile Include="Tools\Pair.cs" />
@@ -52,6 +56,8 @@
     <Compile Include="Translater\Translater.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Properties\Strings.resx" />
+    <EmbeddedResource Include="Properties\Strings.ru-RU.resx" />
     <EmbeddedResource Include="Translater\en-US.txt" />
     <EmbeddedResource Include="Translater\ru-RU.txt" />
   </ItemGroup>

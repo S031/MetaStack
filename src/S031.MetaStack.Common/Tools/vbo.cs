@@ -50,53 +50,38 @@ namespace S031.MetaStack.Common
 		/// </summary>
 		public static readonly double GoldenRatio2 = Math.Sqrt(GoldenRatio * GoldenRatio - 1);
 
-		internal static IEnumerable<Type> AllNumericTypes  //=> integralTypes.Concat(floatingPointTypes).Concat(new Type[] { typeof(long) });
-		{
-			get
-			{
-				yield return typeof(int);
-				yield return typeof(long);
-				yield return typeof(decimal);
+		internal static readonly ReadOnlyCache<Type> AllNumericTypes =
+			new ReadOnlyCache<Type>(
+				typeof(int),
+				typeof(long),
+				typeof(decimal),
+				typeof(char),
+				typeof(sbyte),
+				typeof(byte),
+				typeof(short),
+				typeof(ushort),
+				typeof(uint),
+				typeof(ulong),
+				typeof(float),
+				typeof(double));
 
-				yield return typeof(char);
-				yield return typeof(sbyte);
-				yield return typeof(byte);
-				yield return typeof(short);
-				yield return typeof(ushort);
-				yield return typeof(uint);
-				yield return typeof(ulong);
-				yield return typeof(float);
-				yield return typeof(double);
-			}
-		}
+		internal static readonly ReadOnlyCache<Type> IntegralTypes =
+			new ReadOnlyCache<Type>(
+				typeof(int),
+				typeof(long),
+				typeof(char),
+				typeof(sbyte),
+				typeof(byte),
+				typeof(short),
+				typeof(ushort),
+				typeof(uint),
+				typeof(ulong));
 
-		internal static IEnumerable<Type> IntegralTypes
-		{
-			get
-			{
-				yield return typeof(int);
-				yield return typeof(long);
-
-				yield return typeof(char);
-				yield return typeof(sbyte);
-				yield return typeof(byte);
-				yield return typeof(short);
-				yield return typeof(ushort);
-				yield return typeof(uint);
-				yield return typeof(ulong);
-			}
-		}
-
-		internal static IEnumerable<Type> FloatingPointTypes
-		{
-			get
-			{
-				yield return typeof(decimal);
-
-				yield return typeof(float);
-				yield return typeof(double);
-			}
-		}
+		internal static readonly ReadOnlyCache<Type> FloatingPointTypes =
+			new ReadOnlyCache<Type>(
+				typeof(decimal),
+				typeof(float),
+				typeof(double));
 
 		public static DateTime Date()
         {

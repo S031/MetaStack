@@ -101,31 +101,32 @@ namespace S031.MetaStack.Common
 
 		public static object GetDefaultValue(this Type type)
 		{
+			type.NullTest(nameof(type));
 			if (_defaults.TryGetValue(type, out object result))
 				return result;
 			else if (type.IsValueType || type.IsPrimitive)
 				return CreateInstance(type);
-			return null;
+			return default;
 		}
-		private static readonly Dictionary<Type, object> _defaults = new Dictionary<Type, object>()
-		{
-			{ typeof(string), string.Empty }
-			,{ typeof(DateTime), DateTime.MinValue }
-			,{ typeof(bool), false }
-			,{ typeof(byte), 0 }
-			,{ typeof(char), '\0' }
-			,{ typeof(decimal), 0m }
-			,{ typeof(double), 0d }
-			,{ typeof(float), 0f }
-			,{ typeof(int), 0 }
-			,{ typeof(long), 0L }
-			,{ typeof(sbyte), 0 }
-			,{ typeof(short), 0 }
-			,{ typeof(uint), 0 }
-			,{ typeof(ulong), 0 }
-			,{ typeof(ushort), 0 }
-			,{ typeof(Guid), Guid.Empty }
-		};
+
+		private static readonly ReadOnlyCache<Type, object> _defaults = new ReadOnlyCache<Type, object>(
+			(typeof(string), string.Empty),
+			(typeof(DateTime), DateTime.MinValue),
+			(typeof(bool), false),
+			(typeof(byte), 0),
+			(typeof(char), '\0'),
+			(typeof(decimal), 0m),
+			(typeof(double), 0d),
+			(typeof(float), 0f),
+			(typeof(int), 0),
+			(typeof(long), 0L),
+			(typeof(sbyte), 0),
+			(typeof(short), 0),
+			(typeof(uint), 0),
+			(typeof(ulong), 0),
+			(typeof(ushort), 0),
+			(typeof(Guid), Guid.Empty)
+			);
 
 		public static IEnumerable<Type> GetImplements(this Type type, Assembly assembly = null)
 		{

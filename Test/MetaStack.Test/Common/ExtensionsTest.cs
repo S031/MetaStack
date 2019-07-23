@@ -92,18 +92,27 @@ namespace MetaStack.Test.Common
 				string stackTrace = Environment.StackTrace;
 				for (int i = 0; i < 100000; i++)
 				{
-					string s = stackTrace.GetToken(2, "\r\n");
+					string s = stackTrace.GetToken(5, "\r\n");
 				}
 				l.Write(LogLevels.Debug, "stringExtensionsTest.GetToken Finish");
+
 				l.Write(LogLevels.Debug, "stringExtensionsTest.GetTokenFromSplit Start");
 				for (int i = 0; i < 100000; i++)
 				{
-					string s = stackTrace.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[3];
+					string s = stackTrace.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[5];
 				}
 				l.Write(LogLevels.Debug, "stringExtensionsTest.GetTokenFromSplit Finish");
+
+				l.Write(LogLevels.Debug, "span.GetToken Start");
+				for (int i = 0; i < 100000; i++)
+				{
+					string s = stackTrace.AsSpan().GetToken(5, "\r\n").ToString();
+				}
+				l.Write(LogLevels.Debug, "span.GetToken Finish");
 				l.Write(LogLevels.Debug, "stringExtensionsTest Finish");
-				l.Write(LogLevels.Debug, "Первый токен", stackTrace.GetToken(0, "\r\n"));
-				l.Write(LogLevels.Debug, "Пустой токен", stackTrace.GetToken(100, "\r\n"));
+				l.Write(LogLevels.Debug, "Пятый токен", stackTrace.AsSpan().GetToken(5, "\r\n").ToString());
+				l.Write(LogLevels.Debug, "Пустой токен", stackTrace.AsSpan().GetToken(100, "\r\n").ToString());
+
 				stackTrace = "1;223;444;133456;1;2;3;";
 				int j = 0;
 				do
@@ -203,6 +212,7 @@ namespace MetaStack.Test.Common
 			using (FileLog l = new FileLog("TypeExtensionsTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
 				DateTime start = DateTime.Now;
+				Type t = this.GetType();
 				for (int i = 0; i < 1000000; i++)
 				{
 					object value = typeof(int).GetDefaultValue();
@@ -219,20 +229,30 @@ namespace MetaStack.Test.Common
 				l.Debug($"GetDefaultValue Return for 1,000,000 runs took value = {GetDefaultValue(typeof(int))} {(stop - start).TotalMilliseconds} ms");
 
 				start = DateTime.Now;
-				for (int i = 0; i < 10000000; i++)
+				for (int i = 0; i < 1000000; i++)
 				{
-					int j = '7'.ToIntOrDefault2();
+					var value = typeof(int).Match<Type, object>(
+						(tp => tp == typeof(string), _ => string.Empty),
+						(tp => tp == typeof(DateTime), _ => DateTime.MinValue),
+						(tp => tp == typeof(bool), _ => false),
+						(tp => tp == typeof(byte), _ => 0),
+						(tp => tp == typeof(char), _ => '\0'),
+						(tp => tp == typeof(decimal), _ => 0m),
+						(tp => tp == typeof(double), _ => 0d),
+						(tp => tp == typeof(float), _ => 0f),
+						(tp => tp == typeof(int), _ => 0),
+						(tp => tp == typeof(long), _ => 0L),
+						(tp => tp == typeof(sbyte), _ => 0),
+						(tp => tp == typeof(short), _ => 0),
+						(tp => tp == typeof(uint), _ => 0),
+						(tp => tp == typeof(ulong), _ => 0),
+						(tp => tp == typeof(ushort), _ => 0),
+						(tp => tp == typeof(Guid), _ => Guid.Empty),
+						(tp => true, _ => null)
+						);
 				}
 				stop = DateTime.Now;
-				l.Debug("Char To Int Return for 1,000,000 runs took " + (stop - start).TotalMilliseconds + "ms");
-
-				start = DateTime.Now;
-				for (int i = 0; i < 10000000; i++)
-				{
-					int j = '7'.ToIntOrDefault();
-				}
-				stop = DateTime.Now;
-				l.Debug("Char To Int 2 Return for 1,000,000 runs took " + (stop - start).TotalMilliseconds + "ms");
+				l.Debug($"GetDefaultValue Return for 1,000,000 runs took value = {GetDefaultValue(typeof(int))} {(stop - start).TotalMilliseconds} ms");
 			}
 		}
 
@@ -259,27 +279,6 @@ namespace MetaStack.Test.Common
 			(typeof(Guid), Guid.Empty)
 			);
 
-		private static HashSet<Type> _types = new HashSet<Type>()
-		{
-			typeof(string)
-			,typeof(DateTime)
-			,typeof(bool)
-			,typeof(byte)
-			,typeof(char)
-			,typeof(decimal)
-			,typeof(double)
-			,typeof(float)
-			,typeof(int)
-			,typeof(long)
-			,typeof(sbyte)
-			,typeof(short)
-			,typeof(uint)
-			,typeof(ulong)
-			,typeof(ushort)
-			,typeof(Guid)
-		};
-
-		private static object[] _values = new object[] { "", DateTime.MinValue, false, 0, '\0', 0m, 0d, 0f, 0, 0L, 0, 0, 0, 0, 0, Guid.Empty };
 
 		private static bool IsEmpty(object value)
 		{

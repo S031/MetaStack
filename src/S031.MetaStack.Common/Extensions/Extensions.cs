@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace S031.MetaStack.Common
@@ -12,41 +14,48 @@ namespace S031.MetaStack.Common
 					(Func<int, string>)typeof(string).GetMethods(BindingFlags.NonPublic | BindingFlags.Static)
 						.First(x => x.Name == "FastAllocateString").CreateDelegate(typeof(Func<int, string>));
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static string Left(this string str, int lenght)
 		{
 			str.NullTest(nameof(str));
 			return str.Substring(0, lenght > str.Length ? str.Length : lenght);
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static string Right(this string str, int lenght)
 		{
 			str.NullTest(nameof(str));
 			return str.Substring(str.Length - (lenght > str.Length ? str.Length : lenght));
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int ToIntOrDefault(this string str)
 		{
 			str.NullTest(nameof(str));
 			return int.TryParse(str, out int result) ? result : 0;
 		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static long ToLongOrDefault(this string str)
 		{
 			str.NullTest(nameof(str));
 			return long.TryParse(str, out long result) ? result : 0;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static double ToDoubleOrDefault(this string str)
 		{
 			str.NullTest(nameof(str));
 			return double.TryParse(str, out double result) ? result : 0;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static decimal ToDecimalOrDefault(this string str)
 		{
 			str.NullTest(nameof(str));
 			return decimal.TryParse(str, out decimal result) ? result : 0;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static DateTime ToDateOrDefault(this string str)
 		{
 			if (string.IsNullOrEmpty(str) || str == "0" || str.Left(4) == "0:00" || str.Left(5) == "00:00")
@@ -57,6 +66,7 @@ namespace S031.MetaStack.Common
 				return DateTime.MinValue;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static TimeSpan ToTimeSpan(this string str)
 		{
 			if (string.IsNullOrEmpty(str) || str == "0" || str.Left(4) == "0:00"
@@ -67,6 +77,7 @@ namespace S031.MetaStack.Common
 			return TimeSpan.MinValue;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool ToBoolOrDefault(this string str)
 		{
 			if (string.IsNullOrEmpty(str))
@@ -80,10 +91,13 @@ namespace S031.MetaStack.Common
 			else
 				return bool.TryParse(str, out bool val) ? val : false;
 		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static T To<T>(this string str)
 		{
 			return (T)str.ToObjectOf(typeof(T));
 		}
+
 		public static object ToObjectOf(this string str, Type type)
 		{
 			if (str.IsEmpty())
@@ -111,6 +125,7 @@ namespace S031.MetaStack.Common
 			}
 
 		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static byte[] ToByteArray(this string str, System.Text.Encoding encoding = null)
 		{
 			str.NullTest(nameof(str));
@@ -121,6 +136,7 @@ namespace S031.MetaStack.Common
 			return System.Text.Encoding.Default.GetBytes(str);
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static string TruncDub(this string str, string dublicatedChars)
 		{
 			str.NullTest(nameof(str));
@@ -130,10 +146,10 @@ namespace S031.MetaStack.Common
 			return str;
 		}
 
-		public static string FormattedText(this string str, string format) => string.Format("{0:" + format + "}", str);
-
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static string ToFormat(this string str, params object[] values) => string.Format(str, values);
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float MatchScore(this string str, string stringForCompare)
 		{
 			str.NullTest(nameof(str));
@@ -141,8 +157,10 @@ namespace S031.MetaStack.Common
 			return MatchsMaker.GetScore(str, stringForCompare);
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsEmpty(this string str) => string.IsNullOrEmpty(str);
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool Like(this string str, string template)
 		{
 			if (string.IsNullOrEmpty(str) || string.IsNullOrEmpty(template))
@@ -152,6 +170,7 @@ namespace S031.MetaStack.Common
 			return System.Text.RegularExpressions.Regex.IsMatch(str, template);
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsBase64String(this string str)
 		{
 			if (string.IsNullOrWhiteSpace(str))
@@ -163,8 +182,12 @@ namespace S031.MetaStack.Common
 
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static string Wrap(this string str, int lenght)
 		{
+			if (string.IsNullOrEmpty(str))
+				return str;
+
 			var charCount = 0;
 			var lines = str.Split(new[] { ' ', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 			return string.Join("\n", lines.GroupBy(w => (charCount += w.Length + 1) / (lenght + 2))
@@ -206,7 +229,58 @@ namespace S031.MetaStack.Common
 				return str.Substring(start);
 		}
 
-		public static string Qt(this string source, char leftChar = '"', char rightChar = '"') => leftChar + source + rightChar;
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public unsafe static string Qt(this string source, char leftChar = '"', char rightChar = '"')
+		{
+			int len = source.Length;
+			string destination = FastAllocateString(len + 2);
+			fixed (char* pD = destination)
+			fixed (char* pS = source)
+			{
+				*pD = leftChar;
+				wstrcpy(pD + 1, pS, len);
+				*(pD + 1 + len) = rightChar;
+				return destination;
+			}
+		}
+
+		//[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		//public unsafe static string Qt2(this string source, char leftChar = '"', char rightChar = '"')
+		////=> string.Concat(leftChar, source, rightChar);
+		//{
+		//	int len = source.Length;
+		//	string destination = string.Create<char>(len + 2, ' ', (buffer, value) =>
+		//	   {
+		//		   fixed (char* pD = buffer)
+		//		   fixed (char* pS = source)
+		//		   {
+		//			   *pD = leftChar;
+		//			   wstrcpy(pD + 1, pS, len);
+		//			   *(pD + 1 + len) = rightChar;
+		//		   }
+		//	   });
+		//	return destination;
+		//}
+
+		//[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		//public unsafe static string Qt3(this string source, char leftChar = '"', char rightChar = '"')
+		//{
+		//	int len = source.Length;
+		//	char* destination = stackalloc char[len + 2];
+		//	destination[0] = leftChar;
+		//	fixed (char* pS = source)
+		//		wstrcpy(destination + 1, pS, len);
+		//	destination[len + 1] = leftChar;			
+		//	return new string(destination);
+		//}
+
+		internal static unsafe void wstrcpy(char* dmem, char* smem, int charCount)
+		{
+			//uint len = ((uint)charCount);
+			//for (int i = 0; i < len; i++)
+			//	*(dmem + i) = *(smem + i);
+			Buffer.MemoryCopy(smem, dmem, charCount * 2, charCount * 2);
+		}
 
 		public static string RemoveChar(this string source, char[] charsItem)
 		{
@@ -265,29 +339,21 @@ namespace S031.MetaStack.Common
 
 	public static class CharExtension
 	{
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int ToIntOrDefault(this char c)
 		{
 			if (char.IsDigit(c))
 				return (int)(c - '0');
 			return 0;
 		}
-		public static int ToIntOrDefault2(this char c)
-		{
-			int i = "0123456789".IndexOf(c);
-			if (i == -1)
-				return 0;
-			return i;
-		}
 
-		public static bool ToBoolOrDefault(this char c)
-		{
-			return "123456789".IndexOf(c) > -1;
-		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool ToBoolOrDefault(this char c) 
+			=> c.ToIntOrDefault() != 0;
 
-		public static bool IsNumeric(this char c)
-		{
-			return "0123456789".IndexOf(c) > -1;
-		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool IsNumeric(this char c) 
+			=> char.IsDigit(c);
 	}
 
 	public static class EnumerableExtension
@@ -321,30 +387,29 @@ namespace S031.MetaStack.Common
 
 	public static class DateTimeExtension
 	{
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static string ToDBFormat(this DateTime srcDate)
-		{
-			return srcDate.ToString(vbo.DBDateFormat);
-		}
+			=> srcDate.ToString(vbo.DBDateFormat);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static string ToFormat(this DateTime srcDate)
-		{
-			return srcDate.ToString(vbo.DateFormat);
-		}
+			=> srcDate.ToString(vbo.DateFormat);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static string ToFullFormat(this DateTime srcDate)
-		{
-			return srcDate.ToString(vbo.FullDateFormat);
-		}
+			=> srcDate.ToString(vbo.FullDateFormat);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsEmpty(this DateTime date)
-		{
-			return date == DateTime.MinValue;
-		}
+			=> date == DateTime.MinValue;
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static DateTime FirstDayOfMonth(this DateTime value)
-		{
-			return value.Date.AddDays(1 - value.Day);
-		}
+			=> value.Date.AddDays(1 - value.Day);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static DateTime LastDayOfMonth(this DateTime value)
-		{
-			return value.Date.AddDays((-1) * value.Day).AddMonths(1);
-		}
+			=> value.Date.AddDays((-1) * value.Day).AddMonths(1);
 	}
 
 	public static class ByteArrayExtension
@@ -374,6 +439,7 @@ namespace S031.MetaStack.Common
 
 	public static class KeyValuePairExtension
 	{
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool IsEmpty<T, TU>(this KeyValuePair<T, TU> pair) => pair.Equals(new KeyValuePair<T, TU>());
 	}
 
@@ -397,6 +463,7 @@ namespace S031.MetaStack.Common
 
 		public static T CastOf<T>(this object source) => (T)CastOf(source, typeof(T));
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void NullTest(this object value, string valueName) =>
 			NullTest(value, valueName, (v, n) => { throw new ArgumentNullException(n); });
 		public static void NullTest(this object value, string valueName, Action<object, string> action)
