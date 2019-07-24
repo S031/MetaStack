@@ -282,21 +282,104 @@ namespace S031.MetaStack.Common
 			Buffer.MemoryCopy(smem, dmem, charCount * 2, charCount * 2);
 		}
 
-		public static string RemoveChar(this string source, char[] charsItem)
+		public static string RemoveCharOld(this string source, char[] charsItem)
 		{
 			foreach (var c in charsItem)
 				source = source.RemoveChar(c);
 			return source;
 		}
 
-		public static string RemoveChar(this string source, char charItem)
+		public static string RemoveCharOld(this string source, char charItem)
 		{
 			int indexOfChar = source.IndexOf(charItem);
 			if (indexOfChar < 0)
 			{
 				return source;
 			}
-			return RemoveChar(source.Remove(indexOfChar, 1), charItem);
+			return RemoveCharOld(source.Remove(indexOfChar, 1), charItem);
+		}
+		
+		public unsafe static string RemoveChar(this string source, char[] charsItem)
+		{
+			int indexOfChar = source.IndexOfAny(charsItem);
+			if (indexOfChar < 0)
+			{
+				return source;
+			}
+
+			int len = source.Length;
+			string destination = FastAllocateString(len);
+			fixed (char* pD = destination)
+			fixed (char* pS = source)
+			{
+				int j = 0;
+				int i = 0;
+				int count = indexOfChar == 0 ? 0 : indexOfChar - 1;
+				while(indexOfChar <= len)
+				{
+					if (count>0)
+						wstrcpy(pD + j, pS + i + 1, count);
+					j += count;
+					i = indexOfChar;
+					if (i >= len)
+						break;
+					indexOfChar = source.IndexOfAny(charsItem, i + 1);
+					if (indexOfChar == -1)
+					{
+						indexOfChar = len;
+						count = charsItem.Contains(pS[len - 1]) ? 0 : indexOfChar - i;
+					}
+					else
+						count = indexOfChar - (i + 1);
+				}
+				return destination
+					.AsSpan(0, j)
+					.ToString();
+			}
+		}
+		/// <summary>
+		/// Fast remove char from source string. Use StringComparison.Ordinal
+		/// </summary>
+		/// <param name="source"></param>
+		/// <param name="charItem"></param>
+		/// <returns></returns>
+		public unsafe static string RemoveChar(this string source, char charItem)
+		{
+			int indexOfChar = source.IndexOf(charItem);
+			if (indexOfChar < 0)
+			{
+				return source;
+			}
+
+			int len = source.Length;
+			string destination = FastAllocateString(len);
+			fixed (char* pD = destination)
+			fixed (char* pS = source)
+			{
+				int j = 0;
+				int i = 0;
+				int count = indexOfChar == 0 ? 0 : indexOfChar - 1;
+				while(indexOfChar <= len)
+				{
+					if (count>0)
+						wstrcpy(pD + j, pS + i + 1, count);
+					j += count;
+					i = indexOfChar;
+					if (i >= len)
+						break;
+					indexOfChar = source.IndexOf(charItem, i + 1);
+					if (indexOfChar == -1)
+					{
+						indexOfChar = len;
+						count = pS[len - 1] == charItem ? 0 : indexOfChar - i;
+					}
+					else
+						count = indexOfChar - (i + 1);
+				}
+				return destination
+					.AsSpan(0, j)
+					.ToString();
+			}
 		}
 
 		public static String Between(this string source, String start, String end)

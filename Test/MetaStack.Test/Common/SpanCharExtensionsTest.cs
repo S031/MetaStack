@@ -83,6 +83,43 @@ namespace MetaStack.Test.Common
 				l.Debug($"String.Concat Return for {i} runs took value = {s} {(stop - start).TotalMilliseconds} ms");
 			}
 		}
+		[Fact]
+		void UnsafeStringTest()
+		{
+			using (FileLog l = new FileLog("UnsafeStringTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			{
+				DateTime start = DateTime.Now;
+				Type t = this.GetType();
+				string s = string.Empty;
+				string source = Environment.StackTrace;
+				int i = 0;
+				for (i = 0; i < 100_000; i++)
+				{
+					s = source.RemoveChar('\n');
+				}
+				DateTime stop = DateTime.Now;
+				l.Debug($"String.RemoveChar Return for {i} runs look value = {"[[[[[[[[x[[[[[".RemoveChar('[')} Time = {(stop - start).TotalMilliseconds} ms");
+
+				string buuff = s;
+				start = DateTime.Now;
+				for (i = 0; i < 10_000; i++)
+				{
+					s = source.RemoveCharOld('\n');
+				}
+				stop = DateTime.Now;
+				l.Debug($"String.RemoveCharOld Return for {i} runs look value = {"[[[[[[[[x[[[[[".RemoveChar('[')} Time = {(stop - start).TotalMilliseconds} ms");
+				Assert.True(buuff.Length ==  s.Length);
+
+				char[] f = new char[] { '\r', '\n','(', ')' };
+				start = DateTime.Now;
+				for (i = 0; i < 100_000; i++)
+				{
+					s = source.RemoveChar(f);
+				}
+				stop = DateTime.Now;
+				l.Debug($"String.RemoveCharOld Return for {i} runs look value = {s} Time = {(stop - start).TotalMilliseconds} ms");
+			}
+		}
 	}
 }
 
