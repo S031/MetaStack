@@ -13,92 +13,54 @@ namespace S031.MetaStack.Common
     }
     public class Scheduler
     {
-        static readonly string dayFormat = "yyyy-MM-dd";
-        static readonly string timeFormat = "HH:mm:ss";
-
-        DateTime _createTime = vbo.Date();
-        DateTime _lastStartTime = DateTime.MinValue;
-        DateTime _nextStartTime = DateTime.MinValue;
-
-        string _dayStartTime = "00:00:00";
+        const string dayFormat = "yyyy-MM-dd";
+        const string timeFormat = "HH:mm:ss";
+		string _dayStartTime = "00:00:00";
         string _dayEndTime = "23:59:00";
 		readonly int _qt;
 		readonly UnitOfQt _unitOfQt;
         string _weekDayMask = "1,2,3,4,5,6,7";
 
-        public string DayStartTime
-        {
-            get
-            {
-                return _dayStartTime;
-            }
+		public string DayStartTime
+		{
+			get => _dayStartTime;
 
-            set
-            {
+			set
+			{
 				if (DateTime.TryParse(value, out DateTime d))
 					_dayStartTime = d.ToString(timeFormat);
 			}
-        }
+		}
 
-        public string DayEndTime
-        {
-            get
-            {
-                return _dayEndTime;
-            }
+		public string DayEndTime
+		{
+			get => _dayEndTime;
 
-            set
-            {
+			set
+			{
 				if (DateTime.TryParse(value, out DateTime d))
 					_dayEndTime = d.ToString(timeFormat);
 			}
-        }
+		}
 
-        public string WeekDayMask
-        {
-            get
-            {
-                return _weekDayMask;
-            }
+		public string WeekDayMask
+		{
+			get => _weekDayMask;
 
-            set
-            {
-                if (!value.IsEmpty())
-                    _weekDayMask = value;
-            }
-        }
+			set
+			{
+				if (!value.IsEmpty())
+					_weekDayMask = value;
+			}
+		}
 
-        public DateTime CreateTime
-        {
-            get
-            {
-                return _createTime;
-            }
+		public DateTime CreateTime { get; set; } = vbo.Date();
 
-            set
-            {
-                _createTime = value;
-            }
-        }
+		public DateTime LastStartTime { get; private set; } = DateTime.MinValue;
 
-        public DateTime LastStartTime
-        {
-            get
-            {
-                return _lastStartTime;
-            }
-        }
+		public DateTime NextStartTime { get; private set; } = DateTime.MinValue;
 
-        public DateTime NextStartTime
-        {
-            get
-            {
-                return _nextStartTime;
-            }
-
-        }
-
-        public Scheduler(int qt, UnitOfQt unitOfQt)
+		public Scheduler(int qt, UnitOfQt unitOfQt)
         {
             _qt = qt;
             _unitOfQt = unitOfQt;
@@ -114,7 +76,7 @@ namespace S031.MetaStack.Common
 
             DateTime dayStartTime = DateTime.Parse(startTime.ToString(dayFormat) + " " + _dayStartTime);
             DateTime dayEndTime = DateTime.Parse(startTime.ToString(dayFormat) + " " + _dayEndTime);
-            DateTime nextStartTime = dayStartTime > _createTime ? dayStartTime : _createTime;
+            DateTime nextStartTime = dayStartTime > CreateTime ? dayStartTime : CreateTime;
 
             for (; nextStartTime <= startTime;)
             {
@@ -161,8 +123,8 @@ namespace S031.MetaStack.Common
 
         public virtual void Tick()
         {
-            _lastStartTime = DateTime.Now;
-            _nextStartTime = GetNextStartTime(LastStartTime);
+            LastStartTime = DateTime.Now;
+            NextStartTime = GetNextStartTime(LastStartTime);
         }
     }
 }

@@ -10,7 +10,7 @@ namespace S031.MetaStack.Common
 {
 	public static class StringExtension
 	{
-		private static readonly Func<int, string> FastAllocateString =
+		internal static readonly Func<int, string> FastAllocateString =
 					(Func<int, string>)typeof(string).GetMethods(BindingFlags.NonPublic | BindingFlags.Static)
 						.First(x => x.Name == "FastAllocateString").CreateDelegate(typeof(Func<int, string>));
 
@@ -149,7 +149,6 @@ namespace S031.MetaStack.Common
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static string ToFormat(this string str, params object[] values) => string.Format(str, values);
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static float MatchScore(this string str, string stringForCompare)
 		{
 			str.NullTest(nameof(str));
@@ -195,40 +194,74 @@ namespace S031.MetaStack.Common
 						.ToArray());
 		}
 
+		/// <summary>
+		/// Returns a value from an array of key-value pairs if source is equal to a key. 
+		/// If the key is not found, returns the value of the pair with the key vbo.s_default. 
+		/// If vbo.s_default is not specified, returns an empty string.
+		/// </summary>
+		/// <remarks>
+		/// Use StringComparison.Ordinal
+		/// </remarks>
+		/// <param name="source">Key for search</param>
+		/// <param name="comparePairs">Array of key-value pairs</param>
+		/// <returns></returns>
 		public static string SwitchItem(this string source, params string[] comparePairs)
+		{
+			return SwitchItem(source, StringComparison.Ordinal, comparePairs);
+		}
+
+		/// <summary>
+		/// Returns a value from an array of key-value pairs if source is equal to a key. 
+		/// If the key is not found, returns the value of the pair with the key vbo.s_default. 
+		/// If vbo.s_default is not specified, returns an empty string.
+		/// </summary>
+		/// <remarks>
+		/// Use stringComparison for compare
+		/// </remarks>
+		/// <param name="source">Key for search</param>
+		/// <param name="comparePairs">Array of key-value pairs</param>
+		/// <returns></returns>
+		public static string SwitchItem(this string source, StringComparison stringComparison, params string[] comparePairs)
 		{
 			string defaultResult = string.Empty;
 			for (int i = 0; i < comparePairs.Length; i += 2)
 			{
-				if (source.Equals(comparePairs[i], StringComparison.CurrentCultureIgnoreCase))
+				if (source.Equals(comparePairs[i], stringComparison))
 					return comparePairs[i + 1];
-				else if (comparePairs[i].Equals(vbo.s_default, StringComparison.CurrentCultureIgnoreCase))
+				else if (comparePairs[i].Equals(vbo.s_default, stringComparison))
 					//Если указать "default", "" то вернет source. Если надо "", то не указавать "default"
 					defaultResult = comparePairs[i + 1].IsEmpty() ? source : comparePairs[i + 1];
 			}
 			return defaultResult;
 		}
 
+		/// <summary>
+		/// Fast return substring of str with used index && separator
+		/// </summary>
+		/// <param name="str"></param>
+		/// <param name="index"></param>
+		/// <param name="separator"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// Use StringComparison.Ordinal
+		/// </remarks>
 		public static string GetToken(this string str, int index, string separator)
 		{
 			str.NullTest(nameof(str));
 			separator.NullTest(nameof(separator));
-			int start = 0;
-			int len = separator.Length;
-			for (int i = 0; i < index && start != -1; i++)
-			{
-				start = str.IndexOf(separator, start += len);
-			}
-			if (start < 0) return string.Empty;
-
-			if (start > 0) start += len;
-			int finish = str.IndexOf(separator, start);
-			if (finish > 0)
-				return str.Substring(start, finish - start);
-			else
-				return str.Substring(start);
+			return str
+				.AsSpan()
+				.GetToken(index, separator.AsSpan())
+				.ToString();
 		}
 
+		/// <summary>
+		/// Returns string between quotes, for example Qt("123", '"', '"') returns "123"
+		/// </summary>
+		/// <param name="source"></param>
+		/// <param name="leftChar"></param>
+		/// <param name="rightChar"></param>
+		/// <returns></returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public unsafe static string Qt(this string source, char leftChar = '"', char rightChar = '"')
 		{
@@ -273,7 +306,6 @@ namespace S031.MetaStack.Common
 		//	destination[len + 1] = leftChar;			
 		//	return new string(destination);
 		//}
-
 		internal static unsafe void wstrcpy(char* dmem, char* smem, int charCount)
 		{
 			//uint len = ((uint)charCount);
@@ -282,30 +314,17 @@ namespace S031.MetaStack.Common
 			Buffer.MemoryCopy(smem, dmem, charCount * 2, charCount * 2);
 		}
 
-		public static string RemoveCharOld(this string source, char[] charsItem)
-		{
-			foreach (var c in charsItem)
-				source = source.RemoveChar(c);
-			return source;
-		}
-
-		public static string RemoveCharOld(this string source, char charItem)
-		{
-			int indexOfChar = source.IndexOf(charItem);
-			if (indexOfChar < 0)
-			{
-				return source;
-			}
-			return RemoveCharOld(source.Remove(indexOfChar, 1), charItem);
-		}
-		
+		/// <summary>
+		/// Fast remove chars from source string. Use StringComparison.Ordinal
+		/// </summary>
+		/// <param name="source"></param>
+		/// <param name="charItem"></param>
+		/// <returns></returns>
 		public unsafe static string RemoveChar(this string source, char[] charsItem)
 		{
 			int indexOfChar = source.IndexOfAny(charsItem);
 			if (indexOfChar < 0)
-			{
 				return source;
-			}
 
 			int len = source.Length;
 			string destination = FastAllocateString(len);
@@ -314,23 +333,23 @@ namespace S031.MetaStack.Common
 			{
 				int j = 0;
 				int i = 0;
-				int count = indexOfChar == 0 ? 0 : indexOfChar - 1;
-				while(indexOfChar <= len)
+				int count = indexOfChar;
+				while (indexOfChar <= len)
 				{
-					if (count>0)
-						wstrcpy(pD + j, pS + i + 1, count);
+					if (count > 0)
+						wstrcpy(pD + j, pS + i, count);
 					j += count;
-					i = indexOfChar;
+					i = indexOfChar + 1;
 					if (i >= len)
 						break;
-					indexOfChar = source.IndexOfAny(charsItem, i + 1);
+					indexOfChar = source.IndexOfAny(charsItem, i);
 					if (indexOfChar == -1)
 					{
 						indexOfChar = len;
 						count = charsItem.Contains(pS[len - 1]) ? 0 : indexOfChar - i;
 					}
 					else
-						count = indexOfChar - (i + 1);
+						count = indexOfChar - i;
 				}
 				return destination
 					.AsSpan(0, j)
@@ -347,9 +366,7 @@ namespace S031.MetaStack.Common
 		{
 			int indexOfChar = source.IndexOf(charItem);
 			if (indexOfChar < 0)
-			{
 				return source;
-			}
 
 			int len = source.Length;
 			string destination = FastAllocateString(len);
@@ -358,23 +375,23 @@ namespace S031.MetaStack.Common
 			{
 				int j = 0;
 				int i = 0;
-				int count = indexOfChar == 0 ? 0 : indexOfChar - 1;
+				int count = indexOfChar;
 				while(indexOfChar <= len)
 				{
-					if (count>0)
-						wstrcpy(pD + j, pS + i + 1, count);
+					if (count > 0)
+						wstrcpy(pD + j, pS + i, count);
 					j += count;
-					i = indexOfChar;
+					i = indexOfChar + 1;
 					if (i >= len)
 						break;
-					indexOfChar = source.IndexOf(charItem, i + 1);
+					indexOfChar = source.IndexOf(charItem, i);
 					if (indexOfChar == -1)
 					{
 						indexOfChar = len;
 						count = pS[len - 1] == charItem ? 0 : indexOfChar - i;
 					}
 					else
-						count = indexOfChar - (i + 1);
+						count = indexOfChar - i;
 				}
 				return destination
 					.AsSpan(0, j)
@@ -382,6 +399,13 @@ namespace S031.MetaStack.Common
 			}
 		}
 
+		/// <summary>
+		/// Return string located between start && end. Use StringComparison.Ordinal
+		/// </summary>
+		/// <param name="source"></param>
+		/// <param name="start"></param>
+		/// <param name="end"></param>
+		/// <returns></returns>
 		public static String Between(this string source, String start, String end)
 		{
 			int i = source.IndexOf(start) + start.Length;
@@ -392,6 +416,13 @@ namespace S031.MetaStack.Common
 			return string.Empty;
 		}
 
+		/// <summary>
+		/// Return string located between start && end. Use StringComparison.Ordinal
+		/// </summary>
+		/// <param name="source"></param>
+		/// <param name="start"></param>
+		/// <param name="end"></param>
+		/// <returns></returns>
 		public static String Between(this string source, char start, char end)
 		{
 			int i = source.IndexOf(start) + 1;
@@ -399,24 +430,6 @@ namespace S031.MetaStack.Common
 			if (j != -1)
 				return source.Substring(i, j - i);
 			return string.Empty;
-		}
-	}
-
-	public static class NumericExtension
-	{
-		public static string Format(this int num, string format)
-		{
-			return string.Format("{0:" + format + "}", num);
-		}
-
-		public static string Format(this double num, string format)
-		{
-			return string.Format("{0:" + format + "}", num);
-		}
-
-		public static string Format(this decimal num, string format)
-		{
-			return string.Format("{0:" + format + "}", num);
 		}
 	}
 
@@ -497,6 +510,7 @@ namespace S031.MetaStack.Common
 
 	public static class ByteArrayExtension
 	{
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static string ToBASE64String(this byte[] data)
 		{
 			data.NullTest(nameof(data));
@@ -506,17 +520,15 @@ namespace S031.MetaStack.Common
 
 	public static class IDictionaryExtension
 	{
-		public static object GetValue(this IDictionary<string, object> d, string key, object defaultValue = null)
+		public static TValue GetValue<TKey, TValue>(this IDictionary<TKey, TValue> d, TKey key, TValue defaultValue = default)
 		{
-			if (d != null && d.TryGetValue(key, out object result))
+			if (d != null && d.TryGetValue(key, out TValue result))
 				return result;
 			return defaultValue;
 		}
 		public static T GetValue<T>(this IDictionary<string, object> d, string key, object defaultValue = null)
 		{
-			if (d != null && d.TryGetValue(key, out object result))
-				return result.CastOf<T>();
-			return (T)defaultValue;
+			return (T)d.GetValue<string, object>(key, defaultValue);
 		}
 	}
 

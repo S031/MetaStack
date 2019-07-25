@@ -7,12 +7,16 @@ namespace S031.MetaStack.Common
 {
 	public static class SpanCharExtensions
 	{
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static ReadOnlySpan<char> Left(this ReadOnlySpan<char> str, int lenght)
-		{
-			return str.Slice(0, lenght > str.Length ? str.Length : lenght);
-		}
-
+		/// <summary>
+		/// Fast return subsequence of dource span with used index && separator
+		/// </summary>
+		/// <param name="str"></param>
+		/// <param name="index"></param>
+		/// <param name="separator"></param>
+		/// <returns></returns>
+		/// <remarks>
+		/// Use StringComparison.Ordinal
+		/// </remarks>
 		public static ReadOnlySpan<char> GetToken(this ReadOnlySpan<char> str, int index, ReadOnlySpan<char> separator)
 		{
 			int start = 0;

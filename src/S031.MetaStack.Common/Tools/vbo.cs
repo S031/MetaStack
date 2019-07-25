@@ -84,17 +84,11 @@ namespace S031.MetaStack.Common
 				typeof(double));
 
 		public static DateTime Date()
-        {
-            DateTime dNow = DateTime.Now;
-            return new DateTime(dNow.Year, dNow.Month, dNow.Day);
-        }
+			=> DateTime.Now.Date;
 
 		public static bool IsEmpty(object value)
-		{
-			return value == null || 
-				value.Equals(DBNull.Value) ||
-				(value.GetType().IsNumeric() && Convert.ToDecimal(value).Equals(0)) ||
-				value.Equals(value.GetType().GetDefaultValue());
-		}
+			=> value == null
+				|| Convert.IsDBNull(value)
+				|| value.Equals(value.GetType().GetDefaultValue());
     }
 }

@@ -21,7 +21,7 @@ namespace S031.MetaStack.Services
 	{
 		private TcpListener _listener;
 		private CancellationToken _token;
-		private ILogger _log;
+		private readonly ILogger _log;
 		private long _maxReceivedMessageSize = 1048576;
 		private readonly HostedServiceOptions _options;
 		private static readonly string _nameof = typeof(TCPServerService).FullName;
@@ -57,11 +57,13 @@ namespace S031.MetaStack.Services
 								$"The size of the incoming message is greater than the one specified in the settings({_maxReceivedMessageSize})");
 						var res = await GetByteArrayFromStreamAsync(stream, streamSize);
 
-						response = (await ProcessMessageAsync(new DataPackage(res))).ToArray();
+						using (var dr = await ProcessMessageAsync(new DataPackage(res)))
+							response = dr.ToArray();
 					}
 					catch (Exception ex)
 					{
-						response = DataPackage.CreateErrorPackage(ex).ToArray();
+						using (var dr = DataPackage.CreateErrorPackage(ex))
+							response = dr.ToArray();
 					}
 					streamSize = response.Length;
 					await stream.WriteAsync(BitConverter.GetBytes(streamSize), 0, 4);

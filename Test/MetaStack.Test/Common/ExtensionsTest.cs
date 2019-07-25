@@ -65,7 +65,7 @@ namespace MetaStack.Test.Common
 			Assert.True("123{0}567".ToFormat(4) == "1234567");
 			d = "1234567".MatchScore("123567");
 			Assert.True(d > 0.8 && d < 0.9);
-			Assert.True(d.Format("##0.0000") == "0,8571");
+			Assert.True(d.ToString("##0.0000") == "0,8571");
 
 			Assert.True("1234 23456 34567 8901".Wrap(5) == "1234\n23456\n34567\n8901");
 
@@ -81,7 +81,11 @@ namespace MetaStack.Test.Common
 
 			Assert.True("0".ToDateOrDefault().IsEmpty());
 			Assert.True(!DateTime.Now.IsEmpty());
-			Assert.True("123456[[(())]]77890".RemoveChar("[[(())]]".ToCharArray()) == "12345677890");
+			string s = "(123456[[(())]]77890)".RemoveChar("[[(())]]".ToCharArray());
+			Assert.True(s == "12345677890");
+			s = "(123456(())77890)".RemoveChar('(');
+			s = s.RemoveChar(')');
+			Assert.True(s == "12345677890");
 		}
 		[Fact]
 		void StringExtensionsTokenTets()

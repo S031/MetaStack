@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Linq.Expressions;
+using System.Collections.Concurrent;
 
 namespace S031.MetaStack.Common
 {
 	public static class TypeExtensions
 	{
-		static readonly object objLock = new object();
-		static readonly Dictionary<string, Func<object[], object>> _ctorCache =
-			new Dictionary<string, Func<object[], object>>();
-		static readonly Dictionary<Type, object> _instancesList = new Dictionary<Type, object>();
-		static readonly Dictionary<string, ConstructorInfo> _ctorCache2 = new Dictionary<string, ConstructorInfo>();
+		static readonly object _obj4Lock = new object();
+		static readonly ConcurrentDictionary<string, Func<object[], object>> _ctorCache =
+			new ConcurrentDictionary<string, Func<object[], object>>();
+		static readonly ConcurrentDictionary<Type, object> _instancesList = new ConcurrentDictionary<Type, object>();
+		static readonly ConcurrentDictionary<string, ConstructorInfo> _ctorCache2 = new ConcurrentDictionary<string, ConstructorInfo>();
 
 		/// <summary>
 		/// Create instance of Type with parameters, or returns Instance property if it exists
@@ -36,24 +37,21 @@ namespace S031.MetaStack.Common
 			type.NullTest(nameof(type));
 			string key = (args.Length == 0) ? type.FullName : $"{type.FullName}_{ string.Join("_", args.Select(o => o.GetType().Name))}";
 			object instance = null;
-			lock (objLock)
-			{
-				if (_ctorCache.TryGetValue(key, out var ctor))
-					return ctor(args);
-				else if (_instancesList.TryGetValue(type, out instance))
-					return instance;
-
-				instance = type.GetField("Instance", BindingFlags.Public | BindingFlags.Static)?.GetValue(null);
-				if (instance != null)
-				{
-					_instancesList[type] = instance;
-					return instance;
-				}
-
-				ctor = GetCtor(type.GetConstructor(args.Select(o => o.GetType()).ToArray()));
-				_ctorCache[key] = ctor;
+			if (_ctorCache.TryGetValue(key, out var ctor))
 				return ctor(args);
+			else if (_instancesList.TryGetValue(type, out instance))
+				return instance;
+
+			instance = type.GetField("Instance", BindingFlags.Public | BindingFlags.Static)?.GetValue(null);
+			if (instance != null)
+			{
+				_instancesList.TryAdd(type, instance);
+				return instance;
 			}
+
+			ctor = GetCtor(type.GetConstructor(args.Select(o => o.GetType()).ToArray()));
+			_ctorCache[key] = ctor;
+			return ctor(args);
 		}
 
 		private static Func<object[], object> GetCtor(ConstructorInfo ctorInfo)
@@ -82,7 +80,7 @@ namespace S031.MetaStack.Common
 			if (_ctorCache2.TryGetValue(key, out var ctor))
 				return (T)ctor.Invoke(args);
 			ctor = type.GetConstructor(args.Select(o => o.GetType()).ToArray());
-			lock (objLock) _ctorCache2[key] = ctor;
+			lock (_obj4Lock) _ctorCache2[key] = ctor;
 			return (T)ctor.Invoke(args);
 		}
 		public static bool IsNumeric(this Type type, NumericTypesScope scope = NumericTypesScope.All)

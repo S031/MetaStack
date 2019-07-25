@@ -26,7 +26,7 @@ namespace S031.MetaStack.Common
 		{
 			key.NullTest(nameof(key));
 			int i = Array.BinarySearch<int>(_keys, key.GetHashCode());
-			if (i > 0)
+			if (i >= 0)
 			{
 				value = _data[i];
 				return true;
@@ -36,7 +36,7 @@ namespace S031.MetaStack.Common
 		}
 
 		public bool Contains(TKey key)
-			=> Array.BinarySearch<int>(_keys, key.GetHashCode()) > 0;
+			=> Array.BinarySearch<int>(_keys, key.GetHashCode()) >= 0;
 
 		public ReadOnlyCache(params (TKey key, TValue value)[] data)
 		{
@@ -66,7 +66,7 @@ namespace S031.MetaStack.Common
 		public bool TryGetValue(TKey key, out TKey value)
 		{
 			int i = Array.BinarySearch<int>(_keys, key.GetHashCode());
-			if (i > 0)
+			if (i >= 0)
 			{
 				value = _data[i];
 				return true;
@@ -76,7 +76,7 @@ namespace S031.MetaStack.Common
 		}
 
 		public bool Contains(TKey key)
-			=> Array.BinarySearch<int>(_keys, key.GetHashCode()) > 0;
+			=> Array.BinarySearch<int>(_keys, key.GetHashCode()) >= 0;
 
 		public ReadOnlyCache(params TKey[] data)
 		{
