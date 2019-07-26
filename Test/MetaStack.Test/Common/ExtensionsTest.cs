@@ -35,6 +35,15 @@ namespace MetaStack.Test.Common
 				l.Debug(value.ToString());
 			}
 		}
+		[Fact]
+		void EnumExceptiobnTest()
+		{
+			using (FileLog l = new FileLog("EnumExceptiobnTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			{
+				string value = LogLevels.Debug.ToText();
+				l.Debug(value);
+			}
+		}
 
 		[Fact]
 		void StringExtensionsTest()

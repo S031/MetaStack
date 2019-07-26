@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace S031.MetaStack.Common.Logging
+﻿namespace S031.MetaStack.Common.Logging
 {
 	public static class FileLogExtensions
 	{
@@ -15,9 +11,7 @@ namespace S031.MetaStack.Common.Logging
 			(LogLevels.Debug, Properties.Strings.LogLevel_Debug),
 			(LogLevels.Trace, Properties.Strings.LogLevel_Trace));
 
-		public static string ToString(this LogLevels level)
-		{
-			return _messages[level];
-		}
+		public static string ToText(this LogLevels level)
+			=> _messages[level];
 	}
 }

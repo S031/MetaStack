@@ -247,12 +247,16 @@ namespace S031.MetaStack.Common
 		/// </remarks>
 		public static string GetToken(this string str, int index, string separator)
 		{
+#if NETCOREAPP
 			str.NullTest(nameof(str));
 			separator.NullTest(nameof(separator));
 			return str
 				.AsSpan()
 				.GetToken(index, separator.AsSpan())
 				.ToString();
+#else
+			throw new NotSupportedException();
+#endif
 		}
 
 		/// <summary>
@@ -351,9 +355,13 @@ namespace S031.MetaStack.Common
 					else
 						count = indexOfChar - i;
 				}
+#if NETCOREAPP
 				return destination
 					.AsSpan(0, j)
 					.ToString();
+#else
+				return destination.Substring(0, j);
+#endif
 			}
 		}
 		/// <summary>
@@ -393,9 +401,13 @@ namespace S031.MetaStack.Common
 					else
 						count = indexOfChar - i;
 				}
+#if NETCOREAPP
 				return destination
 					.AsSpan(0, j)
 					.ToString();
+#else
+				return destination.Substring(0, j);
+#endif
 			}
 		}
 

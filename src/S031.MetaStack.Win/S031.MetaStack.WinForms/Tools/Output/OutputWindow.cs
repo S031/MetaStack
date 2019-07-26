@@ -116,7 +116,7 @@ namespace S031.MetaStack.WinForms
 		public static void Print(string message) => Print(LogLevels.None, message);
 
 		public static void Print(LogLevels level, string message)=>
-			_queue.Enqueue(new Tuple<DateTime, string, string>(DateTime.Now, level.ToString(), message));
+			_queue.Enqueue(new Tuple<DateTime, string, string>(DateTime.Now, level.ToText(), message));
 
 		public static void Print(LogLevels level, string[] messages)
 		{
