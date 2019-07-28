@@ -228,7 +228,7 @@ namespace MetaStack.Test.Common
 				Type t = this.GetType();
 				for (int i = 0; i < 1000000; i++)
 				{
-					object value = typeof(int).GetDefaultValue();
+					object value = typeof(string).GetDefaultValue();
 				}
 				DateTime stop = DateTime.Now;
 				l.Debug("GetDefaultValue Return for 1,000,000 runs took " + (stop - start).TotalMilliseconds + "ms");
@@ -236,7 +236,7 @@ namespace MetaStack.Test.Common
 				start = DateTime.Now;
 				for (int i = 0; i < 1000000; i++)
 				{
-					var value = GetDefaultValue(typeof(int));
+					var value = GetDefaultValue(typeof(string));
 				}
 				stop = DateTime.Now;
 				l.Debug($"GetDefaultValue Return for 1,000,000 runs took value = {GetDefaultValue(typeof(int))} {(stop - start).TotalMilliseconds} ms");

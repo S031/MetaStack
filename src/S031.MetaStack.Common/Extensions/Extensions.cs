@@ -245,18 +245,74 @@ namespace S031.MetaStack.Common
 		/// <remarks>
 		/// Use StringComparison.Ordinal
 		/// </remarks>
-		public static string GetToken(this string str, int index, string separator)
+		public unsafe static string GetToken(this string str, int index, string separator)
 		{
-#if NETCOREAPP
 			str.NullTest(nameof(str));
 			separator.NullTest(nameof(separator));
+#if NETCOREAPP
 			return str
 				.AsSpan()
 				.GetToken(index, separator.AsSpan())
 				.ToString();
 #else
-			throw new NotSupportedException();
+			int start = 0;
+			int len = separator.Length;
+
+			for (int i = 0; i < index && start != -1; i++)
+			{
+				int pos = str.IndexOf(separator, start, StringComparison.Ordinal);
+				if (pos < 0)
+					return string.Empty;
+				else
+					start = (len + pos);
+			}
+
+			int finish = str.IndexOf(separator, start, StringComparison.Ordinal);
+			if (finish > 0)
+				return str.Substring(start, finish - start);
+			else
+				return str.Substring(start);
+
+
+			//int start = 0;
+			//int len = separator.Length;
+
+			//fixed (char* pD = separator)
+			//fixed (char* pS = str)
+			//{
+			//	for (int i = 0; i < index && start != -1; i++)
+			//	{
+			//		//start = str.IndexOf(separator, start += len, StringComparison.Ordinal);
+			//		//!!! fix start += len
+			//		start = IndexOfInternal(pS, str.Length, pD, len, start += len);
+			//	}
+			//	if (start < 0) return string.Empty;
+
+			//	if (start > 0) start += len;
+			//	//int finish = str.IndexOf(separator, start, StringComparison.Ordinal);
+			//	int finish = IndexOfInternal(pS, str.Length, pD, len, start);
+			//	if (finish > 0)
+			//		return str.Substring(start, finish - start);
+			//	else
+			//		return str.Substring(start);
+			//}
 #endif
+		}
+
+		private unsafe static int IndexOfInternal(char* str, int N, char* searchStr, int M, int start = 0)
+		{
+			for (int i = start; i <= N - M; i++)
+			{
+				int j;
+
+				for (j = 0; j < M; j++)
+					if (*(str + i + j) != *(searchStr + j))
+						break;
+
+				if (j == M)
+					return i;
+			}
+			return -1;
 		}
 
 		/// <summary>

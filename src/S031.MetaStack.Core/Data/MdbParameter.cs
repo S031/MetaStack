@@ -8,9 +8,7 @@ namespace S031.MetaStack.Core.Data
 	/// </summary>
 	public class MdbParameter
     {
-		private string _name;
 		private object _value;
-		private string _sqlTypeExact;
 		private MdbTypeInfo _mdbTypeInfo;
 
 		/// <summary>
@@ -22,16 +20,12 @@ namespace S031.MetaStack.Core.Data
 		{
 			Name = name;
 			Value = value;
-			this.NullIfEmpty = true;
+			NullIfEmpty = true;
 		}
 		/// <summary>
 		/// Get, Set parameter name
 		/// </summary>
-		public string Name
-		{
-			get { return _name; }
-			set { _name = value; }
-		}
+		public string Name { get; set; }
 		/// <summary>
 		/// If true return Null if parameter value is empty
 		/// </summary>
@@ -46,14 +40,7 @@ namespace S031.MetaStack.Core.Data
 				_value = value;
 				_mdbTypeInfo = MdbTypeMap.GetTypeInfo(value.GetType());
 			}
-			get
-			{
-				if (this.NullIfEmpty && vbo.IsEmpty(_value))
-				{
-					return DBNull.Value;
-				}
-				return _value;
-			}
+			get => this.NullIfEmpty && vbo.IsEmpty(_value) ? DBNull.Value : _value;
 		}
 		/// <summary>
 		/// Return <see cref="MdbType" of parameter
@@ -66,10 +53,6 @@ namespace S031.MetaStack.Core.Data
 		/// <summary>
 		/// Get, Set SQL data type name for parameter (int, varchar(max)...)
 		/// </summary>
-		public string SqlTypeExact
-		{
-			set { _sqlTypeExact = value; }
-			get { return _sqlTypeExact; }
-		}
+		public string SqlTypeExact { set; get; }
 	}
 }

@@ -64,7 +64,16 @@ namespace S031.MetaStack.Core.Data
 		public override string ToString() =>
 			$"{ProviderNameField}={ProviderName};{ConnectionString}";
 
-		public override bool Equals(object obj) => this.ToString().Equals(obj.ToString(), StringComparison.CurrentCultureIgnoreCase);
+		public override bool Equals(object obj)
+		{
+			ConnectInfo cn = obj as ConnectInfo;
+			if (obj == null)
+				return false;
+
+			return string.Equals(ProviderName, cn.ProviderName, StringComparison.OrdinalIgnoreCase)
+				&& string.Equals(ConnectionString, cn.ConnectionString, StringComparison.OrdinalIgnoreCase)
+				&& SchemaSupport == cn.SchemaSupport;
+		}
 
 		public override int GetHashCode() =>
 			new { ProviderName, ConnectionString }.GetHashCode();

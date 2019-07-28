@@ -8,7 +8,7 @@ namespace S031.MetaStack.Common
 	public static class SpanCharExtensions
 	{
 		/// <summary>
-		/// Fast return subsequence of dource span with used index && separator
+		/// Fast return subsequence of source span with used index && separator
 		/// </summary>
 		/// <param name="str"></param>
 		/// <param name="index"></param>

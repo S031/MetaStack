@@ -29,6 +29,7 @@ namespace MetaStack.Test.Common
 				DateTime stop = DateTime.Now;
 				l.Debug($"String.GetToken Return for {i} runs look {(stop - start).TotalMilliseconds} ms");
 
+				string buff = s;
 				start = DateTime.Now;
 				for (i = 0; i < 100_000; i++)
 				{
@@ -38,14 +39,15 @@ namespace MetaStack.Test.Common
 				}
 				stop = DateTime.Now;
 				l.Debug($"Sapn.GetToken Return for {i} runs took value = {s} {(stop - start).TotalMilliseconds} ms");
+				Assert.Equal(buff, s);
 
-				start = DateTime.Now;
-				for (i = 0; i < 100_000; i++)
-				{
-					s = source.Split("\r\n".ToCharArray())[5];
-				}
-				stop = DateTime.Now;
-				l.Debug($"String.Split.GetToken Return for {i} runs took value = {s} {(stop - start).TotalMilliseconds} ms");
+				//start = DateTime.Now;
+				//for (i = 0; i < 100_000; i++)
+				//{
+				//	s = source.Split("\r\n".ToCharArray())[5];
+				//}
+				//stop = DateTime.Now;
+				//l.Debug($"String.Split.GetToken Return for {i} runs took value = {s} {(stop - start).TotalMilliseconds} ms");
 
 				start = DateTime.Now;
 				//source = s;
@@ -90,7 +92,7 @@ namespace MetaStack.Test.Common
 				}
 				stop = DateTime.Now;
 				l.Debug($"String.Replace Return for {i} runs look value = {"[[[[[[[[x[[[[[".Replace("[", "")} Time = {(stop - start).TotalMilliseconds} ms");
-				Assert.True(buuff.Length ==  s.Length);
+				Assert.Equal(buuff, s);
 
 				char[] f = new char[] { '\r', '\n','(', ')' };
 				start = DateTime.Now;
@@ -99,7 +101,7 @@ namespace MetaStack.Test.Common
 					s = source.RemoveChar(f);
 				}
 				stop = DateTime.Now;
-				l.Debug($"String.RemoveCharOld Return for {i} runs look value = {s} Time = {(stop - start).TotalMilliseconds} ms");
+				l.Debug($"String.RemoveChars array Return for {i} runs look value = {s} Time = {(stop - start).TotalMilliseconds} ms");
 			}
 		}
 	}

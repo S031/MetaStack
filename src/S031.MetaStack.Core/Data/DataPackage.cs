@@ -203,15 +203,15 @@ namespace S031.MetaStack.WinForms.Data
 		/// <summary>
 		/// Create a new instance of <see cref="DataPackage"/> from list of objects in key/value pair sequence
 		/// </summary>
-		/// <param name="keyValuePayr">list of objects in key/value pair sequence</param>
+		/// <param name="keyValuePair">list of objects in key/value pair sequence</param>
 		/// <example>
 		/// <code>
 		/// p = new DataPackage("Col1", 999999999999, "Col2", "Свойство 1", "Col3", DateTime.Now, "Col4", Guid.NewGuid());
 		/// </code>
 		/// </example>
-		public DataPackage(params object[] keyValuePayr)
-			: this(WriteDataInternal(_headerSpaceSizeDef, keyValuePayr.Where((obj, i) => i % 2 == 0).Select(obj => (string)obj).ToArray(),
-			keyValuePayr.Where((obj, i) => i % 2 != 0).ToArray()))
+		public DataPackage(params object[] keyValuePair)
+			: this(WriteDataInternal(_headerSpaceSizeDef, keyValuePair.Where((obj, i) => i % 2 == 0).Select(obj => (string)obj).ToArray(),
+			keyValuePair.Where((obj, i) => i % 2 != 0).ToArray()))
 		{
 		}
 		/// <summary>
@@ -953,10 +953,9 @@ namespace S031.MetaStack.WinForms.Data
 
 			JArray columns = (j["Columns"] as JArray);
 			JArray rows = (j["Rows"] as JArray);
-			string[] cis = columns.Select(c =>
-			{
-				return $"{c["Name"]}.{c["Type"]}.{c["Size"]}.{c["AllowNull"]}";
-			}).ToArray();
+			string[] cis = columns.Select(
+				c => $"{c["Name"]}.{c["Type"]}.{c["Size"]}.{c["AllowNull"]}")
+				.ToArray();
 			DataPackage ts = new DataPackage(headerSpaceSize, cis, null);
 			JObject headers = (JObject)j["Headers"];
 			foreach (var pair in headers)
