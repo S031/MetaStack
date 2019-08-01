@@ -9,7 +9,6 @@ using S031.MetaStack.Core.Json;
 #else
 using S031.MetaStack.WinForms.Json;
 #endif
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 #if SERIALIZEBINARY
@@ -22,7 +21,7 @@ namespace S031.MetaStack.Core.Data
 namespace S031.MetaStack.WinForms.Data
 #endif
 {
-    public enum TsExportFormat
+	public enum TsExportFormat
 	{
 		JSON,
 		XML

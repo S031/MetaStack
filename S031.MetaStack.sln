@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29123.88
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1C7C4780-10A0-439A-AB42-32D923C07BDA}"
 EndProject
@@ -28,9 +28,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "S031.MetaStack.Core.ORM.MsS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "S031.MetaStack.Core.ORM.SQLite", "src\S031.MetaStack.Core.ORM.SQLite\S031.MetaStack.Core.ORM.SQLite.csproj", "{45CCEE9D-289A-4817-9145-DF6BAEE8D362}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Metib.Business.Msfo", "src\Metib.Business.Msfo\Metib.Business.Msfo.csproj", "{6C70E25F-11A2-47E7-9124-ECEE325DA804}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Metib.Business.Msfo", "src\Metib.Business.Msfo\Metib.Business.Msfo.csproj", "{6C70E25F-11A2-47E7-9124-ECEE325DA804}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", "{2C526453-5795-4CA2-BBF4-42D366A6CE8B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "S031.MetaStack.Json", "src\S031.MetaStack.Json\S031.MetaStack.Json.csproj", "{DBEEC9B0-20AA-4AFE-922B-BF817BB2F150}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -70,6 +72,10 @@ Global
 		{6C70E25F-11A2-47E7-9124-ECEE325DA804}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6C70E25F-11A2-47E7-9124-ECEE325DA804}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6C70E25F-11A2-47E7-9124-ECEE325DA804}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBEEC9B0-20AA-4AFE-922B-BF817BB2F150}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBEEC9B0-20AA-4AFE-922B-BF817BB2F150}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBEEC9B0-20AA-4AFE-922B-BF817BB2F150}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBEEC9B0-20AA-4AFE-922B-BF817BB2F150}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -84,6 +90,7 @@ Global
 		{45CCEE9D-289A-4817-9145-DF6BAEE8D362} = {1C7C4780-10A0-439A-AB42-32D923C07BDA}
 		{6C70E25F-11A2-47E7-9124-ECEE325DA804} = {2C526453-5795-4CA2-BBF4-42D366A6CE8B}
 		{2C526453-5795-4CA2-BBF4-42D366A6CE8B} = {1C7C4780-10A0-439A-AB42-32D923C07BDA}
+		{DBEEC9B0-20AA-4AFE-922B-BF817BB2F150} = {1C7C4780-10A0-439A-AB42-32D923C07BDA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7ECF74F3-895D-4DD3-95B2-C79542194888}
