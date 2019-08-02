@@ -1,0 +1,392 @@
+{
+	"ObjectName": "CashFlow_NK",
+	"UID": "E0475055-7336-4342-AEA5-DCE77E8575C2",
+	"Name": "Денежные\tпотоки",
+	"DBObjectName": {
+		"AreaName": "dbo",
+		"ObjectName": "CashFlow_NKN"
+	},
+	"Attributes": [{
+			"ID": 1,
+			"AttribName": "BranchID",
+			"FieldName": "BranchID",
+			"Position": 1,
+			"ServerDataType": "numeric",
+			"DataType": "decimal",
+			"DataSize": {
+				"Size": 9,
+				"Scale": 0,
+				"Precision": 15
+			},
+			"IsNullable": false,
+			"NullOption": "NOT NULL",
+			"DefaultConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			},
+			"CheckConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			}
+		}, {
+			"ID": 2,
+			"AttribName": "Date",
+			"FieldName": "Date",
+			"Position": 2,
+			"ServerDataType": "smalldatetime",
+			"DataType": "dateTime",
+			"DataSize": {
+				"Size": 4,
+				"Scale": 0,
+				"Precision": 16
+			},
+			"IsNullable": false,
+			"NullOption": "NOT NULL",
+			"DefaultConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			},
+			"CheckConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			}
+		}, {
+			"ID": 3,
+			"AttribName": "DealID",
+			"FieldName": "DealID",
+			"Position": 3,
+			"ServerDataType": "numeric",
+			"DataType": "decimal",
+			"DataSize": {
+				"Size": 9,
+				"Scale": 0,
+				"Precision": 15
+			},
+			"IsNullable": true,
+			"NullOption": "NULL",
+			"DefaultConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			},
+			"CheckConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			}
+		}, {
+			"ID": 4,
+			"AttribName": "ResourceID",
+			"FieldName": "ResourceID",
+			"Position": 4,
+			"ServerDataType": "numeric",
+			"DataType": "decimal",
+			"DataSize": {
+				"Size": 9,
+				"Scale": 0,
+				"Precision": 15
+			},
+			"IsNullable": true,
+			"NullOption": "NULL",
+			"DefaultConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			},
+			"CheckConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			}
+		}, {
+			"ID": 5,
+			"AttribName": "InstitutionID",
+			"FieldName": "InstitutionID",
+			"Position": 5,
+			"ServerDataType": "numeric",
+			"DataType": "decimal",
+			"DataSize": {
+				"Size": 9,
+				"Scale": 0,
+				"Precision": 15
+			},
+			"IsNullable": true,
+			"NullOption": "NULL",
+			"DefaultConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			},
+			"CheckConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			}
+		}, {
+			"ID": 6,
+			"AttribName": "ModuleID",
+			"FieldName": "ModuleID",
+			"Position": 6,
+			"ServerDataType": "numeric",
+			"DataType": "decimal",
+			"DataSize": {
+				"Size": 9,
+				"Scale": 0,
+				"Precision": 15
+			},
+			"IsNullable": false,
+			"NullOption": "NOT NULL",
+			"DefaultConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			},
+			"CheckConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			}
+		}, {
+			"ID": 7,
+			"AttribName": "InstrumentID",
+			"FieldName": "InstrumentID",
+			"Position": 7,
+			"ServerDataType": "numeric",
+			"DataType": "decimal",
+			"DataSize": {
+				"Size": 9,
+				"Scale": 0,
+				"Precision": 15
+			},
+			"IsNullable": true,
+			"NullOption": "NULL",
+			"DefaultConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			},
+			"CheckConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			}
+		}, {
+			"ID": 8,
+			"AttribName": "Interest",
+			"FieldName": "Interest",
+			"Position": 8,
+			"ServerDataType": "float",
+			"DataType": "float",
+			"DataSize": {
+				"Size": 8,
+				"Scale": 0,
+				"Precision": 53
+			},
+			"IsNullable": true,
+			"NullOption": "NULL",
+			"DefaultConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			},
+			"CheckConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			}
+		}, {
+			"ID": 9,
+			"AttribName": "CashTypeID",
+			"FieldName": "CashTypeID",
+			"Position": 9,
+			"ServerDataType": "int",
+			"DataType": "int",
+			"DataSize": {
+				"Size": 4,
+				"Scale": 0,
+				"Precision": 10
+			},
+			"IsNullable": false,
+			"NullOption": "NOT NULL",
+			"DefaultConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			},
+			"CheckConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			}
+		}, {
+			"ID": 10,
+			"AttribName": "DateCash",
+			"FieldName": "DateCash",
+			"Position": 10,
+			"ServerDataType": "smalldatetime",
+			"DataType": "dateTime",
+			"DataSize": {
+				"Size": 4,
+				"Scale": 0,
+				"Precision": 16
+			},
+			"IsNullable": false,
+			"NullOption": "NOT NULL",
+			"DefaultConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			},
+			"CheckConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			}
+		}, {
+			"ID": 11,
+			"AttribName": "QtyBs",
+			"FieldName": "QtyBs",
+			"Position": 11,
+			"ServerDataType": "numeric",
+			"DataType": "decimal",
+			"DataSize": {
+				"Size": 9,
+				"Scale": 2,
+				"Precision": 16
+			},
+			"IsNullable": false,
+			"NullOption": "NOT NULL",
+			"DefaultConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			},
+			"CheckConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			}
+		}, {
+			"ID": 12,
+			"AttribName": "Confirmed",
+			"FieldName": "Confirmed",
+			"Position": 12,
+			"ServerDataType": "int",
+			"DataType": "int",
+			"DataSize": {
+				"Size": 4,
+				"Scale": 0,
+				"Precision": 10
+			},
+			"IsNullable": true,
+			"NullOption": "NULL",
+			"DefaultConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			},
+			"CheckConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			}
+		}, {
+			"ID": 13,
+			"AttribName": "OperationID",
+			"FieldName": "OperationID",
+			"Position": 13,
+			"ServerDataType": "numeric",
+			"DataType": "decimal",
+			"DataSize": {
+				"Size": 9,
+				"Scale": 0,
+				"Precision": 15
+			},
+			"IsNullable": true,
+			"NullOption": "NULL",
+			"DefaultConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			},
+			"CheckConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			}
+		}, {
+			"ID": 14,
+			"AttribName": "Qty",
+			"FieldName": "Qty",
+			"Position": 14,
+			"ServerDataType": "numeric",
+			"DataType": "decimal",
+			"DataSize": {
+				"Size": 9,
+				"Scale": 2,
+				"Precision": 16
+			},
+			"IsNullable": true,
+			"NullOption": "NULL",
+			"DefaultConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			},
+			"CheckConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			}
+		}, {
+			"ID": 15,
+			"AttribName": "Cur",
+			"FieldName": "Cur",
+			"Position": 15,
+			"ServerDataType": "char",
+			"DataType": "string",
+			"DataSize": {
+				"Size": 3,
+				"Scale": 0,
+				"Precision": 0
+			},
+			"CollationName": "Cyrillic_General_CI_AS",
+			"IsNullable": true,
+			"NullOption": "NULL",
+			"DefaultConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			},
+			"CheckConstraint": {
+				"ConstraintName": "",
+				"Definition": ""
+			}
+		}
+	],
+	"Indexes": [{
+			"IndexName": "Наименование индекса",
+			"IsUnique": false,
+			"ClusteredOption": 0,
+			"KeyMembers": [{
+					"FieldName": "Date",
+					"Position": 1,
+					"IsDescending": false,
+					"IsIncluded": false
+				}, {
+					"FieldName": "BranchID",
+					"Position": 2,
+					"IsDescending": false,
+					"IsIncluded": false
+				}, {
+					"FieldName": "CashTypeID",
+					"Position": 3,
+					"IsDescending": false,
+					"IsIncluded": false
+				}
+			]
+		}, {
+			"IndexName": "CF_DealID",
+			"IsUnique": false,
+			"ClusteredOption": 0,
+			"KeyMembers": [{
+					"FieldName": "DealID",
+					"Position": 1,
+					"IsDescending": false,
+					"IsIncluded": false
+				}, {
+					"FieldName": "Date",
+					"Position": 2,
+					"IsDescending": false,
+					"IsIncluded": false
+				}
+			]
+		}, {
+			"IndexName": "CF_Module",
+			"IsUnique": false,
+			"ClusteredOption": 0,
+			"KeyMembers": [{
+					"FieldName": "ModuleID",
+					"Position": 1,
+					"IsDescending": false,
+					"IsIncluded": false
+				}
+			]
+		}
+	]
+}

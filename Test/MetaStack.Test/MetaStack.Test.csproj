@@ -73,6 +73,7 @@
     <ProjectReference Include="..\..\src\S031.MetaStack.Core.ORM.MsSql\S031.MetaStack.Core.ORM.MsSql.csproj" />
     <ProjectReference Include="..\..\src\S031.MetaStack.Core.ORM.SQLite\S031.MetaStack.Core.ORM.SQLite.csproj" />
     <ProjectReference Include="..\..\src\S031.MetaStack.Core\S031.MetaStack.Core.csproj" />
+    <ProjectReference Include="..\..\src\S031.MetaStack.Json\S031.MetaStack.Json.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -80,6 +81,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>TestSchemas.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\TestData.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>TestData.resx</DependentUpon>
     </Compile>
   </ItemGroup>
 
@@ -94,6 +100,14 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>TestSchemas.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Update="Resources\TestData.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>TestData.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\Files\" />
   </ItemGroup>
 
 </Project>
