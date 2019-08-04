@@ -36,7 +36,7 @@ namespace MetaStack.Test.Json
 				_logger.Debug($"Finish perfomance parse string test. Time={(DateTime.Now-t).Milliseconds}ms, loop count={i}");
 
 				_logger.Debug($"Start perfomance ToString test");
-				var json = new JsonReader(ref str).Read();
+				var json =(JsonObject) new JsonReader(ref str).Read();
 				//_logger.Debug(json.ToString());
 				t = DateTime.Now;
 				for (i = 0; i < 10_000; i++)
@@ -44,6 +44,17 @@ namespace MetaStack.Test.Json
 					var s = json.ToString();
 				}
 				_logger.Debug($"Finish perfomance Tostring test. Time={(DateTime.Now-t).Milliseconds}ms, loop count={i}");
+			}
+		}
+
+		[Fact]
+		public void JsonWriterTest()
+		{
+			using (FileLog _logger = new FileLog(" MetaStackJson.JsonWriterTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			{
+				var str = _sourceJsonString;
+				var json = (JsonObject)(new JsonReader(ref str).Read());
+				_logger.Debug(json.ToString(Formatting.None));
 			}
 		}
 	}

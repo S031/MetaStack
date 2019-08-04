@@ -25,11 +25,11 @@ namespace S031.MetaStack.Json
 			_list = new List<JsonValue>(items);
 		}
 
-		public override int Count => _list.Count;
+		public int Count => _list.Count;
 
 		public bool IsReadOnly => false;
 
-		public sealed override JsonValue this[int index]
+		public JsonValue this[int index]
 		{
 			get => _list[index];
 			set => _list[index] = value;
@@ -95,38 +95,27 @@ namespace S031.MetaStack.Json
 			_list.RemoveAt(index);
 		}
 
-		public override void Save(Stream stream)
+		public override string ToString()
+			=> ToString(Formatting.None);
+
+		public string ToString(Formatting formatting)
 		{
-			if (stream == null)
-			{
-				throw new ArgumentNullException(nameof(stream));
-			}
+			JsonWriter w = new JsonWriter(formatting);
+			WriteRaw(w);
+			return w.ToString();
+		}
 
-			stream.WriteByte((byte)'[');
-
-			for (int i = 0; i < _list.Count; i++)
+		public void WriteRaw(JsonWriter writer)
+		{
+			writer.WriteStartArray();
+			foreach (JsonValue v in this)
 			{
-				JsonValue v = _list[i];
-				if (v != null)
-				{
-					v.Save(stream);
-				}
+				if (v == null)
+					writer.WriteNull();
 				else
-				{
-					stream.WriteByte((byte)'n');
-					stream.WriteByte((byte)'u');
-					stream.WriteByte((byte)'l');
-					stream.WriteByte((byte)'l');
-				}
-
-				if (i < Count - 1)
-				{
-					stream.WriteByte((byte)',');
-					stream.WriteByte((byte)' ');
-				}
+					writer.WriteValue(v);
 			}
-
-			stream.WriteByte((byte)']');
+			writer.WriteEndArray();
 		}
 
 		IEnumerator<JsonValue> IEnumerable<JsonValue>.GetEnumerator()

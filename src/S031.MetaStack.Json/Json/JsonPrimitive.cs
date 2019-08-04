@@ -4,7 +4,7 @@ using System.Text;
 
 namespace S031.MetaStack.Json
 {
-	public partial class JsonValue
+	public class JsonValue
 	{
 		private static readonly byte[] s_trueBytes = Encoding.UTF8.GetBytes("true");
 		private static readonly byte[] s_falseBytes = Encoding.UTF8.GetBytes("false");
@@ -390,31 +390,5 @@ namespace S031.MetaStack.Json
 
 		public virtual JsonType JsonType
 			=> _type;
-
-		private static readonly NumberFormatInfo _nfi = new CultureInfo("en-US").NumberFormat;
-
-		internal string GetFormattedString()
-		{
-			if (Value == null)
-				return "null";
-			switch (JsonType)
-			{
-				case JsonType.Integer:
-					return Convert.ToInt64(_value).ToString("g", _nfi);
-				case JsonType.Float:
-					return Convert.ToDouble(_value).ToString("g", _nfi);
-				case JsonType.Date:
-					return ((DateTime)_value).ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
-				case JsonType.String:
-					return (string)_value;
-				case JsonType.Bytes:
-					return Convert.ToBase64String((byte[])_value);
-				case JsonType.Array:
-				case JsonType.Object:
-					throw new NotImplementedException();
-				default:
-					return _value.ToString();
-			}
-		}
 	}
 }

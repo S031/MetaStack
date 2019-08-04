@@ -6,7 +6,7 @@ using JsonPair = System.Collections.Generic.KeyValuePair<string, S031.MetaStack.
 
 namespace S031.MetaStack.Json
 {
-	public partial class JsonValue : IEnumerable
+/*	public partial class JsonValue : IEnumerable
 	{
 		private static readonly UTF8Encoding s_encoding = new UTF8Encoding(false, true);
 
@@ -221,5 +221,5 @@ namespace S031.MetaStack.Json
 			return sb.ToString();
 		}
 
-	}
+	}*/
 }

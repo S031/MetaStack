@@ -34,7 +34,7 @@ namespace S031.MetaStack.Json
 			AddRange(items);
 		}
 
-		public override int Count => _map.Count;
+		public int Count => _map.Count;
 
 		public IEnumerator<JsonPair> GetEnumerator()
 		{
@@ -46,7 +46,7 @@ namespace S031.MetaStack.Json
 			return _map.GetEnumerator();
 		}
 
-		public sealed override JsonValue this[string key]
+		public JsonValue this[string key]
 		{
 			get => _map[key];
 			set => _map[key] = value;
@@ -106,7 +106,7 @@ namespace S031.MetaStack.Json
 			return (_map as ICollection<JsonPair>).Remove(item);
 		}
 
-		public override bool ContainsKey(string key)
+		public bool ContainsKey(string key)
 		{
 			if (key == null)
 			{
@@ -133,9 +133,29 @@ namespace S031.MetaStack.Json
 
 		bool ICollection<JsonPair>.IsReadOnly => false;
 
-		public override void Save(Stream stream)
+		public override string ToString()
+			=> ToString(Formatting.None);
+
+		public string ToString(Formatting formatting)
 		{
-			base.Save(stream);
+			JsonWriter w = new JsonWriter(formatting);
+			WriteRaw(w);
+			return w.ToString();
+		}
+
+		public void WriteRaw(JsonWriter writer)
+		{
+			writer.WriteStartObject();
+			foreach (JsonPair pair in this)
+			{
+				//Use options for escape property names
+				writer.WritePropertyName(pair.Key, false); 
+				if (pair.Value == null)
+					writer.WriteNull();
+				else
+					writer.WriteValue(pair.Value);
+			}
+			writer.WriteEndObject();
 		}
 
 		public bool TryGetValue(string key, out JsonValue value)

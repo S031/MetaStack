@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 
-namespace S031.MetaStack.Json.Extensions
+namespace S031.MetaStack.Json
 {
-	internal class JsonValueExtensions
+	internal static class JsonHelper
 	{
+		public static NumberFormatInfo NumberFormatInfo { get; } = new CultureInfo("en-US").NumberFormat;
+
 		private static IEnumerable<KeyValuePair<string, JsonValue>> ToJsonPairEnumerable(IEnumerable<KeyValuePair<string, object>> kvpc)
 		{
 			foreach (KeyValuePair<string, object> kvp in kvpc)
