@@ -1,12 +1,5 @@
-﻿
-// Licensed to the .NET Foundation under one or more agreements.
-// See the LICENSE file in the project root for more information.
-
-using System;
+﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Text;
 using JsonPair = System.Collections.Generic.KeyValuePair<string, S031.MetaStack.Json.JsonValue>;
@@ -16,9 +9,6 @@ namespace S031.MetaStack.Json
 	public partial class JsonValue : IEnumerable
 	{
 		private static readonly UTF8Encoding s_encoding = new UTF8Encoding(false, true);
-
-		[ThreadStatic]
-		private static StringBuilder _stringBuilder = new StringBuilder();
 
 		public static JsonValue Parse(string jsonString)
 		{
@@ -30,21 +20,18 @@ namespace S031.MetaStack.Json
 			return new JsonReader(ref jsonString).Read();
 		}
 
-		public virtual int Count
-		{
-			get { throw new InvalidOperationException(); }
-		}
+		public virtual int Count => throw new InvalidOperationException();
 
 		public virtual JsonValue this[int index]
 		{
-			get { throw new InvalidOperationException(); }
-			set { throw new InvalidOperationException(); }
+			get => throw new InvalidOperationException();
+			set => throw new InvalidOperationException();
 		}
 
 		public virtual JsonValue this[string key]
 		{
-			get { throw new InvalidOperationException(); }
-			set { throw new InvalidOperationException(); }
+			get => throw new InvalidOperationException();
+			set => throw new InvalidOperationException();
 		}
 
 		public virtual bool ContainsKey(string key)
@@ -89,7 +76,8 @@ namespace S031.MetaStack.Json
 							w.Write(", ");
 						}
 						w.Write('\"');
-						w.Write(EscapeString(pair.Key));
+						//w.Write(EscapeString(pair.Key));
+						w.Write(pair.Key);
 						w.Write("\": ");
 						if (pair.Value == null)
 						{
@@ -140,16 +128,18 @@ namespace S031.MetaStack.Json
 					break;
 
 				default:
-					w.Write(((JsonValue)this).GetFormattedString());
+					w.Write(this.GetFormattedString());
 					break;
 			}
 		}
 
 		public override string ToString()
 		{
-			var sw = new StringWriter();
-			SaveInternal(sw);
-			return sw.ToString();
+			using (StringWriter sw = new StringWriter())
+			{
+				SaveInternal(sw);
+				return sw.ToString();
+			}
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
@@ -190,8 +180,7 @@ namespace S031.MetaStack.Json
 				{
 					if (NeedEscape(src, i))
 					{
-						var sb = _stringBuilder;
-						sb.Clear();
+						StringBuilder sb = new StringBuilder(src.Length);
 						if (i > 0)
 						{
 							sb.Append(src, 0, i);

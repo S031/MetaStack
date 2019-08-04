@@ -1,4 +1,4 @@
-﻿#if SPANJSON  
+﻿#if SPANJSON
 using System;
 using System.Buffers.Text;
 using System.Collections.Generic;

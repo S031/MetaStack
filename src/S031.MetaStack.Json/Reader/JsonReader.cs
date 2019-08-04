@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
-using System.Text;
 using System.Runtime.CompilerServices;
+using System.Text;
 using SR = S031.MetaStack.Json.Resources.Strings;
 
 namespace S031.MetaStack.Json
@@ -171,7 +169,10 @@ namespace S031.MetaStack.Json
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private int ReadCharInternal() => _cur == _len ? -1 : _r[_cur++];
+		private int ReadCharInternal()
+		{
+			return _cur == _len ? -1 : _r[_cur++];
+		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private int ReadChar()
@@ -217,7 +218,7 @@ namespace S031.MetaStack.Json
 		// It could return either int, long, ulong, decimal or double, depending on the parsed value.
 		private JsonValue ReadNumericLiteral()
 		{
-			var sb = _sb;
+			StringBuilder sb = _sb;
 			sb.Clear();
 
 			if (PeekChar() == '-')

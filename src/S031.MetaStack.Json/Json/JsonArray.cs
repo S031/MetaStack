@@ -1,7 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// See the LICENSE file in the project root for more information.
-
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -32,10 +29,10 @@ namespace S031.MetaStack.Json
 
 		public bool IsReadOnly => false;
 
-		public override sealed JsonValue this[int index]
+		public sealed override JsonValue this[int index]
 		{
-			get { return _list[index]; }
-			set { _list[index] = value; }
+			get => _list[index];
+			set => _list[index] = value;
 		}
 
 		public override JsonType JsonType => JsonType.Array;
@@ -63,19 +60,40 @@ namespace S031.MetaStack.Json
 			}
 		}
 
-		public void Clear() => _list.Clear();
+		public void Clear()
+		{
+			_list.Clear();
+		}
 
-		public bool Contains(JsonValue item) => _list.Contains(item);
+		public bool Contains(JsonValue item)
+		{
+			return _list.Contains(item);
+		}
 
-		public void CopyTo(JsonValue[] array, int arrayIndex) => _list.CopyTo(array, arrayIndex);
+		public void CopyTo(JsonValue[] array, int arrayIndex)
+		{
+			_list.CopyTo(array, arrayIndex);
+		}
 
-		public int IndexOf(JsonValue item) => _list.IndexOf(item);
+		public int IndexOf(JsonValue item)
+		{
+			return _list.IndexOf(item);
+		}
 
-		public void Insert(int index, JsonValue item) => _list.Insert(index, item);
+		public void Insert(int index, JsonValue item)
+		{
+			_list.Insert(index, item);
+		}
 
-		public bool Remove(JsonValue item) => _list.Remove(item);
+		public bool Remove(JsonValue item)
+		{
+			return _list.Remove(item);
+		}
 
-		public void RemoveAt(int index) => _list.RemoveAt(index);
+		public void RemoveAt(int index)
+		{
+			_list.RemoveAt(index);
+		}
 
 		public override void Save(Stream stream)
 		{
@@ -111,8 +129,14 @@ namespace S031.MetaStack.Json
 			stream.WriteByte((byte)']');
 		}
 
-		IEnumerator<JsonValue> IEnumerable<JsonValue>.GetEnumerator() => _list.GetEnumerator();
+		IEnumerator<JsonValue> IEnumerable<JsonValue>.GetEnumerator()
+		{
+			return _list.GetEnumerator();
+		}
 
-		IEnumerator IEnumerable.GetEnumerator() => _list.GetEnumerator();
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return _list.GetEnumerator();
+		}
 	}
 }

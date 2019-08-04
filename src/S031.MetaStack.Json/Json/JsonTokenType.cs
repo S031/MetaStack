@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace S031.MetaStack.Json.Json
+﻿namespace S031.MetaStack.Json.Json
 {
 	public enum JsonTokenType : byte
 	{

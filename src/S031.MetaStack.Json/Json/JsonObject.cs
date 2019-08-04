@@ -1,11 +1,7 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// See the LICENSE file in the project root for more information.
-
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 using JsonPair = System.Collections.Generic.KeyValuePair<string, S031.MetaStack.Json.JsonValue>;
 using JsonPairEnumerable = System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, S031.MetaStack.Json.JsonValue>>;
@@ -40,14 +36,20 @@ namespace S031.MetaStack.Json
 
 		public override int Count => _map.Count;
 
-		public IEnumerator<JsonPair> GetEnumerator() => _map.GetEnumerator();
-
-		IEnumerator IEnumerable.GetEnumerator() => _map.GetEnumerator();
-
-		public override sealed JsonValue this[string key]
+		public IEnumerator<JsonPair> GetEnumerator()
 		{
-			get { return _map[key]; }
-			set { _map[key] = value; }
+			return _map.GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return _map.GetEnumerator();
+		}
+
+		public sealed override JsonValue this[string key]
+		{
+			get => _map[key];
+			set => _map[key] = value;
 		}
 
 		public override JsonType JsonType => JsonType.Object;
@@ -66,7 +68,10 @@ namespace S031.MetaStack.Json
 			_map.Add(key, value);
 		}
 
-		public void Add(JsonPair pair) => Add(pair.Key, pair.Value);
+		public void Add(JsonPair pair)
+		{
+			Add(pair.Key, pair.Value);
+		}
 
 		public void AddRange(JsonPairEnumerable items)
 		{
@@ -75,19 +80,31 @@ namespace S031.MetaStack.Json
 				throw new ArgumentNullException(nameof(items));
 			}
 
-			foreach (var pair in items)
+			foreach (JsonPair pair in items)
 			{
 				_map.Add(pair.Key, pair.Value);
 			}
 		}
 
-		public void AddRange(params JsonPair[] items) => AddRange((JsonPairEnumerable)items);
+		public void AddRange(params JsonPair[] items)
+		{
+			AddRange((JsonPairEnumerable)items);
+		}
 
-		public void Clear() => _map.Clear();
+		public void Clear()
+		{
+			_map.Clear();
+		}
 
-		bool ICollection<JsonPair>.Contains(JsonPair item) => (_map as ICollection<JsonPair>).Contains(item);
+		bool ICollection<JsonPair>.Contains(JsonPair item)
+		{
+			return (_map as ICollection<JsonPair>).Contains(item);
+		}
 
-		bool ICollection<JsonPair>.Remove(JsonPair item) => (_map as ICollection<JsonPair>).Remove(item);
+		bool ICollection<JsonPair>.Remove(JsonPair item)
+		{
+			return (_map as ICollection<JsonPair>).Remove(item);
+		}
 
 		public override bool ContainsKey(string key)
 		{
@@ -99,7 +116,10 @@ namespace S031.MetaStack.Json
 			return _map.ContainsKey(key);
 		}
 
-		public void CopyTo(JsonPair[] array, int arrayIndex) => (_map as ICollection<JsonPair>).CopyTo(array, arrayIndex);
+		public void CopyTo(JsonPair[] array, int arrayIndex)
+		{
+			(_map as ICollection<JsonPair>).CopyTo(array, arrayIndex);
+		}
 
 		public bool Remove(string key)
 		{
@@ -118,6 +138,9 @@ namespace S031.MetaStack.Json
 			base.Save(stream);
 		}
 
-		public bool TryGetValue(string key, out JsonValue value) => _map.TryGetValue(key, out value);
+		public bool TryGetValue(string key, out JsonValue value)
+		{
+			return _map.TryGetValue(key, out value);
+		}
 	}
 }
