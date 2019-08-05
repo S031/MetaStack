@@ -12,7 +12,8 @@ namespace MetaStack.Test.Json
 	public class MetaStackJsonTest
 	{
 		private static readonly string _sourceJsonString = Encoding.UTF8.GetString(Resources.TestData.TestJson);
-		byte[] _sourceJsonData = Resources.TestData.TestJsonData;
+		private static readonly byte[] _sourceJsonData = Resources.TestData.TestJsonData;
+		private static readonly string _sourceUtf8JsonString = Encoding.UTF8.GetString(_sourceJsonData);
 
 		public MetaStackJsonTest()
 		{
@@ -33,7 +34,7 @@ namespace MetaStack.Test.Json
 				{
 					var j = new JsonReader(ref str).Read();
 				}
-				_logger.Debug($"Finish perfomance parse string test. Time={(DateTime.Now-t).Milliseconds}ms, loop count={i}");
+				_logger.Debug($"Finish perfomance parse string test. Time={(DateTime.Now-t).Milliseconds} ms, loop count={i}");
 
 				_logger.Debug($"Start perfomance ToString test");
 				var json =(JsonObject) new JsonReader(ref str).Read();
@@ -43,7 +44,7 @@ namespace MetaStack.Test.Json
 				{
 					var s = json.ToString();
 				}
-				_logger.Debug($"Finish perfomance Tostring test. Time={(DateTime.Now-t).Milliseconds}ms, loop count={i}");
+				_logger.Debug($"Finish perfomance Tostring test. Time={(DateTime.Now-t).Milliseconds} ms, loop count={i}");
 			}
 		}
 
@@ -54,7 +55,14 @@ namespace MetaStack.Test.Json
 			{
 				var str = _sourceJsonString;
 				var json = (JsonObject)(new JsonReader(ref str).Read());
-				_logger.Debug(json.ToString(Formatting.None));
+				json["EscapedString"] = str;
+				var newStr = json.ToString(Formatting.Indented);
+				json = (JsonObject)(new JsonReader(ref newStr).Read());
+				Assert.Equal(json["EscapedString"], str);
+				_logger.Debug(json.ToString(Formatting.Indented));
+				//str = _sourceUtf8JsonString;
+				//var jsonArray = (JsonArray)(new JsonReader(ref str).Read());
+				//_logger.Debug(jsonArray.ToString(Formatting.None));
 			}
 		}
 	}

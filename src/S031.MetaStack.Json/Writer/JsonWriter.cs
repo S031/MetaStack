@@ -10,9 +10,9 @@ namespace S031.MetaStack.Json
 		None = 0,
 		Indented = 1
 	}
-	public ref struct JsonWriter
+	public sealed class JsonWriter
 	{
-		private const int default_capacity = 128;
+		private const int default_capacity = 512;
 
 		private readonly StringBuilder _sb;
 		private readonly Formatting _formatting;
@@ -39,7 +39,10 @@ namespace S031.MetaStack.Json
 		{
 			if (_commaExpected)
 				WriteComma();
+			else
+				WriteNewLine();
 			WriteIndent();
+			_tabCount++;
 			_sb.Append('[');
 			_commaExpected = false;
 			return this;
@@ -48,6 +51,8 @@ namespace S031.MetaStack.Json
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public JsonWriter WriteEndArray()
 		{
+			_tabCount--;
+			WriteNewLine();
 			WriteIndent();
 			_sb.Append(']');
 			_commaExpected = true;
@@ -59,6 +64,8 @@ namespace S031.MetaStack.Json
 		{
 			if (_commaExpected)
 				WriteComma();
+			else
+				WriteNewLine();
 			WriteIndent();
 			_tabCount++;
 			_sb.Append('{');
@@ -70,11 +77,11 @@ namespace S031.MetaStack.Json
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public JsonWriter WriteEndObject()
 		{
-			WriteNewLine();
 			_tabCount--;
+			WriteNewLine();
 			WriteIndent();
 			_sb.Append('}');
-			_commaExpected = true;// (_tabCount > 0);
+			_commaExpected = true;
 			return this;
 		}
 
@@ -85,6 +92,7 @@ namespace S031.MetaStack.Json
 		{
 			if (_commaExpected)
 				WriteComma();
+			WriteIndent();
 			_sb.Append('"');
 			if (escaped)
 				WriteEscapeString(ref propertyName);

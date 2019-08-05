@@ -15,7 +15,7 @@ namespace S031.MetaStack.Json
 	/// </summary>
 	public ref struct JsonReader
 	{
-		private const int default_capacity = 64;
+		private const int default_capacity = 256;
 
 		//private static readonly ThreadLocal<StringBuilder> _sb = new ThreadLocal<StringBuilder>(() => new StringBuilder(default_capacity));
 		[ThreadStatic]
