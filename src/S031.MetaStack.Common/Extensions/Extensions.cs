@@ -596,7 +596,10 @@ namespace S031.MetaStack.Common
 		}
 		public static T GetValue<T>(this IDictionary<string, object> d, string key, object defaultValue = null)
 		{
-			return (T)d.GetValue<string, object>(key, defaultValue);
+			if (d != null && d.TryGetValue(key, out object result))
+				return result.CastOf<T>();
+			return (T)defaultValue;
+			//return d.GetValue<string, object>(key, defaultValue).CastOf<T>();
 		}
 	}
 

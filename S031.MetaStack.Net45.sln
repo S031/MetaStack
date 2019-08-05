@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2026
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29123.88
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S031.MetaStack.WinForms", "src\S031.MetaStack.Win\S031.MetaStack.WinForms\S031.MetaStack.WinForms.csproj", "{487C0CDC-53A2-4DDA-8BF0-A2DBB04BD587}"
 EndProject
@@ -14,6 +14,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetApp", "src\S031.MetaStack.Win\MetApp\MetApp.csproj", "{4F43FBEA-13C4-4CEF-B0B8-8C96D9ED89CC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetApp.Report", "src\S031.MetaStack.Win\MetApp.Report\MetApp.Report.csproj", "{07F2A235-6019-45BD-BECC-353CD43D623B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S031.MetaStack.Json.Net45", "src\S031.MetaStack.Json\S031.MetaStack.Json.Net45.csproj", "{F0CAFC3F-8117-49EE-B472-1D86DD8340DD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{07F2A235-6019-45BD-BECC-353CD43D623B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{07F2A235-6019-45BD-BECC-353CD43D623B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{07F2A235-6019-45BD-BECC-353CD43D623B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F0CAFC3F-8117-49EE-B472-1D86DD8340DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F0CAFC3F-8117-49EE-B472-1D86DD8340DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F0CAFC3F-8117-49EE-B472-1D86DD8340DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F0CAFC3F-8117-49EE-B472-1D86DD8340DD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

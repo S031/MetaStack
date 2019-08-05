@@ -60,9 +60,9 @@ namespace MetaStack.Test.Json
 				json = (JsonObject)(new JsonReader(ref newStr).Read());
 				Assert.Equal(json["EscapedString"], str);
 				_logger.Debug(json.ToString(Formatting.Indented));
-				//str = _sourceUtf8JsonString;
-				//var jsonArray = (JsonArray)(new JsonReader(ref str).Read());
-				//_logger.Debug(jsonArray.ToString(Formatting.None));
+				str = _sourceUtf8JsonString;
+				var jsonArray = (JsonArray)(new JsonReader(ref str).Read());
+				_logger.Debug(jsonArray.ToString(Formatting.Indented));
 			}
 		}
 	}

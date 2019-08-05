@@ -17,6 +17,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="S031.MetaStack.Common.Net45.project.json" />
+    <None Remove="S031.MetaStack.Common.Net45.project.lock.json" />
     <None Remove="Translater\en-US.txt" />
     <None Remove="Translater\ru-Ru.txt" />
   </ItemGroup>
