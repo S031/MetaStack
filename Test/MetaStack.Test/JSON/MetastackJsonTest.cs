@@ -1,5 +1,6 @@
 ﻿using S031.MetaStack.Common;
 using S031.MetaStack.Common.Logging;
+using S031.MetaStack.Core.Actions;
 using S031.MetaStack.Json;
 using System;
 using System.Globalization;
@@ -63,6 +64,53 @@ namespace MetaStack.Test.Json
 				str = _sourceUtf8JsonString;
 				var jsonArray = (JsonArray)(new JsonReader(ref str).Read());
 				_logger.Debug(jsonArray.ToString(Formatting.Indented));
+			}
+		}
+
+		[Fact]
+		public void JsonWriterObjectTest()
+		{
+			using (FileLog logger = new FileLog(" MetaStackJsoJsonWriterObjectTestn.", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			{
+				ActionInfo a = new ActionInfo
+				{
+					ActionID = "TestActionID",
+					AssemblyID = "S031.MetaStack.Core.Actions",
+					ClassName = "S031.MetaStack.Core.Actions.ActionInfo",
+					Description = "public sealed class ActionInfo : InterfaceInfo",
+					EMailOnError = true,
+					IID = 1,
+					InterfaceID = "IActionsTest",
+					InterfaceName = "IActionsName",
+					Name = "Test ActionInfo",
+					TransactionSupport = TransactionActionSupport.Support,
+					WebAuthentication = ActionWebAuthenticationType.Basic
+				};
+				for (int i = 0; i < 3; i++)
+				{
+					string name = $"Attrib{i}";
+					ParamInfo p = new ParamInfo()
+					{
+						Agregate = $"COUNT({i})",
+						AttribName = name,
+						AttribPath = name,
+						DataType = "int",
+						DefaultValue = "0",
+						Dirrect = ParamDirrect.Input,
+						DisplayWidth = 10,
+						FieldName = name,
+						Name = $"Name of {name}",
+						Position = i,
+						Required = true
+					};
+					a.InterfaceParameters.Add(p);
+				}
+				var str = a.ToString();
+				logger.Debug(str);
+				a = ActionInfo.Create(str);
+				Assert.Equal(str, a.ToString());
+				var json = (JsonObject)(new JsonReader(ref str).Read());
+				logger.Debug((string)json["InterfaceParameters"][2]["Agregate"]);
 			}
 		}
 	}

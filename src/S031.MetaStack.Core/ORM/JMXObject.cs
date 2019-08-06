@@ -1,16 +1,10 @@
-﻿using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 using System.Threading.Tasks;
-using System.IO;
-using System.Linq;
 using S031.MetaStack.Common;
+using S031.MetaStack.Json;
 
 
 #if NETCOREAPP
-using S031.MetaStack.Core.Json;
 namespace S031.MetaStack.Core.ORM
 #else
 using S031.MetaStack.WinForms.Json;
@@ -18,19 +12,10 @@ namespace S031.MetaStack.WinForms.ORM
 #endif
 {
 	//[JsonConverter(typeof(JsonConverter))]
-	public class JMXObject : JObject
+	public class JMXObject : JsonObject
 	{
 		private JMXSchema _schema;
 		private readonly IJMXFactory _factory;
-
-		// Call internal methods of JsonReader && JObjects for parse json
-		static readonly FastMethodInfo.ReturnValueDelegate _moveToContent = new FastMethodInfo(typeof(JsonReader)
-			.GetMethod("MoveToContent", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)).Delegate;
-		static readonly FastMethodInfo.ReturnValueDelegate _setLineInfo = new FastMethodInfo(typeof(JObject)
-			.GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Single(
-			m => m.Name == "SetLineInfo" && m.GetParameters()[0].ParameterType == typeof(IJsonLineInfo))).Delegate;
-		static readonly FastMethodInfo.ReturnValueDelegate _readTokenFrom = new FastMethodInfo(typeof(JObject)
-			.GetMethod("ReadTokenFrom", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)).Delegate;
 
 		JMXObject()
 		{
@@ -62,13 +47,41 @@ namespace S031.MetaStack.WinForms.ORM
 				throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchema.ctor.1", objectName));
 			foreach (var a in _schema.Attributes)
 			{
-				if (!vbo.IsEmpty(a.DefaultValue))
-					this[a.AttribName] = JToken.FromObject(a.DefaultValue);
-				else if (a.ConstName.ToUpper() == "DATE_CURRENT")
+				if (!vbo.IsEmpty(a.DefaultValue)) { }
+					//!!!
+					//this[a.AttribName] = JToken.FromObject(a.DefaultValue);
+				else if (a.ConstName.ToLower() == "date_current")
 					this[a.AttribName] = DateTime.Now;
-
 			}
 		}
+
+		public string ObjectName
+		{
+			get => (string)this["ObjectName"];
+			private set => this["ObjectName"] = value;
+		}
+
+		public int ID
+		{
+			get => this.GetIntOrDefault("ID");
+			set => this["ID"] = value;
+		}
+
+		public JMXSchema Schema => _schema;
+
+		public IJMXFactory GetJMXFactory() => _factory;
+
+		public override string ToString()
+		{
+			return base.ToString();
+		}
+
+		public void ParseJson(string json)
+		{
+			new JsonReader(ref json)
+				.ReadInto(this);
+		}
+
 		public static async Task<JMXObject> CreateObjectAsync(string objectName, IJMXFactory schemaFactory)
 		{
 			JMXObject instance = new JMXObject
@@ -86,6 +99,7 @@ namespace S031.MetaStack.WinForms.ORM
 				throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchema.ctor.1", objectName));
 			return instance;
 		}
+
 		public static JMXObject CreateFrom(string json)
 		{
 #if NETCOREAPP
@@ -94,13 +108,14 @@ namespace S031.MetaStack.WinForms.ORM
 			return CreateFrom(json, JMXFactory.Create());
 #endif
 		}
+
 		public static JMXObject CreateFrom(string json, IJMXFactory schemaFactory)
 		{
 			JMXObject instance = new JMXObject();
 			instance.ParseJson(json);
+			//!!! may not be exists
 			instance.ObjectName = (string)instance["ObjectName"];
-			if (!instance.TryGetValue("ID", StringComparison.CurrentCultureIgnoreCase, out var j))
-				instance.ID = 0;
+			instance.ID = instance.GetIntOrDefault("ID");
 			try
 			{
 				instance._schema = schemaFactory
@@ -113,48 +128,6 @@ namespace S031.MetaStack.WinForms.ORM
 
 			return instance;
 		}
-		public string ObjectName
-		{
-			get => (string)this["ObjectName"];
-			private set => this["ObjectName"] = value;
-		}
-		public int ID
-		{
-			get => Convert.ToInt32(this["ID"].ToIntOrDefault());
-			set => this["ID"] = value;
-		}
-		public JMXSchema Schema => _schema;
-		public IJMXFactory GetJMXFactory() => _factory;
-		public override string ToString()
-		{
-			return base.ToString();
-		}
-		public void ParseJson(string json, JsonLoadSettings settings=null)
-		{
-			using (JsonReader reader = new JsonTextReader(new StringReader(json)))
-			{
-				load(reader, settings);
-			}
-		}
-		private void load(JsonReader reader, JsonLoadSettings settings)
-		{
-			if (reader.TokenType == JsonToken.None)
-			{
-				if (!reader.Read())
-				{
-					throw new JsonReaderException("Error reading JObject from JsonReader.");
-				}
-			}
-
-			_moveToContent(reader, null);
-			if (reader.TokenType != JsonToken.StartObject)
-			{
-				throw new JsonReaderException($"Error reading JObject from JsonReader. Current JsonReader item is not an object: {reader.TokenType}");
-			}
-
-			_setLineInfo(this, new object[] { reader as IJsonLineInfo, settings });
-			_readTokenFrom(this, new object[] { reader, settings });
-		}
-
+		//!!! JMXObject <-> JsonObject Implicit/Explicit
 	}
 }

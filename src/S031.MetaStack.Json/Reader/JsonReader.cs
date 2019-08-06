@@ -58,6 +58,28 @@ namespace S031.MetaStack.Json
 			return v;
 		}
 
+		public void ReadInto(JsonObject obj)
+		{
+			SkipSpaces();
+			int c = PeekChar();
+			if (c < 0)
+				throw JsonError(SR.ArgumentException_IncompleteInput);
+			else if (c!='{')
+				throw JsonError(SR.ArgumentException_ExtraCharacters);
+			ReadObject(obj);
+		}
+
+		public void ReadInto(JsonArray list)
+		{
+			SkipSpaces();
+			int c = PeekChar();
+			if (c < 0)
+				throw JsonError(SR.ArgumentException_IncompleteInput);
+			else if (c != '[')
+				throw JsonError(SR.ArgumentException_ExtraCharacters);
+			ReadArray(list);
+		}
+
 		private JsonValue ReadCore()
 		{
 			SkipSpaces();
@@ -70,67 +92,13 @@ namespace S031.MetaStack.Json
 			switch (c)
 			{
 				case '[':
-					ReadChar();
 					JsonArray list = new JsonArray();
-					SkipSpaces();
-					if (PeekChar() == ']')
-					{
-						ReadChar();
-						return list;
-					}
-
-					while (true)
-					{
-						list.Add(ReadCore());
-						SkipSpaces();
-						c = PeekChar();
-						if (c != ',')
-							break;
-						ReadChar();
-						continue;
-					}
-
-					if (ReadChar() != ']')
-					{
-						throw JsonError(SR.ArgumentException_ArrayMustEndWithBracket);
-					}
-
+					ReadArray(list);
 					return list;
 
 				case '{':
-					ReadChar();
 					JsonObject obj = new JsonObject();
-					SkipSpaces();
-					if (PeekChar() == '}')
-					{
-						ReadChar();
-						return obj;
-					}
-
-					while (true)
-					{
-						SkipSpaces();
-						if (PeekChar() == '}')
-						{
-							ReadChar();
-							break;
-						}
-						string name = ReadStringLiteral();
-						SkipSpaces();
-						Expect(':');
-						SkipSpaces();
-						obj[name] = ReadCore(); // it does not reject duplicate names.
-						SkipSpaces();
-						c = ReadChar();
-						if (c == ',')
-						{
-							continue;
-						}
-						if (c == '}')
-						{
-							break;
-						}
-					}
+					ReadObject(obj);
 					return obj;
 
 				case 't':
@@ -154,6 +122,71 @@ namespace S031.MetaStack.Json
 						return ReadNumericLiteral();
 					}
 					throw JsonError(string.Format(SR.ArgumentException_UnexpectedCharacter, (char)c));
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private void ReadArray(JsonArray list)
+		{
+			ReadChar();
+			SkipSpaces();
+			if (PeekChar() == ']')
+			{
+				ReadChar();
+				return;
+			}
+
+			while (true)
+			{
+				list.Add(ReadCore());
+				SkipSpaces();
+				var c = PeekChar();
+				if (c != ',')
+					break;
+				ReadChar();
+				continue;
+			}
+
+			if (ReadChar() != ']')
+			{
+				throw JsonError(SR.ArgumentException_ArrayMustEndWithBracket);
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private void ReadObject(JsonObject obj)
+		{
+			ReadChar();
+			SkipSpaces();
+			if (PeekChar() == '}')
+			{
+				ReadChar();
+				return;
+			}
+
+			while (true)
+			{
+				SkipSpaces();
+				if (PeekChar() == '}')
+				{
+					ReadChar();
+					break;
+				}
+				string name = ReadStringLiteral();
+				SkipSpaces();
+				Expect(':');
+				SkipSpaces();
+				obj[name] = ReadCore(); // it does not reject duplicate names.
+				SkipSpaces();
+				var c = ReadChar();
+				if (c == ',')
+				{
+					continue;
+				}
+				if (c == '}')
+				{
+					break;
+				}
 			}
 		}
 

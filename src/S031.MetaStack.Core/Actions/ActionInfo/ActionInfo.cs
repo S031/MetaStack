@@ -1,7 +1,7 @@
 ﻿#if NETCOREAPP
 using S031.MetaStack.Common;
 using S031.MetaStack.Core.Data;
-using S031.MetaStack.Core.Json;
+using S031.MetaStack.Json;
 using System;
 #else
 using S031.MetaStack.WinForms.Data;
@@ -29,7 +29,7 @@ namespace S031.MetaStack.WinForms.Actions
 		NotAllowed = -1
 	}
 
-	public class ActionInfo : InterfaceInfo
+	public sealed class ActionInfo : InterfaceInfo
 	{
 		public string ActionID { get; set; }
 		public string AssemblyID { get; set; }
@@ -72,10 +72,123 @@ namespace S031.MetaStack.WinForms.Actions
 		public bool AsyncMode { get; set; } = false;
 		public int IID { get; set; }
 
-		public override string ToString() => JSONExtensions.SerializeObject(this);
+		/// <summary>
+		/// Serialize content only <see cref="ActionInfo"/> to json string
+		/// </summary>
+		/// <returns>json string</returns>
+		public void ToStringRaw(JsonWriter writer)
+		{
+			writer.WriteProperty("ActionID", ActionID);
+			writer.WriteProperty("AssemblyID", AssemblyID);
+			writer.WriteProperty("ClassName", ClassName);
+			writer.WriteProperty("Name", Name);
+			writer.WriteProperty("LogOnError", LogOnError);
+			writer.WriteProperty("EMailOnError", EMailOnError);
+			writer.WriteProperty("EMailGroup", EMailGroup);
+			writer.WriteProperty("TransactionSupport", TransactionSupport.ToString());
+			writer.WriteProperty("WebAuthentication", WebAuthentication.ToString());
+			writer.WriteProperty("AuthenticationRequired", AuthenticationRequired);
+			writer.WriteProperty("AuthorizationRequired", AuthorizationRequired);
+			writer.WriteProperty("AsyncMode", AsyncMode);
+			writer.WriteProperty("IID", IID);
+			writer.WriteProperty("InterfaceID", InterfaceID);
+			writer.WriteProperty("InterfaceName", InterfaceName);
+			writer.WriteProperty("Description", Description);
+			writer.WriteProperty("MultipleRowsParams", MultipleRowsParams);
+			writer.WriteProperty("MultipleRowsResult", MultipleRowsResult);
 
-		public static ActionInfo Create(string serializedJsonString) =>
-			JSONExtensions.DeserializeObject<ActionInfo>(serializedJsonString);
+			writer.WritePropertyName("InterfaceParameters");
+			writer.WriteStartArray();
+			foreach (var item in InterfaceParameters)
+			{
+				writer.WriteStartObject();
+				item.Value.ToStringRaw(writer);
+				writer.WriteEndObject();
+			}
+			writer.WriteEndArray();
+		}
+
+		/// <summary>
+		/// Serialize <see cref="ActionInfo"/> to json string
+		/// </summary>
+		/// <returns>json string</returns>
+		public override string ToString()
+		{
+			JsonWriter w = new JsonWriter(Formatting.None);
+			w.WriteStartObject();
+			ToStringRaw(w);
+			w.WriteEndObject();
+			return w.ToString();
+		}
+
+		public static ActionInfo Create(string serializedJsonString)
+		{
+			JsonObject j = (JsonObject)(new JsonReader(ref serializedJsonString).Read());
+			ActionInfo a = new ActionInfo
+			{
+				ActionID = j.GetStringOrDefault("ActionID"),
+				AssemblyID = j.GetStringOrDefault("AssemblyID"),
+				ClassName = j.GetStringOrDefault("ClassName"),
+				Name = j.GetStringOrDefault("Name"),
+				LogOnError = j.GetBoolOrDefault("LogOnError"),
+				EMailOnError = j.GetBoolOrDefault("EMailOnError"),
+				EMailGroup = j.GetStringOrDefault("EMailGroup"),
+				TransactionSupport = Enum.Parse<TransactionActionSupport>(j.GetStringOrDefault("TransactionSupport")),
+				WebAuthentication = Enum.Parse<ActionWebAuthenticationType>(j.GetStringOrDefault("WebAuthentication")),
+				AuthenticationRequired = j.GetBoolOrDefault("AuthenticationRequired"),
+				AuthorizationRequired = j.GetBoolOrDefault("AuthorizationRequired"),
+				AsyncMode = j.GetBoolOrDefault("AsyncMode"),
+				IID = j.GetIntOrDefault("IID"),
+				InterfaceID = j.GetStringOrDefault("InterfaceID"),
+				InterfaceName = j.GetStringOrDefault("InterfaceName"),
+				Description = j.GetStringOrDefault("Description"),
+				MultipleRowsParams = j.GetBoolOrDefault("MultipleRowsParams"),
+				MultipleRowsResult = j.GetBoolOrDefault("MultipleRowsResult")
+			};
+			if (j.ContainsKey("InterfaceParameters"))
+			{
+				JsonArray ps = (JsonArray)j["InterfaceParameters"];
+				foreach (var v in ps)
+				{
+					var o = (JsonObject)v;
+					var p = new ParamInfo()
+					{
+						ParameterID = o.GetStringOrDefault("ParameterID"),
+						Dirrect = Enum.Parse<ParamDirrect>(o.GetStringOrDefault("Dirrect")),
+						PresentationType = o.GetStringOrDefault("PresentationType"),
+						Required = o.GetBoolOrDefault("Required"),
+						DefaultValue = o.GetStringOrDefault("DefaultValue"),
+						IsObjectName = o.GetBoolOrDefault("IsObjectName"),
+						AttribName = o.GetStringOrDefault("AttribName"),
+						AttribPath = o.GetStringOrDefault("AttribPath"),
+						Name = o.GetStringOrDefault("Name"),
+						Position = o.GetIntOrDefault("Position"),
+						DataType = o.GetStringOrDefault("DataType"),
+						Width = o.GetIntOrDefault("Width"),
+						DisplayWidth = o.GetIntOrDefault("DisplayWidth"),
+						Mask = o.GetStringOrDefault("Mask"),
+						Format = o.GetStringOrDefault("Format"),
+						IsPK = o.GetBoolOrDefault("IsPK"),
+						Locate = o.GetBoolOrDefault("Locate"),
+						Visible = o.GetBoolOrDefault("Visible"),
+						ReadOnly = o.GetBoolOrDefault("ReadOnly"),
+						Enabled = o.GetBoolOrDefault("Enabled"),
+						Sorted = o.GetBoolOrDefault("Sorted"),
+						SuperForm = o.GetStringOrDefault("SuperForm"),
+						SuperObject = o.GetStringOrDefault("SuperObject"),
+						SuperMethod = o.GetStringOrDefault("SuperMethod"),
+						SuperFilter = o.GetStringOrDefault("SuperFilter"),
+						ListItems = o.GetStringOrDefault("ListItems"),
+						ListData = o.GetStringOrDefault("ListData"),
+						FieldName = o.GetStringOrDefault("FieldName"),
+						ConstName = o.GetStringOrDefault("ConstName"),
+						Agregate = o.GetStringOrDefault("Agregate")
+					};
+					a.InterfaceParameters.Add(p);
+				}
+			}
+			return a;
+		}
 
 #if NETCOREAPP
 		ActionContext _ctx = null;

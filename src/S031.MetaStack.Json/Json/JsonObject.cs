@@ -46,10 +46,14 @@ namespace S031.MetaStack.Json
 			return _map.GetEnumerator();
 		}
 
-		public JsonValue this[string key]
+		public override JsonValue this[string key]
 		{
 			get => _map[key];
 			set => _map[key] = value;
+		}
+		public override JsonValue this[int index]
+		{
+			get => JsonType == JsonType.Array ? ((this as JsonValue) as JsonArray)[index] : throw new NotSupportedException();
 		}
 
 		public override JsonType JsonType => JsonType.Object;

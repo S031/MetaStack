@@ -13,7 +13,7 @@ namespace S031.MetaStack.Core.ORM
 	{
 		const string detail_field_prefix = "$1_";
 		private readonly JMXSchema _schema;
-		private IJMXTypeMapping _typeMapping;
+		private readonly IJMXTypeMapping _typeMapping;
 		private readonly bool _schemaSupport = true;
 
 

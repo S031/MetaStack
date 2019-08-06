@@ -29,7 +29,7 @@ namespace S031.MetaStack.Json
 
 		public bool IsReadOnly => false;
 
-		public JsonValue this[int index]
+		public override JsonValue this[int index]
 		{
 			get => _list[index];
 			set => _list[index] = value;

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using S031.MetaStack.Json;
+using System.Collections.Generic;
 using System.Linq;
 
 #if NETCOREAPP
@@ -33,6 +34,47 @@ namespace S031.MetaStack.WinForms.Actions
 		public bool Required { get; set; }
 		public string DefaultValue { get; set; }
 		public bool IsObjectName { get; set; }
+		public void ToStringRaw(JsonWriter writer)
+		{
+			writer.WriteProperty("ParameterID", ParameterID);
+			writer.WriteProperty("Dirrect", Dirrect.ToString());
+			writer.WriteProperty("PresentationType", PresentationType);
+			writer.WriteProperty("Required", Required);
+			writer.WriteProperty("DefaultValue", DefaultValue);
+			writer.WriteProperty("IsObjectName", IsObjectName);
+			writer.WriteProperty("AttribName", AttribName);
+			writer.WriteProperty("AttribPath", AttribPath);
+			writer.WriteProperty("Name", Name);
+			writer.WriteProperty("Position", Position);
+			writer.WriteProperty("DataType", DataType);
+			writer.WriteProperty("Width", Width);
+			writer.WriteProperty("DisplayWidth", DisplayWidth);
+			writer.WriteProperty("Mask", Mask);
+			writer.WriteProperty("Format", Format);
+			writer.WriteProperty("IsPK", IsPK);
+			writer.WriteProperty("Locate", Locate);
+			writer.WriteProperty("Visible", Visible);
+			writer.WriteProperty("ReadOnly", ReadOnly);
+			writer.WriteProperty("Enabled", Enabled);
+			writer.WriteProperty("Sorted", Sorted);
+			writer.WriteProperty("SuperForm", SuperForm);
+			writer.WriteProperty("SuperObject", SuperObject);
+			writer.WriteProperty("SuperMethod", SuperMethod);
+			writer.WriteProperty("SuperFilter", SuperFilter);
+			writer.WriteProperty("ListItems", ListItems);
+			writer.WriteProperty("ListData", ListData);
+			writer.WriteProperty("FieldName", FieldName);
+			writer.WriteProperty("ConstName", ConstName);
+			writer.WriteProperty("Agregate", Agregate);
+		}
+		public override string ToString()
+		{
+			JsonWriter w = new JsonWriter(Formatting.None);
+			w.WriteStartObject();
+			ToStringRaw(w);
+			w.WriteEndObject();
+			return w.ToString();
+		}
 	}
 
 	public class ParamInfoList : SortedList<int, ParamInfo>

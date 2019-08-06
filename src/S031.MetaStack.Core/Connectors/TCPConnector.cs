@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
-using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using S031.MetaStack.Common;
 using System.Linq;
-using Newtonsoft.Json.Linq;
 #if NETCOREAPP
 using S031.MetaStack.Core.App;
 using S031.MetaStack.Core.Data;

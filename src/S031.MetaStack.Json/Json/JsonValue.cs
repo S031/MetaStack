@@ -1,26 +1,393 @@
 ﻿using System;
-using System.Collections;
-using System.IO;
+using System.Globalization;
 using System.Text;
-using JsonPair = System.Collections.Generic.KeyValuePair<string, S031.MetaStack.Json.JsonValue>;
 
 namespace S031.MetaStack.Json
 {
-/*	public partial class JsonValue : IEnumerable
+	public class JsonValue
 	{
-		private static readonly UTF8Encoding s_encoding = new UTF8Encoding(false, true);
+		private readonly object _value;
+		private readonly JsonType _type;
 
-		public static JsonValue Parse(string jsonString)
+		public JsonValue()
 		{
-			if (jsonString == null)
-			{
-				throw new ArgumentNullException(nameof(jsonString));
-			}
-
-			return new JsonReader(ref jsonString).Read();
+			_value = null;
+			_type = JsonType.Null;
 		}
 
-		public virtual int Count => throw new InvalidOperationException();
+		public JsonValue(bool value)
+		{
+			_value = value;
+			_type = JsonType.Boolean;
+		}
+
+		public JsonValue(byte value)
+		{
+			_value = value;
+			_type = JsonType.Integer;
+		}
+
+		public JsonValue(char value)
+		{
+			_value = value;
+			_type = JsonType.String;
+		}
+
+		public JsonValue(decimal value)
+		{
+			_value = value;
+			_type = JsonType.Float;
+		}
+
+		public JsonValue(double value)
+		{
+			_value = value;
+			_type = JsonType.Float;
+		}
+
+		public JsonValue(float value)
+		{
+			_value = value;
+			_type = JsonType.Float;
+		}
+
+		public JsonValue(int value)
+		{
+			_value = value;
+			_type = JsonType.Integer;
+		}
+
+		public JsonValue(long value)
+		{
+			_value = value;
+			_type = JsonType.Integer;
+		}
+
+		public JsonValue(sbyte value)
+		{
+			_value = value;
+			_type = JsonType.Integer;
+		}
+
+		public JsonValue(short value)
+		{
+			_value = value;
+			_type = JsonType.Integer;
+		}
+
+		public JsonValue(string value)
+		{
+			_value = value;
+			_type = JsonType.String;
+		}
+
+		public JsonValue(DateTime value)
+		{
+			_value = value;
+			_type = JsonType.Date;
+		}
+
+		public JsonValue(uint value)
+		{
+			_value = value;
+			_type = JsonType.Integer;
+		}
+
+		public JsonValue(ulong value)
+		{
+			_value = value;
+			_type = JsonType.Integer;
+		}
+
+		public JsonValue(ushort value)
+		{
+			_value = value;
+			_type = JsonType.Integer;
+		}
+
+		public JsonValue(DateTimeOffset value)
+		{
+			_value = value;
+			_type = JsonType.String;
+		}
+
+		public JsonValue(Guid value)
+		{
+			_value = value;
+			_type = JsonType.Guid;
+		}
+
+		public JsonValue(TimeSpan value)
+		{
+			_value = value;
+			_type = JsonType.String;
+		}
+
+		public JsonValue(Uri value)
+		{
+			_value = value;
+			_type = JsonType.String;
+		}
+
+		public JsonValue(byte[] value)
+		{
+			_value = value;
+			_type = JsonType.Bytes;
+		}
+
+		internal object Value => _value;
+
+		// CLI -> JsonValue
+
+		public static implicit operator JsonValue(bool value)
+		{
+			return new JsonValue(value);
+		}
+
+		public static implicit operator JsonValue(byte value)
+		{
+			return new JsonValue(value);
+		}
+
+		public static implicit operator JsonValue(char value)
+		{
+			return new JsonValue(value);
+		}
+
+		public static implicit operator JsonValue(decimal value)
+		{
+			return new JsonValue(value);
+		}
+
+		public static implicit operator JsonValue(double value)
+		{
+			return new JsonValue(value);
+		}
+
+		public static implicit operator JsonValue(float value)
+		{
+			return new JsonValue(value);
+		}
+
+		public static implicit operator JsonValue(int value)
+		{
+			return new JsonValue(value);
+		}
+
+		public static implicit operator JsonValue(long value)
+		{
+			return new JsonValue(value);
+		}
+
+		public static implicit operator JsonValue(sbyte value)
+		{
+			return new JsonValue(value);
+		}
+
+		public static implicit operator JsonValue(short value)
+		{
+			return new JsonValue(value);
+		}
+
+		public static implicit operator JsonValue(string value)
+		{
+			return new JsonValue(value);
+		}
+
+		public static implicit operator JsonValue(uint value)
+		{
+			return new JsonValue(value);
+		}
+
+		public static implicit operator JsonValue(ulong value)
+		{
+			return new JsonValue(value);
+		}
+
+		public static implicit operator JsonValue(ushort value)
+		{
+			return new JsonValue(value);
+		}
+
+		public static implicit operator JsonValue(DateTime value)
+		{
+			return new JsonValue(value);
+		}
+
+		public static implicit operator JsonValue(DateTimeOffset value)
+		{
+			return new JsonValue(value);
+		}
+
+		public static implicit operator JsonValue(Guid value)
+		{
+			return new JsonValue(value);
+		}
+
+		public static implicit operator JsonValue(TimeSpan value)
+		{
+			return new JsonValue(value);
+		}
+
+		public static implicit operator JsonValue(Uri value)
+		{
+			return new JsonValue(value);
+		}
+
+		// JsonValue -> CLI
+
+		public static implicit operator bool(JsonValue value)
+		{
+			if (value == null)
+				throw new ArgumentNullException(nameof(value));
+
+			return (bool)value.Value;
+		}
+
+		public static implicit operator byte(JsonValue value)
+		{
+			if (value == null)
+				throw new ArgumentNullException(nameof(value));
+
+			return (byte)value.Value;
+		}
+
+		public static implicit operator char(JsonValue value)
+		{
+			if (value == null)
+				throw new ArgumentNullException(nameof(value));
+
+			return (char)value.Value;
+		}
+
+		public static implicit operator decimal(JsonValue value)
+		{
+			if (value == null)
+				throw new ArgumentNullException(nameof(value));
+
+			return (decimal)value.Value;
+		}
+
+		public static implicit operator double(JsonValue value)
+		{
+			if (value == null)
+				throw new ArgumentNullException(nameof(value));
+			return (double)value.Value;
+		}
+
+		public static implicit operator float(JsonValue value)
+		{
+			if (value == null)
+				throw new ArgumentNullException(nameof(value));
+
+			return (float)value.Value;
+		}
+
+		public static implicit operator int(JsonValue value)
+		{
+			if (value == null)
+				throw new ArgumentNullException(nameof(value));
+
+			return (int)value.Value;
+		}
+
+		public static implicit operator long(JsonValue value)
+		{
+			if (value == null)
+				throw new ArgumentNullException(nameof(value));
+
+			return (long)value.Value;
+		}
+
+		public static implicit operator sbyte(JsonValue value)
+		{
+			if (value == null)
+				throw new ArgumentNullException(nameof(value));
+
+			return (sbyte)value.Value;
+		}
+
+		public static implicit operator short(JsonValue value)
+		{
+			if (value == null)
+				throw new ArgumentNullException(nameof(value));
+
+			return (short)value.Value;
+		}
+
+		public static implicit operator string(JsonValue value)
+		{
+			return value != null ?
+				(string)value.Value :
+				null;
+		}
+
+		public static implicit operator uint(JsonValue value)
+		{
+			if (value == null)
+				throw new ArgumentNullException(nameof(value));
+
+			return (uint)value.Value;
+		}
+
+		public static implicit operator ulong(JsonValue value)
+		{
+			if (value == null)
+				throw new ArgumentNullException(nameof(value));
+
+			return (ulong)value.Value;
+		}
+
+		public static implicit operator ushort(JsonValue value)
+		{
+			if (value == null)
+				throw new ArgumentNullException(nameof(value));
+
+			return (ushort)value.Value;
+		}
+
+		public static implicit operator DateTime(JsonValue value)
+		{
+			if (value == null)
+				throw new ArgumentNullException(nameof(value));
+
+			return (DateTime)value.Value;
+		}
+
+		public static implicit operator DateTimeOffset(JsonValue value)
+		{
+			if (value == null)
+				throw new ArgumentNullException(nameof(value));
+
+			return (DateTimeOffset)value.Value;
+		}
+
+		public static implicit operator TimeSpan(JsonValue value)
+		{
+			if (value == null)
+				throw new ArgumentNullException(nameof(value));
+
+			return (TimeSpan)value.Value;
+		}
+
+		public static implicit operator Guid(JsonValue value)
+		{
+			if (value == null)
+				throw new ArgumentNullException(nameof(value));
+
+			return (Guid)value.Value;
+		}
+
+		public static implicit operator Uri(JsonValue value)
+		{
+			if (value == null)
+				throw new ArgumentNullException(nameof(value));
+
+			return (Uri)value.Value;
+		}
+
+		public virtual JsonType JsonType
+			=> _type;
 
 		public virtual JsonValue this[int index]
 		{
@@ -33,193 +400,5 @@ namespace S031.MetaStack.Json
 			get => throw new InvalidOperationException();
 			set => throw new InvalidOperationException();
 		}
-
-		public virtual bool ContainsKey(string key)
-		{
-			throw new InvalidOperationException();
-		}
-
-		public virtual void Save(Stream stream)
-		{
-			if (stream == null)
-			{
-				throw new ArgumentNullException(nameof(stream));
-			}
-
-			using (StreamWriter writer = new StreamWriter(stream, s_encoding, 1024, true))
-			{
-				Save(writer);
-			}
-		}
-
-		public virtual void Save(TextWriter textWriter)
-		{
-			if (textWriter == null)
-			{
-				throw new ArgumentNullException(nameof(textWriter));
-			}
-
-			SaveInternal(textWriter);
-		}
-
-		private void SaveInternal(TextWriter w)
-		{
-			switch (JsonType)
-			{
-				case JsonType.Object:
-					w.Write('{');
-					bool following = false;
-					foreach (JsonPair pair in ((JsonObject)this))
-					{
-						if (following)
-						{
-							w.Write(", ");
-						}
-						w.Write('\"');
-						//w.Write(EscapeString(pair.Key));
-						w.Write(pair.Key);
-						w.Write("\": ");
-						if (pair.Value == null)
-						{
-							w.Write("null");
-						}
-						else
-						{
-							pair.Value.SaveInternal(w);
-						}
-
-						following = true;
-					}
-					w.Write('}');
-					break;
-
-				case JsonType.Array:
-					w.Write('[');
-					following = false;
-					foreach (JsonValue v in ((JsonArray)this))
-					{
-						if (following)
-						{
-							w.Write(", ");
-						}
-
-						if (v != null)
-						{
-							v.SaveInternal(w);
-						}
-						else
-						{
-							w.Write("null");
-						}
-
-						following = true;
-					}
-					w.Write(']');
-					break;
-
-				case JsonType.Boolean:
-					w.Write(this ? "true" : "false");
-					break;
-
-				case JsonType.String:
-					w.Write('"');
-					w.Write(EscapeString((string)_value));
-					w.Write('"');
-					break;
-
-				default:
-					w.Write(this.GetFormattedString());
-					break;
-			}
-		}
-
-		public override string ToString()
-		{
-			using (StringWriter sw = new StringWriter())
-			{
-				SaveInternal(sw);
-				return sw.ToString();
-			}
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			throw new InvalidOperationException();
-		}
-
-		// Characters which have to be escaped:
-		// - Required by JSON Spec: Control characters, '"' and '\\'
-		// - Broken surrogates to make sure the JSON string is valid Unicode
-		//   (and can be encoded as UTF8)
-		// - JSON does not require U+2028 and U+2029 to be escaped, but
-		//   JavaScript does require this:
-		//   http://stackoverflow.com/questions/2965293/javascript-parse-error-on-u2028-unicode-character/9168133#9168133
-		// - '/' also does not have to be escaped, but escaping it when
-		//   preceeded by a '<' avoids problems with JSON in HTML <script> tags
-		private static bool NeedEscape(string src, int i)
-		{
-			char c = src[i];
-			return c < 32 || c == '"' || c == '\\'
-				// Broken lead surrogate
-				|| (c >= '\uD800' && c <= '\uDBFF' &&
-					(i == src.Length - 1 || src[i + 1] < '\uDC00' || src[i + 1] > '\uDFFF'))
-				// Broken tail surrogate
-				|| (c >= '\uDC00' && c <= '\uDFFF' &&
-					(i == 0 || src[i - 1] < '\uD800' || src[i - 1] > '\uDBFF'))
-				// To produce valid JavaScript
-				|| c == '\u2028' || c == '\u2029'
-				// Escape "</" for <script> tags
-				|| (c == '/' && i > 0 && src[i - 1] == '<');
-		}
-
-		internal static string EscapeString(string src)
-		{
-			if (src != null)
-			{
-				for (int i = 0; i < src.Length; i++)
-				{
-					if (NeedEscape(src, i))
-					{
-						StringBuilder sb = new StringBuilder(src.Length);
-						if (i > 0)
-						{
-							sb.Append(src, 0, i);
-						}
-						return DoEscapeString(sb, src, i);
-					}
-				}
-			}
-
-			return src;
-		}
-
-		private static string DoEscapeString(StringBuilder sb, string src, int cur)
-		{
-			int start = cur;
-			for (int i = cur; i < src.Length; i++)
-				if (NeedEscape(src, i))
-				{
-					sb.Append(src, start, i - start);
-					switch (src[i])
-					{
-						case '\b': sb.Append("\\b"); break;
-						case '\f': sb.Append("\\f"); break;
-						case '\n': sb.Append("\\n"); break;
-						case '\r': sb.Append("\\r"); break;
-						case '\t': sb.Append("\\t"); break;
-						case '\"': sb.Append("\\\""); break;
-						case '\\': sb.Append("\\\\"); break;
-						case '/': sb.Append("\\/"); break;
-						default:
-							sb.Append("\\u");
-							sb.Append(((int)src[i]).ToString("x04"));
-							break;
-					}
-					start = i + 1;
-				}
-			sb.Append(src, start, src.Length - start);
-			return sb.ToString();
-		}
-
-	}*/
+	}
 }
