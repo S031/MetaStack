@@ -1,27 +1,21 @@
-﻿using S031.MetaStack.Core.ORM;
-using S031.MetaStack.Core.Logging;
-using Xunit;
+﻿using Microsoft.Extensions.Configuration;
+using S031.MetaStack.Common.Logging;
 using S031.MetaStack.Core.App;
 using S031.MetaStack.Core.Data;
-using Microsoft.Extensions.Logging;
-using S031.MetaStack.Common.Logging;
-using System.Data.Common;
-using System.Threading.Tasks;
+using S031.MetaStack.Core.Logging;
+using S031.MetaStack.Core.ORM;
 using System.Collections.Generic;
-using System;
+using System.Data.Common;
 using System.IO;
-using System.Text;
-using System.Xml.Linq;
-using Newtonsoft.Json.Linq;
-using System.Linq;
-using Microsoft.Extensions.Configuration;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace MetaStack.Test.ORM
 {
 	public class ORMDBTest
 	{
-		string _cn;
-		
+		private readonly string _cn;
+
 		/// <summary>
 		/// Required MetaStack database in sql server
 		/// </summary>
@@ -43,7 +37,7 @@ namespace MetaStack.Test.ORM
 		/// DBSchemaProviderTest, obtain <see cref="JMXSchemaProviderDB"/> and create SysCat if not exists
 		/// </summary>
 		[Fact]
-		void Test1()
+		private void Test1()
 		{
 			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			using (MdbContext mdb = new MdbContext(_cn))
@@ -55,12 +49,12 @@ namespace MetaStack.Test.ORM
 		/// Create test schemas from <see cref="Resources.TestSchemas"/>
 		/// </summary>
 		[Fact]
-		void Test2()
+		private void Test2()
 		{
 			SaveSchemaTestAsyncNew().GetAwaiter().GetResult();
 		}
 
-		async Task SaveSchemaTestAsyncNew()
+		private async Task SaveSchemaTestAsyncNew()
 		{
 			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			using (MdbContext mdb = new MdbContext(_cn))
@@ -68,8 +62,9 @@ namespace MetaStack.Test.ORM
 			{
 				var stor = f.CreateJMXRepo();
 				foreach (var s in GetTestSchemas())
+				{
 					await stor.SaveSchemaAsync(s);
-
+				}
 			}
 		}
 
@@ -77,12 +72,12 @@ namespace MetaStack.Test.ORM
 		/// Create database objects from saved schemas
 		/// </summary>
 		[Fact]
-		void Test3()
+		private void Test3()
 		{
 			SyncSchemaTestAsyncNew().GetAwaiter().GetResult();
 		}
 
-		async Task SyncSchemaTestAsyncNew()
+		private async Task SyncSchemaTestAsyncNew()
 		{
 			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			using (MdbContext mdb = new MdbContext(_cn))
@@ -90,7 +85,9 @@ namespace MetaStack.Test.ORM
 			{
 				var stor = f.CreateJMXRepo();
 				foreach (string s in GetTestNames())
+				{
 					await stor.SyncSchemaAsync(s);
+				}
 			}
 		}
 
@@ -117,11 +114,12 @@ namespace MetaStack.Test.ORM
 		/// Delete database objects created with <see cref="Test3"/>
 		/// </summary>
 		[Fact]
-		void Test4()
+		private void Test4()
 		{
 			DropSchemaTestAsyncNew().GetAwaiter().GetResult();
 		}
-		async Task DropSchemaTestAsyncNew()
+
+		private async Task DropSchemaTestAsyncNew()
 		{
 			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			using (MdbContext mdb = new MdbContext(_cn))
@@ -129,19 +127,22 @@ namespace MetaStack.Test.ORM
 			{
 				var stor = f.CreateJMXRepo();
 				foreach (string s in GetTestNames())
+				{
 					await stor.DropSchemaAsync(s);
+				}
 			}
 		}
-		
+
 		/// <summary>
 		/// Delete SysCat from database
 		/// </summary>
 		[Fact]
-		void Test5()
+		private void Test5()
 		{
 			DropDBSchemaTestAsyncNew().GetAwaiter().GetResult();
 		}
-		async Task DropDBSchemaTestAsyncNew()
+
+		private async Task DropDBSchemaTestAsyncNew()
 		{
 			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			using (MdbContext mdb = new MdbContext(_cn))
@@ -152,7 +153,7 @@ namespace MetaStack.Test.ORM
 		}
 
 		[Fact]
-		void SpeedGetHashCodeTest()
+		private void SpeedGetHashCodeTest()
 		{
 			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -188,10 +189,10 @@ namespace MetaStack.Test.ORM
 		}
 
 		[Fact]
-		void CreateFactorySpeedGTest()
+		private void CreateFactorySpeedGTest()
 		{
 			var _configuration = ApplicationContext.GetConfiguration();
-			var	_schemaConnectInfo = _configuration.GetSection($"connectionStrings:{_configuration["appSettings:SysCatConnection"]}").Get<ConnectInfo>();
+			var _schemaConnectInfo = _configuration.GetSection($"connectionStrings:{_configuration["appSettings:SysCatConnection"]}").Get<ConnectInfo>();
 			var workConnectInfo = _configuration.GetSection($"connectionStrings:Test").Get<ConnectInfo>();
 			MdbContext schemaDb = new MdbContext(_schemaConnectInfo);
 			using (FileLogger _logger = new FileLogger("ORMDBTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
@@ -215,7 +216,7 @@ namespace MetaStack.Test.ORM
 		}
 
 		[Fact]
-		void SaveTestData()
+		private void SaveTestData()
 		{
 			//foreach (var s in GetTestSchemas())
 			//	System.IO.File.WriteAllText($"d:\\testData\\{s.ObjectName}.json", s.ToString());
@@ -236,13 +237,13 @@ namespace MetaStack.Test.ORM
 		}
 
 		[Fact]
-		void BaseDocumentTest()
+		private void BaseDocumentTest()
 		{
 			BaseDocument basedocument = new BaseDocument("DealAcc");
 			basedocument.Save(true);
 		}
 
-		JMXSchema CreateTestSchema()
+		private JMXSchema CreateTestSchema()
 		{
 
 			JMXSchema s = new JMXSchema("SysSchema")
@@ -265,19 +266,20 @@ namespace MetaStack.Test.ORM
 			return s;
 		}
 
-		static string[] GetTestNames()
+		private static string[] GetTestNames()
 		{
 			return new string[] { "dbo.Customer", "dbo.Terminal", "dbo.Contact", "dbo.Terminal2Customer",
 				"dbo.Card", "dbo.PaymentState", "dbo.ErrorCode", "dbo.Request", "dbo.Payment", "dbo.PaymentStateHist" };
 		}
-		static JMXSchema[] GetTestSchemas()
+
+		private static JMXSchema[] GetTestSchemas()
 		{
 			List<JMXSchema> l = new List<JMXSchema>();
 			var rm = Resources.TestSchemas.ResourceManager;
 			foreach (JMXObjectName item in GetTestNames())
 			{
 				var path = $@"..\..\..\orm\Resources\TestSchemas\{item.ObjectName}.json";
-				l.Add(JMXSchema.Parse(File.ReadAllText(path))); 
+				l.Add(JMXSchema.Parse(File.ReadAllText(path)));
 			}
 			return l.ToArray();
 		}

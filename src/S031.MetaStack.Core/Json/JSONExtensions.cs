@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json.Linq;
 using S031.MetaStack.Common;
-using Newtonsoft.Json;
+using fastJSON;
 
 #if NETCOREAPP
 namespace S031.MetaStack.Core.Json
@@ -11,6 +11,10 @@ namespace S031.MetaStack.WinForms.Json
 {
 	public static class JSONExtensions
     {
+		private static readonly JSONParameters _jsonParameters = new JSONParameters()
+		{
+			SerializeNullValues = false, UseExtensions = true
+		};
         public static bool ToBoolOrDefault(this JToken jsonValue)
         {
 			if (jsonValue == null)
@@ -32,6 +36,7 @@ namespace S031.MetaStack.WinForms.Json
 			else
 				return !jsonValue.IsNullOrEmpty();
         }
+
 		public static long ToIntOrDefault(this JToken jsonValue)
 		{
 			if (jsonValue == null)
@@ -50,6 +55,7 @@ namespace S031.MetaStack.WinForms.Json
 				return 0;
 
 		}
+
 		public static decimal ToDecimalOrDefault(this JToken jsonValue)
 		{
 			if (jsonValue == null)
@@ -68,6 +74,7 @@ namespace S031.MetaStack.WinForms.Json
 				return 0;
 
 		}
+
 		public static DateTime ToDateOrDefault(this JToken jsonValue)
 		{
 			string str;
@@ -89,6 +96,7 @@ namespace S031.MetaStack.WinForms.Json
 				return val;
 			return DateTime.MinValue;
 		}
+
 		public static bool IsNullOrEmpty(this JToken jsonValue)
 		{
 			return (jsonValue == null) ||
@@ -101,6 +109,7 @@ namespace S031.MetaStack.WinForms.Json
 				   (jsonValue.Type == JTokenType.Object && !jsonValue.HasValues) ||
 				   (jsonValue.Type == JTokenType.String && jsonValue.ToString() == String.Empty);
 		}
+
 		public static object GetValue(this JToken jsonValue)
 		{
 			if (jsonValue.Type == JTokenType.Boolean)
@@ -120,41 +129,15 @@ namespace S031.MetaStack.WinForms.Json
 			else
 				return jsonValue.ToString();
 		}
+
 		public static object DeserializeObject(string json)
-		{
-			return JsonConvert.DeserializeObject(json,
-				new Newtonsoft.Json.JsonSerializerSettings()
-				{
-					MissingMemberHandling = MissingMemberHandling.Ignore,
-					Error = (sender, args) => args.ErrorContext.Handled = true
-				});
+			=> fastJSON.JSON.ToObject(json, _jsonParameters);
 
-		}
 		public static T DeserializeObject<T>(string json)
-		{
-			try
-			{
-				return JsonConvert.DeserializeObject<T>(json,
-					new Newtonsoft.Json.JsonSerializerSettings()
-					{
-						MissingMemberHandling = MissingMemberHandling.Ignore,
-						Error = (sender, args) => args.ErrorContext.Handled = true
-					});
-			}
-			catch
-			{
-				return default;
-			}
-		}
-		public static string SerializeObject(object value)
-		{
-			return JsonConvert.SerializeObject(value,
-				new Newtonsoft.Json.JsonSerializerSettings()
-				{
-					Error = (sender, args) => args.ErrorContext.Handled = true
-				});
+			=> fastJSON.JSON.ToObject<T>(json, _jsonParameters);
 
-		}
+		public static string SerializeObject(object value)
+			=> fastJSON.JSON.ToJSON(value, _jsonParameters);
 #if NETCOREAPP
 #else
 		public static JObject Parse2Json(this string source)

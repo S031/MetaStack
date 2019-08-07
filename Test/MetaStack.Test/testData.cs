@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CommonTest
+﻿namespace CommonTest
 {
-    internal static class testData1
-    {
+	internal static class testData1
+	{
 		public static string testJsonData => @"{
 	""reqType"":""checkPaymentParams"",
 	""svcTypeId"": ""0"",

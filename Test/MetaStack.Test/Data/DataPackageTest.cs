@@ -1,11 +1,11 @@
-﻿using Xunit;
+﻿using MessagePack;
 using S031.MetaStack.Common.Logging;
-using System.Collections.Generic;
-using System;
-using System.Text;
 using S031.MetaStack.Core.Data;
-using MessagePack;
 using S031.MetaStack.Core.Json;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using Xunit;
 
 namespace MetaStack.Test.Data
 {
@@ -16,7 +16,7 @@ namespace MetaStack.Test.Data
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
 		}
 		[Fact]
-		void ctorTest()
+		private void ctorTest()
 		{
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -60,7 +60,7 @@ namespace MetaStack.Test.Data
 		}
 
 		[Fact]
-		void speedTest()
+		private void speedTest()
 		{
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			using (DataPackage p = new DataPackage(new string[] { "Col1.int", "Col2.string.255", "Col3.datetime.10", "Col4.Guid.34", "Col5.object" }))
@@ -91,7 +91,7 @@ namespace MetaStack.Test.Data
 			}
 		}
 		[Fact]
-		void byteArrayTest()
+		private void byteArrayTest()
 		{
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -124,7 +124,7 @@ namespace MetaStack.Test.Data
 		}
 
 		[Fact]
-		void parseTest()
+		private void parseTest()
 		{
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -141,8 +141,8 @@ namespace MetaStack.Test.Data
 					p["Col3"] = DateTime.Now.AddDays(i);
 					p["Col4"] = Guid.NewGuid();
 					//без сериализации работает в 1.5 раза быстрееp
-					//p["Col5"] = null;
-					p["Col5"] = new testClass() { ID = i, Name = (string)p["Col2"] };
+					p["Col5"] = null;
+					//p["Col5"] = new testClass() { ID = i, Name = (string)p["Col2"] };
 					p.Update();
 				}
 				l.Debug($"parseTest source {i} rows added");
@@ -153,14 +153,14 @@ namespace MetaStack.Test.Data
 				l.Debug(p.ToString(TsExportFormat.JSON));
 				Assert.True(hash == p.ToString(TsExportFormat.JSON).GetHashCode());
 
-				string source = @"{'string1':'value','integer2':99,'datetime3':'2017-05-23T00:00:00','time4':'22:00:00'}";
+				string source = "{\"string1\":\"value\",\"integer2\":99,\"datetime3\":\"2017-05-23T00:00:00\",\"time4\":\"22:00:00\"}";
 				p = DataPackage.Parse(512, source);
 				l.Debug(p.ToString(TsExportFormat.JSON));
 			}
 		}
 
 		[Fact]
-		void headerTest()
+		private void headerTest()
 		{
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -199,7 +199,7 @@ namespace MetaStack.Test.Data
 			}
 		}
 		[Fact]
-		void writeDataTest()
+		private void writeDataTest()
 		{
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -231,7 +231,7 @@ namespace MetaStack.Test.Data
 			}
 		}
 		[Fact]
-		void ToDataTableTest()
+		private void ToDataTableTest()
 		{
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -251,12 +251,12 @@ namespace MetaStack.Test.Data
 				}
 				l.Debug($"writeDataTest source {i} rows added");
 				var t = p.ToDataTable();
-				DisplayData(t, l);				
+				DisplayData(t, l);
 			}
 		}
 
 		[Fact]
-		void serializationSpeedTest()
+		private void serializationSpeedTest()
 		{
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{

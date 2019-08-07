@@ -76,13 +76,7 @@ namespace S031.MetaStack.WinForms.ORM
 			return base.ToString();
 		}
 
-		public void ParseJson(string json)
-		{
-			new JsonReader(ref json)
-				.ReadInto(this);
-		}
-
-		public static async Task<JMXObject> CreateObjectAsync(string objectName, IJMXFactory schemaFactory)
+		public static async Task<JMXObject> CreateAsync(string objectName, IJMXFactory schemaFactory)
 		{
 			JMXObject instance = new JMXObject
 			{
@@ -100,22 +94,18 @@ namespace S031.MetaStack.WinForms.ORM
 			return instance;
 		}
 
-		public static JMXObject CreateFrom(string json)
+		public static JMXObject Parse(string json)
 		{
 #if NETCOREAPP
-			return CreateFrom(json, ObjectFactories.GetDefault<IJMXFactory>());
+			return Parse(json, ObjectFactories.GetDefault<IJMXFactory>());
 #else
 			return CreateFrom(json, JMXFactory.Create());
 #endif
 		}
 
-		public static JMXObject CreateFrom(string json, IJMXFactory schemaFactory)
+		public static JMXObject Parse(string json, IJMXFactory schemaFactory)
 		{
-			JMXObject instance = new JMXObject();
-			instance.ParseJson(json);
-			//!!! may not be exists
-			instance.ObjectName = (string)instance["ObjectName"];
-			instance.ID = instance.GetIntOrDefault("ID");
+			JMXObject instance = (JMXObject)new JsonReader(ref json).Read();
 			try
 			{
 				instance._schema = schemaFactory
@@ -128,6 +118,21 @@ namespace S031.MetaStack.WinForms.ORM
 
 			return instance;
 		}
-		//!!! JMXObject <-> JsonObject Implicit/Explicit
+
+		public static async Task<JMXObject> ParseAsync(string json, IJMXFactory schemaFactory)
+		{
+			JMXObject instance = (JMXObject)new JsonReader(ref json).Read();
+			try
+			{
+				instance._schema = await schemaFactory
+					.CreateJMXRepo()
+					.GetSchemaAsync(instance.ObjectName);
+			}
+			catch { }
+			if (instance._schema == null)
+				throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchema.ctor.1", instance.ObjectName));
+
+			return instance;
+		}
 	}
 }

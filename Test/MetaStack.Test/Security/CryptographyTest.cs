@@ -1,28 +1,27 @@
-﻿using S031.MetaStack.Common;
+﻿using Microsoft.Extensions.DependencyInjection;
+using S031.MetaStack.Common;
 using S031.MetaStack.Common.Logging;
 using S031.MetaStack.Core.App;
+using S031.MetaStack.Core.Logging;
 using S031.MetaStack.Core.Security;
 using System;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.Extensions.DependencyInjection;
 using Xunit;
-using S031.MetaStack.Core.Logging;
-using System.Threading.Tasks;
 
 namespace MetaStack.Test.Security
 {
 	public class CryptographyTest
 	{
-		static readonly RSAEncryptionPadding _padding = RSAEncryptionPadding.OaepSHA256;
+		private static readonly RSAEncryptionPadding _padding = RSAEncryptionPadding.OaepSHA256;
 		public CryptographyTest()
 		{
 			MetaStack.Test.Program.ConfigureTests();
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
 		}
 		[Fact]
-		void RSATest()
+		private void RSATest()
 		{
 			//var data = Encoding.UTF8.GetBytes("Data To Be Encrypted");
 			var data = "Данные для шифрования";
@@ -36,7 +35,7 @@ namespace MetaStack.Test.Security
 			Assert.Equal(data, Encoding.UTF8.GetString(decryptedData));
 		}
 		[Fact]
-		void AesTest()
+		private void AesTest()
 		{
 			Guid data = Guid.NewGuid();
 			var aesServer = Aes.Create();
@@ -55,13 +54,13 @@ namespace MetaStack.Test.Security
 		}
 
 		[Fact]
-		void ImpersonateTest()
+		private void ImpersonateTest()
 		{
 			Impersonator.Execute<bool>("Test", "@TestPassword", () => true);
 		}
 
 		[Fact]
-		void LogonTest()
+		private void LogonTest()
 		{
 			using (FileLogger l = new FileLogger("CryptographyTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -102,7 +101,7 @@ namespace MetaStack.Test.Security
 			}
 		}
 
-		RSA CreateFromPK(string publicKeyBase64String)
+		private RSA CreateFromPK(string publicKeyBase64String)
 		{
 			var rsa = RSA.Create();
 			rsa.Import(publicKeyBase64String);

@@ -4,12 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Data;
 using S031.MetaStack.Common;
+using S031.MetaStack.Json;
 #if NETCOREAPP
 using S031.MetaStack.Core.Json;
 #else
 using S031.MetaStack.WinForms.Json;
 #endif
-using Newtonsoft.Json.Linq;
+//using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 #if SERIALIZEBINARY
 using MessagePack;
@@ -119,23 +120,23 @@ namespace S031.MetaStack.WinForms.Data
 				ReadDelegate = br => JSONExtensions.DeserializeObject(br.ReadString())}}
 #endif
 		};
-		static readonly object obj4Lock = new object();
-		MemoryStream _ms;
-		BinaryReader _br;
-		BinaryWriter _bw;
+		private static readonly object obj4Lock = new object();
+		private MemoryStream _ms;
+		private BinaryReader _br;
+		private readonly BinaryWriter _bw;
 
 		//string _tableName;
-		int _headerSpaceSize;
-		int _colCount;
-		const int _headerPos = 8; // sizeof(int) *2
-		const int _headerSpaceSizeDef = 512;
-		long _dataPos;
-		long _rowPos;
+		private readonly int _headerSpaceSize;
+		private readonly int _colCount;
+		private const int _headerPos = 8; // sizeof(int) *2
+		private const int _headerSpaceSizeDef = 512;
+		private readonly long _dataPos;
+		private long _rowPos;
 
-		Dictionary<string, object> _dataRow;
-		Dictionary<string, object> _headers;
-		List<string> _indexes;
-		List<ColumnInfo> _colInfo;
+		private Dictionary<string, object> _dataRow;
+		private readonly Dictionary<string, object> _headers;
+		private readonly List<string> _indexes;
+		private readonly List<ColumnInfo> _colInfo;
 		
 		/// <summary>
 		/// Create a new instance of <see cref="DataPackage"/> from <see cref="byte"/> array
@@ -402,7 +403,7 @@ namespace S031.MetaStack.WinForms.Data
 				//
 				int count = (int)(_ms.Length - _ms.Position);
 				byte[] nextData = new byte[count];
-				int result = _ms.Read(nextData, 0, count);
+				_ = _ms.Read(nextData, 0, count);
 				WriteRow();
 				long l = _ms.Position;
 				_ms.Write(nextData, 0, (int)nextData.Length);
@@ -426,7 +427,7 @@ namespace S031.MetaStack.WinForms.Data
 				//Updates the current row with a rewrite to end of array
 				int count = (int)(_ms.Length - _ms.Position);
 				byte[] nextData = new byte[count];
-				int result = await _ms.ReadAsync(nextData, 0, count).ConfigureAwait(false);
+				_ = await _ms.ReadAsync(nextData, 0, count).ConfigureAwait(false);
 				WriteRow();
 				long l = _ms.Position;
 				await _ms.WriteAsync(nextData, 0, (int)nextData.Length).ConfigureAwait(false);
@@ -716,17 +717,8 @@ namespace S031.MetaStack.WinForms.Data
 			return i;
 		}
 
-        public JObject GetRowJSON()
-		{
-			//return new JsonObject(dataRow.Select(kvp => new JsonPair(kvp.Key, JsonValue.ToJsonValue(kvp.Value))));
-			JObject o = new JObject();
-			foreach (KeyValuePair<string, object> kvp in _dataRow)
-			{
-				//o.Add(kvp.Key, new JValue(kvp.Value));
-				o.Add(kvp.Key, kvp.Value == null ? null : JValue.FromObject(kvp.Value));
-			}
-			return o;
-		}
+		public JsonObject GetRowJSON()
+			=> new JsonObject(_dataRow.Select(kvp => new KeyValuePair<string, JsonValue>(kvp.Key, new JsonValue(kvp.Value))));
 
         public bool IsDBNull(int i) => DBNull.Value.Equals(_dataRow[_indexes[i]]);
 
@@ -816,9 +808,9 @@ namespace S031.MetaStack.WinForms.Data
 
 		private string SaveJSON()
 		{
-			JObject j = new JObject();
+			JsonObject j = new JsonObject();
 
-			JObject headers = new JObject();
+			JsonObject headers = new JsonObject();
 			_ms.Seek(_headerPos, SeekOrigin.Begin);
 			int headCount = _br.ReadInt32();
 			for (int i = 0; i < headCount; i++)
@@ -831,42 +823,42 @@ namespace S031.MetaStack.WinForms.Data
 				{
 					Type tp = t.Type();
 					object v = _dti[tp].ReadDelegate(_br);
-					if (tp.IsNumeric(NumericTypesScope.Integral))
-						headers[key] = Convert.ToInt64(v);
-					else if (tp.IsNumeric(NumericTypesScope.FloatingPoint))
-						headers[key] = Convert.ToDecimal(v);
-					else if (tp == typeof(bool))
-						headers[key] = (bool)v;
-					else if (tp == typeof(string))
-						headers[key] = (string)v;
-					else if (tp == typeof(DateTime))
-						headers[key] = (DateTime)v;
-					else if (tp == typeof(Guid))
-						headers[key] = (Guid)v;
-					else if (tp == typeof(byte[]))
-						headers[key] = Convert.ToBase64String((byte[])v);
-					else
-						headers[key] = JValue.FromObject(v);
+					//if (tp.IsNumeric(NumericTypesScope.Integral))
+					//	headers[key] = Convert.ToInt64(v);
+					//else if (tp.IsNumeric(NumericTypesScope.FloatingPoint))
+					//	headers[key] = Convert.ToDecimal(v);
+					//else if (tp == typeof(bool))
+					//	headers[key] = (bool)v;
+					//else if (tp == typeof(string))
+					//	headers[key] = (string)v;
+					//else if (tp == typeof(DateTime))
+					//	headers[key] = (DateTime)v;
+					//else if (tp == typeof(Guid))
+					//	headers[key] = (Guid)v;
+					//else if (tp == typeof(byte[]))
+					//	headers[key] = Convert.ToBase64String((byte[])v);
+					//else
+						headers[key] = new JsonValue(v);
 				}
 			}
 			j["Headers"] = headers;
 
-			JArray columns = new JArray();
+			JsonArray columns = new JsonArray();
 			for (int i = 0; i < _indexes.Count; i++)
 			{
 				ColumnInfo ci = _colInfo[i];
 
-				columns.Add(new JObject{ { "Name", _indexes[i] },
+				columns.Add(new JsonObject{ { "Name", _indexes[i] },
 				{ "Type", MdbTypeMap.GetTypeInfo(ci.DataType).Name },
 				{ "Size", ci.ColumnSize },
 				{ "AllowNull", ci.AllowDBNull} });
 			}
 
-			JArray rows = new JArray();
+			JsonArray rows = new JsonArray();
 			GoDataTop();
 			for (; _ms.Position < _ms.Length - 1;)
 			{
-				JObject dr = new JObject();
+				JsonObject dr = new JsonObject();
 				for (int i = 0; i < _colCount; i++)
 				{
 					MdbType t = (MdbType)_br.ReadByte();
@@ -877,23 +869,23 @@ namespace S031.MetaStack.WinForms.Data
 					{
 						Type tp = MdbTypeMap.GetType(t);
 						object v = _dti[tp].ReadDelegate(_br);
-						if (tp.IsNumeric(NumericTypesScope.Integral))
-							dr[colName] = Convert.ToInt64(v);
-						else if (tp.IsNumeric(NumericTypesScope.FloatingPoint))
-							dr[colName] = Convert.ToDecimal(v);
-						else if (tp == typeof(bool))
-							dr[colName] = (bool)v;
-						else if (tp == typeof(string))
-							dr[colName] = (string)v;
-						else if (tp == typeof(DateTime))
-							dr[colName] = (DateTime)v;
-						else if (tp == typeof(Guid))
-							dr[colName] = (Guid)v;
-						else if (tp == typeof(byte[]))
-							dr[colName] = Convert.ToBase64String((byte[])v);
-						else
-							dr[colName] = JSONExtensions.SerializeObject(v);
-						//dr[colName] = JValue.FromObject(v);
+						//if (tp.IsNumeric(NumericTypesScope.Integral))
+						//	dr[colName] = Convert.ToInt64(v);
+						//else if (tp.IsNumeric(NumericTypesScope.FloatingPoint))
+						//	dr[colName] = Convert.ToDecimal(v);
+						//else if (tp == typeof(bool))
+						//	dr[colName] = (bool)v;
+						//else if (tp == typeof(string))
+						//	dr[colName] = (string)v;
+						//else if (tp == typeof(DateTime))
+						//	dr[colName] = (DateTime)v;
+						//else if (tp == typeof(Guid))
+						//	dr[colName] = (Guid)v;
+						//else if (tp == typeof(byte[]))
+						//	dr[colName] = Convert.ToBase64String((byte[])v);
+						//else
+						//	dr[colName] = JSONExtensions.SerializeObject(v);
+						dr[colName] = new JsonValue(v);
 					}
 				}
 				rows.Add(dr);
@@ -937,9 +929,10 @@ namespace S031.MetaStack.WinForms.Data
 		}
 		public static DataPackage Parse(int headerSpaceSize, string jsonString)
 		{
-			JObject j = (JObject.Parse(jsonString) as JObject);
-			DataPackage ts = new DataPackage(headerSpaceSize, j.Properties().Select(kvp => kvp.Name).ToArray<string>(),
-				j.Values().Select(v => v.GetValue()).ToArray<object>());
+			JsonObject j = (JsonObject)new JsonReader(ref jsonString).Read();
+			DataPackage ts = new DataPackage(headerSpaceSize, 
+				j.Select(kvp => kvp.Key).ToArray<string>(),
+				j.Select(kvp => kvp.Value?.GetValue()).ToArray<object>());
 			ts.Update();
 			ts.GoDataTop();
 			return ts;
@@ -947,27 +940,27 @@ namespace S031.MetaStack.WinForms.Data
 
 		public static DataPackage Parse(string jsonString)
 		{
-			JObject j = (JObject.Parse(jsonString) as JObject);
+			JsonObject j = (JsonObject)new JsonReader(ref jsonString).Read();
 			int headerSpaceSize = (int)j["HeaderSize"];
 
-			JArray columns = (j["Columns"] as JArray);
-			JArray rows = (j["Rows"] as JArray);
+			JsonArray columns = (j["Columns"] as JsonArray);
+			JsonArray rows = (j["Rows"] as JsonArray);
 			string[] cis = columns.Select(
-				c => $"{c["Name"]}.{c["Type"]}.{c["Size"]}.{c["AllowNull"]}")
+				c => $"{(string)c["Name"]}.{(string)c["Type"]}.{(int)c["Size"]}.{(bool)c["AllowNull"]}")
 				.ToArray();
 			DataPackage ts = new DataPackage(headerSpaceSize, cis, null);
-			JObject headers = (JObject)j["Headers"];
+			JsonObject headers = (JsonObject)j["Headers"];
 			foreach (var pair in headers)
 			{
-				ts.Headers.Add(pair.Key, pair.Value.GetValue());
+				ts.Headers.Add(pair.Key, pair.Value?.GetValue());
 			}
 			ts.UpdateHeaders();
-			foreach (JObject r in rows)
+			foreach (JsonObject r in rows)
 			{
 				ts.AddNew();
 				foreach (var jo in r)
 				{
-					ts[jo.Key] = jo.Value.GetValue();
+					ts[jo.Key] = jo.Value?.GetValue();
 				}
 				ts.Update();
 			}

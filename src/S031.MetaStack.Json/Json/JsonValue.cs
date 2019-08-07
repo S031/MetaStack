@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 
@@ -6,6 +7,30 @@ namespace S031.MetaStack.Json
 {
 	public class JsonValue
 	{
+		private static readonly Dictionary<Type, JsonType> _typesCache = new Dictionary<Type, JsonType>()
+		{
+			{typeof(bool), JsonType.Boolean },
+			{typeof(byte), JsonType.Integer },
+			{typeof(char), JsonType.String },
+			{typeof(sbyte), JsonType.Integer },
+			{typeof(short), JsonType.Integer },
+			{typeof(ushort), JsonType.Integer },
+			{typeof(int), JsonType.Integer },
+			{typeof(uint), JsonType.Integer },
+			{typeof(long), JsonType.Integer },
+			{typeof(ulong), JsonType.Integer },
+			{typeof(float), JsonType.Float },
+			{typeof(double), JsonType.Float },
+			{typeof(decimal), JsonType.Float },
+			{typeof(DateTime), JsonType.Date },
+			{typeof(string), JsonType.String },
+			{typeof(Uri), JsonType.Uri },
+			{typeof(Guid), JsonType.Guid },
+			{typeof(byte[]), JsonType.Bytes },
+			{typeof(DateTimeOffset), JsonType.String },
+			{typeof(TimeSpan), JsonType.String },
+		};
+
 		private readonly object _value;
 		private readonly JsonType _type;
 
@@ -13,6 +38,23 @@ namespace S031.MetaStack.Json
 		{
 			_value = null;
 			_type = JsonType.Null;
+		}
+
+		public JsonValue(object value)
+		{
+			if (value == null)
+			{
+				_type = JsonType.Null;
+				_value = value;
+			}
+			else
+			{
+				Type t = value.GetType();
+				if (!_typesCache.TryGetValue(t, out _type))
+					//throw new NotSupportedException();
+					_type = JsonType.Raw;
+				_value = value;
+			}
 		}
 
 		public JsonValue(bool value)
@@ -400,5 +442,15 @@ namespace S031.MetaStack.Json
 			get => throw new InvalidOperationException();
 			set => throw new InvalidOperationException();
 		}
+
+		public virtual bool IsEmpty()
+			=> _type == JsonType.Null;
+
+		public virtual object GetValue()
+			=> _value;
+		public override string ToString()
+			=> new JsonWriter(Formatting.None)
+			.WriteValue(this)
+			.ToString();
 	}
 }

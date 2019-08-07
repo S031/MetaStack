@@ -1,12 +1,9 @@
-﻿using Xunit;
-using S031.MetaStack.Common;
-using Xunit.Abstractions;
-using System;
-using System.Linq;
+﻿using S031.MetaStack.Common;
 using S031.MetaStack.Common.Logging;
+using System;
 using System.Collections.Generic;
+using Xunit;
 using pair = System.Collections.Generic.KeyValuePair<System.Type, System.ValueType>;
-using System.Collections;
 
 namespace MetaStack.Test.Common
 {
@@ -17,7 +14,7 @@ namespace MetaStack.Test.Common
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
 		}
 		[Fact]
-		void NullExceptiobnTest()
+		private void NullExceptiobnTest()
 		{
 			using (FileLog l = new FileLog("nullEceptionTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -36,7 +33,7 @@ namespace MetaStack.Test.Common
 			}
 		}
 		[Fact]
-		void EnumExceptiobnTest()
+		private void EnumExceptiobnTest()
 		{
 			using (FileLog l = new FileLog("EnumExceptiobnTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -46,7 +43,7 @@ namespace MetaStack.Test.Common
 		}
 
 		[Fact]
-		void StringExtensionsTest()
+		private void StringExtensionsTest()
 		{
 			Assert.True("1234" == "12345677890".Left(4));
 			Assert.True("7890" == "12345677890".Right(4));
@@ -97,7 +94,7 @@ namespace MetaStack.Test.Common
 			Assert.True(s == "12345677890");
 		}
 		[Fact]
-		void StringExtensionsTokenTets()
+		private void StringExtensionsTokenTets()
 		{
 			using (FileLog l = new FileLog("stringExtensionsTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -132,8 +129,10 @@ namespace MetaStack.Test.Common
 				{
 					string s = stackTrace.GetToken(j++, ";");
 					l.Write(LogLevels.Debug, $"{j} токен", s);
-					if (s.IsEmpty()) break;
-
+					if (s.IsEmpty())
+					{
+						break;
+					}
 				} while (true);
 				l.Debug("12345".Qt());
 				l.Debug(100.GetType().IsNumeric().ToString());
@@ -144,14 +143,14 @@ namespace MetaStack.Test.Common
 		}
 
 		[Fact]
-		void ByteArrayExtensionsTest()
+		private void ByteArrayExtensionsTest()
 		{
 			Assert.True("0KHQtdGA0LPQtdC5INCS0LjRgtCw0LvRjNC10LLQuNGHINCS0L7RgdGC0YDQuNC60L7Qsg==".IsBase64String());
 			Assert.Equal(new byte[] { 1, 2, 3, 4, 5 }.ToBASE64String().ToByteArray().ToBASE64String(),
 				new byte[] { 1, 2, 3, 4, 5 }.ToBASE64String());
 		}
 		[Fact]
-		void ObjectExtensionsTest()
+		private void ObjectExtensionsTest()
 		{
 			using (FileLog l = new FileLog("ObjectExtensionsTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -173,7 +172,9 @@ namespace MetaStack.Test.Common
 						(n => n == 4, n => n.ToString()),
 						(n => true, n => $"default {n}"));
 					if (retd != null)
+					{
 						l.Debug(retd.ToString());
+					}
 				});
 
 				DateTime start = DateTime.Now;
@@ -188,7 +189,7 @@ namespace MetaStack.Test.Common
 			}
 		}
 		[Fact]
-		void DecimalExtensionsTest()
+		private void DecimalExtensionsTest()
 		{
 			using (FileLog l = new FileLog("DecimalExtensionsTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -220,7 +221,7 @@ namespace MetaStack.Test.Common
 			}
 		}
 		[Fact]
-		void TypeExtensionsTest()
+		private void TypeExtensionsTest()
 		{
 			using (FileLog l = new FileLog("TypeExtensionsTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -269,7 +270,11 @@ namespace MetaStack.Test.Common
 			}
 		}
 
-		public static System.ValueType GetDefaultValue(Type type) => _defaults[type];
+		public static System.ValueType GetDefaultValue(Type type)
+		{
+			return _defaults[type];
+		}
+
 		//public static object GetDefaultValue(Type type) => _defaults.FirstOrDefault(p => p.Key == type).Value;
 
 
@@ -299,31 +304,42 @@ namespace MetaStack.Test.Common
 		}
 
 	}
-	static class TestExt
+
+	internal static class TestExt
 	{
 		public static int BinarySearch(this pair[] array, int searchFor)
-		{ 
+		{
 			int high = array.Length - 1;
 			int low = 0;
 			int mid;
 
 			if (array[0].Equals(searchFor))
+			{
 				return 0;
+			}
 			else if (array[high].Equals(searchFor))
+			{
 				return high;
+			}
 			else
 			{
 				while (low <= high)
 				{
 					mid = (high + low) / 2;
 					int key = array[mid].Key.GetHashCode();
-					int result =  key - searchFor;
+					int result = key - searchFor;
 					if (result == 0)
+					{
 						return mid;
+					}
 					else if (result > 0)
+					{
 						high = mid--;
+					}
 					else
+					{
 						low = mid++;
+					}
 				}
 				return -1;
 			}
@@ -337,7 +353,8 @@ namespace MetaStack.Test.Common
 			}
 		}
 	}
-	static class TestExt1
+
+	internal static class TestExt1
 	{
 		public static IEnumerable<T> ForEach<T>(IEnumerable<T> xs, Action<T> f)
 		{

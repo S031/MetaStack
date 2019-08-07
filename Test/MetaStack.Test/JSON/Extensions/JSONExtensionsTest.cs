@@ -1,7 +1,7 @@
-﻿using S031.MetaStack.Common;
+﻿using Newtonsoft.Json.Linq;
+using S031.MetaStack.Common;
 using S031.MetaStack.Common.Logging;
 using S031.MetaStack.Core.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using Xunit;
 
@@ -15,7 +15,7 @@ namespace MetaStack.Test.Json
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
 		}
 
-		readonly JToken _v = JValue.Parse(CommonTest.testData1.testJsonData);
+		private readonly JToken _v = JValue.Parse(CommonTest.testData1.testJsonData);
 
 		[Fact]
 		public void CastTest()

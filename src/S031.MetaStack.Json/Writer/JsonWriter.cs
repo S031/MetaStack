@@ -211,7 +211,7 @@ namespace S031.MetaStack.Json
 			=> WriteString(value.ToString("c"), false);
 
 		public JsonWriter WriteValue(Guid value)
-			=> WriteString(value.ToString("c"), false);
+			=> WriteString(value.ToString(), false);
 		
 		public JsonWriter WriteValue(DateTimeOffset value)
 			=> WriteString(value.ToString("c"), false);

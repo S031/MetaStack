@@ -1,13 +1,11 @@
-﻿using Xunit;
+﻿using Microsoft.Extensions.Logging;
 using S031.MetaStack.Common;
 using S031.MetaStack.Common.Logging;
-using Xunit.Abstractions;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Collections.Generic;
-using System;
-using Microsoft.Extensions.Logging;
 using S031.MetaStack.Core.Logging;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace MetaStack.Test.Common
 {
@@ -18,7 +16,7 @@ namespace MetaStack.Test.Common
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
 		}
 		[Fact]
-		void numericTest()
+		private void numericTest()
 		{
 			using (FileLog l = new FileLog("NumericTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -39,7 +37,7 @@ namespace MetaStack.Test.Common
 		}
 
 		[Fact]
-		void passwordGenTest()
+		private void passwordGenTest()
 		{
 			using (FileLog l = new FileLog("passwordGenTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -65,7 +63,7 @@ namespace MetaStack.Test.Common
 		}
 
 		[Fact]
-		void fileLoggerTest()
+		private void fileLoggerTest()
 		{
 			using (FileLog logger = new FileLog("fileTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd", CacheSize = 1000 }))
 			{
@@ -82,8 +80,10 @@ namespace MetaStack.Test.Common
 						using (FileLog logger2 = new FileLog($"fileTestdata{id}", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd", CacheSize = 1000 }))
 						{
 							for (int i = 1; i <= 100000; i++)
+							{
 								//logger2.Write(LogLevels.Information, "loggerTest", "Сообщение № {0} в потоке {1}".ToFormat(i, id));
 								logger2.Debug("Сообщение № {0} в потоке {1}".ToFormat(i, id));
+							}
 						}
 					}));
 				}
@@ -92,7 +92,7 @@ namespace MetaStack.Test.Common
 			}
 		}
 		[Fact]
-		void fileLoggerTestAsync()
+		private void fileLoggerTestAsync()
 		{
 			using (FileLog logger = new FileLog("fileTestAsync", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd", CacheSize = 1000 }))
 			{
@@ -109,17 +109,20 @@ namespace MetaStack.Test.Common
 				logger.Write(LogLevels.Information, "loggerTest", "Финиш");
 			}
 		}
-		void _fileLoggerTestAsync(FileLog logger)
+
+		private void _fileLoggerTestAsync(FileLog logger)
 		{
 			for (int i = 1; i <= 100000; i++)
+			{
 				logger.Write(LogLevels.Information, "loggerTest", "Сообщение № {0} в потоке {1}".ToFormat(i,
 					System.Threading.Thread.CurrentThread.ManagedThreadId));
+			}
 		}
 		/// <summary>
 		/// Работает в 10 раз медленнее
 		/// </summary>
 		[Fact]
-		void fileLoggerFactoryTest()
+		private void fileLoggerFactoryTest()
 		{
 			using (ILoggerFactory factory = new LoggerFactory())
 			{
@@ -151,7 +154,7 @@ namespace MetaStack.Test.Common
 		}
 
 		[Fact]
-		void schedulerTestSecond()
+		private void schedulerTestSecond()
 		{
 			using (FileLog l = new FileLog("schedulerTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd", CacheSize = 1000 }))
 			{
@@ -163,12 +166,14 @@ namespace MetaStack.Test.Common
 				DateTime d1 = DateTime.Now;
 				DateTime d2 = d1.AddDays(2);
 				for (DateTime d = s.GetNextStartTime(d1); d < d2; d = s.GetNextStartTime(d))
+				{
 					l.Write(LogLevels.Information, "schedulerTestSecond", $"GetNextStartTime={d.ToString(vbo.FullDateFormat)}");
+				}
 			}
 		}
 
 		[Fact]
-		void schedulerTestDay()
+		private void schedulerTestDay()
 		{
 			using (FileLog l = new FileLog("schedulerTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd", CacheSize = 1000 }))
 			{

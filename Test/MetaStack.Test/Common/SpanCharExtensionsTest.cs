@@ -1,7 +1,7 @@
-﻿using Xunit;
-using S031.MetaStack.Common;
-using System;
+﻿using S031.MetaStack.Common;
 using S031.MetaStack.Common.Logging;
+using System;
+using Xunit;
 
 namespace MetaStack.Test.Common
 {
@@ -13,7 +13,7 @@ namespace MetaStack.Test.Common
 		}
 
 		[Fact]
-		void SpanCharTest()
+		private void SpanCharTest()
 		{
 			using (FileLog l = new FileLog("SpanCharExtensionsTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -68,7 +68,7 @@ namespace MetaStack.Test.Common
 			}
 		}
 		[Fact]
-		void UnsafeStringTest()
+		private void UnsafeStringTest()
 		{
 			using (FileLog l = new FileLog("UnsafeStringTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -94,7 +94,7 @@ namespace MetaStack.Test.Common
 				l.Debug($"String.Replace Return for {i} runs look value = {"[[[[[[[[x[[[[[".Replace("[", "")} Time = {(stop - start).TotalMilliseconds} ms");
 				Assert.Equal(buuff, s);
 
-				char[] f = new char[] { '\r', '\n','(', ')' };
+				char[] f = new char[] { '\r', '\n', '(', ')' };
 				start = DateTime.Now;
 				for (i = 0; i < 100_000; i++)
 				{

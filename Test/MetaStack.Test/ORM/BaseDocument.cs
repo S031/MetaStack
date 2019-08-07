@@ -1,27 +1,27 @@
 ﻿using Newtonsoft.Json.Linq;
 using S031.MetaStack.Core.Data;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace MetaStack.Test.ORM
 {
 	public class BaseDocument : JObject
 	{
-		const string connection_string = "Data Source=localhost;Initial Catalog=Msfodb;Integrated Security=True";
-
-		static readonly Dictionary<string, JObject> _schemaCache = new Dictionary<string, JObject>();
+		private const string connection_string = "Data Source=localhost;Initial Catalog=Msfodb;Integrated Security=True";
+		private static readonly Dictionary<string, JObject> _schemaCache = new Dictionary<string, JObject>();
 		private readonly JObject _schema;
-		private static object obj4Lock = new object();
+		private static readonly object obj4Lock = new object();
 
 		public BaseDocument(string dbObjectName)
 		{
 			if (!_schemaCache.TryGetValue(dbObjectName, out _schema))
 			{
 				lock (obj4Lock)
+				{
 					_schemaCache.Add(dbObjectName, GetSchema(dbObjectName));
+				}
+
 				_schema = _schemaCache[dbObjectName];
 			}
 		}

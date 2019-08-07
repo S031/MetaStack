@@ -1,13 +1,12 @@
-﻿using Xunit;
-using S031.MetaStack.Common.Logging;
-using S031.MetaStack.Core;
-using System.Collections.Generic;
-using System;
+﻿using S031.MetaStack.Common.Logging;
 using S031.MetaStack.Core.Data;
-using System.Text;
-using System.Net.Sockets;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Net.Sockets;
+using System.Text;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace MetaStack.Test.Services
 {
@@ -18,7 +17,7 @@ namespace MetaStack.Test.Services
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
 		}
 		[Fact]
-		void SpeedTest4ConnectedSocket()
+		private void SpeedTest4ConnectedSocket()
 		{
 			using (FileLog l = new FileLog("TCPServerServicesTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -31,7 +30,10 @@ namespace MetaStack.Test.Services
 					using (var stream = new NetworkStream(client))
 					{
 						for (int i = 0; i < 2000; i++)
+						{
 							response = SendAndRecieve(stream, p);
+						}
+
 						Close(stream);
 					}
 				}
@@ -40,7 +42,7 @@ namespace MetaStack.Test.Services
 		}
 
 		[Fact]
-		void SpeedTest4Mixed()
+		private void SpeedTest4Mixed()
 		{
 			using (FileLog l = new FileLog("TCPServerServicesTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -58,7 +60,10 @@ namespace MetaStack.Test.Services
 							using (var stream = new NetworkStream(client))
 							{
 								for (int i = 0; i < 2000; i++)
+								{
 									response = SendAndRecieve(stream, p);
+								}
+
 								Close(stream);
 							}
 						}
@@ -83,13 +88,13 @@ namespace MetaStack.Test.Services
 			return new DataPackage(res);
 		}
 
-		void Close(NetworkStream stream)
+		private void Close(NetworkStream stream)
 		{
 			stream.Write(BitConverter.GetBytes(0), 0, 4);
 		}
 
 		[Fact]
-		void SpeedTestForDisconnectedSocket()
+		private void SpeedTestForDisconnectedSocket()
 		{
 			using (FileLog l = new FileLog("TCPServerServicesTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -112,7 +117,7 @@ namespace MetaStack.Test.Services
 			}
 		}
 
-		static DataPackage GetTestPackage()
+		private static DataPackage GetTestPackage()
 		{
 			var p = new DataPackage(new string[] { "Col1.int", "Col2.string.255", "Col3.datetime.10", "Col4.Guid.34", "Col5.object" });
 			p.Headers.Add("Username", "Сергей");
@@ -147,8 +152,8 @@ namespace MetaStack.Test.Services
 
 		public sealed class AppClient : IDisposable
 		{
-			private TcpClient _client;
-			private Stream _stream;
+			private readonly TcpClient _client;
+			private readonly Stream _stream;
 
 			public DataPackage SendAndWaitForResponse(DataPackage input)
 			{
@@ -161,7 +166,8 @@ namespace MetaStack.Test.Services
 				_stream.Write(BitConverter.GetBytes(data.Length), 0, 4);
 				_stream.Write(data, 0, data.Length);
 			}
-			DataPackage Resieve()
+
+			private DataPackage Resieve()
 			{
 				byte[] buffer = new byte[4096];
 				var bytesRead = 0;

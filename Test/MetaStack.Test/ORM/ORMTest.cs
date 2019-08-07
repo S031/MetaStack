@@ -1,12 +1,12 @@
-﻿using S031.MetaStack.Core.ORM;
-using S031.MetaStack.Core;
-using S031.MetaStack.Common.Logging;
-using Xunit;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using S031.MetaStack.Common;
-using System.Linq;
-using System.Data;
+using S031.MetaStack.Common.Logging;
+using S031.MetaStack.Core;
 using S031.MetaStack.Core.Data;
+using S031.MetaStack.Core.ORM;
+using System.Data;
+using System.Linq;
+using Xunit;
 
 namespace MetaStack.Test.ORM
 {
@@ -19,7 +19,7 @@ namespace MetaStack.Test.ORM
 		}
 
 		[Fact]
-		void SerializeTest()
+		private void SerializeTest()
 		{
 			using (FileLog _logger = new FileLog("ORMSchemaTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -102,7 +102,7 @@ namespace MetaStack.Test.ORM
 			}
 		}
 		[Fact]
-		void JMXObjectTest()
+		private void JMXObjectTest()
 		{
 			//JMXSchemaProviderFactory.RegisterProvider<JMXSchemaProviderMemory>();
 			//IJMXSchemaProvider sp = JMXSchemaProviderFactory.GetProvider<JMXSchemaProviderMemory>();
@@ -124,7 +124,7 @@ namespace MetaStack.Test.ORM
 			//}
 		}
 		[Fact]
-		void JMXParameterTest()
+		private void JMXParameterTest()
 		{
 			////using (FileLog _logger = new FileLog("ORMSchemaTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			//using (FileLog _logger = typeof(FileLog).CreateInstance<FileLog>(new object[]
@@ -144,7 +144,7 @@ namespace MetaStack.Test.ORM
 		}
 
 		[Fact]
-		void CreateInstaceSpeedTest()
+		private void CreateInstaceSpeedTest()
 		{
 			using (FileLog _logger = typeof(FileLog).CreateInstance<FileLog>(new object[]
 				{"ORMSchemaTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }}))
@@ -166,7 +166,7 @@ namespace MetaStack.Test.ORM
 
 		}
 		[Fact]
-		void CreateTypesListSpeedTest()
+		private void CreateTypesListSpeedTest()
 		{
 			using (FileLog _logger = typeof(FileLog).CreateInstance<FileLog>(new object[]
 				{"ORMSchemaTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }}))
@@ -174,7 +174,9 @@ namespace MetaStack.Test.ORM
 				_logger.Debug("List implements IDataReader");
 				ImplementsList.Add(typeof(IDataReader));
 				foreach (var s in ImplementsList.GetTypes(typeof(IDataReader)))
+				{
 					_logger.Debug(s.FullName);
+				}
 
 				_logger.Debug("Start speed test for find implements IDataReader");
 				for (int i = 0; i < 1000000; i++)
@@ -194,7 +196,7 @@ namespace MetaStack.Test.ORM
 			}
 		}
 
-		JMXSchema creaateTestSchema()
+		private JMXSchema creaateTestSchema()
 		{
 
 			JMXSchema s = new JMXSchema("SysSchema")
@@ -205,7 +207,7 @@ namespace MetaStack.Test.ORM
 			{
 				DataType = MdbType.@int
 			};
-			s.Attributes.Add(new JMXAttribute("ID") { DataType = MdbType.@int, Caption = "Identifier", IsNullable =false });
+			s.Attributes.Add(new JMXAttribute("ID") { DataType = MdbType.@int, Caption = "Identifier", IsNullable = false });
 			s.Attributes.Add(new JMXAttribute("Name") { DataType = MdbType.@string, Caption = "Name of SysSchema" });
 			s.PrimaryKey = new JMXPrimaryKey("PK_SysSchemas", "ID");
 			s.Indexes.Add(new JMXIndex("IE1_SysSchemas", "Name"));

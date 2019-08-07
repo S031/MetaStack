@@ -1,5 +1,4 @@
-﻿using S031.MetaStack.Common;
-using S031.MetaStack.Common.Logging;
+﻿using S031.MetaStack.Common.Logging;
 using S031.MetaStack.Core.Actions;
 using S031.MetaStack.Json;
 using System;
@@ -35,17 +34,17 @@ namespace MetaStack.Test.Json
 				{
 					var j = new JsonReader(ref str).Read();
 				}
-				_logger.Debug($"Finish perfomance parse string test. Time={(DateTime.Now-t).Milliseconds} ms, loop count={i}");
+				_logger.Debug($"Finish perfomance parse string test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
 
 				_logger.Debug($"Start perfomance ToString test");
-				var json =(JsonObject) new JsonReader(ref str).Read();
+				var json = (JsonObject)new JsonReader(ref str).Read();
 				//_logger.Debug(json.ToString());
 				t = DateTime.Now;
 				for (i = 0; i < 10_000; i++)
 				{
 					var s = json.ToString();
 				}
-				_logger.Debug($"Finish perfomance Tostring test. Time={(DateTime.Now-t).Milliseconds} ms, loop count={i}");
+				_logger.Debug($"Finish perfomance Tostring test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
 			}
 		}
 

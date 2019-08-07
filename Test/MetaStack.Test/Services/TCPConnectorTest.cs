@@ -1,22 +1,15 @@
-﻿using Xunit;
-using S031.MetaStack.Common.Logging;
-using S031.MetaStack.Core.Connectors;
-using S031.MetaStack.Core;
-using System.Collections.Generic;
-using System;
-using S031.MetaStack.Core.Data;
-using System.Text;
-using System.Net.Sockets;
-using System.IO;
-using System.Threading.Tasks;
+﻿using S031.MetaStack.Common.Logging;
 using S031.MetaStack.Core.Actions;
+using S031.MetaStack.Core.Connectors;
+using S031.MetaStack.Core.Data;
 using S031.MetaStack.Core.Logging;
+using Xunit;
 
 namespace MetaStack.Test.Services
 {
 	public class TCPConnectorTest
 	{
-		private readonly string  _cn;
+		private readonly string _cn;
 
 		public TCPConnectorTest()
 		{
@@ -27,7 +20,7 @@ namespace MetaStack.Test.Services
 		}
 
 		[Fact]
-		void TCPConnectorConnectTest()
+		private void TCPConnectorConnectTest()
 		{
 			using (FileLogger l = new FileLogger("TCPConnectorConnectTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			using (TCPConnector connector = TCPConnector.Create())
@@ -37,7 +30,7 @@ namespace MetaStack.Test.Services
 				int i = 0;
 				for (i = 0; i < 1000; i++)
 				{
-					var dr = connector.Execute("Sys.Select", new DataPackage(new string[] { "ParamName", "ParamValue" }, 
+					var dr = connector.Execute("Sys.Select", new DataPackage(new string[] { "ParamName", "ParamValue" },
 						new object[] { "_connectionName", "banklocal" }));
 					//string s = (string)dr["ObjectSchema"];
 				}
@@ -46,7 +39,7 @@ namespace MetaStack.Test.Services
 		}
 
 		[Fact]
-		void ActionManagerTest()
+		private void ActionManagerTest()
 		{
 			using (FileLogger _logger = new FileLogger("ActionManagerTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			using (MdbContext mdb = new MdbContext(_cn))

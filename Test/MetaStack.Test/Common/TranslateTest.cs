@@ -1,7 +1,5 @@
 ﻿using S031.MetaStack.Common;
 using S031.MetaStack.Common.Logging;
-using System;
-using System.IO;
 using Xunit;
 
 
@@ -15,7 +13,7 @@ namespace MetaStack.Test.Common
 		}
 
 		[Fact]
-		void translateMessageTest()
+		private void translateMessageTest()
 		{
 			using (FileLog l = new FileLog("TranslateTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{

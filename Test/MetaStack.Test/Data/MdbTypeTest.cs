@@ -1,9 +1,7 @@
-﻿using Xunit;
-using S031.MetaStack.Common.Logging;
-using S031.MetaStack.Core;
-using System.Collections.Generic;
-using System;
+﻿using S031.MetaStack.Common.Logging;
 using S031.MetaStack.Core.Data;
+using System;
+using Xunit;
 
 namespace MetaStack.Test.Data
 {
@@ -14,7 +12,7 @@ namespace MetaStack.Test.Data
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
 		}
 		[Fact]
-		void speedTest()
+		private void speedTest()
 		{
 			using (FileLog l = new FileLog("MdbTypeTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
