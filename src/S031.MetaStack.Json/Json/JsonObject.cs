@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-
+using System.Linq;
 using JsonPair = System.Collections.Generic.KeyValuePair<string, S031.MetaStack.Json.JsonValue>;
 using JsonPairEnumerable = System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, S031.MetaStack.Json.JsonValue>>;
 
@@ -166,5 +166,8 @@ namespace S031.MetaStack.Json
 		{
 			return _map.TryGetValue(key, out value);
 		}
+
+		public JsonPair GetPair()
+			=> _map.FirstOrDefault();
 	}
 }

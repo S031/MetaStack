@@ -2,7 +2,9 @@
 using S031.MetaStack.Core.Actions;
 using S031.MetaStack.Json;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using Xunit;
 
@@ -110,6 +112,82 @@ namespace MetaStack.Test.Json
 				Assert.Equal(str, a.ToString());
 				var json = (JsonObject)(new JsonReader(ref str).Read());
 				logger.Debug((string)json["InterfaceParameters"][2]["Agregate"]);
+			}
+		}
+		[Fact]
+		public void JsonWriterWellKnownTest()
+		{
+			using (FileLog _logger = new FileLog("MetaStackJson.JsonWriterWellKnownTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			{
+				testClass t = new testClass() { ID = 1, Name = "MetaStackJson.JsonWriterWellKnownTest" };
+				for (int i = 0; i < 10; i++)
+					t.ItemList.Add($"key-{i}", $"Item value {i} for MetaStackJson.JsonWriterWellKnownTest");
+
+				//write
+				JsonWriter w = new JsonWriter(Formatting.Indented);
+				w.WriteValue(new JsonValue(t));
+				string str = w.ToString();
+				_logger.Debug(str);
+
+				//Read
+				t = new testClass();
+				JsonReader r = new JsonReader(ref str);
+				t.ReadRaw(r);
+				w = new JsonWriter(Formatting.Indented);
+				w.WriteValue(new JsonValue(t));
+				Assert.Equal(str, w.ToString());
+			}
+		}
+		private class testClass
+		{
+			static testClass()
+			{
+				JsonWriter.AddWellKnown(typeof(testClass),
+					(w, o) => (o as testClass).WriteRaw(w));
+			}
+
+			public testClass()
+			{
+				ItemList = new Dictionary<string, object>();
+			}
+
+			public int ID { get; set; }
+
+			public string Name { get; set; }
+
+			public Dictionary<string, object> ItemList { get; set; }
+
+			public void WriteRaw(JsonWriter writer)
+			{
+				writer.WriteStartObject();
+				writer.WriteProperty("ID", ID);
+				writer.WriteProperty("Name", Name);
+				if (ItemList.Count >0)
+				{
+					writer.WritePropertyName("ItemList");
+					writer.WriteStartArray();
+					foreach (var item in ItemList)
+					{
+						writer.WriteStartObject();
+						writer.WriteProperty(item.Key, item.Value);
+						writer.WriteEndObject();
+					}
+					writer.WriteEndArray();
+				}
+				writer.WriteEndObject();
+			}
+
+			public void ReadRaw(JsonReader reader)
+			{
+				JsonObject o = (JsonObject)reader.Read();
+				ID = (int)o["ID"];
+				Name = (string)o["Name"];
+				JsonArray a = (JsonArray)o["ItemList"];
+				foreach (var item in a)
+				{
+					var pair = (item as JsonObject).GetPair();
+					ItemList.Add(pair.Key, pair.Value);
+				}
 			}
 		}
 	}

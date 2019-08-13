@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -18,6 +19,9 @@ namespace S031.MetaStack.Json
 		private readonly Formatting _formatting;
 		private bool _commaExpected;
 		private int _tabCount;
+
+		private static readonly ConcurrentDictionary<Type, Action<JsonWriter, object>> _wellKnownTypes =
+			new ConcurrentDictionary<Type, Action<JsonWriter, object>>();
 
 		public JsonWriter(Formatting formatting)
 		{
@@ -313,11 +317,17 @@ namespace S031.MetaStack.Json
 					WriteValue((TimeSpan)v.Value);
 					break;
 				default:
-					WriteValue(v.Value.ToString());
+					if (_wellKnownTypes.TryGetValue(v.Value.GetType(), out var f))
+						f(this, v.Value);
+					else
+						//!!! see for enum
+						WriteValue(v.Value.ToString());
 					break;
 			}
 			return this;
 		}
+
+		public bool CommaExpected { get => _commaExpected; set => _commaExpected = value; }
 
 		// Characters which have to be escaped:
 		// - Required by JSON Spec: Control characters, '"' and '\\'
@@ -389,7 +399,11 @@ namespace S031.MetaStack.Json
 				}
 			sb.Append(src, start, src.Length - start);
 		}
+
 		public override string ToString()
 			=> _sb.ToString();
+
+		public static void AddWellKnown(Type type, Action<JsonWriter, object> writeDelegate)
+			=> _wellKnownTypes[type] = writeDelegate;
 	}
 }
