@@ -30,6 +30,14 @@ namespace S031.MetaStack.Json
 				writer.WriteValue(value);
 			}
 		}
+		public static void WriteProperty(this JsonWriter writer, string propertyName, double value)
+		{
+			if (value != 0)
+			{
+				writer.WritePropertyName(propertyName);
+				writer.WriteValue(value);
+			}
+		}
 		public static void WriteProperty(this JsonWriter writer, string propertyName, DateTime value)
 		{
 			if (value != default)

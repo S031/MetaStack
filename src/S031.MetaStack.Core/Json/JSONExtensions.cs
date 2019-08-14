@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using S031.MetaStack.Common;
 using fastJSON;
+using S031.MetaStack.Json;
 
 #if NETCOREAPP
 namespace S031.MetaStack.Core.Json
@@ -137,7 +138,10 @@ namespace S031.MetaStack.WinForms.Json
 			=> fastJSON.JSON.ToObject<T>(json, _jsonParameters);
 
 		public static string SerializeObject(object value)
-			=> fastJSON.JSON.ToJSON(value, _jsonParameters);
+			=> new JsonWriter(Formatting.None)
+			.WriteValue(new JsonValue(value))
+			.ToString();
+			//=> fastJSON.JSON.ToJSON(value, _jsonParameters);
 #if NETCOREAPP
 #else
 		public static JObject Parse2Json(this string source)
