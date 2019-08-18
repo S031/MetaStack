@@ -1,11 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using Newtonsoft.Json.Converters;
+﻿using S031.MetaStack.Json;
 #if NETCOREAPP
-using S031.MetaStack.Core.Data;
 namespace S031.MetaStack.Core.ORM
 #else
 using S031.MetaStack.WinForms.Data;
@@ -28,7 +22,6 @@ namespace S031.MetaStack.WinForms.ORM
 
 		public string ParamName { get => AttribName; set => AttribName = value; }
 
-		[JsonConverter(typeof(StringEnumConverter))]
 		public Actions.ParamDirrect Dirrect { get; set; }
 
 		public bool NullIfEmpty { get; set; }
@@ -42,17 +35,9 @@ namespace S031.MetaStack.WinForms.ORM
 
 		public override string ToString()
 		{
-			StringBuilder sb = new StringBuilder(1024);
-			StringWriter sw = new StringWriter(sb);
-
-			using (JsonWriter writer = new JsonTextWriter(sw))
-			{
-				writer.Formatting = Formatting.Indented;
-				writer.WriteStartObject();
-				ToStringRaw(writer);
-				writer.WriteEndObject();
-				return sb.ToString();
-			}
+			JsonWriter writer = new JsonWriter(Formatting.None);
+			ToStringRaw(writer);
+			return writer.ToString();
 		}
 
 	}

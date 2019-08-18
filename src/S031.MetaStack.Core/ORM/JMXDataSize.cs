@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿#if NETCOREAPP
+using S031.MetaStack.Json;
 
-#if NETCOREAPP
 namespace S031.MetaStack.Core.ORM
 #else
 namespace S031.MetaStack.WinForms.ORM
@@ -36,5 +34,21 @@ namespace S031.MetaStack.WinForms.ORM
 			return new { Size, Scale, Precision }.GetHashCode();
 		}
 		public bool IsEmpty() => Size == 0 && Scale == 0 && Precision == 0;
+
+		public override string ToString()
+		{
+			JsonWriter writer = new JsonWriter(Formatting.None);
+			ToStringRaw(writer);
+			return writer.ToString();
+		}
+
+		public void ToStringRaw(JsonWriter writer)
+		{
+			writer.WriteStartObject();
+			writer.WriteProperty("Size", Size);
+			writer.WriteProperty("Scale", Scale);
+			writer.WriteProperty("Precision", Precision);
+			writer.WriteEndObject();
+		}
 	}
 }

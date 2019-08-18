@@ -1,9 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using S031.MetaStack.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Newtonsoft.Json.Converters;
 #if NETCOREAPP
 using S031.MetaStack.Core.Data;
 namespace S031.MetaStack.Core.ORM
@@ -98,7 +97,6 @@ namespace S031.MetaStack.WinForms.ORM
 		public string Name { get; set; }
 		public string Caption { get => Name; set => Name = value; }
 
-		[JsonConverter(typeof(StringEnumConverter))]
 		public MdbType DataType
 		{
 			get => _dataType;//.ToString();
@@ -163,34 +161,20 @@ namespace S031.MetaStack.WinForms.ORM
 			if (!CheckConstraint.IsEmpty())
 			{
 				writer.WritePropertyName("CheckConstraint");
-				writer.WriteStartObject();
-				writer.WriteProperty("ConstraintName", CheckConstraint.ConstraintName);
-				writer.WriteProperty("Definition", CheckConstraint.Definition);
-				writer.WriteEndObject();
+				CheckConstraint.ToStringRaw(writer);
 			}
 
 			if (!DefaultConstraint.IsEmpty())
 			{
 				writer.WritePropertyName("DefaultConstraint");
-				writer.WriteStartObject();
-				writer.WriteProperty("ConstraintName", DefaultConstraint.ConstraintName);
-				writer.WriteProperty("Definition", DefaultConstraint.Definition);
-				writer.WriteEndObject();
+				DefaultConstraint.ToStringRaw(writer);
 			}
 
 			writer.WritePropertyName("DataSize");
-			writer.WriteStartObject();
-			writer.WriteProperty("Size", DataSize.Size);
-			writer.WriteProperty("Scale", DataSize.Scale);
-			writer.WriteProperty("Precision", DataSize.Precision);
-			writer.WriteEndObject();
+			DataSize.ToStringRaw(writer);
 
 			writer.WritePropertyName("Identity");
-			writer.WriteStartObject();
-			writer.WriteProperty("IsIdentity", Identity.IsIdentity);
-			writer.WriteProperty("Seed", Identity.Seed);
-			writer.WriteProperty("Increment", Identity.Increment);
-			writer.WriteEndObject();
+			Identity.ToStringRaw(writer);
 
 			writer.WriteProperty("Name", Name);
 			writer.WriteProperty("Caption", Caption);
@@ -215,12 +199,12 @@ namespace S031.MetaStack.WinForms.ORM
 			writer.WriteStartArray();
 			foreach (var item in _listItems)
 				writer.WriteValue(item);
-			writer.WriteEnd();
+			writer.WriteEndArray();
 			writer.WritePropertyName("ListData");
 			writer.WriteStartArray();
 			foreach (var item in _listData)
-				writer.WriteValue(item);
-			writer.WriteEnd();
+				writer.WriteValue(new JsonValue(item));
+			writer.WriteEndArray();
 
 			writer.WriteProperty("FieldName", FieldName);
 			writer.WriteProperty("ConstName", ConstName);
@@ -234,23 +218,15 @@ namespace S031.MetaStack.WinForms.ORM
 			{
 
 				writer.WritePropertyName("ObjectSchema");
-				writer.WriteRawValue(ObjectSchema.ToString());
+				writer.WriteRaw(ObjectSchema.ToString());
 			}
 
 		}
 		public override string ToString()
 		{
-			StringBuilder sb = new StringBuilder(1024);
-			StringWriter sw = new StringWriter(sb);
-
-			using (JsonWriter writer = new JsonTextWriter(sw))
-			{
-				writer.Formatting = Formatting.Indented;
-				writer.WriteStartObject();
-				ToStringRaw(writer);
-				writer.WriteEndObject();
-				return sb.ToString();
-			}
+			JsonWriter writer = new JsonWriter(Formatting.None);
+			ToStringRaw(writer);
+			return writer.ToString();
 		}
 	}
 }

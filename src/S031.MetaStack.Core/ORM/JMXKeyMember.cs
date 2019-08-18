@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using S031.MetaStack.Json;
 
 #if NETCOREAPP
 namespace S031.MetaStack.Core.ORM
@@ -37,5 +38,22 @@ namespace S031.MetaStack.WinForms.ORM
 			return new { FieldName, Position, IsDescending, IsIncluded }.GetHashCode();
 		}
 		public bool IsEmpty() => string.IsNullOrEmpty(FieldName);
+
+		public override string ToString()
+		{
+			JsonWriter writer = new JsonWriter(Formatting.None);
+			ToStringRaw(writer);
+			return writer.ToString();
+		}
+
+		public void ToStringRaw(JsonWriter writer)
+		{
+			writer.WriteStartObject();
+			writer.WriteProperty("FieldName", FieldName);
+			writer.WriteProperty("Position", Position);
+			writer.WriteProperty("IsDescending", IsDescending);
+			writer.WriteProperty("IsIncluded", IsIncluded);
+			writer.WriteEndObject();
+		}
 	}
 }

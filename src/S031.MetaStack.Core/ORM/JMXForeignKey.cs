@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using S031.MetaStack.Common;
+﻿using S031.MetaStack.Common;
+using S031.MetaStack.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -104,68 +104,67 @@ namespace S031.MetaStack.WinForms.ORM
 		}
 		public override string ToString()
 		{
-			StringBuilder sb = new StringBuilder(1024);
-			StringWriter sw = new StringWriter(sb);
+			JsonWriter writer = new JsonWriter(Formatting.None);
+			ToStringRaw(writer);
+			return writer.ToString();
+		}
 
-			using (JsonWriter writer = new JsonTextWriter(sw))
+		public void ToStringRaw(JsonWriter writer)
+		{
+			writer.WriteStartObject();
+			writer.WriteProperty("ID", ID);
+			writer.WriteProperty("UID", UID);
+			writer.WriteProperty("KeyName", KeyName);
+			writer.WriteProperty("CheckOption", CheckOption);
+			writer.WriteProperty("DeleteRefAction", DeleteRefAction);
+			writer.WriteProperty("UpdateRefAction", UpdateRefAction);
+
+			writer.WritePropertyName("RefObjectName");
+			writer.WriteStartObject();
+			writer.WriteProperty("AreaName", _areaName);
+			writer.WriteProperty("ObjectName", _objectName);
+			writer.WriteEndObject();
+
+			writer.WritePropertyName("RefDbObjectName");
+			writer.WriteStartObject();
+			writer.WriteProperty("AreaName", _areaName);
+			writer.WriteProperty("ObjectName", _dbObjectName);
+			writer.WriteEndObject();
+
+			writer.WritePropertyName("KeyMembers");
+			writer.WriteStartArray();
+			foreach (var item in _keyMembers)
 			{
-				writer.Formatting = Formatting.Indented;
 				writer.WriteStartObject();
-				writer.WriteProperty("ID", ID);
-				writer.WriteProperty("UID", UID);
-				writer.WriteProperty("KeyName", KeyName);
-				writer.WriteProperty("CheckOption", CheckOption);
-				writer.WriteProperty("DeleteRefAction", DeleteRefAction);
-				writer.WriteProperty("UpdateRefAction", UpdateRefAction);
-
-				writer.WritePropertyName("RefObjectName");
-				writer.WriteStartObject();
-				writer.WriteProperty("AreaName", _areaName);
-				writer.WriteProperty("ObjectName", _objectName);
+				writer.WriteProperty("FieldName", item.FieldName);
+				writer.WriteProperty("Position", item.Position);
 				writer.WriteEndObject();
-
-				writer.WritePropertyName("RefDbObjectName");
-				writer.WriteStartObject();
-				writer.WriteProperty("AreaName", _areaName);
-				writer.WriteProperty("ObjectName", _dbObjectName);
-				writer.WriteEndObject();
-
-				writer.WritePropertyName("KeyMembers");
-				writer.WriteStartArray();
-				foreach (var item in _keyMembers)
-				{
-					writer.WriteStartObject();
-					writer.WriteProperty("FieldName", item.FieldName);
-					writer.WriteProperty("Position", item.Position);
-					writer.WriteEndObject();
-				}
-				writer.WriteEnd();
-
-				writer.WritePropertyName("RefKeyMembers");
-				writer.WriteStartArray();
-				foreach (var item in _refKeyMembers)
-				{
-					writer.WriteStartObject();
-					writer.WriteProperty("FieldName", item.FieldName);
-					writer.WriteProperty("Position", item.Position);
-					writer.WriteEndObject();
-				}
-				writer.WriteEnd();
-
-				writer.WritePropertyName("MigrateKeyMembers");
-				writer.WriteStartArray();
-				foreach (var item in _migrateKeyMembers)
-				{
-					writer.WriteStartObject();
-					writer.WriteProperty("FieldName", item.FieldName);
-					writer.WriteProperty("Position", item.Position);
-					writer.WriteEndObject();
-				}
-				writer.WriteEnd();
-
-				writer.WriteEndObject();
-				return sb.ToString();
 			}
+			writer.WriteEndArray();
+
+			writer.WritePropertyName("RefKeyMembers");
+			writer.WriteStartArray();
+			foreach (var item in _refKeyMembers)
+			{
+				writer.WriteStartObject();
+				writer.WriteProperty("FieldName", item.FieldName);
+				writer.WriteProperty("Position", item.Position);
+				writer.WriteEndObject();
+			}
+			writer.WriteEndArray();
+
+			writer.WritePropertyName("MigrateKeyMembers");
+			writer.WriteStartArray();
+			foreach (var item in _migrateKeyMembers)
+			{
+				writer.WriteStartObject();
+				writer.WriteProperty("FieldName", item.FieldName);
+				writer.WriteProperty("Position", item.Position);
+				writer.WriteEndObject();
+			}
+			writer.WriteEndArray();
+			writer.WriteEndObject();
 		}
 	}
 }
+

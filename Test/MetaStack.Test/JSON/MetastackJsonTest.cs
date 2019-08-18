@@ -119,7 +119,7 @@ namespace MetaStack.Test.Json
 		{
 			using (FileLog _logger = new FileLog("MetaStackJson.JsonWriterWellKnownTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
-				testClass t = new testClass() { ID = 1, Name = "MetaStackJson.JsonWriterWellKnownTest" };
+				TestClass t = new TestClass() { ID = 1, Name = "MetaStackJson.JsonWriterWellKnownTest" };
 				for (int i = 0; i < 10; i++)
 					t.ItemList.Add($"key-{i}", $"Item value {i} for MetaStackJson.JsonWriterWellKnownTest");
 
@@ -130,7 +130,7 @@ namespace MetaStack.Test.Json
 				_logger.Debug(str);
 
 				//Read
-				t = new testClass();
+				t = new TestClass();
 				JsonReader r = new JsonReader(ref str);
 				t.ReadRaw(r);
 				w = new JsonWriter(Formatting.Indented);
@@ -138,15 +138,15 @@ namespace MetaStack.Test.Json
 				Assert.Equal(str, w.ToString());
 			}
 		}
-		private class testClass
+		private class TestClass
 		{
-			static testClass()
+			static TestClass()
 			{
-				JsonWriter.AddWellKnown(typeof(testClass),
-					(w, o) => (o as testClass).WriteRaw(w));
+				JsonWriter.AddWellKnown(typeof(TestClass),
+					(w, o) => (o as TestClass).WriteRaw(w));
 			}
 
-			public testClass()
+			public TestClass()
 			{
 				ItemList = new Dictionary<string, object>();
 			}

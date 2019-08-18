@@ -1,10 +1,5 @@
-﻿using Newtonsoft.Json;
-using S031.MetaStack.Common;
-using System;
-using System.Collections;
+﻿using S031.MetaStack.Json;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
 
 #if NETCOREAPP
 namespace S031.MetaStack.Core.ORM
@@ -14,7 +9,8 @@ namespace S031.MetaStack.WinForms.ORM
 {
 	public class JMXPrimaryKey
 	{
-		private List<JMXKeyMember> _keyMembers;
+		private readonly List<JMXKeyMember> _keyMembers;
+
 		public JMXPrimaryKey()
 		{
 			_keyMembers = new List<JMXKeyMember>();
@@ -42,33 +38,27 @@ namespace S031.MetaStack.WinForms.ORM
 				position++;
 			}
 		}
+
 		public override string ToString()
 		{
-			StringBuilder sb = new StringBuilder(1024);
-			StringWriter sw = new StringWriter(sb);
+			JsonWriter writer = new JsonWriter(Formatting.None);
+			ToStringRaw(writer);
+			return writer.ToString();
+		}
 
-			using (JsonWriter writer = new JsonTextWriter(sw))
-			{
-				writer.Formatting = Formatting.Indented;
-				writer.WriteStartObject();
-				writer.WriteProperty("ID", ID);
-				writer.WriteProperty("Handle", Handle);
-				writer.WriteProperty("KeyName", KeyName);
+		public void ToStringRaw(JsonWriter writer)
+		{
+			writer.WriteStartObject();
+			writer.WriteProperty("ID", ID);
+			writer.WriteProperty("Handle", Handle);
+			writer.WriteProperty("KeyName", KeyName);
 
-				writer.WritePropertyName("KeyMembers");
-				writer.WriteStartArray();
-				foreach (var item in _keyMembers)
-				{
-					writer.WriteStartObject();
-					writer.WriteProperty("FieldName", item.FieldName);
-					writer.WriteProperty("Position", item.Position);
-					writer.WriteProperty("IsDescending", item.IsDescending);
-					writer.WriteEndObject();
-				}
-				writer.WriteEnd();
-				writer.WriteEndObject();
-				return sb.ToString();
-			}
+			writer.WritePropertyName("KeyMembers");
+			writer.WriteStartArray();
+			foreach (var item in _keyMembers)
+				item.ToStringRaw(writer);
+			writer.WriteEndArray();
+			writer.WriteEndObject();
 		}
 	}
 }

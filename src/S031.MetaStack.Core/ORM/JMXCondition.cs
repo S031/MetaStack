@@ -1,7 +1,6 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using System.IO;
+﻿using System.IO;
 using System.Text;
+using S031.MetaStack.Json;
 
 #if NETCOREAPP
 namespace S031.MetaStack.Core.ORM
@@ -34,7 +33,6 @@ namespace S031.MetaStack.WinForms.ORM
 
 		public string Definition { get; set; }
 
-		[JsonConverter(typeof(StringEnumConverter))]
 		public JMXConditionTypes ConditionType { get; set; }
 
 
@@ -64,18 +62,17 @@ namespace S031.MetaStack.WinForms.ORM
 
 		public override string ToString()
 		{
-			StringBuilder sb = new StringBuilder(1024);
-			StringWriter sw = new StringWriter(sb);
+			JsonWriter writer = new JsonWriter(Formatting.None);
+			ToStringRaw(writer);
+			return writer.ToString();
+		}
 
-			using (JsonWriter writer = new JsonTextWriter(sw))
-			{
-				writer.Formatting = Formatting.Indented;
-				writer.WriteStartObject();
-				writer.WriteProperty("ConditionType", ConditionType.ToString());
-				writer.WriteProperty("Definition", Definition);
-				writer.WriteEndObject();
-				return sb.ToString();
-			}
+		public void ToStringRaw(JsonWriter writer)
+		{
+			writer.WriteStartObject();
+			writer.WriteProperty("ConditionType", ConditionType.ToString());
+			writer.WriteProperty("Definition", Definition);
+			writer.WriteEndObject();
 		}
 	}
 }

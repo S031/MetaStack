@@ -1,8 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using S031.MetaStack.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
 
 #if NETCOREAPP
 namespace S031.MetaStack.Core.ORM
@@ -44,33 +42,25 @@ namespace S031.MetaStack.WinForms.ORM
 		}
 		public override string ToString()
 		{
-			StringBuilder sb = new StringBuilder(1024);
-			StringWriter sw = new StringWriter(sb);
+			JsonWriter writer = new JsonWriter(Formatting.None);
+			ToStringRaw(writer);
+			return writer.ToString();
+		}
 
-			using (JsonWriter writer = new JsonTextWriter(sw))
-			{
-				writer.Formatting = Formatting.Indented;
-				writer.WriteStartObject();
-				writer.WriteProperty("ID", ID);
-				writer.WriteProperty("UID", UID);
-				writer.WriteProperty("IndexName", IndexName);
-				writer.WriteProperty("IsUnique", IsUnique);
+		public void ToStringRaw(JsonWriter writer)
+		{
+			writer.WriteStartObject();
+			writer.WriteProperty("ID", ID);
+			writer.WriteProperty("UID", UID);
+			writer.WriteProperty("IndexName", IndexName);
+			writer.WriteProperty("IsUnique", IsUnique);
 
-				writer.WritePropertyName("KeyMembers");
-				writer.WriteStartArray();
-				foreach (var item in _keyMembers)
-				{
-					writer.WriteStartObject();
-					writer.WriteProperty("FieldName", item.FieldName);
-					writer.WriteProperty("Position", item.Position);
-					writer.WriteProperty("IsDescending", item.IsDescending);
-					writer.WriteProperty("IsIncluded", item.IsIncluded);
-					writer.WriteEndObject();
-				}
-				writer.WriteEnd();
-				writer.WriteEndObject();
-				return sb.ToString();
-			}
+			writer.WritePropertyName("KeyMembers");
+			writer.WriteStartArray();
+			foreach (var item in _keyMembers)
+				item.ToStringRaw(writer);
+			writer.WriteEndArray();
+			writer.WriteEndObject();
 		}
 	}
 }

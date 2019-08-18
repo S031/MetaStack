@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+﻿using S031.MetaStack.Json;
 
 #if NETCOREAPP
 namespace S031.MetaStack.Core.ORM
@@ -39,7 +38,6 @@ namespace S031.MetaStack.WinForms.ORM
 
 		public string Definition { get; set; }
 
-		[JsonConverter(typeof(StringEnumConverter))]
 		public JMXConstraintTypes ConstraintType { get; set; }
 
 		public bool CheckOption { get; set; }
@@ -69,5 +67,22 @@ namespace S031.MetaStack.WinForms.ORM
 		}
 
 		public bool IsEmpty() => string.IsNullOrEmpty(Definition);
+
+
+		public override string ToString()
+		{
+			JsonWriter writer = new JsonWriter(Formatting.None);
+			ToStringRaw(writer);
+			return writer.ToString();
+		}
+
+		public void ToStringRaw(JsonWriter writer)
+		{
+			writer.WriteStartObject();
+			writer.WriteProperty("ConstraintType", ConstraintType.ToString());
+			writer.WriteProperty("Definition", Definition);
+			writer.WriteProperty("CheckOption", CheckOption);
+			writer.WriteEndObject();
+		}
 	}
 }
