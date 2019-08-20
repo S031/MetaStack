@@ -181,252 +181,85 @@ namespace S031.MetaStack.Json
 
 		// CLI -> JsonValue
 
-		public static implicit operator JsonValue(bool value)
-		{
-			return new JsonValue(value);
-		}
+		public static implicit operator JsonValue(bool value) => new JsonValue(value);
 
-		public static implicit operator JsonValue(byte value)
-		{
-			return new JsonValue(value);
-		}
+		public static implicit operator JsonValue(byte value) => new JsonValue(value);
 
-		public static implicit operator JsonValue(char value)
-		{
-			return new JsonValue(value);
-		}
+		public static implicit operator JsonValue(char value) => new JsonValue(value);
 
-		public static implicit operator JsonValue(decimal value)
-		{
-			return new JsonValue(value);
-		}
+		public static implicit operator JsonValue(decimal value) => new JsonValue(value);
 
-		public static implicit operator JsonValue(double value)
-		{
-			return new JsonValue(value);
-		}
+		public static implicit operator JsonValue(double value) => new JsonValue(value);
 
-		public static implicit operator JsonValue(float value)
-		{
-			return new JsonValue(value);
-		}
+		public static implicit operator JsonValue(float value) => new JsonValue(value);
 
-		public static implicit operator JsonValue(int value)
-		{
-			return new JsonValue(value);
-		}
+		public static implicit operator JsonValue(int value) => new JsonValue(value);
 
-		public static implicit operator JsonValue(long value)
-		{
-			return new JsonValue(value);
-		}
+		public static implicit operator JsonValue(long value) => new JsonValue(value);
 
-		public static implicit operator JsonValue(sbyte value)
-		{
-			return new JsonValue(value);
-		}
+		public static implicit operator JsonValue(sbyte value) => new JsonValue(value);
 
-		public static implicit operator JsonValue(short value)
-		{
-			return new JsonValue(value);
-		}
+		public static implicit operator JsonValue(short value) => new JsonValue(value);
 
-		public static implicit operator JsonValue(string value)
-		{
-			return new JsonValue(value);
-		}
+		public static implicit operator JsonValue(string value) => new JsonValue(value);
 
-		public static implicit operator JsonValue(uint value)
-		{
-			return new JsonValue(value);
-		}
+		public static implicit operator JsonValue(uint value) => new JsonValue(value);
 
-		public static implicit operator JsonValue(ulong value)
-		{
-			return new JsonValue(value);
-		}
+		public static implicit operator JsonValue(ulong value) => new JsonValue(value);
 
-		public static implicit operator JsonValue(ushort value)
-		{
-			return new JsonValue(value);
-		}
+		public static implicit operator JsonValue(ushort value) => new JsonValue(value);
 
-		public static implicit operator JsonValue(DateTime value)
-		{
-			return new JsonValue(value);
-		}
+		public static implicit operator JsonValue(DateTime value) => new JsonValue(value);
 
-		public static implicit operator JsonValue(DateTimeOffset value)
-		{
-			return new JsonValue(value);
-		}
+		public static implicit operator JsonValue(DateTimeOffset value) => new JsonValue(value);
 
-		public static implicit operator JsonValue(Guid value)
-		{
-			return new JsonValue(value);
-		}
+		public static implicit operator JsonValue(Guid value) => new JsonValue(value);
 
-		public static implicit operator JsonValue(TimeSpan value)
-		{
-			return new JsonValue(value);
-		}
+		public static implicit operator JsonValue(TimeSpan value) => new JsonValue(value);
 
-		public static implicit operator JsonValue(Uri value)
-		{
-			return new JsonValue(value);
-		}
+		public static implicit operator JsonValue(Uri value) => new JsonValue(value);
 
 		// JsonValue -> CLI
 
-		public static implicit operator bool(JsonValue value)
-		{
-			if (value == null)
-				throw new ArgumentNullException(nameof(value));
+		public static implicit operator bool(JsonValue value) => (bool)value.Value;
 
-			return (bool)value.Value;
-		}
+		public static implicit operator byte(JsonValue value) => (byte)value.Value;
 
-		public static implicit operator byte(JsonValue value)
-		{
-			if (value == null)
-				throw new ArgumentNullException(nameof(value));
+		public static implicit operator char(JsonValue value) => (char)value.Value;
 
-			return (byte)value.Value;
-		}
+		public static implicit operator decimal(JsonValue value) => (decimal)value.Value;
 
-		public static implicit operator char(JsonValue value)
-		{
-			if (value == null)
-				throw new ArgumentNullException(nameof(value));
+		public static implicit operator double(JsonValue value) => (double)value.Value;
 
-			return (char)value.Value;
-		}
+		public static implicit operator float(JsonValue value) => (float)value.Value;
 
-		public static implicit operator decimal(JsonValue value)
-		{
-			if (value == null)
-				throw new ArgumentNullException(nameof(value));
+		public static implicit operator int(JsonValue value) => (int)value.Value;
 
-			return (decimal)value.Value;
-		}
+		public static implicit operator long(JsonValue value) => (long)value.Value;
 
-		public static implicit operator double(JsonValue value)
-		{
-			if (value == null)
-				throw new ArgumentNullException(nameof(value));
-			return (double)value.Value;
-		}
+		public static implicit operator sbyte(JsonValue value) => (sbyte)value.Value;
 
-		public static implicit operator float(JsonValue value)
-		{
-			if (value == null)
-				throw new ArgumentNullException(nameof(value));
+		public static implicit operator short(JsonValue value) => (short)value.Value;
 
-			return (float)value.Value;
-		}
-
-		public static implicit operator int(JsonValue value)
-		{
-			if (value == null)
-				throw new ArgumentNullException(nameof(value));
-
-			return (int)value.Value;
-		}
-
-		public static implicit operator long(JsonValue value)
-		{
-			if (value == null)
-				throw new ArgumentNullException(nameof(value));
-
-			return (long)value.Value;
-		}
-
-		public static implicit operator sbyte(JsonValue value)
-		{
-			if (value == null)
-				throw new ArgumentNullException(nameof(value));
-
-			return (sbyte)value.Value;
-		}
-
-		public static implicit operator short(JsonValue value)
-		{
-			if (value == null)
-				throw new ArgumentNullException(nameof(value));
-
-			return (short)value.Value;
-		}
-
-		public static implicit operator string(JsonValue value)
-		{
-			return value != null ?
+		public static implicit operator string(JsonValue value) => value != null ?
 				(string)value.Value :
 				null;
-		}
 
-		public static implicit operator uint(JsonValue value)
-		{
-			if (value == null)
-				throw new ArgumentNullException(nameof(value));
+		public static implicit operator uint(JsonValue value) => (uint)value.Value;
 
-			return (uint)value.Value;
-		}
+		public static implicit operator ulong(JsonValue value) => (ulong)value.Value;
 
-		public static implicit operator ulong(JsonValue value)
-		{
-			if (value == null)
-				throw new ArgumentNullException(nameof(value));
+		public static implicit operator ushort(JsonValue value) => (ushort)value.Value;
 
-			return (ulong)value.Value;
-		}
+		public static implicit operator DateTime(JsonValue value) => (DateTime)value.Value;
 
-		public static implicit operator ushort(JsonValue value)
-		{
-			if (value == null)
-				throw new ArgumentNullException(nameof(value));
+		public static implicit operator DateTimeOffset(JsonValue value) => (DateTimeOffset)value.Value;
 
-			return (ushort)value.Value;
-		}
+		public static implicit operator TimeSpan(JsonValue value) => (TimeSpan)value.Value;
 
-		public static implicit operator DateTime(JsonValue value)
-		{
-			if (value == null)
-				throw new ArgumentNullException(nameof(value));
+		public static implicit operator Guid(JsonValue value) => (Guid)value.Value;
 
-			return (DateTime)value.Value;
-		}
-
-		public static implicit operator DateTimeOffset(JsonValue value)
-		{
-			if (value == null)
-				throw new ArgumentNullException(nameof(value));
-
-			return (DateTimeOffset)value.Value;
-		}
-
-		public static implicit operator TimeSpan(JsonValue value)
-		{
-			if (value == null)
-				throw new ArgumentNullException(nameof(value));
-
-			return (TimeSpan)value.Value;
-		}
-
-		public static implicit operator Guid(JsonValue value)
-		{
-			if (value == null)
-				throw new ArgumentNullException(nameof(value));
-
-			return (Guid)value.Value;
-		}
-
-		public static implicit operator Uri(JsonValue value)
-		{
-			if (value == null)
-				throw new ArgumentNullException(nameof(value));
-
-			return (Uri)value.Value;
-		}
+		public static implicit operator Uri(JsonValue value) => (Uri)value.Value;
 
 		public virtual JsonType JsonType
 			=> _type;

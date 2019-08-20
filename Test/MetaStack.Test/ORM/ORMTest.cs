@@ -1,11 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿//using Newtonsoft.Json;
 using S031.MetaStack.Common;
 using S031.MetaStack.Common.Logging;
 using S031.MetaStack.Core;
 using S031.MetaStack.Core.Data;
+using S031.MetaStack.Core.Json;
 using S031.MetaStack.Core.ORM;
 using System.Data;
 using System.Linq;
+using System.Text;
 using Xunit;
 
 namespace MetaStack.Test.ORM
@@ -23,45 +25,47 @@ namespace MetaStack.Test.ORM
 		{
 			using (FileLog _logger = new FileLog("ORMSchemaTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
-				JMXAttribute a = new JMXAttribute("ID")
-				{
-					DataType = MdbType.@int,
-					IsNullable = false
-				};
-				string sa = a.ToString();
-				//_logger.Debug(sa);
-				a = JsonConvert.DeserializeObject<JMXAttribute>(sa);
-				//_logger.Debug(a.ToString());
-				Assert.Equal(sa, a.ToString());
-				JMXPrimaryKey pk = new JMXPrimaryKey("PK_SomeObjects", "SomeAtt", "NextAtt");
-				string spk = pk.ToString();
-				//_logger.Debug(spk);
-				pk = JsonConvert.DeserializeObject<JMXPrimaryKey>(spk);
-				Assert.Equal(spk, pk.ToString());
-				JMXSchema s = new JMXSchema("SysSchemas")
-				{
-					DbObjectName = new JMXObjectName("SysCat", "SysSchemas")
-				};
-				s.Attributes.Add(a);
-				s.PrimaryKey = pk;
-				s.Indexes.Add(new JMXIndex("IE1_SysSchemas", "ID"));
-				var fk = new JMXForeignKey("FK1")
-				{
-					RefObjectName = "SysCat.SysArea",
-					RefDbObjectName = new JMXObjectName("SysCat", "SysAreas")
-				};
-				fk.AddKeyMember("AreaID");
-				fk.AddRefKeyMember("ID");
-				s.ForeignKeys.Add(fk);
-				s.Conditions.Add(new JMXCondition(JMXConditionTypes.Where, "1=1"));
-				s.Conditions.Add(new JMXCondition(JMXConditionTypes.OrderBy, "Test"));
-				s.Parameters.Add(new JMXParameter("TestParam") { DataType = MdbType.guid });
-				s.Parameters.Add(new JMXParameter("TestParam1") { DataType = MdbType.@string, Dirrect = S031.MetaStack.Core.Actions.ParamDirrect.Input });
-				s.Parameters.Add(new JMXParameter("TestParam2") { DataType = MdbType.@decimal, Dirrect = S031.MetaStack.Core.Actions.ParamDirrect.Output });
-				string ss = s.ToString();
-				_logger.Debug(ss);
-				s = JsonConvert.DeserializeObject<JMXSchema>(ss);
-				Assert.Equal(ss, s.ToString());
+				var schema = JMXSchema.Parse(Encoding.Default.GetString(MetaStack.Test.Resources.TestData.TestJson));
+				_logger.Debug(schema.ToString());
+				//JMXAttribute a = new JMXAttribute("ID")
+				//{
+				//	DataType = MdbType.@int,
+				//	IsNullable = false
+				//};
+				//string sa = a.ToString();
+				////_logger.Debug(sa);
+				//a = JSONExtensions.DeserializeObject<JMXAttribute>(sa);
+				////_logger.Debug(a.ToString());
+				//Assert.Equal(sa, a.ToString());
+				//JMXPrimaryKey pk = new JMXPrimaryKey("PK_SomeObjects", "SomeAtt", "NextAtt");
+				//string spk = pk.ToString();
+				////_logger.Debug(spk);
+				//pk = JSONExtensions.DeserializeObject<JMXPrimaryKey>(spk);
+				//Assert.Equal(spk, pk.ToString());
+				//JMXSchema s = new JMXSchema("SysSchemas")
+				//{
+				//	DbObjectName = new JMXObjectName("SysCat", "SysSchemas")
+				//};
+				//s.Attributes.Add(a);
+				//s.PrimaryKey = pk;
+				//s.Indexes.Add(new JMXIndex("IE1_SysSchemas", "ID"));
+				//var fk = new JMXForeignKey("FK1")
+				//{
+				//	RefObjectName = "SysCat.SysArea",
+				//	RefDbObjectName = new JMXObjectName("SysCat", "SysAreas")
+				//};
+				//fk.AddKeyMember("AreaID");
+				//fk.AddRefKeyMember("ID");
+				//s.ForeignKeys.Add(fk);
+				//s.Conditions.Add(new JMXCondition(JMXConditionTypes.Where, "1=1"));
+				//s.Conditions.Add(new JMXCondition(JMXConditionTypes.OrderBy, "Test"));
+				//s.Parameters.Add(new JMXParameter("TestParam") { DataType = MdbType.guid });
+				//s.Parameters.Add(new JMXParameter("TestParam1") { DataType = MdbType.@string, Dirrect = S031.MetaStack.Core.Actions.ParamDirrect.Input });
+				//s.Parameters.Add(new JMXParameter("TestParam2") { DataType = MdbType.@decimal, Dirrect = S031.MetaStack.Core.Actions.ParamDirrect.Output });
+				//string ss = s.ToString();
+				//_logger.Debug(ss);
+				//s = JSONExtensions.DeserializeObject<JMXSchema>(ss);
+				//Assert.Equal(ss, s.ToString());
 				_logger.Debug("Start speed test fo JMXObject parse from json string");
 
 

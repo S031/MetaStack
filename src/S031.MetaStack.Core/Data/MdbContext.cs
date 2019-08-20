@@ -16,7 +16,7 @@ namespace S031.MetaStack.Core.Data
 	{
 		private DbTransaction _transaction;
 		private int _transactionLevel = 0;
-		private ConnectInfo _connectInfo;
+		private readonly ConnectInfo _connectInfo;
 
 		private MdbContext() { }
 		/// <summary>
@@ -89,7 +89,6 @@ namespace S031.MetaStack.Core.Data
 		{
 			int i = 0;
 			string pName = string.Empty;
-			string pValue = string.Empty;
 			List<MdbParameter> pList = new List<MdbParameter>();
 			foreach (var p in ps)
 			{

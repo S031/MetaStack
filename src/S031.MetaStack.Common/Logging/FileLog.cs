@@ -21,7 +21,7 @@ namespace S031.MetaStack.Common.Logging
 	}
 	public class FileLog : IDisposable
 	{
-		static readonly ConcurrentDictionary<string, Queue<string>> _queues = 
+		static readonly ConcurrentDictionary<string, Queue<string>> _queues =
 			new ConcurrentDictionary<string, Queue<string>>();
 
 		private readonly string _logName;
@@ -56,11 +56,11 @@ namespace S031.MetaStack.Common.Logging
 				if (level == LogLevels.Debug && source.IsEmpty())
 					source = Environment.StackTrace.GetToken(2, "\r\n").GetToken(1, " in ").Trim();
 				string data = _settings.Formater(level, source, message);
-				lock(_lockObj)
+				lock (_lockObj)
 					_queue.Enqueue(data);
 			}
 		}
-		public void Debug(object data, [CallerMemberName] string source="") =>
+		public void Debug(object data, [CallerMemberName] string source = "") =>
 			Write(LogLevels.Debug, source, $"{data}");
 
 		public void Flush()
@@ -83,12 +83,12 @@ namespace S031.MetaStack.Common.Logging
 						byte[] encodedText = Encoding.Unicode.GetBytes(sb.ToString());
 						sourceStream.Write(encodedText, 0, encodedText.Length);
 #else
-							for (; _queue.Count > 0;)
-							{
-								string message = _queue.Dequeue();
-								byte[] encodedText = Encoding.Unicode.GetBytes(message);
-								sourceStream.Write(encodedText, 0, encodedText.Length);
-							}
+						for (; _queue.Count > 0;)
+						{
+							string message = _queue.Dequeue();
+							byte[] encodedText = Encoding.Unicode.GetBytes(message);
+							sourceStream.Write(encodedText, 0, encodedText.Length);
+						}
 #endif
 					}
 				}
@@ -105,7 +105,14 @@ namespace S031.MetaStack.Common.Logging
 		}
 		public void Dispose()
 		{
-			Flush();
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (disposing)
+				Flush();
 		}
 
 		/* Not смысла

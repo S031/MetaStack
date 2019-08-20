@@ -1,6 +1,7 @@
-﻿using Newtonsoft.Json.Linq;
+﻿//using Newtonsoft.Json.Linq;
 using S031.MetaStack.Common;
 using S031.MetaStack.Core.Data;
+using S031.MetaStack.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -290,7 +291,7 @@ namespace S031.MetaStack.Core.ORM
 			return this;
 		}
 
-		public SQLStatementWriter WriteCreateParentRelationStatement(JToken fk)
+		public SQLStatementWriter WriteCreateParentRelationStatement(JsonObject fk)
 		{
 			bool withCheck = (bool)fk["CheckOption"];
 			string check = withCheck ? "check" : "nocheck";
@@ -300,10 +301,10 @@ namespace S031.MetaStack.Core.ORM
 				(string)fk["ParentObject"]["ObjectName"],
 				check, (string)fk["KeyName"]));
 
-			Write(string.Join(", ", fk["KeyMembers"].Select(m => "[" + (string)m["FieldName"] + "]").ToArray()));
+			Write(string.Join(", ", (fk["KeyMembers"] as JsonArray).Select(m => "[" + (string)m["FieldName"] + "]").ToArray()));
 			Write(")\n");
 			Write($"references [{fk["RefObject"]["AreaName"]}].[{fk["RefObject"]["ObjectName"]}] (");
-			Write(string.Join(", ", fk["RefKeyMembers"].Select(m => "[" + (string)m["FieldName"] + "]").ToArray()));
+			Write(string.Join(", ", (fk["RefKeyMembers"] as JsonArray).Select(m => "[" + (string)m["FieldName"] + "]").ToArray()));
 			Write(")\n");
 			if (withCheck)
 				// check existing rows
@@ -435,14 +436,14 @@ namespace S031.MetaStack.Core.ORM
 				fromSchema = _schema;
 			if (!parentRelationsSchema.IsEmpty())
 			{
-				JArray a = JArray.Parse(parentRelationsSchema);
+				JsonArray a = (JsonArray)new JsonReader(ref parentRelationsSchema).Read();
 				foreach (var o in a)
 				{
 					string sch = (string)o["ParentObject"]["AreaName"];
 					string tbl = (string)o["ParentObject"]["ObjectName"];
 					if (!fromSchema.Attributes.Any(at =>
 						at.FieldName == $"{detail_field_prefix}{sch}_{tbl}"))
-						WriteDropParentRelationStatement(o);
+						WriteDropParentRelationStatement((JsonObject)o);
 				}
 			}
 			foreach (var fk in fromSchema.ForeignKeys)
@@ -451,7 +452,7 @@ namespace S031.MetaStack.Core.ORM
 			return this;
 		}
 
-		public SQLStatementWriter WriteDropParentRelationStatement(JToken o)
+		public SQLStatementWriter WriteDropParentRelationStatement(JsonObject o)
 		{
 			Write("alter table [{0}].[{1}] drop constraint [{2}]\n".ToFormat(
 				(string)o["ParentObject"]["AreaName"],

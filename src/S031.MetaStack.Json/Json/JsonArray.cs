@@ -118,14 +118,8 @@ namespace S031.MetaStack.Json
 			writer.WriteEndArray();
 		}
 
-		IEnumerator<JsonValue> IEnumerable<JsonValue>.GetEnumerator()
-		{
-			return _list.GetEnumerator();
-		}
+		public IEnumerator<JsonValue> GetEnumerator() => _list.GetEnumerator();
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return _list.GetEnumerator();
-		}
+		IEnumerator IEnumerable.GetEnumerator() => _list.GetEnumerator();
 	}
 }

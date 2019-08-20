@@ -1,10 +1,10 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using S031.MetaStack.Common;
+﻿using S031.MetaStack.Common;
+using S031.MetaStack.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using S031.MetaStack.Core.Json;
 #if NETCOREAPP
 using System.Linq;
 using System.Xml;
@@ -48,7 +48,6 @@ namespace S031.MetaStack.WinForms.ORM
         public JMXSchema(string objectName) : this(new JMXObjectName(objectName))
         {
         }
-        [JsonConstructor]
         public JMXSchema(JMXObjectName objectName)
         {
             _objectName = objectName.ObjectName;
@@ -105,9 +104,7 @@ namespace S031.MetaStack.WinForms.ORM
 		/// Костыль!!! Связать с ParentID
 		/// </summary>
         public JMXObjectName OwnerObject { get; set; }
-        [JsonConverter(typeof(StringEnumConverter))]
         public DirectAccess DirectAccess { get; set; }
-        [JsonConverter(typeof(StringEnumConverter))]
         public DbObjectTypes DbObjectType { get; set; }
         public List<JMXAttribute> Attributes => _attributes;
         public List<JMXParameter> Parameters => _parameters;
@@ -117,6 +114,7 @@ namespace S031.MetaStack.WinForms.ORM
 		public List<JMXCondition> Conditions => _conditions;
         protected void ToStringRaw(JsonWriter writer)
         {
+			writer.WriteStartObject();
             writer.WriteProperty("ID", ID);
             writer.WriteProperty("UID", UID);
             writer.WriteProperty("Name", Name);
@@ -150,62 +148,115 @@ namespace S031.MetaStack.WinForms.ORM
             if (PrimaryKey != null)
             {
                 writer.WritePropertyName("PrimaryKey");
-                writer.WriteRawValue(PrimaryKey.ToString());
+				PrimaryKey.ToStringRaw(writer);
             }
 
             writer.WritePropertyName("Attributes");
             writer.WriteStartArray();
-            foreach (var item in _attributes)
-                writer.WriteRawValue(item.ToString());
-            writer.WriteEnd();
+			foreach (var item in _attributes)
+				item.ToStringRaw(writer);
+            writer.WriteEndArray();
 
             writer.WritePropertyName("Parameters");
             writer.WriteStartArray();
-            foreach (var item in _parameters)
-                writer.WriteRawValue(item.ToString());
-            writer.WriteEnd();
+			foreach (var item in _parameters)
+				item.ToStringRaw(writer);
+            writer.WriteEndArray();
 
             writer.WritePropertyName("Indexes");
             writer.WriteStartArray();
-            foreach (var item in _indexes)
-                writer.WriteRawValue(item.ToString());
-            writer.WriteEnd();
+			foreach (var item in _indexes)
+				item.ToStringRaw(writer);
+            writer.WriteEndArray();
 
             writer.WritePropertyName("ForeignKeys");
             writer.WriteStartArray();
-            foreach (var item in _fkeys)
-                writer.WriteRawValue(item.ToString());
-            writer.WriteEnd();
+			foreach (var item in _fkeys)
+				item.ToStringRaw(writer);
+            writer.WriteEndArray();
 
             writer.WritePropertyName("Conditions");
             writer.WriteStartArray();
 			foreach (var item in _conditions)
-			{
-				writer.WriteStartObject();
-				writer.WriteProperty("ConditionType", item.ConditionType.ToString());
-				writer.WriteProperty("Definition", item.Definition);
-				writer.WriteEndObject();
-			}
-			writer.WriteEnd();
+				item.ToStringRaw(writer);
+			writer.WriteEndArray();
+			writer.WriteEndObject();
         }
-        public override string ToString()
-        {
-            StringBuilder sb = new StringBuilder(1024);
-            StringWriter sw = new StringWriter(sb);
 
-            using (JsonWriter writer = new JsonTextWriter(sw))
-            {
-                writer.Formatting = Newtonsoft.Json.Formatting.Indented;
-                writer.WriteStartObject();
-                ToStringRaw(writer);
-                writer.WriteEndObject();
-                return sb.ToString();
-            }
-        }
-        public static JMXSchema Parse(string schemaJson)
+		public override string ToString()
+		{
+			JsonWriter writer = new JsonWriter(MetaStack.Json.Formatting.None);
+			ToStringRaw(writer);
+			return writer.ToString();
+		}
+
+		public static JMXSchema Parse(string schemaJson)
         {
             schemaJson.NullTest(nameof(schemaJson));
-            return JsonConvert.DeserializeObject<JMXSchema>(schemaJson);
+			JsonObject j = (JsonObject)new JsonReader(ref schemaJson).Read();
+			JMXSchema schema = new JMXSchema(j["ObjectName"])
+			{
+				AuditEnabled = j.GetBoolOrDefault("AuditEnabled"),
+				DbObjectType = (DbObjectTypes)j.GetIntOrDefault("DbObjectType"),
+				Name = j.GetStringOrDefault("Name"),
+				ID = j.GetIntOrDefault("ID"),
+				UID = j.GetGuidOrDefault("UID"),
+				DirectAccess = (DirectAccess)j.GetIntOrDefault("DirectAccess"),
+				ReadOnly = j.GetBoolOrDefault("ReadOnly")
+			};
+			if (j.ContainsKey("DbObjectName"))
+			{
+				var o = (j["DbObjectName"] as JsonObject);
+				schema.DbObjectName = new JMXObjectName(o.GetStringOrDefault("AreaName"), o.GetStringOrDefault("ObjectName"));
+			}
+			if (j.ContainsKey("OwnerObject"))
+			{
+				var o = (j["OwnerObject"] as JsonObject);
+				schema.OwnerObject = new JMXObjectName(o.GetStringOrDefault("AreaName"), o.GetStringOrDefault("ObjectName"));
+			}
+			//if (j.ContainsKey("PrimaryKey"))
+			//{
+			//	var o = (j["PrimaryKey"] as JsonObject);
+			//	schema.PrimaryKey = new JMXPrimaryKey(o.GetStringOrDefault("AreaName"), o.GetStringOrDefault("ObjectName"));
+			//}
+
+   //         if (PrimaryKey != null)
+   //         {
+   //             writer.WritePropertyName("PrimaryKey");
+			//	PrimaryKey.ToStringRaw(writer);
+   //         }
+
+   //         writer.WritePropertyName("Attributes");
+   //         writer.WriteStartArray();
+			//foreach (var item in _attributes)
+			//	item.ToStringRaw(writer);
+   //         writer.WriteEndArray();
+
+   //         writer.WritePropertyName("Parameters");
+   //         writer.WriteStartArray();
+			//foreach (var item in _parameters)
+			//	item.ToStringRaw(writer);
+   //         writer.WriteEndArray();
+
+   //         writer.WritePropertyName("Indexes");
+   //         writer.WriteStartArray();
+			//foreach (var item in _indexes)
+			//	item.ToStringRaw(writer);
+   //         writer.WriteEndArray();
+
+   //         writer.WritePropertyName("ForeignKeys");
+   //         writer.WriteStartArray();
+			//foreach (var item in _fkeys)
+			//	item.ToStringRaw(writer);
+   //         writer.WriteEndArray();
+
+   //         writer.WritePropertyName("Conditions");
+   //         writer.WriteStartArray();
+			//foreach (var item in _conditions)
+			//	item.ToStringRaw(writer);
+			//writer.WriteEndArray();
+			//writer.WriteEndObject();
+			return schema;
         }
 #if NETCOREAPP
         public static JMXSchema ParseXml(string schemaXML)

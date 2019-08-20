@@ -1,8 +1,8 @@
 {
 	"ObjectName": "CashFlow_NK",
 	"UID": "E0475055-7336-4342-AEA5-DCE77E8575C2",
-	"Name": "Денежные\tпотоки",
-	"DBObjectName": {
+	"Name": "Денежные потоки",
+	"DbObjectName": {
 		"AreaName": "dbo",
 		"ObjectName": "CashFlow_NKN"
 	},

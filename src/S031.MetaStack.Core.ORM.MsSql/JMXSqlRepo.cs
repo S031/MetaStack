@@ -5,10 +5,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
+//using Newtonsoft.Json.Linq;
 using S031.MetaStack.Common;
 using S031.MetaStack.Core.Data;
 using S031.MetaStack.Core.Logging;
+using S031.MetaStack.Json;
 
 namespace S031.MetaStack.Core.ORM.MsSql
 {
@@ -48,8 +49,8 @@ namespace S031.MetaStack.Core.ORM.MsSql
 		private static string _defaultDbSchema = string.Empty;
 		private static string _sqlVersion = string.Empty;
 		private static readonly JMXSQLTypeMapping _typeMapping = new JMXSQLTypeMapping();
-		private static IDictionary<MdbType, string> _typeMap => _typeMapping.GetTypeMap();
-		private static IDictionary<string, MdbTypeInfo> _typeInfo => _typeMapping.GetServerTypeMap();
+		private static IDictionary<MdbType, string> TypeMap => _typeMapping.GetTypeMap();
+		private static IDictionary<string, MdbTypeInfo> TypeInfo => _typeMapping.GetServerTypeMap();
 
 		public JMXSqlRepo(JMXSqlFactory factory) : base(factory)
 		{
@@ -381,13 +382,13 @@ namespace S031.MetaStack.Core.ORM.MsSql
 					throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.4",
 						att.FieldName));
 
-				string typeMap = _typeMap[att.DataType];
+				string typeMap = TypeMap[att.DataType];
 				if (att.ServerDataType.IsEmpty() || typeMap.IndexOf(att.ServerDataType) == -1)
-					att.ServerDataType = typeMap.Split(';')[0];
+					att.ServerDataType = typeMap.GetToken(0, ";");
 
 				if (att.DataSize.IsEmpty())
 				{
-					MdbTypeInfo ti2 = _typeInfo[att.ServerDataType];
+					MdbTypeInfo ti2 = TypeInfo[att.ServerDataType];
 					if (!ti2.FixedSize)
 						att.DataSize = new JMXDataSize(ti2.Size, ti2.Scale, ti2.Precision);
 				}
@@ -585,7 +586,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 				// error schema not found if db objects exists, but 
 				// synced version schema don't exists
 				var prevSchema = await GetSchemaInternalAsync(mdb, dbSchema, objectName, 1);
-				sqlList = await CompareSchemasAsync(mdb, schema, prevSchema);
+				sqlList = await CompareSchemasAsync(schema, prevSchema);
 			}
 
 			await mdb.BeginTransactionAsync();
@@ -622,7 +623,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 			return sql.ToArray();
 		}
 
-		private async Task<string[]> CompareSchemasAsync(MdbContext mdb, JMXSchema schema, JMXSchema fromDbSchema)
+		private async Task<string[]> CompareSchemasAsync(JMXSchema schema, JMXSchema fromDbSchema)
 		{
 			List<string> sql = new List<string>();
 			using (SQLStatementWriter sb = new SQLStatementWriter(_typeMapping, schema))
@@ -707,7 +708,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 					//Server DataTypes is equals
 					if ((diff & AttribCompareDiff.dataTtype) != AttribCompareDiff.dataTtype)
 					{
-						MdbTypeInfo ti = _typeInfo[att.ServerDataType];
+						MdbTypeInfo ti = TypeInfo[att.ServerDataType];
 						if (!ti.FixedSize)
 						{
 							if (_typeMapping.GetVariableLenghtDataTypes().Contains(att.ServerDataType) && att.DataSize.Size != att2.DataSize.Size)
@@ -921,12 +922,12 @@ namespace S031.MetaStack.Core.ORM.MsSql
 
 			string s = (await mdb.ExecuteAsync<string>(SqlServer.GetParentRelations,
 				new MdbParameter("@table_name", schema.DbObjectName.ToString()))) ?? "";
-			JArray parentRelations = null;
+			JsonArray parentRelations = null;
 			if (!s.IsEmpty())
 			{
-				parentRelations = JArray.Parse(s);
+				parentRelations = (JsonArray)new JsonReader(ref s).Read();
 				foreach (var fk in parentRelations)
-					sb.WriteDropParentRelationStatement(fk);
+					sb.WriteDropParentRelationStatement((JsonObject)fk);
 			}
 			foreach (var fk in fromDbSchema.ForeignKeys)
 				sb.WriteDropFKStatement(fk, fromDbSchema);
@@ -956,7 +957,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 
 			if (parentRelations != null)
 				foreach (var fk in parentRelations)
-					sb.WriteCreateParentRelationStatement(fk);
+					sb.WriteCreateParentRelationStatement((JsonObject)fk);
 		}
 
 		private static string GetDiffs(AttribCompareDiff diff)
@@ -998,7 +999,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 				if (_sqlVersion.IsEmpty())
 					_sqlVersion = "10";
 				else
-					_sqlVersion = _sqlVersion.Split('.')[0];
+					_sqlVersion = _sqlVersion.GetToken(0, ".");
 			}
 			return _sqlVersion;
 		}

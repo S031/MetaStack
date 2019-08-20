@@ -46,6 +46,15 @@ namespace S031.MetaStack.Json
 			return string.Empty;
 		}
 
+		public static Guid GetGuidOrDefault(this JsonObject json, string key)
+		{
+			if (json.ContainsKey(key)
+				&& (json[key].JsonType == JsonType.Guid || json[key].JsonType == JsonType.String)
+				&& Guid.TryParse((string)json[key], out Guid guid))
+				return guid;
+			return default;
+		}
+
 		public static DateTime GetDateOrDefault(this JsonObject json, string key)
 		{
 			if (json.ContainsKey(key)
