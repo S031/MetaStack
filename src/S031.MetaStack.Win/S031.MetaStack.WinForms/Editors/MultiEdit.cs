@@ -77,10 +77,10 @@ namespace S031.MetaStack.WinForms
 			foreach (var item in _schema.Attributes)
 				if (item.Visible)
 				{
-					if (item.DataType== MdbType.@object)
+					if (item.DataType == MdbType.@object)
 						OnGrid2Object(GetItem(item.AttribName).As<DBGridBase>());
 					else if (this.Items.TryGetValue(item.AttribName, out WinFormItem cdi))
-						_objectSource[item.AttribName] = Newtonsoft.Json.Linq.JToken.FromObject(cdi.Value);
+						_objectSource[item.AttribName] = new MetaStack.Json.JsonValue(cdi.Value);
 				}
 		}
 

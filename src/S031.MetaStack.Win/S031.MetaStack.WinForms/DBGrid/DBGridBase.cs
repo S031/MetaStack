@@ -1416,7 +1416,7 @@ namespace S031.MetaStack.WinForms
 				var dr = GetRow(this.CurrentCellAddress.Y);
 				foreach (DataGridViewColumn dc in this.Columns)
 					if (!dc.Name.IsEmpty())
-						jObj[dc.Name] = JToken.FromObject(dr[dc.Name]);
+						jObj[dc.Name] = new MetaStack.Json.JsonValue(dr[dc.Name]);
 			}
 			return jObj;
 		}

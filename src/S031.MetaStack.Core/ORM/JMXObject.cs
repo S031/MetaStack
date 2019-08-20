@@ -99,7 +99,7 @@ namespace S031.MetaStack.WinForms.ORM
 #if NETCOREAPP
 			return Parse(json, ObjectFactories.GetDefault<IJMXFactory>());
 #else
-			return CreateFrom(json, JMXFactory.Create());
+			return Parse(json, JMXFactory.Create());
 #endif
 		}
 

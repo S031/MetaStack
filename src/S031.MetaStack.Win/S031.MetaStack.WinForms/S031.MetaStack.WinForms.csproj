@@ -33,6 +33,9 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="fastJSON, Version=2.2.3.0, Culture=neutral, PublicKeyToken=6b75a806b86095cd, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\fastJSON.2.2.4\lib\net40\fastJSON.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -333,6 +336,10 @@
     <ProjectReference Include="..\..\S031.MetaStack.Common\S031.MetaStack.Common.Net45.csproj">
       <Project>{f9d7f21b-5d2f-4458-a84f-b5e39a493835}</Project>
       <Name>S031.MetaStack.Common.Net45</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\S031.MetaStack.Json\S031.MetaStack.Json.Net45.csproj">
+      <Project>{f0cafc3f-8117-49ee-b472-1d86dd8340dd}</Project>
+      <Name>S031.MetaStack.Json.Net45</Name>
     </ProjectReference>
     <ProjectReference Include="..\ICSharpCode.TextEditor\ICSharpCode.TextEditor.csproj">
       <Project>{2d18be89-d210-49eb-a9dd-2246fbb3df6d}</Project>

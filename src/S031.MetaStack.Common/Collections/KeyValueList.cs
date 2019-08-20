@@ -14,8 +14,8 @@ namespace S031.MetaStack.Common
 		private const string _defaultListSep = ";";
 		private const string _defaultValueSep = "=";
 
-		private string _listSep;
-		private string _valueSep;
+		private readonly string _listSep;
+		private readonly string _valueSep;
 		/// <summary>
 		/// Create empty <see cref="KeyValueList"/> with default list and value sep
 		/// </summary>

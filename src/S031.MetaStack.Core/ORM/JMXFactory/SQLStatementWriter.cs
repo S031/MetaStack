@@ -268,10 +268,10 @@ namespace S031.MetaStack.Core.ORM
 			else
 				Write($"alter table {fromSchema.DbObjectName} with nocheck  add constraint [{fk.KeyName}] foreign key (");
 
-			Write(string.Join(", ", fk.KeyMembers.Select(m => '[' + m.FieldName + ']').ToArray()));
+			Write(string.Join(", ", fk.KeyMembers.Select(m => "[" + m.FieldName + "]").ToArray()));
 			Write(")");
 			Write($"references {fk.RefDbObjectName} (");
-			Write(string.Join(", ", fk.RefKeyMembers.Select(m => '[' + m.FieldName + ']').ToArray()));
+			Write(string.Join(", ", fk.RefKeyMembers.Select(m => "[" + m.FieldName + "]").ToArray()));
 			Write(")\n");
 			if (fk.CheckOption)
 				// check existing rows
@@ -300,10 +300,10 @@ namespace S031.MetaStack.Core.ORM
 				(string)fk["ParentObject"]["ObjectName"],
 				check, (string)fk["KeyName"]));
 
-			Write(string.Join(", ", fk["KeyMembers"].Select(m => '[' + (string)m["FieldName"] + ']').ToArray()));
+			Write(string.Join(", ", fk["KeyMembers"].Select(m => "[" + (string)m["FieldName"] + "]").ToArray()));
 			Write(")\n");
 			Write($"references [{fk["RefObject"]["AreaName"]}].[{fk["RefObject"]["ObjectName"]}] (");
-			Write(string.Join(", ", fk["RefKeyMembers"].Select(m => '[' + (string)m["FieldName"] + ']').ToArray()));
+			Write(string.Join(", ", fk["RefKeyMembers"].Select(m => "[" + (string)m["FieldName"] + "]").ToArray()));
 			Write(")\n");
 			if (withCheck)
 				// check existing rows

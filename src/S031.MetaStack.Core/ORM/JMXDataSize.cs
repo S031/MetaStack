@@ -1,6 +1,6 @@
-﻿#if NETCOREAPP
-using S031.MetaStack.Json;
+﻿using S031.MetaStack.Json;
 
+#if NETCOREAPP
 namespace S031.MetaStack.Core.ORM
 #else
 namespace S031.MetaStack.WinForms.ORM

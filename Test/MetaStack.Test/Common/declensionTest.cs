@@ -31,7 +31,7 @@ namespace MetaStack.Test.Common
 							string result = Declension.GetDeclension(a[0], _dc).TrimEnd();
 							if (!result.Equals(a[2].Trim(), StringComparison.CurrentCultureIgnoreCase))
 							{
-								l.Debug('\n' + a[0] + '\t' + a[1] + '\t' + a[2] + '\t' + result);
+								l.Debug("\n" + a[0] + "\t" + a[1] + "\t" + a[2] + "\t" + result);
 							}
 						}
 					}

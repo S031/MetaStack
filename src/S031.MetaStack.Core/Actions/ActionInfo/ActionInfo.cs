@@ -1,13 +1,13 @@
 ﻿#if NETCOREAPP
 using S031.MetaStack.Common;
 using S031.MetaStack.Core.Data;
-using S031.MetaStack.Json;
-using System;
 #else
 using S031.MetaStack.WinForms.Data;
 using S031.MetaStack.WinForms.Json;
 #endif
 using System.Linq;
+using S031.MetaStack.Json;
+using System;
 
 #if NETCOREAPP
 namespace S031.MetaStack.Core.Actions
@@ -133,8 +133,13 @@ namespace S031.MetaStack.WinForms.Actions
 				LogOnError = j.GetBoolOrDefault("LogOnError"),
 				EMailOnError = j.GetBoolOrDefault("EMailOnError"),
 				EMailGroup = j.GetStringOrDefault("EMailGroup"),
+#if NETCOREAPP
 				TransactionSupport = Enum.Parse<TransactionActionSupport>(j.GetStringOrDefault("TransactionSupport")),
 				WebAuthentication = Enum.Parse<ActionWebAuthenticationType>(j.GetStringOrDefault("WebAuthentication")),
+#else
+				TransactionSupport = (TransactionActionSupport)Enum.Parse(typeof(TransactionActionSupport), j.GetStringOrDefault("TransactionSupport")),
+				WebAuthentication =(ActionWebAuthenticationType) Enum.Parse(typeof(ActionWebAuthenticationType), j.GetStringOrDefault("WebAuthentication")),
+#endif
 				AuthenticationRequired = j.GetBoolOrDefault("AuthenticationRequired"),
 				AuthorizationRequired = j.GetBoolOrDefault("AuthorizationRequired"),
 				AsyncMode = j.GetBoolOrDefault("AsyncMode"),
@@ -154,7 +159,11 @@ namespace S031.MetaStack.WinForms.Actions
 					var p = new ParamInfo()
 					{
 						ParameterID = o.GetStringOrDefault("ParameterID"),
+#if NETCOREAPP
 						Dirrect = Enum.Parse<ParamDirrect>(o.GetStringOrDefault("Dirrect")),
+#else
+						Dirrect = (ParamDirrect)Enum.Parse(typeof(ParamDirrect), o.GetStringOrDefault("Dirrect")),
+#endif
 						PresentationType = o.GetStringOrDefault("PresentationType"),
 						Required = o.GetBoolOrDefault("Required"),
 						DefaultValue = o.GetStringOrDefault("DefaultValue"),

@@ -9,7 +9,7 @@ namespace S031.MetaStack.Core
 	
 	public class PipeService
 	{
-		ConcurrentDictionary<ActionContext, ConcurrentQueue<string>> _messages = 
+		readonly ConcurrentDictionary<ActionContext, ConcurrentQueue<string>> _messages = 
 			new ConcurrentDictionary<ActionContext, ConcurrentQueue<string>>(); 
 
 		public void Write(ActionContext ctx, string message)
@@ -30,7 +30,7 @@ namespace S031.MetaStack.Core
 			StringBuilder sb = new StringBuilder();
 			for (; ; )
 				if (data.TryDequeue(out string message))
-					sb.Append(message + '\f');
+					sb.Append(message + "\f");
 				else
 					break;
 			return sb.ToString();

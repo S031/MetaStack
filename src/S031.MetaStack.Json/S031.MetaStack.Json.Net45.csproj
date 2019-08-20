@@ -36,10 +36,10 @@
     <EmbeddedResource Include="Resources\Strings.ru-RU.resx" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\JsonObjectExtensions.cs" />
     <Compile Include="Extensions\JsonValueExtensions.cs" />
     <Compile Include="Json\JsonArray.cs" />
     <Compile Include="Json\JsonObject.cs" />
-    <Compile Include="Json\JsonPrimitive.cs" />
     <Compile Include="Json\JsonTokenType.cs" />
     <Compile Include="Json\JsonType.cs" />
     <Compile Include="Json\JsonValue.cs" />
@@ -49,6 +49,7 @@
     <Compile Include="Reader\UTF8Reader.cs" />
     <Compile Include="Resources\Strings.Designer.cs" />
     <Compile Include="Writer\JsonWriter.cs" />
+    <Compile Include="Writer\JsonWriterExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
