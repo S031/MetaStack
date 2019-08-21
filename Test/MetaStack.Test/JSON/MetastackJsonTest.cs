@@ -47,8 +47,39 @@ namespace MetaStack.Test.Json
 					var s = json.ToString();
 				}
 				_logger.Debug($"Finish perfomance Tostring test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
+
+				_logger.Debug($"Start perfomance GetIntOrDefault test");
+				t = DateTime.Now;
+				for (i = 0; i < 10_000_000; i++)
+				{
+					var s = (json as JsonObject).GetIntOrDefault("ID");
+				}
+				_logger.Debug($"Finish perfomance GetIntOrDefault test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
+
+				_logger.Debug($"Start perfomance ToIntOrDefault test");
+				t = DateTime.Now;
+				for (i = 0; i < 10_000_000; i++)
+				{
+					var s = ToIntOrDefault(json as JsonObject, "ID");
+				}
+				_logger.Debug($"Finish perfomance GetIntOrDefault test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
+
+				_logger.Debug($"Start perfomance GetDateDefault test");
+				t = DateTime.Now;
+				json["CurrentTime"] = t;
+				for (i = 0; i < 1_000_000; i++)
+				{
+					var s = (json as JsonObject).GetDateOrDefault("CurrentTime");
+				}
+				_logger.Debug($"Finish perfomance GetDateDefault test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
 			}
 		}
+
+		private static int ToIntOrDefault(JsonObject j, string key) 
+			=> j.TryGetValue(key, out JsonValue value)
+				&& value.JsonType == JsonType.Integer
+				? (int)value
+				: 0;
 
 		[Fact]
 		public void JsonWriterTest()
@@ -138,6 +169,7 @@ namespace MetaStack.Test.Json
 				Assert.Equal(str, w.ToString());
 			}
 		}
+
 		private class TestClass
 		{
 			static TestClass()

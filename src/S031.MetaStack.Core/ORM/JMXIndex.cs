@@ -46,7 +46,6 @@ namespace S031.MetaStack.WinForms.ORM
 			ToStringRaw(writer);
 			return writer.ToString();
 		}
-
 		public void ToStringRaw(JsonWriter writer)
 		{
 			writer.WriteStartObject();
@@ -54,13 +53,39 @@ namespace S031.MetaStack.WinForms.ORM
 			writer.WriteProperty("UID", UID);
 			writer.WriteProperty("IndexName", IndexName);
 			writer.WriteProperty("IsUnique", IsUnique);
-
+			writer.WriteProperty("ClusteredOption", ClusteredOption);
 			writer.WritePropertyName("KeyMembers");
 			writer.WriteStartArray();
 			foreach (var item in _keyMembers)
 				item.ToStringRaw(writer);
 			writer.WriteEndArray();
 			writer.WriteEndObject();
+		}
+		internal static JMXIndex ReadFrom(JsonObject o)
+		{
+			var fk = new JMXIndex()
+			{
+				IndexName = o["IndexName"],
+				ClusteredOption = o.GetIntOrDefault("ClusteredOption"),
+				IsUnique = o.GetBoolOrDefault("IsUnique"),
+				ID = o.GetIntOrDefault("ID"),
+				UID = o.GetGuidOrDefault("UID")
+			};
+
+			if (o.TryGetValue("KeyMembers", out JsonArray a))
+			{
+				foreach (JsonObject m in a)
+				{
+					fk.KeyMembers.Add(new JMXKeyMember()
+					{
+						FieldName = m["FieldName"],
+						Position = m.GetIntOrDefault("Position"),
+						IsIncluded = m.GetBoolOrDefault("IsIncluded"),
+						IsDescending = m.GetBoolOrDefault("IsDescending")
+					});
+				}
+			}
+			return fk;
 		}
 	}
 }

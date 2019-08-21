@@ -229,8 +229,8 @@ BEGIN
 		ELSE
 			left(@table_name, len(@table_name)-1)
 		END As ObjectName,
-		@schema_name AS [DBObjectName.AreaName],
-		@table_name AS [DBObjectName.ObjectName],
+		@schema_name AS [DbObjectName.AreaName],
+		@table_name AS [DbObjectName.ObjectName],
 		(SELECT c.column_id AS ID,
 			c.name AS AttribName,
 			c.name AS FieldName,

@@ -38,27 +38,44 @@ namespace S031.MetaStack.WinForms.ORM
 				position++;
 			}
 		}
-
 		public override string ToString()
 		{
 			JsonWriter writer = new JsonWriter(Formatting.None);
 			ToStringRaw(writer);
 			return writer.ToString();
 		}
-
 		public void ToStringRaw(JsonWriter writer)
 		{
 			writer.WriteStartObject();
 			writer.WriteProperty("ID", ID);
 			writer.WriteProperty("Handle", Handle);
 			writer.WriteProperty("KeyName", KeyName);
-
 			writer.WritePropertyName("KeyMembers");
 			writer.WriteStartArray();
 			foreach (var item in _keyMembers)
 				item.ToStringRaw(writer);
 			writer.WriteEndArray();
 			writer.WriteEndObject();
+		}
+		internal static JMXPrimaryKey ReadFrom(JsonObject o)
+		{
+			var pk = new JMXPrimaryKey
+			{
+				KeyName = o["KeyName"],
+				ID = o.GetIntOrDefault("ID")
+			};
+			var km = (o["KeyMembers"] as JsonArray);
+			foreach (JsonObject m in km)
+			{
+				pk.KeyMembers.Add(new JMXKeyMember()
+				{
+					FieldName = m["FieldName"],
+					Position = m.GetIntOrDefault("Position"),
+					IsIncluded = m.GetBoolOrDefault("IsIncluded"),
+					IsDescending = m.GetBoolOrDefault("IsDescending")
+				});
+			}
+			return pk;
 		}
 	}
 }

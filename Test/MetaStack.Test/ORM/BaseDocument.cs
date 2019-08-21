@@ -56,7 +56,7 @@ namespace MetaStack.Test.ORM
 
 		public string WriteInsertStatement()
 		{
-			var dbName = _schema["DBObjectName"];
+			var dbName = _schema["DbObjectName"];
 			JArray attribs = (JArray)_schema["Attributes"];
 			StringBuilder sb = new StringBuilder($"INSERT INTO [{dbName["AreaName"]}].[{dbName["ObjectName"]}] (");
 			sb.Append(string.Join(",", attribs.Where(a => !((JObject)a).Properties().Any(p => p.Name == "Identity")).Select(a => (string)a["FieldName"])));

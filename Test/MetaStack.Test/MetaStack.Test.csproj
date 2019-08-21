@@ -39,6 +39,7 @@
     <None Remove="ORM\Resources\TestSchemas\Request.json" />
     <None Remove="ORM\Resources\TestSchemas\Terminal.json" />
     <None Remove="ORM\Resources\TestSchemas\Terminal2Customer.json" />
+    <None Remove="Resources\Files\TestJson.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -52,6 +53,7 @@
     <EmbeddedResource Include="ORM\Resources\TestSchemas\Request.json" />
     <EmbeddedResource Include="ORM\Resources\TestSchemas\Terminal.json" />
     <EmbeddedResource Include="ORM\Resources\TestSchemas\Terminal2Customer.json" />
+    <EmbeddedResource Include="Resources\Files\TestJson.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -104,10 +106,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>TestData.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Resources\Files\" />
   </ItemGroup>
 
 </Project>

@@ -16,9 +16,9 @@ namespace S031.MetaStack.WinForms.ORM
 		private string _objectName;
 		private string _areaName;
 		private string _dbObjectName;
-		List<JMXKeyMember> _keyMembers;
-		List<JMXKeyMember> _refKeyMembers;
-		List<JMXKeyMember> _migrateKeyMembers;
+		readonly List<JMXKeyMember> _keyMembers;
+		readonly List<JMXKeyMember> _refKeyMembers;
+		readonly List<JMXKeyMember> _migrateKeyMembers;
 
 		public JMXForeignKey(string keyName)
 		{
@@ -108,7 +108,6 @@ namespace S031.MetaStack.WinForms.ORM
 			ToStringRaw(writer);
 			return writer.ToString();
 		}
-
 		public void ToStringRaw(JsonWriter writer)
 		{
 			writer.WriteStartObject();
@@ -164,6 +163,66 @@ namespace S031.MetaStack.WinForms.ORM
 			}
 			writer.WriteEndArray();
 			writer.WriteEndObject();
+		}
+		internal static JMXForeignKey ReadFrom(JsonObject o)
+		{
+			var fk = new JMXForeignKey(o["KeyName"])
+			{
+				CheckOption = o.GetBoolOrDefault("CheckOption"),
+				DeleteRefAction = o.GetStringOrDefault("DeleteRefAction"),
+				UpdateRefAction = o.GetStringOrDefault("DeleteRefAction"),
+				ID = o.GetIntOrDefault("ID"),
+				UID = o.GetGuidOrDefault("UID")
+			};
+
+			if (o.TryGetValue("RefObjectName", out JsonObject j))
+				fk.RefObjectName = new JMXObjectName(j.GetStringOrDefault("AreaName"), j.GetStringOrDefault("ObjectName"));
+
+			if (o.TryGetValue("RefDbObjectName", out j))
+				fk.RefDbObjectName = new JMXObjectName(j.GetStringOrDefault("AreaName"), j.GetStringOrDefault("ObjectName"));
+
+			if (o.TryGetValue("KeyMembers", out JsonArray a))
+			{
+				foreach (JsonObject m in a)
+				{
+					fk.KeyMembers.Add(new JMXKeyMember()
+					{
+						FieldName = m["FieldName"],
+						Position = m.GetIntOrDefault("Position"),
+						IsIncluded = m.GetBoolOrDefault("IsIncluded"),
+						IsDescending = m.GetBoolOrDefault("IsDescending")
+					});
+				}
+			}
+
+			if (o.TryGetValue("RefKeyMembers", out a))
+			{
+				foreach (JsonObject m in a)
+				{
+					fk.RefKeyMembers.Add(new JMXKeyMember()
+					{
+						FieldName = m["FieldName"],
+						Position = m.GetIntOrDefault("Position"),
+						IsIncluded = m.GetBoolOrDefault("IsIncluded"),
+						IsDescending = m.GetBoolOrDefault("IsDescending")
+					});
+				}
+			}
+
+			if (o.TryGetValue("MigrateKeyMembers", out a))
+			{
+				foreach (JsonObject m in a)
+				{
+					fk.MigrateKeyMembers.Add(new JMXKeyMember()
+					{
+						FieldName = m["FieldName"],
+						Position = m.GetIntOrDefault("Position"),
+						IsIncluded = m.GetBoolOrDefault("IsIncluded"),
+						IsDescending = m.GetBoolOrDefault("IsDescending")
+					});
+				}
+			}
+			return fk;
 		}
 	}
 }

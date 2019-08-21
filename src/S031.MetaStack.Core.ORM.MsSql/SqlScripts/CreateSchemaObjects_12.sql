@@ -319,7 +319,7 @@ BEGIN
 				--ELSE
 					left(@table_name, len(@table_name)-1)
 				--END 
-				+ '", "DBObjectName": { "AreaName": "' + @schema_name + '", "ObjectName": "' + @table_name + '" }, ' +
+				+ '", "DbObjectName": { "AreaName": "' + @schema_name + '", "ObjectName": "' + @table_name + '" }, ' +
 			'"Attributes": [' + 
 			STUFF((SELECT ', {' +
 				'"ID": ' + cast([Attribute].column_id AS varchar(5)) + ', ' +

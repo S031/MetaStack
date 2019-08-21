@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using S031.MetaStack.Json;
 
@@ -73,6 +74,16 @@ namespace S031.MetaStack.WinForms.ORM
 			writer.WriteProperty("ConditionType", ConditionType.ToString());
 			writer.WriteProperty("Definition", Definition);
 			writer.WriteEndObject();
+		}
+
+		internal static JMXCondition ReadFrom(JsonObject o)
+		{
+			var condition = new JMXCondition()
+			{
+				ConditionType = o.GetEnum<JMXConditionTypes>("ConditionType"),
+				Definition = o["Definition"]
+			};
+			return condition;
 		}
 	}
 }

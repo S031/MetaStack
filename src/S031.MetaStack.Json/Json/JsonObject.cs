@@ -113,6 +113,28 @@ namespace S031.MetaStack.Json
 
 		public bool TryGetValue(string key, out JsonValue value) => _map.TryGetValue(key, out value);
 
+		public bool TryGetValue(string key, out JsonObject value)
+		{
+			if (_map.TryGetValue(key, out JsonValue v))
+			{
+				value = v as JsonObject;
+				return true;
+			}
+			value = default;
+			return false;
+		}
+
+		public bool TryGetValue(string key, out JsonArray value)
+		{
+			if (_map.TryGetValue(key, out JsonValue v))
+			{
+				value = v as JsonArray;
+				return true;
+			}
+			value = default;
+			return false;
+		}
+
 		public JsonPair GetPair()
 			=> _map.FirstOrDefault();
 	}

@@ -191,75 +191,57 @@ namespace S031.MetaStack.WinForms.ORM
 		}
 
 		public static JMXSchema Parse(string schemaJson)
-        {
-            schemaJson.NullTest(nameof(schemaJson));
+		{
+			schemaJson.NullTest(nameof(schemaJson));
 			JsonObject j = (JsonObject)new JsonReader(ref schemaJson).Read();
 			JMXSchema schema = new JMXSchema(j["ObjectName"])
 			{
 				AuditEnabled = j.GetBoolOrDefault("AuditEnabled"),
-				DbObjectType = (DbObjectTypes)j.GetIntOrDefault("DbObjectType"),
+				DbObjectType = j.GetEnum<DbObjectTypes>("DbObjectType"),
 				Name = j.GetStringOrDefault("Name"),
 				ID = j.GetIntOrDefault("ID"),
 				UID = j.GetGuidOrDefault("UID"),
-				DirectAccess = (DirectAccess)j.GetIntOrDefault("DirectAccess"),
+				DirectAccess = j.GetEnum<DirectAccess>("DirectAccess"),
 				ReadOnly = j.GetBoolOrDefault("ReadOnly")
 			};
-			if (j.ContainsKey("DbObjectName"))
-			{
-				var o = (j["DbObjectName"] as JsonObject);
+
+			if (j.TryGetValue("DbObjectName", out JsonObject o))
 				schema.DbObjectName = new JMXObjectName(o.GetStringOrDefault("AreaName"), o.GetStringOrDefault("ObjectName"));
-			}
-			if (j.ContainsKey("OwnerObject"))
-			{
-				var o = (j["OwnerObject"] as JsonObject);
+
+			if (j.TryGetValue("OwnerObject", out o))
 				schema.OwnerObject = new JMXObjectName(o.GetStringOrDefault("AreaName"), o.GetStringOrDefault("ObjectName"));
-			}
-			//if (j.ContainsKey("PrimaryKey"))
-			//{
-			//	var o = (j["PrimaryKey"] as JsonObject);
-			//	schema.PrimaryKey = new JMXPrimaryKey(o.GetStringOrDefault("AreaName"), o.GetStringOrDefault("ObjectName"));
-			//}
 
-   //         if (PrimaryKey != null)
-   //         {
-   //             writer.WritePropertyName("PrimaryKey");
-			//	PrimaryKey.ToStringRaw(writer);
-   //         }
+			if (j.TryGetValue("PrimaryKey", out o))
+				schema.PrimaryKey = JMXPrimaryKey.ReadFrom(o);
 
-   //         writer.WritePropertyName("Attributes");
-   //         writer.WriteStartArray();
+			if (j.TryGetValue("ForeignKeys", out JsonArray a))
+				foreach (JsonObject obj in a)
+					schema.ForeignKeys.Add(JMXForeignKey.ReadFrom(obj));
+
+			if (j.TryGetValue("Indexes", out a))
+				foreach (JsonObject obj in a)
+					schema.Indexes.Add(JMXIndex.ReadFrom(obj));
+
+			if (j.TryGetValue("Conditions", out a))
+				foreach (JsonObject obj in a)
+					schema.Conditions.Add(JMXCondition.ReadFrom(obj));
+			
+			//         writer.WritePropertyName("Attributes");
+			//         writer.WriteStartArray();
 			//foreach (var item in _attributes)
 			//	item.ToStringRaw(writer);
-   //         writer.WriteEndArray();
+			//         writer.WriteEndArray();
 
-   //         writer.WritePropertyName("Parameters");
-   //         writer.WriteStartArray();
+			//         writer.WritePropertyName("Parameters");
+			//         writer.WriteStartArray();
 			//foreach (var item in _parameters)
 			//	item.ToStringRaw(writer);
-   //         writer.WriteEndArray();
-
-   //         writer.WritePropertyName("Indexes");
-   //         writer.WriteStartArray();
-			//foreach (var item in _indexes)
-			//	item.ToStringRaw(writer);
-   //         writer.WriteEndArray();
-
-   //         writer.WritePropertyName("ForeignKeys");
-   //         writer.WriteStartArray();
-			//foreach (var item in _fkeys)
-			//	item.ToStringRaw(writer);
-   //         writer.WriteEndArray();
-
-   //         writer.WritePropertyName("Conditions");
-   //         writer.WriteStartArray();
-			//foreach (var item in _conditions)
-			//	item.ToStringRaw(writer);
-			//writer.WriteEndArray();
-			//writer.WriteEndObject();
+			//         writer.WriteEndArray();
 			return schema;
-        }
+		}
+
 #if NETCOREAPP
-        public static JMXSchema ParseXml(string schemaXML)
+		public static JMXSchema ParseXml(string schemaXML)
         {
             schemaXML.NullTest(nameof(schemaXML));
             var xDoc = XDocument.Parse(schemaXML);

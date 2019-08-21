@@ -1003,8 +1003,7 @@ namespace S031.MetaStack.Core.ORM.SQLite
 				else
 					att.DataSize = new JMXDataSize(s.ToIntOrDefault());
 			var serverType = source.GetToken(0, " ")
-				.Replace("[", "")
-				.Replace("]", "");
+				.RemoveChar("[]".ToCharArray());
 			att.ServerDataType = serverType;
 			if (TypeInfo.ContainsKey(serverType))
 				att.DataType = TypeInfo[serverType].MdbType;

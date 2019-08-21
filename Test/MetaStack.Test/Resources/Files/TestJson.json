@@ -1,392 +1,436 @@
 {
-	"ObjectName": "CashFlow_NK",
-	"UID": "E0475055-7336-4342-AEA5-DCE77E8575C2",
-	"Name": "Денежные потоки",
-	"DbObjectName": {
-		"AreaName": "dbo",
-		"ObjectName": "CashFlow_NKN"
-	},
-	"Attributes": [{
-			"ID": 1,
-			"AttribName": "BranchID",
-			"FieldName": "BranchID",
-			"Position": 1,
-			"ServerDataType": "numeric",
-			"DataType": "decimal",
-			"DataSize": {
-				"Size": 9,
-				"Scale": 0,
-				"Precision": 15
-			},
-			"IsNullable": false,
-			"NullOption": "NOT NULL",
-			"DefaultConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			},
-			"CheckConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			}
-		}, {
-			"ID": 2,
-			"AttribName": "Date",
-			"FieldName": "Date",
-			"Position": 2,
-			"ServerDataType": "smalldatetime",
-			"DataType": "dateTime",
-			"DataSize": {
-				"Size": 4,
-				"Scale": 0,
-				"Precision": 16
-			},
-			"IsNullable": false,
-			"NullOption": "NOT NULL",
-			"DefaultConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			},
-			"CheckConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			}
-		}, {
-			"ID": 3,
-			"AttribName": "DealID",
-			"FieldName": "DealID",
-			"Position": 3,
-			"ServerDataType": "numeric",
-			"DataType": "decimal",
-			"DataSize": {
-				"Size": 9,
-				"Scale": 0,
-				"Precision": 15
-			},
-			"IsNullable": true,
-			"NullOption": "NULL",
-			"DefaultConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			},
-			"CheckConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			}
-		}, {
-			"ID": 4,
-			"AttribName": "ResourceID",
-			"FieldName": "ResourceID",
-			"Position": 4,
-			"ServerDataType": "numeric",
-			"DataType": "decimal",
-			"DataSize": {
-				"Size": 9,
-				"Scale": 0,
-				"Precision": 15
-			},
-			"IsNullable": true,
-			"NullOption": "NULL",
-			"DefaultConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			},
-			"CheckConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			}
-		}, {
-			"ID": 5,
-			"AttribName": "InstitutionID",
-			"FieldName": "InstitutionID",
-			"Position": 5,
-			"ServerDataType": "numeric",
-			"DataType": "decimal",
-			"DataSize": {
-				"Size": 9,
-				"Scale": 0,
-				"Precision": 15
-			},
-			"IsNullable": true,
-			"NullOption": "NULL",
-			"DefaultConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			},
-			"CheckConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			}
-		}, {
-			"ID": 6,
-			"AttribName": "ModuleID",
-			"FieldName": "ModuleID",
-			"Position": 6,
-			"ServerDataType": "numeric",
-			"DataType": "decimal",
-			"DataSize": {
-				"Size": 9,
-				"Scale": 0,
-				"Precision": 15
-			},
-			"IsNullable": false,
-			"NullOption": "NOT NULL",
-			"DefaultConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			},
-			"CheckConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			}
-		}, {
-			"ID": 7,
-			"AttribName": "InstrumentID",
-			"FieldName": "InstrumentID",
-			"Position": 7,
-			"ServerDataType": "numeric",
-			"DataType": "decimal",
-			"DataSize": {
-				"Size": 9,
-				"Scale": 0,
-				"Precision": 15
-			},
-			"IsNullable": true,
-			"NullOption": "NULL",
-			"DefaultConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			},
-			"CheckConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			}
-		}, {
-			"ID": 8,
-			"AttribName": "Interest",
-			"FieldName": "Interest",
-			"Position": 8,
-			"ServerDataType": "float",
-			"DataType": "float",
-			"DataSize": {
-				"Size": 8,
-				"Scale": 0,
-				"Precision": 53
-			},
-			"IsNullable": true,
-			"NullOption": "NULL",
-			"DefaultConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			},
-			"CheckConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			}
-		}, {
-			"ID": 9,
-			"AttribName": "CashTypeID",
-			"FieldName": "CashTypeID",
-			"Position": 9,
-			"ServerDataType": "int",
-			"DataType": "int",
-			"DataSize": {
-				"Size": 4,
-				"Scale": 0,
-				"Precision": 10
-			},
-			"IsNullable": false,
-			"NullOption": "NOT NULL",
-			"DefaultConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			},
-			"CheckConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			}
-		}, {
-			"ID": 10,
-			"AttribName": "DateCash",
-			"FieldName": "DateCash",
-			"Position": 10,
-			"ServerDataType": "smalldatetime",
-			"DataType": "dateTime",
-			"DataSize": {
-				"Size": 4,
-				"Scale": 0,
-				"Precision": 16
-			},
-			"IsNullable": false,
-			"NullOption": "NOT NULL",
-			"DefaultConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			},
-			"CheckConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			}
-		}, {
-			"ID": 11,
-			"AttribName": "QtyBs",
-			"FieldName": "QtyBs",
-			"Position": 11,
-			"ServerDataType": "numeric",
-			"DataType": "decimal",
-			"DataSize": {
-				"Size": 9,
-				"Scale": 2,
-				"Precision": 16
-			},
-			"IsNullable": false,
-			"NullOption": "NOT NULL",
-			"DefaultConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			},
-			"CheckConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			}
-		}, {
-			"ID": 12,
-			"AttribName": "Confirmed",
-			"FieldName": "Confirmed",
-			"Position": 12,
-			"ServerDataType": "int",
-			"DataType": "int",
-			"DataSize": {
-				"Size": 4,
-				"Scale": 0,
-				"Precision": 10
-			},
-			"IsNullable": true,
-			"NullOption": "NULL",
-			"DefaultConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			},
-			"CheckConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			}
-		}, {
-			"ID": 13,
-			"AttribName": "OperationID",
-			"FieldName": "OperationID",
-			"Position": 13,
-			"ServerDataType": "numeric",
-			"DataType": "decimal",
-			"DataSize": {
-				"Size": 9,
-				"Scale": 0,
-				"Precision": 15
-			},
-			"IsNullable": true,
-			"NullOption": "NULL",
-			"DefaultConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			},
-			"CheckConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			}
-		}, {
-			"ID": 14,
-			"AttribName": "Qty",
-			"FieldName": "Qty",
-			"Position": 14,
-			"ServerDataType": "numeric",
-			"DataType": "decimal",
-			"DataSize": {
-				"Size": 9,
-				"Scale": 2,
-				"Precision": 16
-			},
-			"IsNullable": true,
-			"NullOption": "NULL",
-			"DefaultConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			},
-			"CheckConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			}
-		}, {
-			"ID": 15,
-			"AttribName": "Cur",
-			"FieldName": "Cur",
-			"Position": 15,
-			"ServerDataType": "char",
-			"DataType": "string",
-			"DataSize": {
-				"Size": 3,
-				"Scale": 0,
-				"Precision": 0
-			},
-			"CollationName": "Cyrillic_General_CI_AS",
-			"IsNullable": true,
-			"NullOption": "NULL",
-			"DefaultConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			},
-			"CheckConstraint": {
-				"ConstraintName": "",
-				"Definition": ""
-			}
-		}
-	],
-	"Indexes": [{
-			"IndexName": "Наименование индекса",
-			"IsUnique": false,
-			"ClusteredOption": 0,
-			"KeyMembers": [{
-					"FieldName": "Date",
-					"Position": 1,
-					"IsDescending": false,
-					"IsIncluded": false
-				}, {
-					"FieldName": "BranchID",
-					"Position": 2,
-					"IsDescending": false,
-					"IsIncluded": false
-				}, {
-					"FieldName": "CashTypeID",
-					"Position": 3,
-					"IsDescending": false,
-					"IsIncluded": false
-				}
-			]
-		}, {
-			"IndexName": "CF_DealID",
-			"IsUnique": false,
-			"ClusteredOption": 0,
-			"KeyMembers": [{
-					"FieldName": "DealID",
-					"Position": 1,
-					"IsDescending": false,
-					"IsIncluded": false
-				}, {
-					"FieldName": "Date",
-					"Position": 2,
-					"IsDescending": false,
-					"IsIncluded": false
-				}
-			]
-		}, {
-			"IndexName": "CF_Module",
-			"IsUnique": false,
-			"ClusteredOption": 0,
-			"KeyMembers": [{
-					"FieldName": "ModuleID",
-					"Position": 1,
-					"IsDescending": false,
-					"IsIncluded": false
-				}
-			]
-		}
-	]
+  "ObjectName": "SysSchema",
+  "UID": "c3d29d6d-bd55-4395-8371-2e1208236ba1",
+  "Name": "Схемы объектов",
+  "DbObjectName": {
+    "AreaName": "SysCat",
+    "ObjectName": "SysSchemas"
+  },
+  "Attributes": [
+    {
+      "ID": 1,
+      "AttribName": "ID",
+      "FieldName": "ID",
+      "Position": 1,
+      "ServerDataType": "int",
+      "DataType": "int",
+      "IsPK": true,
+      "DataSize": {
+        "Size": 4,
+        "Scale": 0,
+        "Precision": 10
+      },
+      "IsNullable": false,
+      "NullOption": "NOT NULL",
+      "DefaultConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      },
+      "CheckConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      },
+      "Identity": {
+        "IsIdentity": true,
+        "Seed": 1,
+        "Increment": 1
+      }
+    },
+    {
+      "ID": 2,
+      "AttribName": "UID",
+      "FieldName": "UID",
+      "Position": 2,
+      "ServerDataType": "uniqueidentifier",
+      "DataType": "guid",
+      "DataSize": {
+        "Size": 16,
+        "Scale": 0,
+        "Precision": 0
+      },
+      "IsNullable": false,
+      "NullOption": "NOT NULL",
+      "DefaultConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      },
+      "CheckConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      }
+    },
+    {
+      "ID": 3,
+      "AttribName": "SysAreaID",
+      "FieldName": "SysAreaID",
+      "Position": 3,
+      "ServerDataType": "int",
+      "DataType": "int",
+      "DataSize": {
+        "Size": 4,
+        "Scale": 0,
+        "Precision": 10
+      },
+      "IsNullable": false,
+      "NullOption": "NOT NULL",
+      "DefaultConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      },
+      "CheckConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      }
+    },
+    {
+      "ID": 4,
+      "AttribName": "ObjectType",
+      "FieldName": "ObjectType",
+      "Position": 4,
+      "ServerDataType": "varchar",
+      "DataType": "string",
+      "DataSize": {
+        "Size": 30,
+        "Scale": 0,
+        "Precision": 0
+      },
+      "CollationName": "Cyrillic_General_CI_AS",
+      "IsNullable": false,
+      "NullOption": "NOT NULL",
+      "DefaultConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      },
+      "CheckConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      }
+    },
+    {
+      "ID": 5,
+      "AttribName": "ObjectName",
+      "FieldName": "ObjectName",
+      "Position": 5,
+      "ServerDataType": "varchar",
+      "DataType": "string",
+      "DataSize": {
+        "Size": 60,
+        "Scale": 0,
+        "Precision": 0
+      },
+      "CollationName": "Cyrillic_General_CI_AS",
+      "IsNullable": false,
+      "NullOption": "NOT NULL",
+      "DefaultConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      },
+      "CheckConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      }
+    },
+    {
+      "ID": 6,
+      "AttribName": "ObjectSchema",
+      "FieldName": "ObjectSchema",
+      "Position": 6,
+      "ServerDataType": "varchar",
+      "DataType": "string",
+      "DataSize": {
+        "Size": -1,
+        "Scale": 0,
+        "Precision": 0
+      },
+      "CollationName": "Cyrillic_General_CI_AS",
+      "IsNullable": false,
+      "NullOption": "NOT NULL",
+      "DefaultConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      },
+      "CheckConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      }
+    },
+    {
+      "ID": 7,
+      "AttribName": "DbObjectName",
+      "FieldName": "DbObjectName",
+      "Position": 7,
+      "ServerDataType": "varchar",
+      "DataType": "string",
+      "DataSize": {
+        "Size": 60,
+        "Scale": 0,
+        "Precision": 0
+      },
+      "CollationName": "Cyrillic_General_CI_AS",
+      "IsNullable": false,
+      "NullOption": "NOT NULL",
+      "DefaultConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      },
+      "CheckConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      }
+    },
+    {
+      "ID": 8,
+      "AttribName": "UpdateTime",
+      "FieldName": "UpdateTime",
+      "Position": 8,
+      "ServerDataType": "datetime",
+      "DataType": "dateTime",
+      "DataSize": {
+        "Size": 8,
+        "Scale": 3,
+        "Precision": 23
+      },
+      "IsNullable": false,
+      "NullOption": "NOT NULL",
+      "DefaultConstraint": {
+        "ConstraintName": "DF_UpdateTime_SysSchemas",
+        "Definition": "(getdate())"
+      },
+      "CheckConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      }
+    },
+    {
+      "ID": 9,
+      "AttribName": "Version",
+      "FieldName": "Version",
+      "Position": 9,
+      "ServerDataType": "varchar",
+      "DataType": "string",
+      "DataSize": {
+        "Size": 30,
+        "Scale": 0,
+        "Precision": 0
+      },
+      "CollationName": "Cyrillic_General_CI_AS",
+      "IsNullable": false,
+      "NullOption": "NOT NULL",
+      "DefaultConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      },
+      "CheckConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      }
+    },
+    {
+      "ID": 10,
+      "AttribName": "SyncState",
+      "FieldName": "SyncState",
+      "Position": 10,
+      "ServerDataType": "int",
+      "DataType": "int",
+      "DataSize": {
+        "Size": 4,
+        "Scale": 0,
+        "Precision": 10
+      },
+      "IsNullable": false,
+      "NullOption": "NOT NULL",
+      "DefaultConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      },
+      "CheckConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      }
+    },
+    {
+      "ID": 11,
+      "AttribName": "DateBegin",
+      "FieldName": "DateBegin",
+      "Position": 11,
+      "ServerDataType": "datetime",
+      "DataType": "dateTime",
+      "DataSize": {
+        "Size": 8,
+        "Scale": 3,
+        "Precision": 23
+      },
+      "IsNullable": false,
+      "NullOption": "NOT NULL",
+      "DefaultConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      },
+      "CheckConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      }
+    },
+    {
+      "ID": 12,
+      "AttribName": "DateEnd",
+      "FieldName": "DateEnd",
+      "Position": 12,
+      "ServerDataType": "datetime",
+      "DataType": "dateTime",
+      "DataSize": {
+        "Size": 8,
+        "Scale": 3,
+        "Precision": 23
+      },
+      "IsNullable": true,
+      "NullOption": "NULL",
+      "DefaultConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      },
+      "CheckConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      }
+    },
+    {
+      "ID": 13,
+      "AttribName": "PreviosID",
+      "FieldName": "PreviosID",
+      "Position": 13,
+      "ServerDataType": "int",
+      "DataType": "int",
+      "DataSize": {
+        "Size": 4,
+        "Scale": 0,
+        "Precision": 10
+      },
+      "IsNullable": true,
+      "NullOption": "NULL",
+      "DefaultConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      },
+      "CheckConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      }
+    },
+    {
+      "ID": 14,
+      "AttribName": "AuditEnabled",
+      "FieldName": "AuditEnabled",
+      "Position": 14,
+      "ServerDataType": "bit",
+      "DataType": "bool",
+      "DataSize": {
+        "Size": 1,
+        "Scale": 0,
+        "Precision": 1
+      },
+      "IsNullable": false,
+      "NullOption": "NOT NULL",
+      "DefaultConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      },
+      "CheckConstraint": {
+        "ConstraintName": "",
+        "Definition": ""
+      }
+    }
+  ],
+  "PrimaryKey": {
+    "KeyName": "PK_SYSSCHEMAS",
+    "KeyMembers": [
+      {
+        "FieldName": "ID",
+        "IsDescending": false
+      }
+    ]
+  },
+  "ForeignKeys": [
+    {
+      "KeyName": "FK_SYSSCHEMAS_SYSAREAS",
+      "CheckOption": true,
+      "DeleteRefAction": "",
+      "UpdateRefAction": "",
+      "RefDbObjectName": {
+        "AreaName": "SysCat",
+        "ObjectName": "SysAreas"
+      },
+      "KeyMembers": [
+        {
+          "FieldName": "SysAreaID",
+          "Position": 1
+        }
+      ],
+      "RefKeyMembers": [
+        {
+          "FieldName": "ID",
+          "Position": 1
+        }
+      ],
+      "MigrateKeyMembers": [
+        {
+          "FieldName": "SchemaName",
+          "Position": 1
+        }
+      ]
+    }
+  ],
+  "Indexes": [
+    {
+      "IndexName": "IE1_SysSchemas",
+      "IsUnique": false,
+      "ClusteredOption": 0,
+      "KeyMembers": [
+        {
+          "FieldName": "SysAreaID",
+          "Position": 1,
+          "IsDescending": false,
+          "IsIncluded": false
+        },
+        {
+          "FieldName": "ObjectName",
+          "Position": 2,
+          "IsDescending": false,
+          "IsIncluded": false
+        }
+      ]
+    },
+    {
+      "IndexName": "IE2_SysSchemas",
+      "IsUnique": false,
+      "ClusteredOption": 0,
+      "KeyMembers": [
+        {
+          "FieldName": "SysAreaID",
+          "Position": 1,
+          "IsDescending": false,
+          "IsIncluded": false
+        },
+        {
+          "FieldName": "DbObjectName",
+          "Position": 2,
+          "IsDescending": false,
+          "IsIncluded": false
+        }
+      ]
+    },
+    {
+      "IndexName": "IE4_SysSchemas",
+      "IsUnique": false,
+      "ClusteredOption": 0,
+      "KeyMembers": [
+        {
+          "FieldName": "UID",
+          "Position": 1,
+          "IsDescending": false,
+          "IsIncluded": false
+        }
+      ]
+    }
+  ]
 }
