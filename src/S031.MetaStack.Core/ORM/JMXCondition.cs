@@ -76,14 +76,13 @@ namespace S031.MetaStack.WinForms.ORM
 			writer.WriteEndObject();
 		}
 
-		internal static JMXCondition ReadFrom(JsonObject o)
+		protected internal JMXCondition(JsonObject o)
 		{
-			var condition = new JMXCondition()
-			{
-				ConditionType = o.GetEnum<JMXConditionTypes>("ConditionType"),
-				Definition = o["Definition"]
-			};
-			return condition;
+			ConditionType = o.GetEnum<JMXConditionTypes>("ConditionType");
+			Definition = o["Definition"];
 		}
+
+		internal static JMXCondition ReadFrom(JsonObject o) 
+			=> new JMXCondition(o);
 	}
 }

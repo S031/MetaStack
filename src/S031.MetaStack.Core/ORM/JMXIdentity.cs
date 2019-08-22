@@ -17,14 +17,12 @@ namespace S031.MetaStack.WinForms.ORM
         public bool IsIdentity { get; set; }
         public int Seed { get; set; }
         public int Increment { get; set; }
-
 		public override string ToString()
 		{
 			JsonWriter writer = new JsonWriter(Formatting.None);
 			ToStringRaw(writer);
 			return writer.ToString();
 		}
-
 		public void ToStringRaw(JsonWriter writer)
 		{
 			writer.WriteStartObject();
@@ -33,5 +31,16 @@ namespace S031.MetaStack.WinForms.ORM
 			writer.WriteProperty("Increment", Increment);
 			writer.WriteEndObject();
 		}
+		internal static JMXIdentity ReadFrom(JsonObject o)
+		{
+			var identity = new JMXIdentity()
+			{
+				IsIdentity = o.GetBoolOrDefault("IsIdentity"),
+				Seed = o.GetIntOrDefault("Seed"),
+				Increment = o.GetIntOrDefault("Increment")
+			};
+			return identity;
+		}
+
 	}
 }

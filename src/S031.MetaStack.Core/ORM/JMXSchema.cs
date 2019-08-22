@@ -226,6 +226,7 @@ namespace S031.MetaStack.WinForms.ORM
 				foreach (JsonObject obj in a)
 					schema.Conditions.Add(JMXCondition.ReadFrom(obj));
 			
+
 			//         writer.WritePropertyName("Attributes");
 			//         writer.WriteStartArray();
 			//foreach (var item in _attributes)

@@ -84,5 +84,16 @@ namespace S031.MetaStack.WinForms.ORM
 			writer.WriteProperty("CheckOption", CheckOption);
 			writer.WriteEndObject();
 		}
+
+		protected internal JMXConstraint(JsonObject o)
+		{
+			ConstraintType = o.GetEnum<JMXConstraintTypes>("ConstraintType");
+			Definition = o.GetStringOrDefault("Definition");
+			CheckOption = o.GetBoolOrDefault("CheckOption");
+			ConstraintName = o.GetStringOrDefault("ConstraintName");
+		}
+
+		internal static JMXConstraint ReadFrom(JsonObject o)
+			=> new JMXConstraint(o);
 	}
 }

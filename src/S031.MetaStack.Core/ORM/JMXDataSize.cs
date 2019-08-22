@@ -34,14 +34,12 @@ namespace S031.MetaStack.WinForms.ORM
 			return new { Size, Scale, Precision }.GetHashCode();
 		}
 		public bool IsEmpty() => Size == 0 && Scale == 0 && Precision == 0;
-
 		public override string ToString()
 		{
 			JsonWriter writer = new JsonWriter(Formatting.None);
 			ToStringRaw(writer);
 			return writer.ToString();
 		}
-
 		public void ToStringRaw(JsonWriter writer)
 		{
 			writer.WriteStartObject();
@@ -50,5 +48,13 @@ namespace S031.MetaStack.WinForms.ORM
 			writer.WriteProperty("Precision", Precision);
 			writer.WriteEndObject();
 		}
+		internal JMXDataSize(JsonObject o)
+		{
+			Size = o.GetIntOrDefault("Size");
+			Scale = o.GetIntOrDefault("Scale");
+			Precision = o.GetIntOrDefault("Precision");
+		}
+		internal static JMXDataSize ReadFrom(JsonObject o)
+			=> new JMXDataSize(o);
 	}
 }

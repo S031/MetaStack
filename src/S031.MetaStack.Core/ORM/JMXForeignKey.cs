@@ -164,28 +164,26 @@ namespace S031.MetaStack.WinForms.ORM
 			writer.WriteEndArray();
 			writer.WriteEndObject();
 		}
-		internal static JMXForeignKey ReadFrom(JsonObject o)
+
+		protected internal JMXForeignKey(JsonObject o) : this(o["KeyName"])
 		{
-			var fk = new JMXForeignKey(o["KeyName"])
-			{
-				CheckOption = o.GetBoolOrDefault("CheckOption"),
-				DeleteRefAction = o.GetStringOrDefault("DeleteRefAction"),
-				UpdateRefAction = o.GetStringOrDefault("DeleteRefAction"),
-				ID = o.GetIntOrDefault("ID"),
-				UID = o.GetGuidOrDefault("UID")
-			};
+			CheckOption = o.GetBoolOrDefault("CheckOption");
+			DeleteRefAction = o.GetStringOrDefault("DeleteRefAction");
+			UpdateRefAction = o.GetStringOrDefault("DeleteRefAction");
+			ID = o.GetIntOrDefault("ID");
+			UID = o.GetGuidOrDefault("UID");
 
 			if (o.TryGetValue("RefObjectName", out JsonObject j))
-				fk.RefObjectName = new JMXObjectName(j.GetStringOrDefault("AreaName"), j.GetStringOrDefault("ObjectName"));
+				RefObjectName = new JMXObjectName(j.GetStringOrDefault("AreaName"), j.GetStringOrDefault("ObjectName"));
 
 			if (o.TryGetValue("RefDbObjectName", out j))
-				fk.RefDbObjectName = new JMXObjectName(j.GetStringOrDefault("AreaName"), j.GetStringOrDefault("ObjectName"));
+				RefDbObjectName = new JMXObjectName(j.GetStringOrDefault("AreaName"), j.GetStringOrDefault("ObjectName"));
 
 			if (o.TryGetValue("KeyMembers", out JsonArray a))
 			{
 				foreach (JsonObject m in a)
 				{
-					fk.KeyMembers.Add(new JMXKeyMember()
+					KeyMembers.Add(new JMXKeyMember()
 					{
 						FieldName = m["FieldName"],
 						Position = m.GetIntOrDefault("Position"),
@@ -199,7 +197,7 @@ namespace S031.MetaStack.WinForms.ORM
 			{
 				foreach (JsonObject m in a)
 				{
-					fk.RefKeyMembers.Add(new JMXKeyMember()
+					RefKeyMembers.Add(new JMXKeyMember()
 					{
 						FieldName = m["FieldName"],
 						Position = m.GetIntOrDefault("Position"),
@@ -213,7 +211,7 @@ namespace S031.MetaStack.WinForms.ORM
 			{
 				foreach (JsonObject m in a)
 				{
-					fk.MigrateKeyMembers.Add(new JMXKeyMember()
+					MigrateKeyMembers.Add(new JMXKeyMember()
 					{
 						FieldName = m["FieldName"],
 						Position = m.GetIntOrDefault("Position"),
@@ -222,8 +220,10 @@ namespace S031.MetaStack.WinForms.ORM
 					});
 				}
 			}
-			return fk;
 		}
+
+		internal static JMXForeignKey ReadFrom(JsonObject o)
+			=> new JMXForeignKey(o);
 	}
 }
 

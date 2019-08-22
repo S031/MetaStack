@@ -228,5 +228,34 @@ namespace S031.MetaStack.WinForms.ORM
 			ToStringRaw(writer);
 			return writer.ToString();
 		}
+
+		protected internal JMXAttribute(JsonObject o)
+		{
+			ID = o.GetIntOrDefault("ID");
+			UID = o.GetGuidOrDefault("UID");
+			AttribName = o.GetStringOrDefault("AttribName");
+			Position = o.GetIntOrDefault("Position");
+			ServerDataType = o.GetStringOrDefault("ServerDataType");
+			IsNullable = o.GetBoolOrDefault("IsNullable");
+			Required = o.GetBoolOrDefault("Required");
+			CollationName = o.GetStringOrDefault("CollationName");
+			IsPK = o.GetBoolOrDefault("IsPK");
+			IsFK = o.GetBoolOrDefault("IsFK");
+			Name = o.GetStringOrDefault("Name");
+			Caption = o.GetStringOrDefault("Caption");
+			DataType = o.GetEnum<MdbType>("DataType");
+			Width = o.GetIntOrDefault("Width");
+
+			if (o.TryGetValue("CheckConstraint", out JsonObject j))
+				CheckConstraint = JMXConstraint.ReadFrom(j);
+			if (o.TryGetValue("DefaultConstraint", out j))
+				DefaultConstraint = JMXConstraint.ReadFrom(j);
+			if (o.TryGetValue("DataSize", out j))
+				DataSize = JMXDataSize.ReadFrom(j);
+			if (o.TryGetValue("Identity", out j))
+				Identity = JMXIdentity.ReadFrom(j);
+		}
+		internal static JMXAttribute ReadFrom(JsonObject o)
+			=> new JMXAttribute(o);
 	}
 }
