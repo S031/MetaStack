@@ -8,12 +8,11 @@ namespace S031.MetaStack.Core.ORM
 namespace S031.MetaStack.WinForms.ORM
 #endif
 {
-	public class JMXIndex
+	public sealed class JMXIndex
     {
-		private List<JMXKeyMember> _keyMembers;
 		public JMXIndex()
 		{
-			_keyMembers = new List<JMXKeyMember>();
+			KeyMembers = new List<JMXKeyMember>();
 		}
 		public JMXIndex(string indexName, params string[] keyMemberNamnes):this()
 		{
@@ -25,30 +24,31 @@ namespace S031.MetaStack.WinForms.ORM
 		public string IndexName { get; set; }
 		public bool IsUnique { get; set; }
 		public int ClusteredOption { get; set; }
-		public List<JMXKeyMember> KeyMembers { get => _keyMembers; }
+		public List<JMXKeyMember> KeyMembers { get; }
 		public void AddKeyMember(params JMXKeyMember[] members)
 		{
 			foreach (var m in members)
-				_keyMembers.Add(m);
+				KeyMembers.Add(m);
 		}
 		public void AddKeyMember(params string[] attribNames)
 		{
-			int position = _keyMembers.Count + 1;
+			int position = KeyMembers.Count + 1;
 			foreach (var n in attribNames)
 			{
-				_keyMembers.Add(new JMXKeyMember() { FieldName = n, Position = position });
+				KeyMembers.Add(new JMXKeyMember() { FieldName = n, Position = position });
 				position++;
 			}
 		}
 		public override string ToString()
 		{
 			JsonWriter writer = new JsonWriter(Formatting.None);
+			writer.WriteStartObject();
 			ToStringRaw(writer);
+			writer.WriteEndObject();
 			return writer.ToString();
 		}
 		public void ToStringRaw(JsonWriter writer)
 		{
-			writer.WriteStartObject();
 			writer.WriteProperty("ID", ID);
 			writer.WriteProperty("UID", UID);
 			writer.WriteProperty("IndexName", IndexName);
@@ -56,36 +56,25 @@ namespace S031.MetaStack.WinForms.ORM
 			writer.WriteProperty("ClusteredOption", ClusteredOption);
 			writer.WritePropertyName("KeyMembers");
 			writer.WriteStartArray();
-			foreach (var item in _keyMembers)
+			foreach (var item in KeyMembers)
 				item.ToStringRaw(writer);
 			writer.WriteEndArray();
-			writer.WriteEndObject();
+		}
+		internal JMXIndex(JsonObject o)
+		{
+			IndexName = o.GetStringOrDefault("IndexName");
+			ClusteredOption = o.GetIntOrDefault("ClusteredOption");
+			IsUnique = o.GetBoolOrDefault("IsUnique");
+			ID = o.GetIntOrDefault("ID");
+			UID = o.GetGuidOrDefault("UID");
+
+			KeyMembers = new List<JMXKeyMember>();
+			if (o.TryGetValue("KeyMembers", out JsonArray a))
+				foreach (JsonObject m in a)
+					KeyMembers.Add(JMXKeyMember.ReadFrom(m));
+
 		}
 		internal static JMXIndex ReadFrom(JsonObject o)
-		{
-			var fk = new JMXIndex()
-			{
-				IndexName = o["IndexName"],
-				ClusteredOption = o.GetIntOrDefault("ClusteredOption"),
-				IsUnique = o.GetBoolOrDefault("IsUnique"),
-				ID = o.GetIntOrDefault("ID"),
-				UID = o.GetGuidOrDefault("UID")
-			};
-
-			if (o.TryGetValue("KeyMembers", out JsonArray a))
-			{
-				foreach (JsonObject m in a)
-				{
-					fk.KeyMembers.Add(new JMXKeyMember()
-					{
-						FieldName = m["FieldName"],
-						Position = m.GetIntOrDefault("Position"),
-						IsIncluded = m.GetBoolOrDefault("IsIncluded"),
-						IsDescending = m.GetBoolOrDefault("IsDescending")
-					});
-				}
-			}
-			return fk;
-		}
+			=> new JMXIndex(o);
 	}
 }

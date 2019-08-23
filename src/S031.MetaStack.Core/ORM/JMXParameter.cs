@@ -6,7 +6,7 @@ using S031.MetaStack.WinForms.Data;
 namespace S031.MetaStack.WinForms.ORM
 #endif
 {
-	public class JMXParameter : JMXAttribute
+	public sealed class JMXParameter : JMXAttribute
 	{
 		public JMXParameter():base()
 		{
@@ -36,9 +36,18 @@ namespace S031.MetaStack.WinForms.ORM
 		public override string ToString()
 		{
 			JsonWriter writer = new JsonWriter(Formatting.None);
+			writer.WriteStartObject();
 			ToStringRaw(writer);
+			writer.WriteEndObject();
 			return writer.ToString();
 		}
 
+		internal JMXParameter(JsonObject o) : base(o)
+		{
+			Dirrect = o.GetEnum<Actions.ParamDirrect>("Dirrect");
+			NullIfEmpty = o.GetBoolOrDefault("NullIfEmpty");
+		}
+		internal static new JMXParameter ReadFrom(JsonObject o)
+			=> new JMXParameter(o);
 	}
 }

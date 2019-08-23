@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using S031.MetaStack.Common;
+using System.Linq;
 #if NETCOREAPP
 using S031.MetaStack.Core.Data;
 namespace S031.MetaStack.Core.ORM
@@ -13,22 +15,16 @@ namespace S031.MetaStack.WinForms.ORM
 {
 	public class JMXAttribute
 	{
-		private string _attribName;
-		private JMXSchema _schema;
-		private JMXDataSize _dataSize;
-		private JMXIdentity _identity;
-		private readonly List<string> _listItems;
-		private readonly List<object> _listData;
 		private JMXConstraint _checkConstraint;
 		private JMXConstraint _defaultConstraint;
-		private MdbType _dataType;
+
 		public JMXAttribute()
 		{
-			_identity = new JMXIdentity();
-			_listItems = new List<string>();
-			_listData = new List<object>();
-			_dataType = MdbType.@null;
-			_dataSize = new JMXDataSize();
+			Identity = new JMXIdentity();
+			ListItems = new List<string>();
+			ListData = new List<object>();
+			DataType = MdbType.@null;
+			DataSize = new JMXDataSize();
 			UID = Guid.NewGuid();
 			ServerDataType = string.Empty;
 			IsNullable = true;
@@ -56,13 +52,13 @@ namespace S031.MetaStack.WinForms.ORM
 		}
 		public JMXAttribute(string attrtibName) : this()
 		{
-			_attribName = attrtibName;
+			AttribName = attrtibName;
 		}
 
 		#region DBServerSpecificAttributes
 		public int ID { get; set; }
 		public Guid UID { get; set; }
-		public string AttribName { get => _attribName; set => _attribName = value; }
+		public string AttribName { get; set; }
 		public int Position { get; set; }
 		public string ServerDataType { get; set; }
 		public bool IsNullable { get; set; }
@@ -71,8 +67,8 @@ namespace S031.MetaStack.WinForms.ORM
 		public string CollationName { get; set; }
 		public bool IsPK { get; set; }
 		public bool IsFK { get; set; }
-		public JMXDataSize DataSize { get => _dataSize; set => _dataSize = value; }
-		public JMXIdentity Identity { get => _identity; set => _identity = value; }
+		public JMXDataSize DataSize { get; set; }
+		public JMXIdentity Identity { get; set; }
 		public JMXConstraint CheckConstraint
 		{
 			get => _checkConstraint;
@@ -97,20 +93,16 @@ namespace S031.MetaStack.WinForms.ORM
 		public string Name { get; set; }
 		public string Caption { get => Name; set => Name = value; }
 
-		public MdbType DataType
-		{
-			get => _dataType;//.ToString();
-			set => _dataType = value;// MdbTypeMap.GetTypeInfo(MdbTypeMap.GetType(value)).MdbType;
-		}
+		public MdbType DataType { get; set; }
 		public int Width
 		{
-			get => _dataType.GetTypeInfo().FixedSize ? _dataSize.Precision : _dataSize.Size;
+			get => DataType.GetTypeInfo().FixedSize ? DataSize.Precision : DataSize.Size;
 			set
 			{
-				if (_dataType.GetTypeInfo().FixedSize)
-					_dataSize.Precision = value;
+				if (DataType.GetTypeInfo().FixedSize)
+					DataSize = new JMXDataSize(DataSize.Size, DataSize.Scale, value);
 				else
-					_dataSize.Size = value;
+					DataSize = new JMXDataSize(value, DataSize.Scale, DataSize.Precision);
 			}
 		}
 		public bool Locate { get => (Visible || !ReadOnly); }
@@ -130,8 +122,8 @@ namespace S031.MetaStack.WinForms.ORM
 		public string SuperObject { get; set; }
 		public string SuperMethod { get; set; }
 		public string SuperFilter { get; set; }
-		public List<string> ListItems { get => _listItems; }
-		public List<object> ListData { get => _listData; }
+		public List<string> ListItems { get; }
+		public List<object> ListData { get; }
 		public string FieldName { get; set; }
 		public string ConstName { get; set; }
 		public string Agregate { get; set; }
@@ -143,7 +135,7 @@ namespace S031.MetaStack.WinForms.ORM
 		/// </summary>
 		public string ObjectName { get; set; }
 		public bool IsArray { get; set; }
-		public JMXSchema ObjectSchema { get => _schema; set => _schema = value; }
+		public JMXSchema ObjectSchema { get; set; }
 		public virtual void ToStringRaw(JsonWriter writer)
 		{
 			writer.WriteProperty("ID", ID);
@@ -161,20 +153,28 @@ namespace S031.MetaStack.WinForms.ORM
 			if (!CheckConstraint.IsEmpty())
 			{
 				writer.WritePropertyName("CheckConstraint");
+				writer.WriteStartObject();
 				CheckConstraint.ToStringRaw(writer);
+				writer.WriteEndObject();
 			}
 
 			if (!DefaultConstraint.IsEmpty())
 			{
 				writer.WritePropertyName("DefaultConstraint");
+				writer.WriteStartObject();
 				DefaultConstraint.ToStringRaw(writer);
+				writer.WriteEndObject();
 			}
 
 			writer.WritePropertyName("DataSize");
+			writer.WriteStartObject();
 			DataSize.ToStringRaw(writer);
+			writer.WriteEndObject();
 
 			writer.WritePropertyName("Identity");
+			writer.WriteStartObject();
 			Identity.ToStringRaw(writer);
+			writer.WriteEndObject();
 
 			writer.WriteProperty("Name", Name);
 			writer.WriteProperty("Caption", Caption);
@@ -195,16 +195,23 @@ namespace S031.MetaStack.WinForms.ORM
 			writer.WriteProperty("SuperMethod", SuperMethod);
 			writer.WriteProperty("SuperFilter", SuperFilter);
 
-			writer.WritePropertyName("ListItems");
-			writer.WriteStartArray();
-			foreach (var item in _listItems)
-				writer.WriteValue(item);
-			writer.WriteEndArray();
-			writer.WritePropertyName("ListData");
-			writer.WriteStartArray();
-			foreach (var item in _listData)
-				writer.WriteValue(new JsonValue(item));
-			writer.WriteEndArray();
+			if (ListItems.Count > 0)
+			{
+				writer.WritePropertyName("ListItems");
+				writer.WriteStartArray();
+				foreach (var item in ListItems)
+					writer.WriteValue(item);
+				writer.WriteEndArray();
+			}
+
+			if (ListData.Count > 0)
+			{
+				writer.WritePropertyName("ListData");
+				writer.WriteStartArray();
+				foreach (var item in ListData)
+					writer.WriteValue(new JsonValue(item));
+				writer.WriteEndArray();
+			}
 
 			writer.WriteProperty("FieldName", FieldName);
 			writer.WriteProperty("ConstName", ConstName);
@@ -220,23 +227,23 @@ namespace S031.MetaStack.WinForms.ORM
 				writer.WritePropertyName("ObjectSchema");
 				writer.WriteRaw(ObjectSchema.ToString());
 			}
-
 		}
 		public override string ToString()
 		{
 			JsonWriter writer = new JsonWriter(Formatting.None);
+			writer.WriteStartObject();
 			ToStringRaw(writer);
+			writer.WriteEndObject();
 			return writer.ToString();
 		}
-
 		protected internal JMXAttribute(JsonObject o)
 		{
 			ID = o.GetIntOrDefault("ID");
-			UID = o.GetGuidOrDefault("UID");
+			UID = o.GetGuidOrDefault("UID", () => Guid.NewGuid());
 			AttribName = o.GetStringOrDefault("AttribName");
 			Position = o.GetIntOrDefault("Position");
 			ServerDataType = o.GetStringOrDefault("ServerDataType");
-			IsNullable = o.GetBoolOrDefault("IsNullable");
+			IsNullable = o.GetBoolOrDefault("IsNullable", true);
 			Required = o.GetBoolOrDefault("Required");
 			CollationName = o.GetStringOrDefault("CollationName");
 			IsPK = o.GetBoolOrDefault("IsPK");
@@ -245,15 +252,66 @@ namespace S031.MetaStack.WinForms.ORM
 			Caption = o.GetStringOrDefault("Caption");
 			DataType = o.GetEnum<MdbType>("DataType");
 			Width = o.GetIntOrDefault("Width");
+			Visible = o.GetBoolOrDefault("Visible", true);
+			ReadOnly = o.GetBoolOrDefault("ReadOnly");
+			Enabled = o.GetBoolOrDefault("Enabled", true);
+			Description = o.GetStringOrDefault("Description");
+			PresentationType = o.GetStringOrDefault("PresentationType");
+			DisplayWidth = o.GetIntOrDefault("DisplayWidth", 10);
+			Mask = o.GetStringOrDefault("Mask");
+			Format = o.GetStringOrDefault("Format");
+			Sorted = o.GetBoolOrDefault("Sorted", true);
+			SuperForm = o.GetStringOrDefault("SuperForm");
+			SuperObject = o.GetStringOrDefault("SuperObject");
+			SuperMethod = o.GetStringOrDefault("SuperMethod");
+			SuperFilter = o.GetStringOrDefault("SuperFilter");
+			FieldName = o.GetStringOrDefault("FieldName");
+			ConstName = o.GetStringOrDefault("ConstName");
+			Agregate = o.GetStringOrDefault("Agregate");
+			AttribPath = o.GetStringOrDefault("AttribPath");
+
+			if (o.TryGetValue("DefaultValue", out JsonValue value)
+				&& !string.IsNullOrEmpty(value))
+				DefaultValue = ((string)value).ToObjectOf(MdbTypeMap.GetType(DataType));
+
+			if (o.TryGetValue("ObjectName", out value)
+				&& !string.IsNullOrEmpty(value))
+			{
+				ObjectName = value;
+				if (o.TryGetValue("ObjectSchema", out JsonValue schema)
+					&& !string.IsNullOrEmpty(schema))
+					ObjectSchema = JMXSchema.Parse(schema);
+				IsArray = o.GetBoolOrDefault("IsArray");
+			}
+
+			ListItems = new List<string>();
+			if (o.TryGetValue("ListItems", out JsonArray a))
+				ListItems.AddRange(a.Select(v => (string)v));
+
+			ListData = new List<object>();
+			if (o.TryGetValue("ListData", out a))
+				ListData.AddRange(a.Select(v=>v.GetValue()));
+
 
 			if (o.TryGetValue("CheckConstraint", out JsonObject j))
 				CheckConstraint = JMXConstraint.ReadFrom(j);
+			else
+				CheckConstraint = new JMXConstraint() { ConstraintType = JMXConstraintTypes.checkConstraint };
+
 			if (o.TryGetValue("DefaultConstraint", out j))
 				DefaultConstraint = JMXConstraint.ReadFrom(j);
+			else
+				DefaultConstraint = new JMXConstraint() { ConstraintType = JMXConstraintTypes.defaultConstraint };
+
 			if (o.TryGetValue("DataSize", out j))
 				DataSize = JMXDataSize.ReadFrom(j);
+			else
+				DataSize = new JMXDataSize();
+
 			if (o.TryGetValue("Identity", out j))
 				Identity = JMXIdentity.ReadFrom(j);
+			else
+				Identity = new JMXIdentity();
 		}
 		internal static JMXAttribute ReadFrom(JsonObject o)
 			=> new JMXAttribute(o);

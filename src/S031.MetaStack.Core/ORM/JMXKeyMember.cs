@@ -55,5 +55,15 @@ namespace S031.MetaStack.WinForms.ORM
 			writer.WriteProperty("IsIncluded", IsIncluded);
 			writer.WriteEndObject();
 		}
+		internal JMXKeyMember(JsonObject o)
+		{
+			FieldName = o.GetStringOrDefault("FieldName");
+			Position = o.GetIntOrDefault("Position");
+			IsDescending = o.GetBoolOrDefault("IsDescending");
+			IsIncluded = o.GetBoolOrDefault("IsIncluded");
+		}
+
+		internal static JMXKeyMember ReadFrom(JsonObject o)
+			=> new JMXKeyMember(o);
 	}
 }

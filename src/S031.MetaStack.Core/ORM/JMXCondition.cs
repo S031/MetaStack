@@ -18,13 +18,8 @@ namespace S031.MetaStack.WinForms.ORM
 		Havind,
 		Join
 	}
-	public class JMXCondition
+	public readonly struct JMXCondition
 	{
-		public JMXCondition()
-		{
-			ConditionType = JMXConditionTypes.none;
-			Definition = string.Empty;
-		}
 
 		public JMXCondition(JMXConditionTypes conditionType, string definition)
 		{
@@ -32,9 +27,9 @@ namespace S031.MetaStack.WinForms.ORM
 			Definition = definition;
 		}
 
-		public string Definition { get; set; }
+		public string Definition { get; }
 
-		public JMXConditionTypes ConditionType { get; set; }
+		public JMXConditionTypes ConditionType { get; }
 
 
 		public static bool operator ==(JMXCondition m1, JMXCondition m2)
@@ -64,19 +59,19 @@ namespace S031.MetaStack.WinForms.ORM
 		public override string ToString()
 		{
 			JsonWriter writer = new JsonWriter(Formatting.None);
+			writer.WriteStartObject();
 			ToStringRaw(writer);
+			writer.WriteEndObject();
 			return writer.ToString();
 		}
 
 		public void ToStringRaw(JsonWriter writer)
 		{
-			writer.WriteStartObject();
 			writer.WriteProperty("ConditionType", ConditionType.ToString());
 			writer.WriteProperty("Definition", Definition);
-			writer.WriteEndObject();
 		}
 
-		protected internal JMXCondition(JsonObject o)
+		internal JMXCondition(JsonObject o)
 		{
 			ConditionType = o.GetEnum<JMXConditionTypes>("ConditionType");
 			Definition = o["Definition"];

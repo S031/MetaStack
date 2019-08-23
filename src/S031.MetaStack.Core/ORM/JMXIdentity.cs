@@ -6,7 +6,7 @@ namespace S031.MetaStack.Core.ORM
 namespace S031.MetaStack.WinForms.ORM
 #endif
 {
-	public struct JMXIdentity
+	public readonly struct JMXIdentity
 	{
 		public JMXIdentity(bool isIdentity=false, int seed = 0, int increment=0)
 		{
@@ -14,33 +14,30 @@ namespace S031.MetaStack.WinForms.ORM
 			Seed = isIdentity && seed <= 0 ? 1 : seed;
 			Increment = isIdentity && increment == 0 ? 1 : increment;
 		}
-        public bool IsIdentity { get; set; }
-        public int Seed { get; set; }
-        public int Increment { get; set; }
+        public bool IsIdentity { get; }
+        public int Seed { get; }
+        public int Increment { get; }
 		public override string ToString()
 		{
 			JsonWriter writer = new JsonWriter(Formatting.None);
+			writer.WriteStartObject();
 			ToStringRaw(writer);
+			writer.WriteEndObject();
 			return writer.ToString();
 		}
 		public void ToStringRaw(JsonWriter writer)
 		{
-			writer.WriteStartObject();
 			writer.WriteProperty("IsIdentity", IsIdentity);
 			writer.WriteProperty("Seed", Seed);
 			writer.WriteProperty("Increment", Increment);
-			writer.WriteEndObject();
+		}
+		internal JMXIdentity(JsonObject o)
+		{
+			IsIdentity = o.GetBoolOrDefault("IsIdentity");
+			Seed = o.GetIntOrDefault("Seed", 1);
+			Increment = o.GetIntOrDefault("Increment", 1);
 		}
 		internal static JMXIdentity ReadFrom(JsonObject o)
-		{
-			var identity = new JMXIdentity()
-			{
-				IsIdentity = o.GetBoolOrDefault("IsIdentity"),
-				Seed = o.GetIntOrDefault("Seed"),
-				Increment = o.GetIntOrDefault("Increment")
-			};
-			return identity;
-		}
-
+			=> new JMXIdentity(o);
 	}
 }

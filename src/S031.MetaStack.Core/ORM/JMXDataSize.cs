@@ -6,7 +6,7 @@ namespace S031.MetaStack.Core.ORM
 namespace S031.MetaStack.WinForms.ORM
 #endif
 {
-	public struct JMXDataSize
+	public readonly struct JMXDataSize
 	{
 		public JMXDataSize(int size = 0, int scale = 0, int precision = 0)
 		{
@@ -14,9 +14,9 @@ namespace S031.MetaStack.WinForms.ORM
 			Scale = scale;
 			Precision = precision;
 		}
-        public int Size { get; set; }
-        public int Scale { get; set; }
-        public int Precision { get; set; }
+        public int Size { get; }
+        public int Scale { get; }
+        public int Precision { get; }
 		public static bool operator ==(JMXDataSize s1, JMXDataSize s2)
 		{
 			return (s1.Size == s2.Size && s1.Scale == s2.Scale && s1.Precision == s2.Precision);
@@ -37,16 +37,16 @@ namespace S031.MetaStack.WinForms.ORM
 		public override string ToString()
 		{
 			JsonWriter writer = new JsonWriter(Formatting.None);
+			writer.WriteStartObject();
 			ToStringRaw(writer);
+			writer.WriteEndObject();
 			return writer.ToString();
 		}
 		public void ToStringRaw(JsonWriter writer)
 		{
-			writer.WriteStartObject();
 			writer.WriteProperty("Size", Size);
 			writer.WriteProperty("Scale", Scale);
 			writer.WriteProperty("Precision", Precision);
-			writer.WriteEndObject();
 		}
 		internal JMXDataSize(JsonObject o)
 		{

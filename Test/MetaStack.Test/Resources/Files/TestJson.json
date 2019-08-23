@@ -246,7 +246,9 @@
       "CheckConstraint": {
         "ConstraintName": "",
         "Definition": ""
-      }
+      },
+      "ListItems": ["One", "Two", "Three"],
+      "ListData": [1, 2, 3],
     },
     {
       "ID": 11,

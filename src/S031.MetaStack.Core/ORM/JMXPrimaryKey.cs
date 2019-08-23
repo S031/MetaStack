@@ -7,13 +7,11 @@ namespace S031.MetaStack.Core.ORM
 namespace S031.MetaStack.WinForms.ORM
 #endif
 {
-	public class JMXPrimaryKey
+	public sealed class JMXPrimaryKey
 	{
-		private readonly List<JMXKeyMember> _keyMembers;
-
 		public JMXPrimaryKey()
 		{
-			_keyMembers = new List<JMXKeyMember>();
+			KeyMembers = new List<JMXKeyMember>();
 		}
 		public JMXPrimaryKey(string keyName, params string[] keyMemberNames):this()
 		{
@@ -23,59 +21,51 @@ namespace S031.MetaStack.WinForms.ORM
 		public int ID { get; set; }
 		public int Handle { get => ID; set => ID = value; }
 		public string KeyName { get; set; }
-		public List<JMXKeyMember> KeyMembers { get => _keyMembers; }
+		public List<JMXKeyMember> KeyMembers { get; }
 		public void AddKeyMember(params JMXKeyMember[] members)
 		{
 			foreach (var m in members)
-				_keyMembers.Add(m);
+				KeyMembers.Add(m);
 		}
 		public void AddKeyMember(params string[] attribNames)
 		{
-			int position = _keyMembers.Count + 1;
+			int position = KeyMembers.Count + 1;
 			foreach (var n in attribNames)
 			{
-				_keyMembers.Add(new JMXKeyMember() { FieldName = n, Position = position });
+				KeyMembers.Add(new JMXKeyMember() { FieldName = n, Position = position });
 				position++;
 			}
 		}
 		public override string ToString()
 		{
 			JsonWriter writer = new JsonWriter(Formatting.None);
+			writer.WriteStartObject();
 			ToStringRaw(writer);
+			writer.WriteEndObject();
 			return writer.ToString();
 		}
 		public void ToStringRaw(JsonWriter writer)
 		{
-			writer.WriteStartObject();
 			writer.WriteProperty("ID", ID);
 			writer.WriteProperty("Handle", Handle);
 			writer.WriteProperty("KeyName", KeyName);
 			writer.WritePropertyName("KeyMembers");
 			writer.WriteStartArray();
-			foreach (var item in _keyMembers)
+			foreach (var item in KeyMembers)
 				item.ToStringRaw(writer);
 			writer.WriteEndArray();
-			writer.WriteEndObject();
+		}
+		internal JMXPrimaryKey(JsonObject o)
+		{
+			KeyName = o.GetStringOrDefault("KeyName");
+			ID = o.GetIntOrDefault("ID");
+
+			KeyMembers = new List<JMXKeyMember>();
+			if (o.TryGetValue("KeyMembers", out JsonArray a))
+				foreach (JsonObject m in a)
+					KeyMembers.Add(JMXKeyMember.ReadFrom(m));
 		}
 		internal static JMXPrimaryKey ReadFrom(JsonObject o)
-		{
-			var pk = new JMXPrimaryKey
-			{
-				KeyName = o["KeyName"],
-				ID = o.GetIntOrDefault("ID")
-			};
-			var km = (o["KeyMembers"] as JsonArray);
-			foreach (JsonObject m in km)
-			{
-				pk.KeyMembers.Add(new JMXKeyMember()
-				{
-					FieldName = m["FieldName"],
-					Position = m.GetIntOrDefault("Position"),
-					IsIncluded = m.GetBoolOrDefault("IsIncluded"),
-					IsDescending = m.GetBoolOrDefault("IsDescending")
-				});
-			}
-			return pk;
-		}
+			=> new JMXPrimaryKey(o);
 	}
 }

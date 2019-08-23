@@ -11,14 +11,11 @@ namespace S031.MetaStack.Core.ORM
 namespace S031.MetaStack.WinForms.ORM
 #endif
 {
-	public class JMXForeignKey
+	public sealed class JMXForeignKey
 	{
 		private string _objectName;
 		private string _areaName;
 		private string _dbObjectName;
-		readonly List<JMXKeyMember> _keyMembers;
-		readonly List<JMXKeyMember> _refKeyMembers;
-		readonly List<JMXKeyMember> _migrateKeyMembers;
 
 		public JMXForeignKey(string keyName)
 		{
@@ -27,9 +24,9 @@ namespace S031.MetaStack.WinForms.ORM
 			CheckOption = true;
 			DeleteRefAction = string.Empty;
 			UpdateRefAction = string.Empty;
-			_keyMembers = new List<JMXKeyMember>();
-			_refKeyMembers = new List<JMXKeyMember>();
-			_migrateKeyMembers = new List<JMXKeyMember>();
+			KeyMembers = new List<JMXKeyMember>();
+			RefKeyMembers = new List<JMXKeyMember>();
+			MigrateKeyMembers = new List<JMXKeyMember>();
 		}
 
 		public int ID { get; set; }
@@ -57,60 +54,61 @@ namespace S031.MetaStack.WinForms.ORM
 				_dbObjectName = value.ObjectName;
 			}
 		}
-		public List<JMXKeyMember> KeyMembers => _keyMembers;
-		public List<JMXKeyMember> RefKeyMembers => _refKeyMembers;
-		public List<JMXKeyMember> MigrateKeyMembers => _migrateKeyMembers;
+		public List<JMXKeyMember> KeyMembers { get; }
+		public List<JMXKeyMember> RefKeyMembers { get; }
+		public List<JMXKeyMember> MigrateKeyMembers { get; }
 		public void AddKeyMember(params JMXKeyMember[] members)
 		{
 			foreach (var m in members)
-				_keyMembers.Add(m);
+				KeyMembers.Add(m);
 		}
 		public void AddKeyMember(params string[] attribNames)
 		{
-			int position = _keyMembers.Count + 1;
+			int position = KeyMembers.Count + 1;
 			foreach (var n in attribNames)
 			{
-				_keyMembers.Add(new JMXKeyMember() { FieldName = n, Position = position });
+				KeyMembers.Add(new JMXKeyMember() { FieldName = n, Position = position });
 				position++;
 			}
 		}
 		public void AddRefKeyMember(params JMXKeyMember[] members)
 		{
 			foreach (var m in members)
-				_refKeyMembers.Add(m);
+				RefKeyMembers.Add(m);
 		}
 		public void AddRefKeyMember(params string[] attribNames)
 		{
-			int position = _refKeyMembers.Count + 1;
+			int position = RefKeyMembers.Count + 1;
 			foreach (var n in attribNames)
 			{
-				_refKeyMembers.Add(new JMXKeyMember() { FieldName = n, Position = position });
+				RefKeyMembers.Add(new JMXKeyMember() { FieldName = n, Position = position });
 				position++;
 			}
 		}
 		public void AddMigrateKeyMember(params JMXKeyMember[] members)
 		{
 			foreach (var m in members)
-				_migrateKeyMembers.Add(m);
+				MigrateKeyMembers.Add(m);
 		}
 		public void AddMigrateKeyMember(params string[] attribNames)
 		{
-			int position = _migrateKeyMembers.Count + 1;
+			int position = MigrateKeyMembers.Count + 1;
 			foreach (var n in attribNames)
 			{
-				_migrateKeyMembers.Add(new JMXKeyMember() { FieldName = n, Position = position });
+				MigrateKeyMembers.Add(new JMXKeyMember() { FieldName = n, Position = position });
 				position++;
 			}
 		}
 		public override string ToString()
 		{
 			JsonWriter writer = new JsonWriter(Formatting.None);
+			writer.WriteStartObject();
 			ToStringRaw(writer);
+			writer.WriteEndObject();
 			return writer.ToString();
 		}
 		public void ToStringRaw(JsonWriter writer)
 		{
-			writer.WriteStartObject();
 			writer.WriteProperty("ID", ID);
 			writer.WriteProperty("UID", UID);
 			writer.WriteProperty("KeyName", KeyName);
@@ -132,7 +130,7 @@ namespace S031.MetaStack.WinForms.ORM
 
 			writer.WritePropertyName("KeyMembers");
 			writer.WriteStartArray();
-			foreach (var item in _keyMembers)
+			foreach (var item in KeyMembers)
 			{
 				writer.WriteStartObject();
 				writer.WriteProperty("FieldName", item.FieldName);
@@ -143,7 +141,7 @@ namespace S031.MetaStack.WinForms.ORM
 
 			writer.WritePropertyName("RefKeyMembers");
 			writer.WriteStartArray();
-			foreach (var item in _refKeyMembers)
+			foreach (var item in RefKeyMembers)
 			{
 				writer.WriteStartObject();
 				writer.WriteProperty("FieldName", item.FieldName);
@@ -154,7 +152,7 @@ namespace S031.MetaStack.WinForms.ORM
 
 			writer.WritePropertyName("MigrateKeyMembers");
 			writer.WriteStartArray();
-			foreach (var item in _migrateKeyMembers)
+			foreach (var item in MigrateKeyMembers)
 			{
 				writer.WriteStartObject();
 				writer.WriteProperty("FieldName", item.FieldName);
@@ -162,16 +160,14 @@ namespace S031.MetaStack.WinForms.ORM
 				writer.WriteEndObject();
 			}
 			writer.WriteEndArray();
-			writer.WriteEndObject();
 		}
-
-		protected internal JMXForeignKey(JsonObject o) : this(o["KeyName"])
+		internal JMXForeignKey(JsonObject o) : this(o["KeyName"])
 		{
-			CheckOption = o.GetBoolOrDefault("CheckOption");
+			CheckOption = o.GetBoolOrDefault("CheckOption", true);
 			DeleteRefAction = o.GetStringOrDefault("DeleteRefAction");
 			UpdateRefAction = o.GetStringOrDefault("DeleteRefAction");
 			ID = o.GetIntOrDefault("ID");
-			UID = o.GetGuidOrDefault("UID");
+			UID = o.GetGuidOrDefault("UID", () => Guid.NewGuid());
 
 			if (o.TryGetValue("RefObjectName", out JsonObject j))
 				RefObjectName = new JMXObjectName(j.GetStringOrDefault("AreaName"), j.GetStringOrDefault("ObjectName"));
@@ -179,49 +175,21 @@ namespace S031.MetaStack.WinForms.ORM
 			if (o.TryGetValue("RefDbObjectName", out j))
 				RefDbObjectName = new JMXObjectName(j.GetStringOrDefault("AreaName"), j.GetStringOrDefault("ObjectName"));
 
+			KeyMembers = new List<JMXKeyMember>();
 			if (o.TryGetValue("KeyMembers", out JsonArray a))
-			{
 				foreach (JsonObject m in a)
-				{
-					KeyMembers.Add(new JMXKeyMember()
-					{
-						FieldName = m["FieldName"],
-						Position = m.GetIntOrDefault("Position"),
-						IsIncluded = m.GetBoolOrDefault("IsIncluded"),
-						IsDescending = m.GetBoolOrDefault("IsDescending")
-					});
-				}
-			}
+					KeyMembers.Add(JMXKeyMember.ReadFrom(m));
 
+			RefKeyMembers = new List<JMXKeyMember>();
 			if (o.TryGetValue("RefKeyMembers", out a))
-			{
 				foreach (JsonObject m in a)
-				{
-					RefKeyMembers.Add(new JMXKeyMember()
-					{
-						FieldName = m["FieldName"],
-						Position = m.GetIntOrDefault("Position"),
-						IsIncluded = m.GetBoolOrDefault("IsIncluded"),
-						IsDescending = m.GetBoolOrDefault("IsDescending")
-					});
-				}
-			}
+					RefKeyMembers.Add(JMXKeyMember.ReadFrom(m));
 
+			MigrateKeyMembers = new List<JMXKeyMember>();
 			if (o.TryGetValue("MigrateKeyMembers", out a))
-			{
 				foreach (JsonObject m in a)
-				{
-					MigrateKeyMembers.Add(new JMXKeyMember()
-					{
-						FieldName = m["FieldName"],
-						Position = m.GetIntOrDefault("Position"),
-						IsIncluded = m.GetBoolOrDefault("IsIncluded"),
-						IsDescending = m.GetBoolOrDefault("IsDescending")
-					});
-				}
-			}
+					MigrateKeyMembers.Add(JMXKeyMember.ReadFrom(m));
 		}
-
 		internal static JMXForeignKey ReadFrom(JsonObject o)
 			=> new JMXForeignKey(o);
 	}

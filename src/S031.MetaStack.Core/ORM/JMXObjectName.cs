@@ -9,7 +9,7 @@ namespace S031.MetaStack.Core.ORM
 namespace S031.MetaStack.WinForms.ORM
 #endif
 {
-	public struct JMXObjectName
+	public readonly struct JMXObjectName
 	{
 		internal JMXObjectName(string fullObjectName)
 		{
@@ -30,8 +30,8 @@ namespace S031.MetaStack.WinForms.ORM
 			AreaName = areaName;
 			ObjectName = objectName;
 		}
-		public string AreaName { get; set; }
-		public string ObjectName { get; set; }
+		public string AreaName { get; }
+		public string ObjectName { get; }
 		public static bool operator ==(JMXObjectName m1, JMXObjectName m2)
 		{
 			return (m1.AreaName == m2.AreaName &&
@@ -60,17 +60,14 @@ namespace S031.MetaStack.WinForms.ORM
 				return $"[{AreaName}].[{ObjectName}]";
 			return $"{AreaName}.{ObjectName}";
 		}
-
 		public static implicit operator JMXObjectName(string s)
 		{
 			return new JMXObjectName(s);
 		}
-
 		public static implicit operator string(JMXObjectName name)
 		{
 			return name.ToString();
 		}
-
 		public bool IsEmpty()
 		{
 			return ObjectName.IsEmpty();

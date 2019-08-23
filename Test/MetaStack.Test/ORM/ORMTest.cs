@@ -1,10 +1,13 @@
 ﻿//using Newtonsoft.Json;
+using Newtonsoft.Json;
 using S031.MetaStack.Common;
 using S031.MetaStack.Common.Logging;
 using S031.MetaStack.Core;
 using S031.MetaStack.Core.Data;
 using S031.MetaStack.Core.Json;
 using S031.MetaStack.Core.ORM;
+using S031.MetaStack.Json;
+using System;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -14,6 +17,7 @@ namespace MetaStack.Test.ORM
 {
 	public class ORMSchemaTest
 	{
+		private static readonly string _sourceJsonString = Encoding.UTF8.GetString(Test.Resources.TestData.TestJson);
 		public ORMSchemaTest()
 		{
 			Program.ConfigureTests();
@@ -25,8 +29,38 @@ namespace MetaStack.Test.ORM
 		{
 			using (FileLog _logger = new FileLog("ORMSchemaTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
-				var schema = JMXSchema.Parse(Encoding.Default.GetString(MetaStack.Test.Resources.TestData.TestJson));
-				_logger.Debug(schema.ToString());
+				var str = _sourceJsonString;
+				_logger.Debug($"Start perfomance parse string test");
+				int i;
+				DateTime t = DateTime.Now;
+				JsonObject j = null;
+				for (i = 0; i < 1_000; i++)
+				{
+					j = (JsonObject)new S031.MetaStack.Json.JsonReader(ref str).Read();
+				}
+				_logger.Debug($"Finish perfomance parse string test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
+
+				_logger.Debug($"Start perfomance parse string schema test");
+				t = DateTime.Now;
+				for (i = 0; i < 1_000; i++)
+				{
+					var schema = JMXSchema.Parse(str);
+				}				
+				_logger.Debug($"Finish perfomance parse string schema test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
+
+				//_logger.Debug($"Start perfomance parse string schema Json.NET test");
+				//t = DateTime.Now;
+				//for (i = 0; i < 1_000; i++)
+				//{
+				//	var schema = JsonConvert.DeserializeObject<JMXSchema>(str);
+				//}				
+				//_logger.Debug($"Finish perfomance parse string schema Json.NET test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
+				var s = JMXSchema.Parse(str);
+				str = s.ToString();
+				var str2 = JMXSchema.Parse(str).ToString();
+				Assert.Equal(str, str2);
+				_logger.Debug(JMXSchema.Parse(str));
+
 				//JMXAttribute a = new JMXAttribute("ID")
 				//{
 				//	DataType = MdbType.@int,
@@ -66,7 +100,7 @@ namespace MetaStack.Test.ORM
 				//_logger.Debug(ss);
 				//s = JSONExtensions.DeserializeObject<JMXSchema>(ss);
 				//Assert.Equal(ss, s.ToString());
-				_logger.Debug("Start speed test fo JMXObject parse from json string");
+				//_logger.Debug("Start speed test fo JMXObject parse from json string");
 
 
 				//JMXSchemaProviderFactory.RegisterProvider<JMXSchemaProviderMemory>();
