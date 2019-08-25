@@ -60,6 +60,7 @@ namespace MetaStack.Test.ORM
 				var str2 = JMXSchema.Parse(str).ToString();
 				Assert.Equal(str, str2);
 				_logger.Debug(JMXSchema.Parse(str));
+				_logger.Debug(JMXSchema.Parse(str2));
 
 				//JMXAttribute a = new JMXAttribute("ID")
 				//{

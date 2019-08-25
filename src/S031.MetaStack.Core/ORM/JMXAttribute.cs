@@ -171,10 +171,13 @@ namespace S031.MetaStack.WinForms.ORM
 			DataSize.ToStringRaw(writer);
 			writer.WriteEndObject();
 
-			writer.WritePropertyName("Identity");
-			writer.WriteStartObject();
-			Identity.ToStringRaw(writer);
-			writer.WriteEndObject();
+			if (Identity.IsIdentity)
+			{
+				writer.WritePropertyName("Identity");
+				writer.WriteStartObject();
+				Identity.ToStringRaw(writer);
+				writer.WriteEndObject();
+			}
 
 			writer.WriteProperty("Name", Name);
 			writer.WriteProperty("Caption", Caption);

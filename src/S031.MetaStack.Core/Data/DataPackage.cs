@@ -250,53 +250,54 @@ namespace S031.MetaStack.WinForms.Data
 
 		static MemoryStream WriteDataInternal(int headerSpaceSize, string[] columns, object[] values)
 		{
-			MemoryStream ms = new MemoryStream();
-			BinaryWriter bw = new BinaryWriter(ms);
-
-			int fieldCount = columns.Length;
-			bool hasValues = values != null && values.Length == fieldCount;
-
-			bw.Write(headerSpaceSize);
-			bw.Write(fieldCount);
-			//Write Headers
-			bw.Write(0);
-			bw.Write(new byte[headerSpaceSize - 5]);
-			//Write ColInfo
-			for (int i = 0; i < fieldCount; i++)
+			using (MemoryStream ms = new MemoryStream())
+			using (BinaryWriter bw = new BinaryWriter(ms))
 			{
-				if (columns[i].IndexOf('.') > 0)
-				{
-					bw.Write(columns[i].GetToken(0, "."));
-					WriteColumnInfo(bw, ColumnInfo.FromName(columns[i]));
-				}
-				else if (hasValues)
-				{
-					bw.Write(columns[i]);
-					WriteColumnInfo(bw, ColumnInfo.FromValue(values[i]));
-				}
-				else
-				{
-					bw.Write(columns[i]);
-					WriteColumnInfo(bw, ColumnInfo.FromType(typeof(string)));
-				}
+				int fieldCount = columns.Length;
+				bool hasValues = values != null && values.Length == fieldCount;
 
-			}
-			if (hasValues)
-			{
+				bw.Write(headerSpaceSize);
+				bw.Write(fieldCount);
+				//Write Headers
+				bw.Write(0);
+				bw.Write(new byte[headerSpaceSize - 5]);
+				//Write ColInfo
 				for (int i = 0; i < fieldCount; i++)
 				{
-					object value = values[i];
-					if (value == null || DBNull.Value.Equals(value))
-						bw.Write((byte)MdbType.@null);
+					if (columns[i].IndexOf('.') > 0)
+					{
+						bw.Write(columns[i].GetToken(0, "."));
+						WriteColumnInfo(bw, ColumnInfo.FromName(columns[i]));
+					}
+					else if (hasValues)
+					{
+						bw.Write(columns[i]);
+						WriteColumnInfo(bw, ColumnInfo.FromValue(values[i]));
+					}
 					else
-						lock(obj4Lock)
-							_dti[MdbTypeMap.GetType(value.GetType())].WriteDelegate(bw, value);
+					{
+						bw.Write(columns[i]);
+						WriteColumnInfo(bw, ColumnInfo.FromType(typeof(string)));
+					}
+
 				}
+				if (hasValues)
+				{
+					for (int i = 0; i < fieldCount; i++)
+					{
+						object value = values[i];
+						if (value == null || DBNull.Value.Equals(value))
+							bw.Write((byte)MdbType.@null);
+						else
+							lock (obj4Lock)
+								_dti[MdbTypeMap.GetType(value.GetType())].WriteDelegate(bw, value);
+					}
+				}
+				else if (values != null)
+					//The length of the data array must be equal to the length of the array of field names
+					throw new ArgumentException(Properties.Strings.S031_MetaStack_Core_Data_writeData_1);
+				return ms;
 			}
-			else if (values != null)
-				//The length of the data array must be equal to the length of the array of field names
-				throw new ArgumentException("S031.MetaStack.Core.Data.writeData.1".GetTranslate());
-			return ms;
 		}
 		/// <summary>
 		/// Create a serialised in <see cref="byte[]"/> array <see cref="DataPackage"/> from <see cref="IDataReader"/>"/>
@@ -313,80 +314,82 @@ namespace S031.MetaStack.WinForms.Data
 		/// <returns></returns>
 		public static byte[] WriteData(IDataReader dr, int headerSpaceSize, bool allowDublicate)
 		{
-			MemoryStream ms = new MemoryStream();
-			BinaryWriter bw = new BinaryWriter(ms);
-
-			//int fieldCount = dr.FieldCount;
-			//Dictionary<string, ColumnInfo> colInfo = new Dictionary<string, ColumnInfo>(StringComparer.CurrentCultureIgnoreCase);
-
-			//for (int i = 0; i < fieldCount; i++)
-			//{
-			//	string name = dr.GetName(i);
-
-			//	if (allowDublicate)
-			//	{
-			//		string nameOrig = name;
-			//		for (int j = 1; colInfo.ContainsKey(name); j++)
-			//			name = nameOrig + j.ToString();
-			//	}
-			//	else if (colInfo.ContainsKey(name))
-			//		continue;
-
-			//	colInfo.Add(name, ColumnInfo.FromType(dr.GetFieldType(i)));
-			//}
-
-			DataTable dt = dr.GetSchemaTable();
-			int fieldCount = dr.FieldCount;
-			Dictionary<string, ColumnInfo> colInfo = new Dictionary<string, ColumnInfo>(StringComparer.CurrentCultureIgnoreCase);
-
-			for (int i = 0; i < dt.Rows.Count; i++)
+			using (MemoryStream ms = new MemoryStream())
+			using (BinaryWriter bw = new BinaryWriter(ms))
 			{
-				DataRow drCol = dt.Rows[i];
-				string name = (string)drCol["ColumnName"];
 
-				if (allowDublicate)
+				//int fieldCount = dr.FieldCount;
+				//Dictionary<string, ColumnInfo> colInfo = new Dictionary<string, ColumnInfo>(StringComparer.CurrentCultureIgnoreCase);
+
+				//for (int i = 0; i < fieldCount; i++)
+				//{
+				//	string name = dr.GetName(i);
+
+				//	if (allowDublicate)
+				//	{
+				//		string nameOrig = name;
+				//		for (int j = 1; colInfo.ContainsKey(name); j++)
+				//			name = nameOrig + j.ToString();
+				//	}
+				//	else if (colInfo.ContainsKey(name))
+				//		continue;
+
+				//	colInfo.Add(name, ColumnInfo.FromType(dr.GetFieldType(i)));
+				//}
+
+				DataTable dt = dr.GetSchemaTable();
+				int fieldCount = dr.FieldCount;
+				Dictionary<string, ColumnInfo> colInfo = new Dictionary<string, ColumnInfo>(StringComparer.CurrentCultureIgnoreCase);
+
+				for (int i = 0; i < dt.Rows.Count; i++)
 				{
-					string nameOrig = name;
-					for (int j = 1; colInfo.ContainsKey(name); j++)
-						name = nameOrig + j.ToString();
+					DataRow drCol = dt.Rows[i];
+					string name = (string)drCol["ColumnName"];
+
+					if (allowDublicate)
+					{
+						string nameOrig = name;
+						for (int j = 1; colInfo.ContainsKey(name); j++)
+							name = nameOrig + j.ToString();
+					}
+					else if (colInfo.ContainsKey(name))
+						continue;
+
+					ColumnInfo ci = new ColumnInfo()
+					{
+						DataType = (Type)drCol["DataType"],
+						ColumnSize = (int)drCol["ColumnSize"],
+						AllowDBNull = (bool)drCol["AllowDBNull"]
+					};
+					colInfo.Add(name, ci);
 				}
-				else if (colInfo.ContainsKey(name))
-					continue;
 
-				ColumnInfo ci = new ColumnInfo()
-				{
-					DataType = (Type)drCol["DataType"],
-					ColumnSize = (int)drCol["ColumnSize"],
-					AllowDBNull = (bool)drCol["AllowDBNull"]
-				};
-				colInfo.Add(name, ci);
-			}
-
-			bw.Write(headerSpaceSize);
-			bw.Write(colInfo.Count);
-			//Write Headers
-			bw.Write(0); //4 bytes
-			bw.Write(new byte[headerSpaceSize - 5]);
-			//Write colInfo
-			foreach (KeyValuePair<string, ColumnInfo> kvp in colInfo)
-			{
-				bw.Write(kvp.Key);
-				WriteColumnInfo(bw, kvp.Value);
-			}
-
-
-			for (; dr.Read();)
-			{
+				bw.Write(headerSpaceSize);
+				bw.Write(colInfo.Count);
+				//Write Headers
+				bw.Write(0); //4 bytes
+				bw.Write(new byte[headerSpaceSize - 5]);
+				//Write colInfo
 				foreach (KeyValuePair<string, ColumnInfo> kvp in colInfo)
 				{
-					object value = dr[kvp.Key];
-					if (value == null || DBNull.Value.Equals(value))
-						bw.Write((byte)MdbType.@null);
-					else
-						_dti[MdbTypeMap.GetType(value.GetType())].WriteDelegate(bw, value);
+					bw.Write(kvp.Key);
+					WriteColumnInfo(bw, kvp.Value);
 				}
+
+
+				for (; dr.Read();)
+				{
+					foreach (KeyValuePair<string, ColumnInfo> kvp in colInfo)
+					{
+						object value = dr[kvp.Key];
+						if (value == null || DBNull.Value.Equals(value))
+							bw.Write((byte)MdbType.@null);
+						else
+							_dti[MdbTypeMap.GetType(value.GetType())].WriteDelegate(bw, value);
+					}
+				}
+				return ms.ToArray();
 			}
-			return ms.ToArray();
 		}
 		/// <summary>
 		/// Add new row or Updates the current row with a rewrite to end of array

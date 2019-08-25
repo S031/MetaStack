@@ -60,7 +60,7 @@ namespace MetaStack.Test.Json
 				t = DateTime.Now;
 				for (i = 0; i < 10_000_000; i++)
 				{
-					var s = ToIntOrDefault(json as JsonObject, "ID");
+					var s = (json as JsonObject).GetStringOrDefault("NotPresent", "1234567890");
 				}
 				_logger.Debug($"Finish perfomance GetIntOrDefault test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
 
@@ -75,11 +75,6 @@ namespace MetaStack.Test.Json
 			}
 		}
 
-		private static int ToIntOrDefault(JsonObject j, string key) 
-			=> j.TryGetValue(key, out JsonValue value)
-				&& value.JsonType == JsonType.Integer
-				? (int)value
-				: 0;
 
 		[Fact]
 		public void JsonWriterTest()

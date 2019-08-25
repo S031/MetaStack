@@ -13,10 +13,10 @@ namespace S031.MetaStack.Core.App
 		{
 			ActionContext ctx = ai.GetContext();
 			if (ctx != null)
-				return "S031.MetaStack.Core.SecurityAuthorizationExceptions.GetMessage.1"
-					.GetTranslate(ctx.UserName, ai.Name, objectName);
-			return "S031.MetaStack.Core.SecurityAuthorizationExceptions.GetMessage.1"
-				.GetTranslate(Environment.UserName, ai.Name, objectName);
+				return Properties.Strings.S031_MetaStack_Core_SecurityAuthorizationExceptions_GetMessage_1
+					.ToFormat(ctx.UserName, ai.Name, objectName);
+			return Properties.Strings.S031_MetaStack_Core_SecurityAuthorizationExceptions_GetMessage_1
+				.ToFormat(Environment.UserName, ai.Name, objectName);
 		}
 	}
 }

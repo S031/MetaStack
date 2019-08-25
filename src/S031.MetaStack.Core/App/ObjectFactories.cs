@@ -31,8 +31,8 @@ namespace S031.MetaStack.Core
 				return f;
 
 			//The type derived from {0} was not found in service collection
-			throw new InvalidOperationException("S031.MetaStack.Core.Data.ObjectFactories.GetFactories.1"
-				.GetTranslate(typeof(T).FullName));
+			throw new InvalidOperationException(Properties.Strings.S031_MetaStack_Core_Data_DbProviderFactories_GetFactory_1
+				.ToFormat(typeof(T).FullName));
 
 		}
 
