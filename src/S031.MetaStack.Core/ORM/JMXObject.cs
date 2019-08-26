@@ -44,7 +44,8 @@ namespace S031.MetaStack.WinForms.ORM
 			}
 			catch { }
 			if (_schema == null)
-				throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchema.ctor.1", objectName));
+				throw new InvalidOperationException(
+					string.Format(Properties.Strings.S031_MetaStack_Core_ORM_JMXSchema_ctor_1, objectName));
 			foreach (var a in _schema.Attributes)
 			{
 				if (!vbo.IsEmpty(a.DefaultValue)) { }
@@ -90,7 +91,8 @@ namespace S031.MetaStack.WinForms.ORM
 			}
 			catch { }
 			if (instance._schema == null)
-				throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchema.ctor.1", objectName));
+				throw new InvalidOperationException(
+					string.Format(Properties.Strings.S031_MetaStack_Core_ORM_JMXSchema_ctor_1, objectName));
 			return instance;
 		}
 
@@ -114,7 +116,8 @@ namespace S031.MetaStack.WinForms.ORM
 			}
 			catch { }
 			if (instance._schema == null)
-				throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchema.ctor.1", instance.ObjectName));
+				throw new InvalidOperationException(
+					string.Format(Properties.Strings.S031_MetaStack_Core_ORM_JMXSchema_ctor_1, instance.ObjectName));
 
 			return instance;
 		}
@@ -130,7 +133,8 @@ namespace S031.MetaStack.WinForms.ORM
 			}
 			catch { }
 			if (instance._schema == null)
-				throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchema.ctor.1", instance.ObjectName));
+				throw new InvalidOperationException(
+					string.Format(Properties.Strings.S031_MetaStack_Core_ORM_JMXSchema_ctor_1, instance.ObjectName));
 
 			return instance;
 		}

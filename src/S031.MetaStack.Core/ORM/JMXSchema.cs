@@ -280,7 +280,8 @@ namespace S031.MetaStack.WinForms.ORM
             var elem = root.selectElement("DbObjectName");
             if (elem == null)
                 //Missing required element 'DbObjectName'
-                throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchema.ParseXml.1", "DbObjectName"));
+                throw new InvalidOperationException(
+					string.Format(Properties.Strings.S031_MetaStack_Core_ORM_JMXSchema_ParseXml_1, "DbObjectName"));
 
             schema.DbObjectName = new JMXObjectName(elem.elementValue("AreaName"),
                 elem.elementValue("ObjectName"));
@@ -301,7 +302,8 @@ namespace S031.MetaStack.WinForms.ORM
             }
             elem = root.selectElement("Attributes");
             if (elem == null)
-                throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchema.ParseXml.1", "Attributes"));
+                throw new InvalidOperationException(
+					string.Format(Properties.Strings.S031_MetaStack_Core_ORM_JMXSchema_ParseXml_1, "Attributes"));
             schema.Attributes.AddRange(elem.Elements()
                 .Select(e => new JMXAttribute(e.elementValue("AttribName"))
                 {

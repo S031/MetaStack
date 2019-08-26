@@ -52,6 +52,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Properties\Strings.Designer.cs">
+      <DependentUpon>Strings.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
     <Compile Update="SqlServer.Designer.cs">
       <DependentUpon>SqlServer.resx</DependentUpon>
       <DesignTime>True</DesignTime>
@@ -60,6 +65,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Properties\Strings.resx">
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
     <EmbeddedResource Update="SqlServer.resx">
       <CustomToolNamespace>S031.MetaStack.Core.ORM.MsSql</CustomToolNamespace>
       <LastGenOutput>SqlServer.Designer.cs</LastGenOutput>

@@ -29,7 +29,7 @@ namespace S031.MetaStack.Common
 			if (!_languages.ContainsKey(value))
 			{
 				if (value == _default || value == _russian)
-					l = new KeyValueList(getEmbeddedResource(value), Environment.NewLine, "=");
+					l = new KeyValueList(GetEmbeddedResource(value), Environment.NewLine, "=");
 				else
 					l = new KeyValueList(_languages[_default], Environment.NewLine, "=");
 
@@ -51,7 +51,7 @@ namespace S031.MetaStack.Common
 			SetCurrent(CultureInfo.CurrentCulture.Name);
 		}
 
-		static string getEmbeddedResource(string lang)
+		static string GetEmbeddedResource(string lang)
 		{
 			Assembly asm = typeof(Translater).Assembly;
 			return new System.IO.StreamReader(asm.GetManifestResourceStream(

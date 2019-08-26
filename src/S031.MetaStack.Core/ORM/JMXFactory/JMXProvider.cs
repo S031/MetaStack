@@ -34,7 +34,8 @@ namespace S031.MetaStack.Core.ORM
 		{
 			JMXObject jo = await ReadAsync(objectName, id);
 			if (jo == null)
-				throw new InvalidOperationException("S031.MetaStack.Core.ORM.JMXProvider.ObjectNotFound".GetTranslate(objectName, id));
+				throw new InvalidOperationException(Properties.Strings.S031_MetaStack_Core_ORM_JMXProvider_ObjectNotFound
+					.ToFormat(objectName, id));
 			await DeleteAsync(jo);
 		}
 

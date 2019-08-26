@@ -150,7 +150,8 @@ namespace S031.MetaStack.Core.ORM.SQLite
 			{
 				if (!dr.Read())
 					//object schema not found in database
-					throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.SysCat.SysCatManager.getSchema.1", $"{areaName}.{objectName}"));
+					throw new InvalidOperationException(
+						string.Format(Properties.Strings.S031_MetaStack_Core_SysCat_SysCatManager_getSchema_1, $"{areaName}.{objectName}"));
 				var schema = JMXSchema.Parse((string)dr["ObjectSchema"]);
 				schema.ID = Convert.ToInt32(dr["ID"]);
 				schema.SyncState = (int)dr["SyncState"];
@@ -167,7 +168,7 @@ namespace S031.MetaStack.Core.ORM.SQLite
 			{
 				if (!dr.Read())
 					//object schema not found in database
-					throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.SysCat.SysCatManager.getSchema.2",
+					throw new InvalidOperationException(string.Format(Properties.Strings.S031_MetaStack_Core_SysCat_SysCatManager_getSchema_2,
 						$"{areaName}.{objectName}", syncState));
 				var schema = JMXSchema.Parse((string)dr["ObjectSchema"]);
 				schema.ID = (int)dr["ID"];
@@ -335,7 +336,7 @@ namespace S031.MetaStack.Core.ORM.SQLite
 		{
 			if (schema.Attributes.Count == 0)
 				//One or more attribute is required in the schema
-				throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.1"));
+				throw new InvalidOperationException(Properties.Strings.S031_MetaStack_Core_ORM_JMXSchemaProviderDB_normalize_1);
 
 			int i = 0;
 			foreach (var att in schema.Attributes)
@@ -349,7 +350,7 @@ namespace S031.MetaStack.Core.ORM.SQLite
 
 				if (att.DataType == MdbType.@null)
 					//For an object type attribute, you must specify a schema
-					throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.4",
+					throw new InvalidOperationException(string.Format(Properties.Strings.S031_MetaStack_Core_ORM_JMXSchemaProviderDB_normalize_4,
 						att.FieldName));
 
 				string typeMap = TypeMap[att.DataType];
@@ -389,7 +390,8 @@ namespace S031.MetaStack.Core.ORM.SQLite
 					}
 					else
 						//The FieldName specified in the primary key is not in the attribute list
-						throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.3",
+						throw new InvalidOperationException(
+							string.Format(Properties.Strings.S031_MetaStack_Core_ORM_JMXSchemaProviderDB_normalize_3,
 							member.FieldName, "primary key"));
 				}
 			}
@@ -415,7 +417,8 @@ namespace S031.MetaStack.Core.ORM.SQLite
 				}
 				else
 					//A primary key is required for a table that includes columns of type 'object'
-					throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.5",
+					throw new InvalidOperationException(
+						string.Format(Properties.Strings.S031_MetaStack_Core_ORM_JMXSchemaProviderDB_normalize_5,
 						schema.ObjectName));
 			}
 		}
@@ -434,7 +437,8 @@ namespace S031.MetaStack.Core.ORM.SQLite
 					var att = schema.Attributes.FirstOrDefault(a => a.FieldName == member.FieldName);
 					if (att == null)
 						//The FieldName specified in the index is not in the attribute list
-						throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.3",
+						throw new InvalidOperationException(
+							string.Format(Properties.Strings.S031_MetaStack_Core_ORM_JMXSchemaProviderDB_normalize_3,
 							member.FieldName, $"index '{index.IndexName}'"));
 					else if (index.IsUnique)
 						att.Required = true;
@@ -463,7 +467,9 @@ namespace S031.MetaStack.Core.ORM.SQLite
 					var att = schema.Attributes.FirstOrDefault(a => a.FieldName == member.FieldName);
 					if (att == null)
 						//The FieldName specified in the foreign key is not in the attribute list
-						throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.3", member.FieldName, $"foreign key '{fk.KeyName}'"));
+						throw new InvalidOperationException(
+							string.Format(Properties.Strings.S031_MetaStack_Core_ORM_JMXSchemaProviderDB_normalize_3,
+							$"foreign key '{fk.KeyName}'"));
 				}
 			}
 		}
@@ -474,7 +480,7 @@ namespace S031.MetaStack.Core.ORM.SQLite
 			{
 				if (att.ObjectSchema == null)
 					//For an object type attribute, you must specify a schema
-					throw new InvalidOperationException(Translater.GetTranslate("S031.MetaStack.Core.ORM.JMXSchemaProviderDB.normalize.2"));
+					throw new InvalidOperationException(Properties.Strings.S031_MetaStack_Core_ORM_JMXSchemaProviderDB_normalize_2);
 
 				att.ObjectSchema = await NormalizeSchemaAsync(mdb, att.ObjectSchema);
 				att.ServerDataType = "varchar";

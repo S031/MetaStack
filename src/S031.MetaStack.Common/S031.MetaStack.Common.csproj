@@ -17,15 +17,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="S031.MetaStack.Common.Net45.project.json" />
-    <None Remove="S031.MetaStack.Common.Net45.project.lock.json" />
-    <None Remove="Translater\en-US.txt" />
-    <None Remove="Translater\ru-Ru.txt" />
+    <Compile Remove="Translater\**" />
+    <EmbeddedResource Remove="Translater\**" />
+    <None Remove="Translater\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Translater\en-US.txt" />
-    <EmbeddedResource Include="Translater\ru-RU.txt" />
+    <None Remove="S031.MetaStack.Common.Net45.project.json" />
+    <None Remove="S031.MetaStack.Common.Net45.project.lock.json" />
   </ItemGroup>
 
   <ItemGroup>

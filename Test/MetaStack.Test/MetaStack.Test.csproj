@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Common\TranslateTest.cs" />
     <Compile Remove="JSON\Extensions\SystemJson.cs" />
   </ItemGroup>
 
