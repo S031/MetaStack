@@ -1,7 +1,5 @@
 ﻿using System;
-using S031.MetaStack.Common;
-using fastJSON;
-using S031.MetaStack.Json;
+using MessagePack;
 
 #if NETCOREAPP
 namespace S031.MetaStack.Core.Json
@@ -11,21 +9,14 @@ namespace S031.MetaStack.WinForms.Json
 {
 	public static class JSONExtensions
     {
-		private static readonly JSONParameters _jsonParameters = new JSONParameters()
-		{
-			SerializeNullValues = false, UseExtensions = true
-		};
  
-		public static object DeserializeObject(string json)
-			=> fastJSON.JSON.ToObject(json, _jsonParameters);
+		public static object DeserializeObject(string value)
+			=>MessagePackSerializer.Typeless.Deserialize(MessagePackSerializer.FromJson(value));
 
-		public static T DeserializeObject<T>(string json)
-			=> fastJSON.JSON.ToObject<T>(json, _jsonParameters);
+		public static T DeserializeObject<T>(string value)
+			=> MessagePackSerializer.Deserialize<T>(MessagePackSerializer.FromJson(value));
 
 		public static string SerializeObject(object value)
-			=> new JsonWriter(Formatting.None)
-			.WriteValue(new JsonValue(value))
-			.ToString();
-			//=> fastJSON.JSON.ToJSON(value, _jsonParameters);
+			=> MessagePackSerializer.ToJson(value);
 	}
 }

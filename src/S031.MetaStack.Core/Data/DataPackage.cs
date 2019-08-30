@@ -825,22 +825,7 @@ namespace S031.MetaStack.WinForms.Data
 				{
 					Type tp = t.Type();
 					object v = _dti[tp].ReadDelegate(_br);
-					//if (tp.IsNumeric(NumericTypesScope.Integral))
-					//	headers[key] = Convert.ToInt64(v);
-					//else if (tp.IsNumeric(NumericTypesScope.FloatingPoint))
-					//	headers[key] = Convert.ToDecimal(v);
-					//else if (tp == typeof(bool))
-					//	headers[key] = (bool)v;
-					//else if (tp == typeof(string))
-					//	headers[key] = (string)v;
-					//else if (tp == typeof(DateTime))
-					//	headers[key] = (DateTime)v;
-					//else if (tp == typeof(Guid))
-					//	headers[key] = (Guid)v;
-					//else if (tp == typeof(byte[]))
-					//	headers[key] = Convert.ToBase64String((byte[])v);
-					//else
-						headers[key] = new JsonValue(v);
+					headers[key] = new JsonValue(v);
 				}
 			}
 			j["Headers"] = headers;
@@ -871,22 +856,6 @@ namespace S031.MetaStack.WinForms.Data
 					{
 						Type tp = MdbTypeMap.GetType(t);
 						object v = _dti[tp].ReadDelegate(_br);
-						//if (tp.IsNumeric(NumericTypesScope.Integral))
-						//	dr[colName] = Convert.ToInt64(v);
-						//else if (tp.IsNumeric(NumericTypesScope.FloatingPoint))
-						//	dr[colName] = Convert.ToDecimal(v);
-						//else if (tp == typeof(bool))
-						//	dr[colName] = (bool)v;
-						//else if (tp == typeof(string))
-						//	dr[colName] = (string)v;
-						//else if (tp == typeof(DateTime))
-						//	dr[colName] = (DateTime)v;
-						//else if (tp == typeof(Guid))
-						//	dr[colName] = (Guid)v;
-						//else if (tp == typeof(byte[]))
-						//	dr[colName] = Convert.ToBase64String((byte[])v);
-						//else
-						//	dr[colName] = JSONExtensions.SerializeObject(v);
 						dr[colName] = new JsonValue(v);
 					}
 				}

@@ -274,14 +274,15 @@ namespace MetaStack.Test.Data
 				for (i = 0; i < 1000000; i++)
 				{
 					testClass test = new testClass() { ID = i, Name = $"Item {i}" };
-					test.ItemList.Add("Item {i}", i);
+					test.ItemList.Add($"Item {i}", i);
 					var data = JSONExtensions.SerializeObject(test);
-					JSONExtensions.DeserializeObject(data);
+					test = JSONExtensions.DeserializeObject<testClass>(data);
 				}
 				l.Debug("SpeedTest JSOSerializer Finish");
 			}
 		}
-		private class testClass
+		[MessagePackObject(keyAsPropertyName: true)]
+		public class testClass
 		{
 			public testClass()
 			{

@@ -40,7 +40,7 @@ namespace S031.MetaStack.WinForms.ORM
         private string _dbObjectName;
 		private bool _readOnly;
 
-		[Newtonsoft.Json.JsonConstructor]
+		//[Newtonsoft.Json.JsonConstructor]
 		public JMXSchema(string objectName) : this(new JMXObjectName(objectName))
         {
         }

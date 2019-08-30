@@ -7,11 +7,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile></DocumentationFile>
     <LangVersion>latest</LangVersion>
-    <DefineConstants>TRACE;DEBUG;NETCOREAPP</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NETCOREAPP;SERIALIZEBINARY</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <LangVersion>latest</LangVersion>
+    <DefineConstants>TRACE;NETCOREAPP;SERIALIZEBINARY</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -39,11 +40,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="fastJSON" Version="2.2.4" />
+    <PackageReference Include="MessagePack" Version="1.7.3.7" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="System.Data.Common" Version="4.3.0" />
     <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
     <PackageReference Include="System.Security.Principal.Windows" Version="4.5.1" />

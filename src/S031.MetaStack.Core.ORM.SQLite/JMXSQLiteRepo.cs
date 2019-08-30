@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
 using S031.MetaStack.Common;
 using S031.MetaStack.Core.Data;
 using S031.MetaStack.Core.Logging;
