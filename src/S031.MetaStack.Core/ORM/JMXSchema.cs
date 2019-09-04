@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using S031.MetaStack.Core.Json;
+using MessagePack;
 #if NETCOREAPP
 using System.Linq;
 using System.Xml;
@@ -33,7 +34,8 @@ namespace S031.MetaStack.WinForms.ORM
 		Action = 5
     }
 
-    public class JMXSchema
+	[MessagePackObject(keyAsPropertyName: true)]
+	public class JMXSchema
     {
         private readonly string _objectName;
         private string _areaName;

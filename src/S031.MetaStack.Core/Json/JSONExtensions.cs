@@ -14,7 +14,8 @@ namespace S031.MetaStack.WinForms.Json
 			=>MessagePackSerializer.Typeless.Deserialize(MessagePackSerializer.FromJson(value));
 
 		public static T DeserializeObject<T>(string value)
-			=> MessagePackSerializer.Deserialize<T>(MessagePackSerializer.FromJson(value));
+			=> MessagePackSerializer.Deserialize<T>(MessagePackSerializer.FromJson(value), 
+				MessagePack.Resolvers.ContractlessStandardResolver.Instance);
 
 		public static string SerializeObject(object value)
 			=> MessagePackSerializer.ToJson(value);

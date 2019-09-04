@@ -48,13 +48,13 @@ namespace MetaStack.Test.ORM
 				}				
 				_logger.Debug($"Finish perfomance parse string schema test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
 
-				//_logger.Debug($"Start perfomance parse string schema Json.NET test");
-				//t = DateTime.Now;
-				//for (i = 0; i < 1_000; i++)
-				//{
-				//	var schema = JsonConvert.DeserializeObject<JMXSchema>(str);
-				//}				
-				//_logger.Debug($"Finish perfomance parse string schema Json.NET test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
+				_logger.Debug($"Start perfomance parse string schema MessagePack test");
+				t = DateTime.Now;
+				for (i = 0; i < 1_000; i++)
+				{
+					var schema = JSONExtensions.DeserializeObject<JMXSchema>(str);
+				}
+				_logger.Debug($"Finish perfomance parse string schema MessagePack test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
 				var s = JMXSchema.Parse(str);
 				str = s.ToString();
 				var str2 = JMXSchema.Parse(str).ToString();
