@@ -119,7 +119,7 @@ namespace S031.MetaStack.WinForms.Data
 				ReadDelegate = br => JSONExtensions.DeserializeObject(br.ReadString())}}
 #endif
 		};
-		private static readonly object obj4Lock = new object();
+		//private static readonly object obj4Lock = new object();
 		private MemoryStream _ms;
 		private BinaryReader _br;
 		private readonly BinaryWriter _bw;
@@ -132,7 +132,8 @@ namespace S031.MetaStack.WinForms.Data
 		private readonly long _dataPos;
 		private long _rowPos;
 
-		private Dictionary<string, object> _dataRow;
+		//private Dictionary<string, object> _dataRow;
+		object[] _dataRow;
 		private readonly Dictionary<string, object> _headers;
 		private readonly List<string> _indexes;
 		private readonly List<ColumnInfo> _colInfo;
@@ -142,14 +143,9 @@ namespace S031.MetaStack.WinForms.Data
 		/// using when deserialise <see cref="DataPackage"/> from array created with <see cref="DataPackage.ToArray()"/> methos
 		/// </summary>
 		/// <param name="data"><see cref="byte"/> array created with <see cref="DataPackage.ToArray()"/> methos</param>
-		public DataPackage(byte[] data) :
-			this(new MemoryStream(data))
+		public DataPackage(byte[] data) 
 		{
-		}
-
-		DataPackage(MemoryStream ms)
-		{
-			_ms = ms;
+			_ms = new MemoryStream(data);
 			_ms.Seek(0, SeekOrigin.Begin);
 			_br = new BinaryReader(_ms);
 			_bw = new BinaryWriter(_ms);
@@ -161,7 +157,7 @@ namespace S031.MetaStack.WinForms.Data
 				throw new DataPackageMessageFormatException("Invalid column count");
 			//Headers start
 			int headCount = _br.ReadInt32();
-			_headers = new Dictionary<string, object>();
+			_headers = new Dictionary<string, object>(StringComparer.Ordinal);
 			for (int i = 0; i < headCount; i++)
 			{
 				string key = _br.ReadString();
@@ -186,6 +182,7 @@ namespace S031.MetaStack.WinForms.Data
 			}
 			_dataPos = _ms.Position;
 		}
+
 		/// <summary>
 		/// Create a new instance of <see cref="DataPackage"/> from list of columns definitions
 		/// </summary>
@@ -196,7 +193,7 @@ namespace S031.MetaStack.WinForms.Data
 		/// </code>
 		/// </example>
 		public DataPackage(params string[] columns) :
-			this(WriteDataInternal(_headerSpaceSizeDef, columns, null))
+			this(_headerSpaceSizeDef, columns, null)
 		{
 		}
 		/// <summary>
@@ -209,8 +206,8 @@ namespace S031.MetaStack.WinForms.Data
 		/// </code>
 		/// </example>
 		public DataPackage(params object[] keyValuePair)
-			: this(WriteDataInternal(_headerSpaceSizeDef, keyValuePair.Where((obj, i) => i % 2 == 0).Select(obj => (string)obj).ToArray(),
-			keyValuePair.Where((obj, i) => i % 2 != 0).ToArray()))
+			: this(_headerSpaceSizeDef, keyValuePair.Where((obj, i) => i % 2 == 0).Select(obj => (string)obj).ToArray(),
+			keyValuePair.Where((obj, i) => i % 2 != 0).ToArray())
 		{
 		}
 		/// <summary>
@@ -225,7 +222,7 @@ namespace S031.MetaStack.WinForms.Data
 		///	</code>
 		/// </example>
 		public DataPackage(string[] columns, object[] values) :
-			this(WriteDataInternal(_headerSpaceSizeDef, columns, values))
+			this(_headerSpaceSizeDef, columns, values)
 		{
 		}
 		/// <summary>
@@ -234,9 +231,61 @@ namespace S031.MetaStack.WinForms.Data
 		/// <param name="headerSpaceSize">Header size (default 512 bytes)</param>
 		/// <param name="columns">list of columns definitions strings  in format ColimnName[.ColumnType][.ColumnWidth]</param>
 		/// <param name="values">list of values</param>
-		public DataPackage(int headerSpaceSize, string[] columns, object[] values) :
-			this(WriteDataInternal(headerSpaceSize, columns, values))
+		public DataPackage(int headerSpaceSize, string[] columns, object[] values)
 		{
+			_ms = new MemoryStream();
+			_bw = new BinaryWriter(_ms);
+			_br = new BinaryReader(_ms);
+
+			_colCount = columns.Length;
+			bool hasValues = values != null && values.Length == _colCount;
+
+			//Write Headers
+			_bw.Write(headerSpaceSize);
+			_headerSpaceSize = headerSpaceSize;
+			_bw.Write(_colCount);
+			_bw.Write(0);
+			_bw.Write(new byte[headerSpaceSize - 5]);
+			_headers = new Dictionary<string, object>(StringComparer.Ordinal);
+
+			//Write ColInfo
+			_indexes = new List<string>(_colCount);
+			_colInfo = new List<ColumnInfo>(_colCount);
+			for (int i = 0; i < _colCount; i++)
+			{
+				ColumnInfo info;
+				string name;
+				if (columns[i].IndexOf('.') > 0)
+				{
+					info = ColumnInfo.FromName(columns[i]);
+					name = columns[i].GetToken(0, ".");
+				}
+				else if (hasValues)
+				{
+					name = columns[i];
+					info = ColumnInfo.FromValue(values[i]);
+				}
+				else
+				{
+					name = columns[i];
+					info = ColumnInfo.FromType(typeof(string));
+				}
+				_bw.Write(name);
+				WriteColumnInfo(_bw, info);
+				_indexes.Add(name);
+				_colInfo.Add(info);
+			}
+			_dataPos = _ms.Position;
+			if (hasValues)
+			{
+				AddNew();
+				for (int i = 0; i < _colCount; i++)
+					SetValue(_indexes[i], values[i]);
+				Update();
+			}
+			else if (values != null)
+				//The length of the data array must be equal to the length of the array of field names
+				throw new ArgumentException(Properties.Strings.S031_MetaStack_Core_Data_writeData_1);
 		}
 		/// <summary>
 		/// Create a serialised in <see cref="byte[]"/> array <see cref="DataPackage"/> see <see cref="DataPackage(string[], object[])"/>
@@ -245,60 +294,9 @@ namespace S031.MetaStack.WinForms.Data
 		/// <param name="columns">list of columns definitions strings  in format ColimnName[.ColumnType][.ColumnWidth]</param>
 		/// <param name="values">list of values</param>
 		/// <returns><see cref="byte[]"/></returns>
-		public static byte[] WriteData(int headerSpaceSize, string[] columns, object[] values)=>
-			WriteDataInternal(headerSpaceSize, columns, values).ToArray();
+		//public static byte[] WriteData(int headerSpaceSize, string[] columns, object[] values) =>
+		//	WriteDataInternal(headerSpaceSize, columns, values).ToArray();
 
-		static MemoryStream WriteDataInternal(int headerSpaceSize, string[] columns, object[] values)
-		{
-			using (MemoryStream ms = new MemoryStream())
-			using (BinaryWriter bw = new BinaryWriter(ms))
-			{
-				int fieldCount = columns.Length;
-				bool hasValues = values != null && values.Length == fieldCount;
-
-				bw.Write(headerSpaceSize);
-				bw.Write(fieldCount);
-				//Write Headers
-				bw.Write(0);
-				bw.Write(new byte[headerSpaceSize - 5]);
-				//Write ColInfo
-				for (int i = 0; i < fieldCount; i++)
-				{
-					if (columns[i].IndexOf('.') > 0)
-					{
-						bw.Write(columns[i].GetToken(0, "."));
-						WriteColumnInfo(bw, ColumnInfo.FromName(columns[i]));
-					}
-					else if (hasValues)
-					{
-						bw.Write(columns[i]);
-						WriteColumnInfo(bw, ColumnInfo.FromValue(values[i]));
-					}
-					else
-					{
-						bw.Write(columns[i]);
-						WriteColumnInfo(bw, ColumnInfo.FromType(typeof(string)));
-					}
-
-				}
-				if (hasValues)
-				{
-					for (int i = 0; i < fieldCount; i++)
-					{
-						object value = values[i];
-						if (value == null || DBNull.Value.Equals(value))
-							bw.Write((byte)MdbType.@null);
-						else
-							lock (obj4Lock)
-								_dti[MdbTypeMap.GetType(value.GetType())].WriteDelegate(bw, value);
-					}
-				}
-				else if (values != null)
-					//The length of the data array must be equal to the length of the array of field names
-					throw new ArgumentException(Properties.Strings.S031_MetaStack_Core_Data_writeData_1);
-				return ms;
-			}
-		}
 		/// <summary>
 		/// Create a serialised in <see cref="byte[]"/> array <see cref="DataPackage"/> from <see cref="IDataReader"/>"/>
 		/// </summary>
@@ -339,7 +337,7 @@ namespace S031.MetaStack.WinForms.Data
 
 				DataTable dt = dr.GetSchemaTable();
 				int fieldCount = dr.FieldCount;
-				Dictionary<string, ColumnInfo> colInfo = new Dictionary<string, ColumnInfo>(StringComparer.CurrentCultureIgnoreCase);
+				Dictionary<string, ColumnInfo> colInfo = new Dictionary<string, ColumnInfo>(StringComparer.Ordinal);
 
 				for (int i = 0; i < dt.Rows.Count; i++)
 				{
@@ -443,11 +441,11 @@ namespace S031.MetaStack.WinForms.Data
 			_ms.Seek(_rowPos, SeekOrigin.Begin);
 			for (int i = 0; i < _colCount; i++)
 			{
-				object value = _dataRow[_indexes[i]];
+				object value = _dataRow[i];
 				if (value == null || DBNull.Value.Equals(value))
 					_bw.Write((byte)MdbType.@null);
 				else
-					_dti[MdbTypeMap.GetType(value.GetType())].WriteDelegate(_bw, value);
+					_dti[MdbTypeMap.GetType(_colInfo[i].DataType)].WriteDelegate(_bw, value);
 			}
 		}
 		/// <summary>
@@ -595,7 +593,7 @@ namespace S031.MetaStack.WinForms.Data
 		/// </summary>
 		public DataPackage AddNew()
 		{
-			_dataRow = new Dictionary<string, object>(_colCount, StringComparer.CurrentCultureIgnoreCase);
+			_dataRow = new object[_colCount]; //new Dictionary<string, object>(_colCount, StringComparer.Ordinal);
 			_rowPos = _ms.Length;
 			return this;
 		}
@@ -605,7 +603,7 @@ namespace S031.MetaStack.WinForms.Data
 		/// <returns></returns>
 		public bool Read()
 		{
-			_dataRow = new Dictionary<string, object>(_colCount, StringComparer.CurrentCultureIgnoreCase);
+			_dataRow = new object[_colCount]; //new Dictionary<string, object>(_colCount, StringComparer.Ordinal);
 			if (_ms.Position >= _ms.Length - 1)
 			{
 				_rowPos = 0;
@@ -617,9 +615,10 @@ namespace S031.MetaStack.WinForms.Data
 			{
 				MdbType t = (MdbType)_br.ReadByte();
 				if (t == MdbType.@null)
-					_dataRow.Add(_indexes[i], null);
+					//_dataRow.Add(_indexes[i], null);
+					_dataRow[i] = null;
 				else
-					_dataRow.Add(_indexes[i], _dti[t.Type()].ReadDelegate(_br));
+					_dataRow[i] = _dti[t.Type()].ReadDelegate(_br);
 
 			}
 			return true;
@@ -659,16 +658,16 @@ namespace S031.MetaStack.WinForms.Data
 		/// </summary>
 		public int FieldCount => _colCount;
 
-		public bool GetBoolean(int i)=> (bool)_dataRow[_indexes[i]];
+		public bool GetBoolean(int i)=> (bool)_dataRow[i];
 
-		public byte GetByte(int i) => (byte)_dataRow[_indexes[i]];
+		public byte GetByte(int i) => (byte)_dataRow[i];
 
 		public long GetBytes(int i, long fieldOffset, byte[] buffer, int bufferoffset, int length)
 		{
 			throw new NotImplementedException();
 		}
 
-		public char GetChar(int i) => (char)_dataRow[_indexes[i]];
+		public char GetChar(int i) => (char)_dataRow[i];
 
 		public long GetChars(int i, long fieldoffset, char[] buffer, int bufferoffset, int length)
 		{
@@ -682,36 +681,36 @@ namespace S031.MetaStack.WinForms.Data
 
 		public string GetDataTypeName(int i) => MdbTypeMap.GetTypeInfo(_colInfo[i].DataType).Name;
 
-		public DateTime GetDateTime(int i) => (DateTime)_dataRow[_indexes[i]];
+		public DateTime GetDateTime(int i) => (DateTime)_dataRow[i];
 
-		public decimal GetDecimal(int i) => (decimal)_dataRow[_indexes[i]];
+		public decimal GetDecimal(int i) => (decimal)_dataRow[i];
 
-		public double GetDouble(int i) => (double)_dataRow[_indexes[i]];
+		public double GetDouble(int i) => (double)_dataRow[i];
 
 		public Type GetFieldType(int i) => _colInfo[i].DataType;
 
-		public float GetFloat(int i) => (float)_dataRow[_indexes[i]];
+		public float GetFloat(int i) => (float)_dataRow[i];
 
-		public Guid GetGuid(int i) => (Guid)_dataRow[_indexes[i]];
+		public Guid GetGuid(int i) => (Guid)_dataRow[i];
 
-		public short GetInt16(int i) => (Int16)_dataRow[_indexes[i]];
+		public short GetInt16(int i) => (Int16)_dataRow[i];
 
-		public int GetInt32(int i) => (Int32)_dataRow[_indexes[i]];
+		public int GetInt32(int i) => (Int32)_dataRow[i];
 
-		public long GetInt64(int i) => (Int64)_dataRow[_indexes[i]];
+		public long GetInt64(int i) => (Int64)_dataRow[i];
 
 		public string GetName(int i) => _indexes[i];
 
 		public int GetOrdinal(string name) => _indexes.IndexOf(name);
 
-		public string GetString(int i) => (string)_dataRow[_indexes[i]];
+		public string GetString(int i) => (string)_dataRow[i];
 
-		public object GetValue(int i) => _dataRow[_indexes[i]];
+		public object GetValue(int i) => _dataRow[i];
 
 		public int GetValues(object[] values)
 		{
 			int i = 0;
-			foreach (object value in _dataRow.Values)
+			foreach (object value in _dataRow)
 			{
 				values[i] = value;
 				i++;
@@ -720,25 +719,25 @@ namespace S031.MetaStack.WinForms.Data
 		}
 
 		public JsonObject GetRowJSON()
-			=> new JsonObject(_dataRow.Select(kvp => new KeyValuePair<string, JsonValue>(kvp.Key, new JsonValue(kvp.Value))));
+			=> new JsonObject(_dataRow.Select((v, i) => new KeyValuePair<string, JsonValue>(_indexes[i], new JsonValue(v))));
 
-        public bool IsDBNull(int i) => DBNull.Value.Equals(_dataRow[_indexes[i]]);
+        public bool IsDBNull(int i) => DBNull.Value.Equals(_dataRow[i]);
 
 		public object this[string name]
 		{
-			get { return _dataRow[name]; }
-			set { _dataRow[name] = value; }
+			get { return _dataRow[_indexes.IndexOf(name, StringComparer.Ordinal)]; }
+			set { _dataRow[_indexes.IndexOf(name, StringComparer.Ordinal)] = value; }
 		}
 
 		public object this[int i]
 		{
-			get { return _dataRow[_indexes[i]]; }
-			set { _dataRow[_indexes[i]] = value; }
+			get { return _dataRow[i]; }
+			set { _dataRow[i] = value; }
 		}
 
 		public DataPackage SetValue(string name, object value)
 		{
-			_dataRow[name] = value;
+			_dataRow[_indexes.IndexOf(name, StringComparer.Ordinal)] = value;
 			return this;
 		}
 		static void WriteColumnInfo(BinaryWriter bw, ColumnInfo ci)

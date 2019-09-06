@@ -16,12 +16,12 @@ namespace S031.MetaStack.WinForms.Data
 			DataPackage p = new DataPackage(new string[] { "ErrorCode.String.255", "ErrorDescription.String.1024", "Source.String.512", "StackTrace.String.1024" });
 			p.Headers["Status"] = "ERROR";
 			p.UpdateHeaders();
-			addException(p, e);
+			AddException(p, e);
 			for (Exception inner = e.InnerException; inner!= null; inner = inner.InnerException)
-				addException(p, inner);
+				AddException(p, inner);
 			return p;
 		}
-		static void addException(DataPackage p, Exception e)
+		static void AddException(DataPackage p, Exception e)
 		{
 			p.AddNew();
 			p["ErrorCode"] = e.GetType().FullName;

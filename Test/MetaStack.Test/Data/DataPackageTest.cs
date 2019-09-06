@@ -63,23 +63,15 @@ namespace MetaStack.Test.Data
 		private void speedTest()
 		{
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
-			using (DataPackage p = new DataPackage(new string[] { "Col1.int", "Col2.string.255", "Col3.datetime.10", "Col4.Guid.34", "Col5.object" }))
 			{
-				l.Debug("SpeedTest Start");
 				int i = 0;
-				for (i = 0; i < 1000000; i++)
-				{
-					p.AddNew();
-					p["Col1"] = i;
-					p["Col2"] = $"Строка # {i}";
-					p["Col3"] = DateTime.Now.AddDays(i);
-					p["Col4"] = Guid.NewGuid();
-					//без сериализации работает в 1.5 раза быстрееp
-					//p["Col5"] = null;
-					p["Col5"] = new testClass();
-					p.Update();
-				}
-				l.Debug($"SpeedTest Finish {i} rows added");
+				int count = 1_000;
+				int loopCount = 1_000;
+				DataPackage p = GetTestData(count, false, false);
+				l.Debug("SpeedTest Start");
+				for (i = 0; i < loopCount; i++)
+					p = GetTestData(count, false, false);
+				l.Debug($"SpeedTest Finish {i} packages with {count} rows");
 				p.GoDataTop();
 				i = 0;
 				for (; p.Read();)
@@ -87,32 +79,51 @@ namespace MetaStack.Test.Data
 					i++;
 				}
 				l.Debug($"SpeedTest Finish {i} rows readed");
-
+				byte[] data =  p.ToArray();
+				for (i = 0; i < loopCount; i++)
+					_ = p.ToArray();
+				l.Debug($"SpeedTest Finish {i} serialize with {count} rows");
+				for (i = 0; i < loopCount; i++)
+					p = new DataPackage(data);
+				l.Debug($"SpeedTest Finish {i} deserialize with {count} rows");
 			}
 		}
+
+		private static DataPackage GetTestData(int rowsCount = 5, bool withHeader = false, bool withObjectData = false)
+		{
+			DataPackage p = new DataPackage(new string[] { "Col1.int", "Col2.string.255", "Col3.datetime.10", "Col4.Guid.34", "Col5.object" });
+			if (withHeader)
+			{
+				p.Headers.Add("Username", "Сергей");
+				p.Headers.Add("Password", "1234567T");
+				p.Headers.Add("Sign", UnicodeEncoding.UTF8.GetBytes("Сергей"));
+				p.UpdateHeaders();
+			}
+			int i = 0;
+			for (i = 0; i < rowsCount; i++)
+			{
+				p.AddNew();
+				p[0] = i;
+				p[1] = $"Строка # {i}";
+				p[2] = DateTime.Now.AddDays(i);
+				p[3] = Guid.NewGuid();
+				//без сериализации работает в 1.5 раза быстрееp
+				if (!withObjectData)
+					p[4] = null;
+				else
+					p[4] = new testClass() { ID = i, Name = (string)p[1] };
+				p.Update();
+			}
+			return p;
+		}
+
 		[Fact]
 		private void byteArrayTest()
 		{
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
-				DataPackage p = new DataPackage(new string[] { "Col1.int", "Col2.string.255", "Col3.datetime.10", "Col4.Guid.34", "Col5.object" });
-				p.Headers.Add("Username", "Сергей");
-				p.Headers.Add("Password", "1234567T");
-				p.Headers.Add("Sign", UnicodeEncoding.UTF8.GetBytes("Сергей"));
-				p.UpdateHeaders();
-				int i = 0;
-				for (i = 0; i < 5; i++)
-				{
-					p.AddNew();
-					p["Col1"] = i;
-					p["Col2"] = $"Строка # {i}";
-					p["Col3"] = DateTime.Now.AddDays(i);
-					p["Col4"] = Guid.NewGuid();
-					//без сериализации работает в 1.5 раза быстрееp
-					//p["Col5"] = null;
-					p["Col5"] = new testClass() { ID = i, Name = (string)p["Col2"] };
-					p.Update();
-				}
+				int i = 5;
+				DataPackage p = GetTestData(i, true, true);
 				l.Debug($"byteArrayTest source {i} rows added");
 				l.Debug(p.ToString(TsExportFormat.JSON));
 				int hash = p.ToString(TsExportFormat.JSON).GetHashCode();
@@ -128,23 +139,8 @@ namespace MetaStack.Test.Data
 		{
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
-				DataPackage p = new DataPackage(new string[] { "Col1.int", "Col2.string.255", "Col3.datetime.10", "Col4.Guid.34", "Col5.object" });
-				p.Headers.Add("Username", "Сергей");
-				p.Headers.Add("Password", "1234567T");
-				p.UpdateHeaders();
-				int i = 0;
-				for (i = 0; i < 5; i++)
-				{
-					p.AddNew();
-					p["Col1"] = i;
-					p["Col2"] = $"Строка # {i}";
-					p["Col3"] = DateTime.Now.AddDays(i);
-					p["Col4"] = Guid.NewGuid();
-					//без сериализации работает в 1.5 раза быстрееp
-					p["Col5"] = null;
-					//p["Col5"] = new testClass() { ID = i, Name = (string)p["Col2"] };
-					p.Update();
-				}
+				int i = 5;
+				DataPackage p = GetTestData(i, true, false);
 				l.Debug($"parseTest source {i} rows added");
 				l.Debug(p.ToString(TsExportFormat.JSON));
 				int hash = p.ToString(TsExportFormat.JSON).GetHashCode();
@@ -203,24 +199,8 @@ namespace MetaStack.Test.Data
 		{
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
-				DataPackage p = new DataPackage(new string[] { "Col1.int", "Col2.string.255", "Col3.datetime.10", "Col4.Guid.34", "Col5.object" });
-				p.Headers.Add("Username", "Сергей");
-				p.Headers.Add("Password", "1234567T");
-				p.Headers.Add("Sign", UnicodeEncoding.UTF8.GetBytes("Сергей"));
-				p.UpdateHeaders();
-				int i = 0;
-				for (i = 0; i < 5; i++)
-				{
-					p.AddNew();
-					p["Col1"] = i;
-					p["Col2"] = $"Строка # {i}";
-					p["Col3"] = DateTime.Now.AddDays(i);
-					p["Col4"] = Guid.NewGuid();
-					//без сериализации работает в 1.5 раза быстрееp
-					//p["Col5"] = null;
-					p["Col5"] = new testClass() { ID = i, Name = (string)p["Col2"] };
-					p.Update();
-				}
+				int i = 5;
+				DataPackage p = GetTestData(i, true, true);
 				l.Debug($"writeDataTest source {i} rows added");
 				l.Debug(p.ToString(TsExportFormat.JSON));
 				int hash = p.ToString(TsExportFormat.JSON).GetHashCode();
@@ -235,20 +215,8 @@ namespace MetaStack.Test.Data
 		{
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
-				DataPackage p = new DataPackage(new string[] { "Col1.int", "Col2.string.255", "Col3.datetime.10", "Col4.Guid.34", "Col5.object" });
-				int i = 0;
-				for (i = 0; i < 5; i++)
-				{
-					p.AddNew();
-					p["Col1"] = i;
-					p["Col2"] = $"Строка # {i}";
-					p["Col3"] = DateTime.Now.AddDays(i);
-					p["Col4"] = Guid.NewGuid();
-					//без сериализации работает в 1.5 раза быстрееp
-					//p["Col5"] = null;
-					p["Col5"] = new testClass() { ID = i, Name = (string)p["Col2"] };
-					p.Update();
-				}
+				int i = 5;
+				DataPackage p = GetTestData(i, false, true);
 				l.Debug($"writeDataTest source {i} rows added");
 				var t = p.ToDataTable();
 				DisplayData(t, l);
