@@ -16,7 +16,7 @@ namespace MetaStack.Test.Data
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
 		}
 		[Fact]
-		private void ctorTest()
+		private void CtorTest()
 		{
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -35,7 +35,7 @@ namespace MetaStack.Test.Data
 					p["Col2"] = $"Строка # {i}";
 					p["Col3"] = DateTime.Now.AddDays(i);
 					p["Col4"] = Guid.NewGuid();
-					testClass c = new testClass
+					TestClass c = new TestClass
 					{
 						ID = i,
 						Name = (string)p["Col2"]
@@ -60,12 +60,12 @@ namespace MetaStack.Test.Data
 		}
 
 		[Fact]
-		private void speedTest()
+		private void SpeedTest()
 		{
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
 				int i = 0;
-				int count = 1_000;
+				int count = 10_000;
 				int loopCount = 1_000;
 				DataPackage p = GetTestData(count, false, false);
 				l.Debug("SpeedTest Start");
@@ -93,32 +93,31 @@ namespace MetaStack.Test.Data
 		{
 			DataPackage p = new DataPackage(new string[] { "Col1.int", "Col2.string.255", "Col3.datetime.10", "Col4.Guid.34", "Col5.object" });
 			if (withHeader)
-			{
-				p.Headers.Add("Username", "Сергей");
-				p.Headers.Add("Password", "1234567T");
-				p.Headers.Add("Sign", UnicodeEncoding.UTF8.GetBytes("Сергей"));
-				p.UpdateHeaders();
-			}
+				p.SetHeader("Username", "Сергей")
+				.SetHeader("Password", "1234567T")
+				.SetHeader("Sign", UnicodeEncoding.UTF8.GetBytes("Сергей"))
+				.UpdateHeaders();
+
 			int i = 0;
 			for (i = 0; i < rowsCount; i++)
 			{
-				p.AddNew();
-				p[0] = i;
-				p[1] = $"Строка # {i}";
-				p[2] = DateTime.Now.AddDays(i);
-				p[3] = Guid.NewGuid();
-				//без сериализации работает в 1.5 раза быстрееp
+				p.AddNew()
+					.SetValue(0, i)
+					.SetValue(1, $"Строка # {new string('x', i % 100)}")
+					.SetValue(2, DateTime.Now.AddDays(i))
+					.SetValue(3, Guid.NewGuid());
+				
 				if (!withObjectData)
 					p[4] = null;
 				else
-					p[4] = new testClass() { ID = i, Name = (string)p[1] };
+					p[4] = new TestClass() { ID = i, Name = (string)p[1] };
 				p.Update();
 			}
 			return p;
 		}
 
 		[Fact]
-		private void byteArrayTest()
+		private void ByteArrayTest()
 		{
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -135,7 +134,7 @@ namespace MetaStack.Test.Data
 		}
 
 		[Fact]
-		private void parseTest()
+		private void ParseTest()
 		{
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -156,7 +155,7 @@ namespace MetaStack.Test.Data
 		}
 
 		[Fact]
-		private void headerTest()
+		private void HeaderTest()
 		{
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -187,7 +186,7 @@ namespace MetaStack.Test.Data
 					p["Col4"] = Guid.NewGuid();
 					//без сериализации работает в 1.5 раза быстрееp
 					//p["Col5"] = null;
-					p["Col5"] = new testClass() { ID = i, Name = (string)p["Col2"] };
+					p["Col5"] = new TestClass() { ID = i, Name = (string)p["Col2"] };
 					p.Update();
 				}
 				l.Debug($"headerTest source {i} rows added");
@@ -195,7 +194,7 @@ namespace MetaStack.Test.Data
 			}
 		}
 		[Fact]
-		private void writeDataTest()
+		private void WriteDataTest()
 		{
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -224,7 +223,7 @@ namespace MetaStack.Test.Data
 		}
 
 		[Fact]
-		private void serializationSpeedTest()
+		private void SerializationSpeedTest()
 		{
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -232,27 +231,27 @@ namespace MetaStack.Test.Data
 				int i = 0;
 				for (i = 0; i < 1000000; i++)
 				{
-					testClass test = new testClass() { ID = i, Name = $"Item {i}" };
+					TestClass test = new TestClass() { ID = i, Name = $"Item {i}" };
 					test.ItemList.Add("Item {i}", i);
 					var data = MessagePackSerializer.Typeless.Serialize(test);
-					test = (testClass)MessagePackSerializer.Typeless.Deserialize(data);
+					test = (TestClass)MessagePackSerializer.Typeless.Deserialize(data);
 				}
 				l.Debug("SpeedTest MessagePackSerializer Finish");
 				l.Debug("SpeedTest JSONSerializer Start");
 				for (i = 0; i < 1000000; i++)
 				{
-					testClass test = new testClass() { ID = i, Name = $"Item {i}" };
+					TestClass test = new TestClass() { ID = i, Name = $"Item {i}" };
 					test.ItemList.Add($"Item {i}", i);
 					var data = JSONExtensions.SerializeObject(test);
-					test = JSONExtensions.DeserializeObject<testClass>(data);
+					test = JSONExtensions.DeserializeObject<TestClass>(data);
 				}
 				l.Debug("SpeedTest JSOSerializer Finish");
 			}
 		}
 		[MessagePackObject(keyAsPropertyName: true)]
-		public class testClass
+		public class TestClass
 		{
-			public testClass()
+			public TestClass()
 			{
 				ItemList = new Dictionary<string, object>();
 			}

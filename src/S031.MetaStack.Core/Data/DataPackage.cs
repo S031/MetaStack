@@ -701,7 +701,7 @@ namespace S031.MetaStack.WinForms.Data
 
 		public string GetName(int i) => _indexes[i];
 
-		public int GetOrdinal(string name) => _indexes.IndexOf(name);
+		public int GetOrdinal(string name) => _indexes.IndexOf(name, StringComparer.Ordinal);
 
 		public string GetString(int i) => (string)_dataRow[i];
 
@@ -725,8 +725,10 @@ namespace S031.MetaStack.WinForms.Data
 
 		public object this[string name]
 		{
-			get { return _dataRow[_indexes.IndexOf(name, StringComparer.Ordinal)]; }
-			set { _dataRow[_indexes.IndexOf(name, StringComparer.Ordinal)] = value; }
+			get { return _dataRow[GetOrdinal(name)]; }
+			set { _dataRow[GetOrdinal(name)] = value; }
+			//get { return _dataRow[_indexes.IndexOf(name, StringComparer.Ordinal)]; }
+			//set { _dataRow[_indexes.IndexOf(name, StringComparer.Ordinal)] = value; }
 		}
 
 		public object this[int i]
@@ -737,7 +739,13 @@ namespace S031.MetaStack.WinForms.Data
 
 		public DataPackage SetValue(string name, object value)
 		{
-			_dataRow[_indexes.IndexOf(name, StringComparer.Ordinal)] = value;
+			_dataRow[GetOrdinal(name)] = value;
+			//_dataRow[_indexes.IndexOf(name, StringComparer.Ordinal)] = value;
+			return this;
+		}
+		public DataPackage SetValue(int index, object value)
+		{
+			_dataRow[index] = value;
 			return this;
 		}
 		static void WriteColumnInfo(BinaryWriter bw, ColumnInfo ci)
@@ -928,9 +936,13 @@ namespace S031.MetaStack.WinForms.Data
 			foreach (JsonObject r in rows)
 			{
 				ts.AddNew();
+				int i = 0;
 				foreach (var jo in r)
 				{
-					ts[jo.Key] = jo.Value?.GetValue();
+					ts[i] = jo.Value?
+						.GetValue()
+						.CastOf(ts.GetFieldType(i));
+					i++;
 				}
 				ts.Update();
 			}

@@ -221,7 +221,7 @@ namespace S031.MetaStack.Json
 			=> WriteString(value.ToString("c"), false);
 
 		public JsonWriter WriteValue(DateTime value)
-			=> WriteString(value.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"), false);
+			=> WriteString(value.ToString("yyyy-MM-ddTHH:mm:ss.fff"), false);
 
 		public JsonWriter WriteValue(decimal value)
 			=> WriteNumber(value);

@@ -10,9 +10,12 @@ namespace S031.MetaStack.Common
 {
 	public static class StringExtension
 	{
-		internal static readonly Func<int, string> FastAllocateString =
-					(Func<int, string>)typeof(string).GetMethods(BindingFlags.NonPublic | BindingFlags.Static)
-						.First(x => x.Name == "FastAllocateString").CreateDelegate(typeof(Func<int, string>));
+		//internal static readonly Func<int, string> FastAllocateString =
+		//			(Func<int, string>)typeof(string).GetMethods(BindingFlags.NonPublic | BindingFlags.Static)
+		//				.First(x => x.Name == "FastAllocateString").CreateDelegate(typeof(Func<int, string>));
+
+		public static string FastAllocateString(int count, string str = "\0")
+			=> string.Create<char>(count, str[0], (c, c1) => c1 = c[0]);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static string Left(this string str, int lenght)
