@@ -48,7 +48,7 @@ namespace S031.MetaStack.WinForms.Connectors
 			_host = config.GetValue<string>("Host");
 			_port = config.GetValue<int>("Port");
 #else
-			string setting = System.Configuration.ConfigurationManager.AppSettings["TCPConnector"];
+			string setting = System.Configuration.ConfigurationManager.AppSettings["TCPConnector"].Replace('\'', '"');
 			var j = new JsonReader(ref setting)
 				.Read();
 			if (j != null)

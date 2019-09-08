@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Windows.Forms;
-using S031.MetaStack.Common;
-using Newtonsoft.Json.Linq;
 using S031.MetaStack.WinForms.ORM;
 
 namespace S031.MetaStack.WinForms

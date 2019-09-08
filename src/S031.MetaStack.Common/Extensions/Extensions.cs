@@ -10,12 +10,14 @@ namespace S031.MetaStack.Common
 {
 	public static class StringExtension
 	{
-		//internal static readonly Func<int, string> FastAllocateString =
-		//			(Func<int, string>)typeof(string).GetMethods(BindingFlags.NonPublic | BindingFlags.Static)
-		//				.First(x => x.Name == "FastAllocateString").CreateDelegate(typeof(Func<int, string>));
-
+#if !NETCOREAPP
+		internal static readonly Func<int, string> FastAllocateString =
+					(Func<int, string>)typeof(string).GetMethods(BindingFlags.NonPublic | BindingFlags.Static)
+						.First(x => x.Name == "FastAllocateString").CreateDelegate(typeof(Func<int, string>));
+#else
 		public static string FastAllocateString(int count, string str = "\0")
 			=> string.Create<char>(count, str[0], (c, c1) => c1 = c[0]);
+#endif
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static string Left(this string str, int lenght)
@@ -340,6 +342,7 @@ namespace S031.MetaStack.Common
 			}
 		}
 
+
 		//[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		//public unsafe static string Qt2(this string source, char leftChar = '"', char rightChar = '"')
 		////=> string.Concat(leftChar, source, rightChar);
@@ -369,13 +372,13 @@ namespace S031.MetaStack.Common
 		//	destination[len + 1] = leftChar;			
 		//	return new string(destination);
 		//}
-		internal static unsafe void wstrcpy(char* dmem, char* smem, int charCount)
-		{
-			//uint len = ((uint)charCount);
-			//for (int i = 0; i < len; i++)
-			//	*(dmem + i) = *(smem + i);
+#pragma warning disable IDE1006 // Naming Styles
+		internal static unsafe void wstrcpy(char* dmem, char* smem, int charCount) =>
+#pragma warning restore IDE1006 // Naming Styles
+							   //uint len = ((uint)charCount);
+							   //for (int i = 0; i < len; i++)
+							   //	*(dmem + i) = *(smem + i);
 			Buffer.MemoryCopy(smem, dmem, charCount * 2, charCount * 2);
-		}
 
 		/// <summary>
 		/// Fast remove chars from source string. Use StringComparison.Ordinal

@@ -2,13 +2,8 @@
 using S031.MetaStack.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using S031.MetaStack.Core.Json;
-using MessagePack;
 #if NETCOREAPP
 using System.Linq;
-using System.Xml;
 using System.Xml.Linq;
 
 namespace S031.MetaStack.Core.ORM
@@ -17,7 +12,7 @@ namespace S031.MetaStack.Core.ORM
 namespace S031.MetaStack.WinForms.ORM
 #endif
 {
-    public enum DirectAccess
+	public enum DirectAccess
     {
         None = 0,
         ForInsert = 2,
@@ -34,7 +29,6 @@ namespace S031.MetaStack.WinForms.ORM
 		Action = 5
     }
 
-	[MessagePackObject(keyAsPropertyName: true)]
 	public class JMXSchema
     {
         private readonly string _objectName;
@@ -42,7 +36,6 @@ namespace S031.MetaStack.WinForms.ORM
         private string _dbObjectName;
 		private bool _readOnly;
 
-		//[Newtonsoft.Json.JsonConstructor]
 		public JMXSchema(string objectName) : this(new JMXObjectName(objectName))
         {
         }
@@ -61,10 +54,10 @@ namespace S031.MetaStack.WinForms.ORM
             DirectAccess = DirectAccess.ForAll;
             DbObjectType = DbObjectTypes.Table;
         }
-        /// <summary>
-        /// Assigned from schema repository manager
-        /// </summary>
-        public IJMXRepo SchemaRepo { get; set; }
+		/// <summary>
+		/// Assigned from schema repository manager
+		/// </summary>
+		public IJMXRepo SchemaRepo { get; set; }
         public int ID { get; set; }
         public Guid UID { get; set; }
         public string Name { get; set; }

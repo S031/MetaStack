@@ -6,17 +6,18 @@ using ICSharpCode.TextEditor;
 using ICSharpCode.TextEditor.Actions;
 using ICSharpCode.TextEditor.Document;
 using S031.MetaStack.Common;
+using S031.MetaStack.Json;
 
 namespace S031.MetaStack.WinForms
 {
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming", "CA1722:IdentifiersShouldNotHaveIncorrectPrefix")]
 	public class CEdit: TextEditorControl
 	{
-		private ContextMenuStrip mnuEdit = new ContextMenuStrip();
+		private readonly ContextMenuStrip mnuEdit = new ContextMenuStrip();
 
 		WinForm _cd;
-		private static List<string> _searches = new List<string>();
-		private static List<string> _replaces = new List<string>();
+		private static readonly List<string> _searches = new List<string>();
+		private static readonly List<string> _replaces = new List<string>();
 		static StringComparison _stringComparison = StringComparison.InvariantCultureIgnoreCase;
 		static string _searchText = string.Empty;
 		static string _replaceText = string.Empty;
@@ -29,25 +30,25 @@ namespace S031.MetaStack.WinForms
 			this.ShowLineNumbers = false;
 			this.IndentStyle = ICSharpCode.TextEditor.Document.IndentStyle.Smart;
 			ExitOnEscape = false;
-			mnuEdit.Items.Add(new ToolStripMenuItem("Вырезать", ResourceManager.GetImage("Cut"), new EventHandler(contextMenuClick) ) { Name = "mnuEditCut" });
-			mnuEdit.Items.Add(new ToolStripMenuItem("Копировать", ResourceManager.GetImage("Copy"), new EventHandler(contextMenuClick) ) { Name = "mnuEditCopy" });
-			mnuEdit.Items.Add(new ToolStripMenuItem("Вставить", ResourceManager.GetImage("Paste"), new EventHandler(contextMenuClick) ) { Name = "mnuEditPaste" });
+			mnuEdit.Items.Add(new ToolStripMenuItem("Вырезать", ResourceManager.GetImage("Cut"), new EventHandler(ContextMenuClick) ) { Name = "mnuEditCut" });
+			mnuEdit.Items.Add(new ToolStripMenuItem("Копировать", ResourceManager.GetImage("Copy"), new EventHandler(ContextMenuClick) ) { Name = "mnuEditCopy" });
+			mnuEdit.Items.Add(new ToolStripMenuItem("Вставить", ResourceManager.GetImage("Paste"), new EventHandler(ContextMenuClick) ) { Name = "mnuEditPaste" });
 			mnuEdit.Items.Add(new ToolStripSeparator());
-			mnuEdit.Items.Add(new ToolStripMenuItem("Найти...", ResourceManager.GetImage("Find"), new EventHandler(contextMenuClick)) { Name = "mnuEditFind", ShortcutKeys = Keys.Control | Keys.F});
-			mnuEdit.Items.Add(new ToolStripMenuItem("Заменить...", null, new EventHandler(contextMenuClick) ) { Name = "mnuEditFindReplace", ShortcutKeys = Keys.Control | Keys.H });
-			mnuEdit.Items.Add(new ToolStripMenuItem("Перейти...", null, new EventHandler(contextMenuClick) ) { Name = "mnuEditGoTo", ShortcutKeys = Keys.Control | Keys.G });
+			mnuEdit.Items.Add(new ToolStripMenuItem("Найти...", ResourceManager.GetImage("Find"), new EventHandler(ContextMenuClick)) { Name = "mnuEditFind", ShortcutKeys = Keys.Control | Keys.F});
+			mnuEdit.Items.Add(new ToolStripMenuItem("Заменить...", null, new EventHandler(ContextMenuClick) ) { Name = "mnuEditFindReplace", ShortcutKeys = Keys.Control | Keys.H });
+			mnuEdit.Items.Add(new ToolStripMenuItem("Перейти...", null, new EventHandler(ContextMenuClick) ) { Name = "mnuEditGoTo", ShortcutKeys = Keys.Control | Keys.G });
 			mnuEdit.Items.Add(new ToolStripSeparator());
-			mnuEdit.Items.Add(new ToolStripMenuItem("Отменить", ResourceManager.GetImage("Undo"), new EventHandler(contextMenuClick)) { Name = "mnuEditUndo", Enabled = false});
-			mnuEdit.Items.Add(new ToolStripMenuItem("Вернуть", ResourceManager.GetImage("Redo"), new EventHandler(contextMenuClick)) { Name = "mnuEditRedo", Enabled = false});
+			mnuEdit.Items.Add(new ToolStripMenuItem("Отменить", ResourceManager.GetImage("Undo"), new EventHandler(ContextMenuClick)) { Name = "mnuEditUndo", Enabled = false});
+			mnuEdit.Items.Add(new ToolStripMenuItem("Вернуть", ResourceManager.GetImage("Redo"), new EventHandler(ContextMenuClick)) { Name = "mnuEditRedo", Enabled = false});
 			mnuEdit.Items.Add(new ToolStripSeparator());
 			mnuEdit.Items.Add(new ToolStripMenuItem("Формат") { Name = "mnuFormat"});
 			((ToolStripMenuItem)mnuEdit.Items["mnuFormat"]).DropDownItems.AddRange(new ToolStripItem[] {
-				new ToolStripMenuItem("Верхний регистр", null, contextMenuClick, Keys.Control|Keys.U) { Name = "mnuFormatToUpper" },
-				new ToolStripMenuItem("Нижний регистр", null, contextMenuClick, Keys.Control|Keys.L) { Name = "mnuFormatToLower" },
-				new ToolStripMenuItem("Инвертировать регистр", null, contextMenuClick) { Name = "mnuFormatInvert" },
-				new ToolStripMenuItem("JSON формат", null, contextMenuClick) { Name = "mnuFormatJSON" },
-				new ToolStripMenuItem("XML формат", null, contextMenuClick) { Name = "mnuFormatXML" },
-				new ToolStripMenuItem("Space2Tab", null, contextMenuClick) { Name = "mnuFormatSpace2Tab" }});
+				new ToolStripMenuItem("Верхний регистр", null, ContextMenuClick, Keys.Control|Keys.U) { Name = "mnuFormatToUpper" },
+				new ToolStripMenuItem("Нижний регистр", null, ContextMenuClick, Keys.Control|Keys.L) { Name = "mnuFormatToLower" },
+				new ToolStripMenuItem("Инвертировать регистр", null, ContextMenuClick) { Name = "mnuFormatInvert" },
+				new ToolStripMenuItem("JSON формат", null, ContextMenuClick) { Name = "mnuFormatJSON" },
+				new ToolStripMenuItem("XML формат", null, ContextMenuClick) { Name = "mnuFormatXML" },
+				new ToolStripMenuItem("Space2Tab", null, ContextMenuClick) { Name = "mnuFormatSpace2Tab" }});
 			FontManager.Adop(mnuEdit);
 			this.ContextMenuStrip = mnuEdit;
 			this.TextArea.KeyDown += new System.Windows.Forms.KeyEventHandler(this.CEdit_KeyDown);
@@ -55,8 +56,8 @@ namespace S031.MetaStack.WinForms
 			this.TextChanged += new EventHandler((ctrl, e) => UndoControl());
 			this.Document.UndoStack.ActionUndone += new EventHandler((ctrl, e) => UndoControl());
 			this.Document.UndoStack.ActionRedone += new EventHandler((ctrl, e) => UndoControl());
-			this.TextArea.SelectionManager.SelectionChanged+=new EventHandler((ctrl, e) => selectionControl());
-			selectionControl();
+			this.TextArea.SelectionManager.SelectionChanged+=new EventHandler((ctrl, e) => SelectionControl());
+			SelectionControl();
 		}
 		
 		public bool ExitOnEscape { get; set; }
@@ -105,7 +106,7 @@ namespace S031.MetaStack.WinForms
 			this.TextArea.EndUpdate();
 		}
 
-		void selectionControl()
+		void SelectionControl()
 		{
 			bool canCopy = this.TextArea.SelectionManager.HasSomethingSelected; ;
 
@@ -144,11 +145,11 @@ namespace S031.MetaStack.WinForms
 				Value = GetInitialSearchText()
 			});
 			cbox.Items.AddRange(_searches.ToArray());
-			setAutoComplete(cbox);
+			SetAutoComplete(cbox);
 			_cd.Activated += new EventHandler((o, e) => { ((WinForm)o).GetControl<ComboBox>("SearchText").Focus(); });
 			Button btn = p.Add<Button>("Find");
 			btn.Text = "Найти";
-			btn.Click += new EventHandler(btn_Click);
+			btn.Click += new EventHandler(Btn_Click);
 			_cd.AcceptButton = btn;
 			CheckBox cb = p.Add<CheckBox>(new WinFormItem("MatchCase") { Value = (_stringComparison != StringComparison.InvariantCultureIgnoreCase), DataType = typeof(bool), PresentationType = typeof(CheckBox) });
 			cb.Text = "С учетом регистра";
@@ -184,7 +185,7 @@ namespace S031.MetaStack.WinForms
 				CellAddress = new Pair<int>(0, 0)
 			});
 			cbox.Items.AddRange(_searches.ToArray());
-			setAutoComplete(cbox);
+			SetAutoComplete(cbox);
 			_cd.Activated += new EventHandler((o, e) => { ((WinForm)o).GetControl<ComboBox>("SearchText").Focus(); });
 
 			cbox = p.Add<ComboBox>(new WinFormItem("ReplaceText")
@@ -195,7 +196,7 @@ namespace S031.MetaStack.WinForms
 				CellAddress = new Pair<int>(0, 1)
 			});
 			cbox.Items.AddRange(_replaces.ToArray());
-			setAutoComplete(cbox);
+			SetAutoComplete(cbox);
 
 			CheckBox cb = p.Add<CheckBox>(new WinFormItem("MatchCase")
 			{
@@ -208,22 +209,22 @@ namespace S031.MetaStack.WinForms
 
 			Button btn = p.Add<Button>("Find");
 			btn.Text = "Найти";
-			btn.Click += new EventHandler(btn_Click);
+			btn.Click += new EventHandler(Btn_Click);
 			_cd.AcceptButton = btn;
 
 			btn = p.Add<Button>("Replace");
 			btn.Text = "Заменить";
-			btn.Click += new EventHandler(btn_Click);
+			btn.Click += new EventHandler(Btn_Click);
 			
 			btn = p.Add<Button>("ReplaceAll");
 			btn.Text = "Заменить все";
-			btn.Click += new EventHandler(btn_Click);
+			btn.Click += new EventHandler(Btn_Click);
 			tlpRows.Add<Label>("Blank");
 
 			_cd.Show(this);
 		}
 
-		void btn_Click(object sender, EventArgs e)
+		void Btn_Click(object sender, EventArgs e)
 		{
 			_cd.Save();
 			string searchText = (string)_cd.GetItem("SearchText").Value;
@@ -235,7 +236,7 @@ namespace S031.MetaStack.WinForms
 				bool withStore = (_searchText != searchText);
 				_searchText = searchText;
 				_stringComparison = (bool)_cd.GetItem("MatchCase").Value ? StringComparison.InvariantCulture : StringComparison.InvariantCultureIgnoreCase;
-				runSearch(withStore);
+				RunSearch(withStore);
 			}
 			else if (btn.GetItem().Name == "Replace")
 			{
@@ -244,9 +245,9 @@ namespace S031.MetaStack.WinForms
 				_searchText = searchText;
 				if (!string.IsNullOrEmpty(searchText))
 				{
-					runReplace();
-					runSearch(false);
-					storeAutoComplete(true);
+					RunReplace();
+					RunSearch(false);
+					StoreAutoComplete(true);
 				}
 			}
 			else if (btn.GetItem().Name == "ReplaceAll")
@@ -256,13 +257,13 @@ namespace S031.MetaStack.WinForms
 				_searchText = searchText;
 				if (!string.IsNullOrEmpty(searchText))
 				{
-					runReplaceAll();
-					storeAutoComplete(true);
+					RunReplaceAll();
+					StoreAutoComplete(true);
 				}
 			}
 		}
 
-		void runReplace()
+		void RunReplace()
 		{
 			IDocument document = this.TextArea.Document;
 			int offset;
@@ -281,10 +282,10 @@ namespace S031.MetaStack.WinForms
 			document.Replace(offset, lenght, _replaceText);
 			this.TextArea.Caret.Position = document.OffsetToPosition(offset + _replaceText.Length);
 			this.TextArea.EndUpdate();
-			cdShowPosition(this.TextArea.Caret.Position);
+			CdShowPosition(this.TextArea.Caret.Position);
 		}
 
-		void runReplaceAll()
+		void RunReplaceAll()
 		{
 			IDocument document = this.TextArea.Document;
 			int offset;
@@ -323,10 +324,10 @@ namespace S031.MetaStack.WinForms
 			document.Replace(offset, lenght, sourceText);
 			this.TextArea.Caret.Position = document.OffsetToPosition(offset + _replaceText.Length);
 			this.TextArea.EndUpdate();
-			cdShowPosition(this.TextArea.Caret.Position);
+			CdShowPosition(this.TextArea.Caret.Position);
 		}
 
-		void runSearch(bool withStore)
+		void RunSearch(bool withStore)
 		{
 			string find = _searchText;
 			if (_startIndex > this.Document.TextContent.Length) _startIndex = 0;
@@ -340,16 +341,16 @@ namespace S031.MetaStack.WinForms
 			{
 				_startIndex = index;
 				HighlightText(index, find.Length);
-				cdShowPosition(this.TextArea.Caret.Position);
+				CdShowPosition(this.TextArea.Caret.Position);
 			}
 			else
-				cdShowPosition(TextLocation.Empty);
+				CdShowPosition(TextLocation.Empty);
 
 			if (withStore)
-				storeAutoComplete(false);
+				StoreAutoComplete(false);
 		}
 
-		void cdShowPosition(TextLocation position)
+		void CdShowPosition(TextLocation position)
 		{
 			if (_cd != null && position != TextLocation.Empty)
 				_cd.GetItem("Blank").LinkedControl.Text = $"{position}";
@@ -381,13 +382,13 @@ namespace S031.MetaStack.WinForms
 			return _searchText;
 		}
 
-		private static void setAutoComplete(ComboBox tb)
+		private static void SetAutoComplete(ComboBox tb)
 		{
 			tb.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
 			tb.AutoCompleteSource = AutoCompleteSource.ListItems;
 		}
 
-		private static void storeAutoComplete(bool withReplace)
+		private static void StoreAutoComplete(bool withReplace)
 		{
 			if (_searches.Contains(_searchText)) _searches.Remove(_searchText);
 			_searches.Insert(0, _searchText);
@@ -400,7 +401,7 @@ namespace S031.MetaStack.WinForms
 		#endregion Find&Replace Support
 
 		#region EventImplements
-		private void contextMenuClick(object sender, EventArgs e)
+		private void ContextMenuClick(object sender, EventArgs e)
 		{
 			switch ((sender as ToolStripMenuItem).Name)
 			{
@@ -457,13 +458,13 @@ namespace S031.MetaStack.WinForms
 			{
 				_searchText = GetInitialSearchText();
 				_startIndex += 1;
-				runSearch(true);
+				RunSearch(true);
 			}
 			else if (e.KeyCode == Keys.F3)
 			{
 				int offset = this.TextArea.Document.PositionToOffset(this.TextArea.Caret.Position);
 				_startIndex = offset;
-				runSearch(false);
+				RunSearch(false);
 			}
 		}
 
@@ -489,8 +490,13 @@ namespace S031.MetaStack.WinForms
                 string what = document.GetText(startOffset, length);
 				try
 				{
-                    Newtonsoft.Json.Linq.JObject json = Newtonsoft.Json.Linq.JObject.Parse(what);
-                    what = json.ToString(Newtonsoft.Json.Formatting.Indented);
+					var json = new JsonReader(ref what).Read();
+					if (json is JsonArray a)
+						what = a.ToString(Formatting.Indented);
+					else if (json is JsonObject j)
+						what = j.ToString(Formatting.Indented);
+					else
+						return;
                     document.Replace(startOffset, length, what);
                 }
 				catch

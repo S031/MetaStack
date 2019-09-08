@@ -5,9 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using S031.MetaStack.Common;
-using Newtonsoft.Json.Linq;
 using S031.MetaStack.WinForms.Data;
-using S031.MetaStack.WinForms.Json;
 using S031.MetaStack.WinForms.ORM;
 //using Zuby.ADGV; 
 
@@ -53,7 +51,7 @@ namespace S031.MetaStack.WinForms
 
 		//Selection 
 		DBGridSelectionStyle _selectionStyle = DBGridSelectionStyle.Normal;
-		List<DataGridViewRow> checkedRows = new List<DataGridViewRow>();
+		readonly List<DataGridViewRow> checkedRows = new List<DataGridViewRow>();
 
 		//Footer
 		private bool lastRowPainted;
@@ -68,7 +66,7 @@ namespace S031.MetaStack.WinForms
 		private object lastSearch;
 		private string lastCondition = string.Empty;
 		private int oldCol = -1;
-		private static List<string> searches = new List<string>();
+		private static readonly List<string> searches = new List<string>();
 		private GridSpeedSearch _sss;
 
 		//Sort & filter support
@@ -1103,7 +1101,7 @@ namespace S031.MetaStack.WinForms
 		{
 			if (this.Rows.Count == 0) return;
 			string colName = this.Columns[this.CurrentCellAddress.X].Name;
-			string filter = string.Empty;
+			string filter;
 			if (lastCondition == "Like")
 			{
 				string template = lastSearch.ToString().ToLower();

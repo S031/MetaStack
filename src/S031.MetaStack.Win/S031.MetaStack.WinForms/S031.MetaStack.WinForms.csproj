@@ -33,17 +33,20 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="fastJSON, Version=2.2.3.0, Culture=neutral, PublicKeyToken=6b75a806b86095cd, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\fastJSON.2.2.4\lib\net40\fastJSON.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="MessagePack, Version=1.7.3.7, Culture=neutral, PublicKeyToken=b4a0369545f0a1be, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\MessagePack.1.7.3.7\lib\net47\MessagePack.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\System.Runtime.CompilerServices.Unsafe.4.5.2\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\System.Threading.Tasks.Extensions.4.5.3\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -80,9 +83,6 @@
     </Compile>
     <Compile Include="..\..\S031.MetaStack.Core\ORM\Internal\FastMethodInfo.cs">
       <Link>ORM\Internal\FastMethodInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\ORM\Internal\JsonWriterExtensions.cs">
-      <Link>ORM\Internal\JsonWriterExtensions.cs</Link>
     </Compile>
     <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXAttribute.cs">
       <Link>ORM\JMXAttribute.cs</Link>
@@ -229,6 +229,11 @@
     <Compile Include="ORM\JMXFactory\JMXProvider.cs" />
     <Compile Include="ORM\JMXFactory\JMXRepo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Strings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Strings.resx</DependentUpon>
+    </Compile>
     <Compile Include="Security\CredentialManager\CredentialManager.cs" />
     <Compile Include="Tools\ClientGate.cs" />
     <Compile Include="Tools\Events.cs" />
@@ -245,6 +250,11 @@
     <EmbeddedResource Include="Dialogs\TimeWaitDialog.resx">
       <DependentUpon>TimeWaitDialog.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Strings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Strings.ru-RU.resx" />
     <EmbeddedResource Include="Resources\Attach.png" />
     <EmbeddedResource Include="Resources\AttFiles\Avi.png" />
     <EmbeddedResource Include="Resources\AttFiles\Bat.png" />

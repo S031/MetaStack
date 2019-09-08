@@ -11,12 +11,12 @@ namespace S031.MetaStack.WinForms.Json
     {
  
 		public static object DeserializeObject(string value)
-			=>MessagePackSerializer.Typeless.Deserialize(Convert.FromBase64String(value));
+			=>MessagePackSerializer.Typeless.Deserialize(MessagePack.MessagePackSerializer.FromJson(value));
 
 		public static T DeserializeObject<T>(string value)
-			=> (T)MessagePackSerializer.Typeless.Deserialize(Convert.FromBase64String(value));
+			=> (T)MessagePackSerializer.Deserialize<T>(MessagePack.MessagePackSerializer.FromJson(value));
 
 		public static string SerializeObject(object value)
-			=> Convert.ToBase64String(MessagePackSerializer.Typeless.Serialize(value));
+			=> MessagePack.MessagePackSerializer.ToJson(MessagePackSerializer.Typeless.Serialize(value));
 	}
 }

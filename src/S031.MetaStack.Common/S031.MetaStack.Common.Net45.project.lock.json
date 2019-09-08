@@ -10,19 +10,19 @@
     ".NETFramework,Version=v4.7.2": []
   },
   "packageFolders": {
-    "C:\\Users\\svostrikov\\.nuget\\packages\\": {}
+    "C:\\Users\\Sergey\\.nuget\\packages\\": {}
   },
   "project": {
     "restore": {
-      "projectUniqueName": "C:\\Source\\Repos\\MetaStack\\src\\S031.MetaStack.Common\\S031.MetaStack.Common.Net45.csproj",
+      "projectUniqueName": "D:\\Source\\Repos\\MetaStack\\src\\S031.MetaStack.Common\\S031.MetaStack.Common.Net45.csproj",
       "projectName": "S031.MetaStack.Common.Net45",
-      "projectPath": "C:\\Source\\Repos\\MetaStack\\src\\S031.MetaStack.Common\\S031.MetaStack.Common.Net45.csproj",
-      "projectJsonPath": "C:\\Source\\Repos\\MetaStack\\src\\S031.MetaStack.Common\\S031.MetaStack.Common.Net45.project.json",
-      "packagesPath": "C:\\Users\\svostrikov\\.nuget\\packages\\",
-      "outputPath": "C:\\Source\\Repos\\MetaStack\\src\\S031.MetaStack.Common\\obj\\",
+      "projectPath": "D:\\Source\\Repos\\MetaStack\\src\\S031.MetaStack.Common\\S031.MetaStack.Common.Net45.csproj",
+      "projectJsonPath": "D:\\Source\\Repos\\MetaStack\\src\\S031.MetaStack.Common\\S031.MetaStack.Common.Net45.project.json",
+      "packagesPath": "C:\\Users\\Sergey\\.nuget\\packages\\",
+      "outputPath": "D:\\Source\\Repos\\MetaStack\\src\\S031.MetaStack.Common\\obj\\",
       "projectStyle": "ProjectJson",
       "configFilePaths": [
-        "C:\\Users\\svostrikov\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Sergey\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "sources": {
