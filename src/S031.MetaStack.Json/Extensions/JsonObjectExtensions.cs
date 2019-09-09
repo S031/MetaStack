@@ -54,14 +54,14 @@ namespace S031.MetaStack.Json
 			=> json.TryGetValue(key, out JsonValue value)
 				&& value.JsonType == JsonType.String
 				? (string)value
-				: default;
+				: string.Empty;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static string GetStringOrDefault(this JsonObject json, string key, string defaultValue)
 			=> json.TryGetValue(key, out JsonValue value)
 				&& value.JsonType == JsonType.String
 				? (string)value
-				: defaultValue;
+				: string.Empty;
 
 		public static Guid GetGuidOrDefault(this JsonObject json, string key)
 		{
@@ -71,7 +71,7 @@ namespace S031.MetaStack.Json
 				else if (value.JsonType == JsonType.String
 					&& Guid.TryParse(value, out Guid guid))
 					return guid;
-			return default;
+			return Guid.Empty;
 		}
 
 		public static Guid GetGuidOrDefault(this JsonObject json, string key, Func<Guid> defaultValueCreator)

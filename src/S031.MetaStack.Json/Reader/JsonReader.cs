@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using SR = S031.MetaStack.Json.Resources.Strings;
 
 namespace S031.MetaStack.Json
@@ -17,9 +18,9 @@ namespace S031.MetaStack.Json
 	{
 		private const int default_capacity = 256;
 
-		//private static readonly ThreadLocal<StringBuilder> _sb = new ThreadLocal<StringBuilder>(() => new StringBuilder(default_capacity));
-		[ThreadStatic]
-		private static readonly StringBuilder _sb = new StringBuilder(default_capacity);
+		private static readonly ThreadLocal<StringBuilder> _sb = new ThreadLocal<StringBuilder>(() => new StringBuilder(default_capacity));
+		//[ThreadStatic]
+		//private static readonly StringBuilder _sb = new StringBuilder(default_capacity);
 
 		private readonly string _r;
 		private readonly int _len;
@@ -251,7 +252,7 @@ namespace S031.MetaStack.Json
 		// It could return either int, long, ulong, decimal or double, depending on the parsed value.
 		private JsonValue ReadNumericLiteral()
 		{
-			StringBuilder sb = _sb;
+			StringBuilder sb = _sb.Value;
 			sb.Clear();
 
 			if (PeekChar() == '-')
@@ -385,7 +386,7 @@ namespace S031.MetaStack.Json
 			}
 
 			ReadChar();
-			StringBuilder sb = _sb;
+			StringBuilder sb = _sb.Value;
 			sb.Length = 0;
 			while (true)
 			{

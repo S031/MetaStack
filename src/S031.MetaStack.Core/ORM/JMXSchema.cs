@@ -44,25 +44,16 @@ namespace S031.MetaStack.WinForms.ORM
             _objectName = objectName.ObjectName;
             _areaName = objectName.AreaName;
             _dbObjectName = objectName.ObjectName;
-            Attributes = new List<JMXAttribute>();
-            Parameters = new List<JMXParameter>();
-            Indexes = new List<JMXIndex>();
-            ForeignKeys = new List<JMXForeignKey>();
-			Conditions = new List<JMXCondition>();
-            UID = Guid.NewGuid();
-			AuditEnabled = true;
-            DirectAccess = DirectAccess.ForAll;
-            DbObjectType = DbObjectTypes.Table;
         }
 		/// <summary>
 		/// Assigned from schema repository manager
 		/// </summary>
 		public IJMXRepo SchemaRepo { get; set; }
         public int ID { get; set; }
-        public Guid UID { get; set; }
+		public Guid UID { get; set; } = Guid.Empty;
         public string Name { get; set; }
         public int SyncState { get; set; }
-        public bool AuditEnabled { get; set; }
+		public bool AuditEnabled { get; set; } = true;
         public bool ReadOnly
 		{
 			get => DbObjectType == DbObjectTypes.Table ? _readOnly : true;
@@ -95,14 +86,14 @@ namespace S031.MetaStack.WinForms.ORM
 		/// Костыль!!! Связать с ParentID
 		/// </summary>
         public JMXObjectName OwnerObject { get; set; }
-        public DirectAccess DirectAccess { get; set; }
-        public DbObjectTypes DbObjectType { get; set; }
-		public List<JMXAttribute> Attributes { get; }
-		public List<JMXParameter> Parameters { get; }
+		public DirectAccess DirectAccess { get; set; } = DirectAccess.ForAll;
+		public DbObjectTypes DbObjectType { get; set; } = DbObjectTypes.Table;
+		public List<JMXAttribute> Attributes { get; } = new List<JMXAttribute>();
+		public List<JMXParameter> Parameters { get; } = new List<JMXParameter>();
 		public JMXPrimaryKey PrimaryKey { get; set; }
-		public List<JMXIndex> Indexes { get; }
-		public List<JMXForeignKey> ForeignKeys { get; }
-		public List<JMXCondition> Conditions { get; }
+		public List<JMXIndex> Indexes { get; } = new List<JMXIndex>();
+		public List<JMXForeignKey> ForeignKeys { get; } = new List<JMXForeignKey>();
+		public List<JMXCondition> Conditions { get; } = new List<JMXCondition>();
 		protected void ToStringRaw(JsonWriter writer)
         {
 			writer.WriteStartObject();
@@ -223,11 +214,11 @@ namespace S031.MetaStack.WinForms.ORM
 			JMXSchema schema = new JMXSchema(name)
 			{
 				AuditEnabled = j.GetBoolOrDefault("AuditEnabled"),
-				DbObjectType = j.GetEnum<DbObjectTypes>("DbObjectType"),
+				DbObjectType = j.GetEnum<DbObjectTypes>("DbObjectType", DbObjectTypes.Table),
 				Name = j.GetStringOrDefault("Name"),
 				ID = j.GetIntOrDefault("ID"),
-				UID = j.GetGuidOrDefault("UID"),
-				DirectAccess = j.GetEnum<DirectAccess>("DirectAccess"),
+				UID = j.GetGuidOrDefault("UID", () => Guid.Empty),
+				DirectAccess = j.GetEnum<DirectAccess>("DirectAccess", DirectAccess.ForAll),
 				ReadOnly = j.GetBoolOrDefault("ReadOnly")
 			};
 
@@ -258,7 +249,7 @@ namespace S031.MetaStack.WinForms.ORM
 
 			if (j.TryGetValue("Parameters", out a))
 				foreach (JsonObject obj in a)
-					schema.Attributes.Add(JMXParameter.ReadFrom(obj));
+					schema.Parameters.Add(JMXParameter.ReadFrom(obj));
 
 			return schema;
 		}

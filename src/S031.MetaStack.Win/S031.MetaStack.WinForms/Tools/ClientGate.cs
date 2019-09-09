@@ -115,7 +115,7 @@ namespace S031.MetaStack.WinForms
 				object p = parameters[i];
 				if (i % 2 == 0)
 				{
-					if (p.ToString().EndsWith("ConnectionName", StringComparison.CurrentCultureIgnoreCase))
+					if (p.ToString().EndsWith("ConnectionName", StringComparison.OrdinalIgnoreCase))
 						c = true;
 					else
 					{
@@ -133,7 +133,7 @@ namespace S031.MetaStack.WinForms
 					}
 					else
 					{
-						dr.SetValue("ParamValue", p);
+						dr.SetValue("ParamValue", p.ToString());
 						dr.Update();
 					}
 				}

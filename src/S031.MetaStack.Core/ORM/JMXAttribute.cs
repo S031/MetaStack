@@ -122,8 +122,8 @@ namespace S031.MetaStack.WinForms.ORM
 		public string SuperObject { get; set; }
 		public string SuperMethod { get; set; }
 		public string SuperFilter { get; set; }
-		public List<string> ListItems { get; }
-		public List<object> ListData { get; }
+		public List<string> ListItems { get; } = new List<string>();
+		public List<object> ListData { get; } = new List<object>();
 		public string FieldName { get; set; }
 		public string ConstName { get; set; }
 		public string Agregate { get; set; }
@@ -252,7 +252,8 @@ namespace S031.MetaStack.WinForms.ORM
 			IsPK = o.GetBoolOrDefault("IsPK");
 			IsFK = o.GetBoolOrDefault("IsFK");
 			Name = o.GetStringOrDefault("Name");
-			Caption = o.GetStringOrDefault("Caption");
+			if (o.TryGetValue("Caption", out JsonValue caption))
+				Caption = o.GetStringOrDefault("Caption");
 			DataType = o.GetEnum<MdbType>("DataType");
 			Width = o.GetIntOrDefault("Width");
 			Visible = o.GetBoolOrDefault("Visible", true);
@@ -287,11 +288,9 @@ namespace S031.MetaStack.WinForms.ORM
 				IsArray = o.GetBoolOrDefault("IsArray");
 			}
 
-			ListItems = new List<string>();
 			if (o.TryGetValue("ListItems", out JsonArray a))
 				ListItems.AddRange(a.Select(v => (string)v));
 
-			ListData = new List<object>();
 			if (o.TryGetValue("ListData", out a))
 				ListData.AddRange(a.Select(v=>v.GetValue()));
 
