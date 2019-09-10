@@ -72,13 +72,13 @@ namespace MetaStack.Test.Data
 				for (i = 0; i < loopCount; i++)
 					p = GetTestData(count, false, false);
 				l.Debug($"SpeedTest Finish {i} packages with {count} rows");
-				p.GoDataTop();
 				i = 0;
-				for (; p.Read();)
-				{
-					i++;
-				}
-				l.Debug($"SpeedTest Finish {i} rows readed");
+				for (i = 0; i < loopCount; i++)
+					p.GoDataTop();
+					for (; p.Read();)
+					{
+					}
+				l.Debug($"SpeedTest Finish {count*loopCount} rows readed");
 				byte[] data =  p.ToArray();
 				for (i = 0; i < loopCount; i++)
 					_ = p.ToArray();
@@ -89,6 +89,7 @@ namespace MetaStack.Test.Data
 			}
 		}
 
+		private static readonly DateTime _dateTest = DateTime.Now.Date;
 		private static DataPackage GetTestData(int rowsCount = 5, bool withHeader = false, bool withObjectData = false)
 		{
 			DataPackage p = new DataPackage(new string[] { "Col1.int", "Col2.string.255", "Col3.datetime.10", "Col4.Guid.34", "Col5.object" });
@@ -106,9 +107,9 @@ namespace MetaStack.Test.Data
 					.SetValue(1, $"Строка # {new string('x', i % 100)}")
 					.SetValue(2, DateTime.Now.AddDays(i))
 					.SetValue(3, Guid.NewGuid());
-				
+
 				if (!withObjectData)
-					p[4] = null;
+					p[4] = null; //_dateTest (+4 sec for 10_000_000 loops);
 				else
 					p[4] = new TestClass() { ID = i, Name = (string)p[1] };
 				p.Update();
@@ -227,7 +228,7 @@ namespace MetaStack.Test.Data
 		{
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
-				l.Debug("SpeedTest MessagePackSerializer Start");
+				l.Debug("SpeedTest MessagePackSerializer custom object Start");
 				int i = 0;
 				for (i = 0; i < 1000000; i++)
 				{
@@ -236,7 +237,7 @@ namespace MetaStack.Test.Data
 					var data = MessagePackSerializer.Typeless.Serialize(test);
 					test = (TestClass)MessagePackSerializer.Typeless.Deserialize(data);
 				}
-				l.Debug("SpeedTest MessagePackSerializer Finish");
+				l.Debug("SpeedTest MessagePackSerializer custom object Finish");
 				l.Debug("SpeedTest JSONSerializer Start");
 				for (i = 0; i < 1000000; i++)
 				{
@@ -244,6 +245,14 @@ namespace MetaStack.Test.Data
 					test.ItemList.Add($"Item {i}", i);
 					var data = JSONExtensions.SerializeObject(test);
 					test = JSONExtensions.DeserializeObject<TestClass>(data);
+				}
+				l.Debug("SpeedTest JSOSerializer Finish");
+				l.Debug("SpeedTest DateTime object Start");
+				object d = DateTime.Now;
+				for (i = 0; i < 1000000; i++)
+				{
+					var data = MessagePackSerializer.Typeless.Serialize(d);
+					d = MessagePack.MessagePackSerializer.Typeless.Deserialize(data);
 				}
 				l.Debug("SpeedTest JSOSerializer Finish");
 			}

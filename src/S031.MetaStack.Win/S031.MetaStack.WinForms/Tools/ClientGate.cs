@@ -133,7 +133,7 @@ namespace S031.MetaStack.WinForms
 					}
 					else
 					{
-						dr.SetValue("ParamValue", p.ToString());
+						dr.SetValue("ParamValue", p);
 						dr.Update();
 					}
 				}

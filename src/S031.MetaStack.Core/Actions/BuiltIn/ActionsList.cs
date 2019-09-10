@@ -203,7 +203,7 @@ namespace S031.MetaStack.Core.Actions
 				AttribName = "ParamValue",
 				FieldName = "ParamValue",
 				ParameterID = "ParamValue",
-				DataType = "string",
+				DataType = "object",
 				Dirrect = ParamDirrect.Input,
 				Enabled = true,
 				Name = "Значение параметра",
