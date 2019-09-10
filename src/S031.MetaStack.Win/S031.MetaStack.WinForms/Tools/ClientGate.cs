@@ -36,11 +36,11 @@ namespace S031.MetaStack.WinForms
 				return true;
 
 			string userName = $@"{Environment.UserDomainName}\{Environment.UserName}";
-			string password = string.Empty;
 			bool savePassword = ConfigurationManager.AppSettings["SavePassword"].ToBoolOrDefault();
 			bool isPrompt = false;
 			var sInfo = CredentialManager.ReadCredential(_appName);
 			forcePassword = forcePassword || sInfo == null || sInfo.Password.IsEmpty() || !savePassword;
+			string password;
 			if (forcePassword)
 			{
 				password = SecureRequest(userName);
