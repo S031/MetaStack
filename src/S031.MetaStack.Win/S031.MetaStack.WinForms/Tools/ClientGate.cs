@@ -91,7 +91,7 @@ namespace S031.MetaStack.WinForms
 					if (!_actionss.ContainsKey(actionID))
 						_actionss.Add(actionID, ai);
 			}
-			return _actionss[actionID];
+			return ai;
 		}
 
 		public static JMXSchema GetObjectSchema(string objectName) => 

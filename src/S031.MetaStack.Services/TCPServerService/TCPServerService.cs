@@ -59,6 +59,7 @@ namespace S031.MetaStack.Services
 
 						using (var dr = await ProcessMessageAsync(new DataPackage(res)))
 							response = dr.ToArray();
+						//ArrayPool<byte>.Shared.Return(res);
 					}
 					catch (Exception ex)
 					{
@@ -83,15 +84,18 @@ namespace S031.MetaStack.Services
 
 		private static async Task<byte[]> GetByteArrayFromStreamAsync(NetworkStream ns, int length)
 		{
-			byte[] result = new byte[length];
-			int ReadBytes = 0;
-			while (length > ReadBytes)
-			{
-				ReadBytes += await ns.ReadAsync(result, ReadBytes, length - ReadBytes);
-				if (ReadBytes == 0)
-					break;
-			}
-			return result;
+			Memory<byte> result = new Memory<byte>(new byte[length]);
+			await ns.ReadAsync(result);
+			//byte[] result = new byte[length];
+			////byte[] result = ArrayPool<byte>.Shared.Rent(length);
+			//int ReadBytes = 0;
+			//while (length > ReadBytes)
+			//{
+			//	ReadBytes += await ns.ReadAsync(result, ReadBytes, length - ReadBytes);
+			//	if (ReadBytes == 0)
+			//		break;
+			//}
+			return result.ToArray();
 		}
 
 		public override  async Task StopAsync(CancellationToken cancellationToken)

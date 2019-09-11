@@ -18,7 +18,7 @@ namespace S031.MetaStack.Core.Actions
 
 		public DataPackage Invoke(ActionInfo ai, DataPackage dp)
 		{
-			GetParameters(ai, dp);
+			GetParameters(dp);
 			using (MdbContext mdb = new MdbContext(_connectInfo))
 			using (JMXFactory f = JMXFactory.Create(mdb, ApplicationContext.GetLogger()))
 			{
@@ -31,7 +31,7 @@ namespace S031.MetaStack.Core.Actions
 
 		public async Task<DataPackage> InvokeAsync(ActionInfo ai, DataPackage dp)
 		{
-			GetParameters(ai, dp);
+			GetParameters(dp);
 			//using (MdbContext mdb = await MdbContext.CreateMdbContextAsync(_connectInfo))
 			using (MdbContext mdb = new MdbContext(_connectInfo))
 			using (JMXFactory f = JMXFactory.Create(mdb, ApplicationContext.GetLogger()))
@@ -43,7 +43,7 @@ namespace S031.MetaStack.Core.Actions
 			}
 		}
 
-		private void GetParameters(ActionInfo ai, DataPackage dp)
+		private void GetParameters(DataPackage dp)
 		{
 			var configuration = ApplicationContext.GetConfiguration();
 			if (!dp.Headers.TryGetValue("ConnectionName", out object connectionName))
