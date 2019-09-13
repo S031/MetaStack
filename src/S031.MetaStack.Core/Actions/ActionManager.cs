@@ -78,7 +78,7 @@ namespace S031.MetaStack.Core.Actions
 							Coalesce(DefaultValue, '') As DefaultValue,
 							Coalesce(ConstantName, '') As ConstantName,
 							Coalesce(FieldName, '') As FieldName,
-							Case When SuperObject Like '%SysSchema%' and SuperMethod = 'ObjectName' then 1 else 0 end as IsObjectName
+							Cast(Case When SuperObject Like '%SysSchema%' and SuperMethod = 'ObjectName' then 1 else 0 end as bit) as IsObjectName
 						From {1}InterfaceParameters Where InterfaceID = '{0}'";
 
 		private readonly string _schemaName = string.Empty;
@@ -280,7 +280,7 @@ namespace S031.MetaStack.Core.Actions
 			pil.Add(new ParamInfo()
 			{
 				ParameterID = (string)dr["ParameterID"],
-				Dirrect = (ParamDirrect)dr["Dirrect"],
+				Dirrect = (ParamDirrect)(int)dr["Dirrect"],
 				Position = dr["Position"].CastOf<int>(),
 				Name = (string)dr["Name"],
 				DataType = (string)dr["DataType"],
@@ -301,7 +301,7 @@ namespace S031.MetaStack.Core.Actions
 				DefaultValue = (string)dr["DefaultValue"],
 				ConstName = (string)dr["ConstantName"],
 				FieldName = (string)dr["FieldName"],
-				IsObjectName = (bool)dr["IsObjectName"]
+				IsObjectName = dr["IsObjectName"].CastOf<bool>()
 			});
 		}
 	}

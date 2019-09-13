@@ -89,7 +89,7 @@ namespace S031.MetaStack.WinForms.Actions
 		}
 		public IEnumerable<ParamInfo> OutputParameters()
 		{
-			return this.Where(kvp => kvp.Key > (int)ParamDirrect.Output).Select(kvp => kvp.Value);
+			return this.Where(kvp => kvp.Key >= (int)ParamDirrect.Output).Select(kvp => kvp.Value);
 		}
 		public ParamInfo GetObjectNameParamInfo(ParamDirrect dirrect = ParamDirrect.Input)
 			=>

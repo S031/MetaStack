@@ -4,7 +4,6 @@ using System.Net.Sockets;
 using System.Security.Cryptography;
 using S031.MetaStack.Common;
 using System.Linq;
-using S031.MetaStack.Json;
 #if NETCOREAPP
 using S031.MetaStack.Core.App;
 using S031.MetaStack.Core.Data;
@@ -16,6 +15,7 @@ namespace S031.MetaStack.Core.Connectors
 #else
 using S031.MetaStack.WinForms.Data;
 using S031.MetaStack.WinForms.Security;
+using S031.MetaStack.Json;
 
 namespace S031.MetaStack.WinForms.Connectors
 #endif
@@ -73,6 +73,7 @@ namespace S031.MetaStack.WinForms.Connectors
 		public void Dispose()
 		{
 			Disconnect();
+			_clientAes?.Dispose();
 			//_stream.Close();
 			//_socket.Close();
 			//_stream.Dispose();
@@ -93,12 +94,17 @@ namespace S031.MetaStack.WinForms.Connectors
 			//	return;
 			if (!_connected)
 				return;
-			Execute("Sys.Logout", new DataPackage("Col1"));
+			Execute("Sys.Logout")
+				.Dispose();
 		}
-		public DataPackage Execute(string actionID, DataPackage paramTable = null)
+		public DataPackage Execute(string actionID)
 		{
-			if (paramTable == null)
-				paramTable = new DataPackage(new string[] { "Default.String.10" });
+			using (var paramTable = new DataPackage(new string[] { "Default.String.10" }))
+				return Execute(actionID, paramTable);
+		}
+
+		public DataPackage Execute(string actionID, DataPackage paramTable)
+		{
 			//for paranoya mode
 			//var request = new DataPackage(paramTable.ToArray());
 			paramTable.Headers["ActionID"] = actionID;
@@ -121,53 +127,63 @@ namespace S031.MetaStack.WinForms.Connectors
 		private void Connecting(string userName, string password)
 		{
 #if NETCOREAPP
-			var clientRSA = RSA.Create();
+			using (var clientRSA = RSA.Create())
 #else
-			var clientRSA = new RSACng();
+			using (var clientRSA = new RSACng())
 #endif
-			var clientPK = clientRSA.Export();
-			DataPackage request = new DataPackage("UserName.String.32", "PublicKey.String.256");
-			request.Headers.Add("ActionID", "Sys.LoginRequest");
-			request.Headers.Add("UserName", userName);
-			request.UpdateHeaders();
-			request.AddNew();
-			request["UserName"] = userName;
-			request["PublicKey"] = clientPK;
-			request.Update();
-			var response = SendAndRecieve(request);
-			if (response.Headers.ContainsKey("Status") &&
-				(string)response.Headers["Status"] == "ERROR")
-				throw new TCPConnectorException(response);
+			{
+				var clientPK = clientRSA.Export();
+				using (DataPackage request = new DataPackage("UserName.String.32", "PublicKey.String.256"))
+				{
+					request.Headers.Add("ActionID", "Sys.LoginRequest");
+					request.Headers.Add("UserName", userName);
+					request.UpdateHeaders();
+					request.AddNew();
+					request["UserName"] = userName;
+					request["PublicKey"] = clientPK;
+					request.Update();
+					using (var response = SendAndRecieve(request))
+					{
+						if (response.Headers.ContainsKey("Status") &&
+							(string)response.Headers["Status"] == "ERROR")
+							throw new TCPConnectorException(response);
 
-			response.GoDataTop();
-			response.Read();
-			_loginInfo = new LoginInfo();
-			_loginInfo.Import(clientRSA.Decrypt(((string)response["LoginInfo"]).ToByteArray(), _padding));
-			_clientAes = Aes.Create()
-				.ImportBin(_loginInfo.CryptoKey);
+						response.GoDataTop();
+						response.Read();
+						_loginInfo = new LoginInfo();
+						_loginInfo.Import(clientRSA.Decrypt(((string)response["LoginInfo"]).ToByteArray(), _padding));
+						_clientAes = Aes.Create()
+							.ImportBin(_loginInfo.CryptoKey);
+					}
+				}
 
-			request = new DataPackage("UserName.String.32", "SessionID.String.34", "EncryptedKey.String.256");
-			request.Headers.Add("ActionID", "Sys.Logon");
-			request.Headers.Add("UserName", userName);
-			request.UpdateHeaders();
-			request.AddNew();
-			request["UserName"] = userName;
-			request["SessionID"] = _loginInfo.SessionID.ToString();
-			request["EncryptedKey"] = _clientAes
-					.EncryptBin(Encoding.UTF8.GetBytes(password))
-					.ToBASE64String();
-			request.Update();
-			response = SendAndRecieve(request);
-			if (response.Headers.ContainsKey("Status") &&
-				(string)response.Headers["Status"] == "ERROR")
-				throw new TCPConnectorException(response);
+				using (var request = new DataPackage("UserName.String.32", "SessionID.String.34", "EncryptedKey.String.256"))
+				{
+					request.Headers.Add("ActionID", "Sys.Logon");
+					request.Headers.Add("UserName", userName);
+					request.UpdateHeaders();
+					request.AddNew();
+					request["UserName"] = userName;
+					request["SessionID"] = _loginInfo.SessionID.ToString();
+					request["EncryptedKey"] = _clientAes
+							.EncryptBin(Encoding.UTF8.GetBytes(password))
+							.ToBASE64String();
+					request.Update();
+					using (var response = SendAndRecieve(request))
+					{
+						if (response.Headers.ContainsKey("Status") &&
+							(string)response.Headers["Status"] == "ERROR")
+							throw new TCPConnectorException(response);
 
-			response.GoDataTop();
-			response.Read();
-			var token = (string)response["Ticket"];
-			_ticket = new Guid(_clientAes.DecryptBin(token.ToByteArray()).Take(16).ToArray());
-			_userName = userName;
-			_connected = true;
+						response.GoDataTop();
+						response.Read();
+						var token = (string)response["Ticket"];
+						_ticket = new Guid(_clientAes.DecryptBin(token.ToByteArray()).Take(16).ToArray());
+						_userName = userName;
+						_connected = true;
+					}
+				}
+			}
 		}
 
 		private DataPackage SendAndRecieve(DataPackage p)
@@ -198,7 +214,8 @@ namespace S031.MetaStack.WinForms.Connectors
 						break;
 				}
 				socket.Shutdown(SocketShutdown.Both);
-				socket.Disconnect(false);
+				//socket.Disconnect(false);
+				socket.Close();
 				return new DataPackage(res);
 			}
 		}
@@ -208,34 +225,8 @@ namespace S031.MetaStack.WinForms.Connectors
 			_socket.Connect(host, port);
 			return _socket;
 		}
-
-		private static DataPackage SendAndRecieve(NetworkStream stream, DataPackage p)
-		{
-			var data = p.ToArray();
-			stream.Write(BitConverter.GetBytes(data.Length), 0, 4);
-			stream.Write(data, 0, data.Length);
-
-			var buffer = new byte[4];
-			int ReadBytes = 0;
-			while (4 > ReadBytes)
-			{
-				ReadBytes += stream.Read(buffer, ReadBytes, 4 - ReadBytes);
-				if (ReadBytes == 0)
-					break;
-			}
-
-			var byteCount = BitConverter.ToInt32(buffer, 0);
-			var res = new byte[byteCount];
-			ReadBytes = 0;
-			while (byteCount > ReadBytes)
-			{
-				ReadBytes += stream.Read(res, ReadBytes, byteCount - ReadBytes);
-				if (ReadBytes == 0)
-					break;
-			}
-			return new DataPackage(res);
-		}
 	}
+
 	public class TCPConnectorException : Exception
 	{
 		public string RemoteSource { get; }
