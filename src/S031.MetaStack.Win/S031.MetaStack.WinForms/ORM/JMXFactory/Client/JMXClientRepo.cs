@@ -6,16 +6,18 @@ namespace S031.MetaStack.WinForms.ORM
 	{
 		public override JMXSchema GetSchema(string objectName)
 		{
-			var r = ClientGate.Execute("Sys.GetSchema",
-				new DataPackage(
+			using (var p = new DataPackage(
 					new string[] { "ObjectName" },
-					new object[] { objectName }));
-			r.GoDataTop();
-			if (r.Read())
+					new object[] { objectName }))
+			using (var r = ClientGate.Execute("Sys.GetSchema", p))
 			{
-				JMXSchema schema = JMXSchema.Parse((string)r["ObjectSchema"]);
-				schema.SchemaRepo = this;
-				return schema;
+				r.GoDataTop();
+				if (r.Read())
+				{
+					JMXSchema schema = JMXSchema.Parse((string)r["ObjectSchema"]);
+					schema.SchemaRepo = this;
+					return schema;
+				}
 			}
 			return null;
 		}

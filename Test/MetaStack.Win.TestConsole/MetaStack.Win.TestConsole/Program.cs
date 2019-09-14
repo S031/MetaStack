@@ -23,8 +23,8 @@ namespace MetaStack.Win.TestConsole
 				DateTime t = DateTime.Now;
 				Console.WriteLine("Start performance test for Sys.Select");
 				//int i = 0;
-				for (int i = 0; i < 10000; i++)
-				//Parallel.For(0, 50000, (i, c) =>
+				//for (int i = 0; i < 10000; i++)
+				Parallel.For(0, 16000, (i, c) =>
 				{
 					var dr = ClientGate.GetActionInfo("A_TestForFct")
 					   .GetInputParamTable()
@@ -56,7 +56,7 @@ namespace MetaStack.Win.TestConsole
 					//	c.Break();
 					//}
 
-				}//);
+				});
 				Console.WriteLine($"End performance test for {(DateTime.Now - t).TotalMilliseconds} ms Sys.Select");
 				ClientGate.Logout();
 

@@ -214,7 +214,7 @@ namespace S031.MetaStack.WinForms.Connectors
 						break;
 				}
 				socket.Shutdown(SocketShutdown.Both);
-				//socket.Disconnect(false);
+				socket.Disconnect(false);
 				socket.Close();
 				return new DataPackage(res);
 			}

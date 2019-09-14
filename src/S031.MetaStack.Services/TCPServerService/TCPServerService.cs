@@ -19,7 +19,7 @@ namespace S031.MetaStack.Services
 {
 	public class TCPServerService : BackgroundService
 	{
-		private TcpListener _listener;
+		private Socket _listener;
 		private CancellationToken _token;
 		private readonly ILogger _log;
 		private long _maxReceivedMessageSize = 1048576;
@@ -31,15 +31,14 @@ namespace S031.MetaStack.Services
 		{
 			while (!_token.IsCancellationRequested)
 			{
-				await _listener.AcceptTcpClientAsync()
+				await _listener.AcceptAsync()
 				.ContinueWith(Accept, _token)
 				.ConfigureAwait(false);
 			}
 		}
-		async Task Accept(Task<TcpClient> task)
+		async Task Accept(Task<Socket> task)
 		{
 			using (var client = await task)
-			using (var stream = client.GetStream())
 			{
 				var buffer = new byte[4];
 				while (client.Connected)
@@ -48,14 +47,14 @@ namespace S031.MetaStack.Services
 					int streamSize;
 					try
 					{
-						buffer = await GetByteArrayFromStreamAsync(stream, 4);
+						buffer = await GetByteArrayFromStreamAsync(client, 4);
 						streamSize = BitConverter.ToInt32(buffer, 0);
 						if (streamSize == 0)
 							break;
 						else if (streamSize > _maxReceivedMessageSize)
 							throw new InvalidOperationException(
 								$"The size of the incoming message is greater than the one specified in the settings({_maxReceivedMessageSize})");
-						var res = await GetByteArrayFromStreamAsync(stream, streamSize);
+						var res = await GetByteArrayFromStreamAsync(client, streamSize);
 
 						using (var dr = await ProcessMessageAsync(new DataPackage(res)))
 							response = dr.ToArray();
@@ -67,8 +66,8 @@ namespace S031.MetaStack.Services
 							response = dr.ToArray();
 					}
 					streamSize = response.Length;
-					await stream.WriteAsync(BitConverter.GetBytes(streamSize), 0, 4);
-					await stream.WriteAsync(response, 0, streamSize);
+					await client.SendAsync(BitConverter.GetBytes(streamSize), SocketFlags.None);
+					await client.SendAsync(response, SocketFlags.None);
 				}
 			}
 		}
@@ -82,10 +81,10 @@ namespace S031.MetaStack.Services
 			}
 		}
 
-		private static async Task<byte[]> GetByteArrayFromStreamAsync(NetworkStream ns, int length)
+		private static async Task<byte[]> GetByteArrayFromStreamAsync(Socket socket, int length)
 		{
 			Memory<byte> result = new Memory<byte>(new byte[length]);
-			await ns.ReadAsync(result);
+			await socket.ReceiveAsync(result, SocketFlags.None);
 			//byte[] result = new byte[length];
 			////byte[] result = ArrayPool<byte>.Shared.Rent(length);
 			//int ReadBytes = 0;
@@ -100,7 +99,8 @@ namespace S031.MetaStack.Services
 
 		public override  async Task StopAsync(CancellationToken cancellationToken)
 		{
-			_listener.Stop();
+			//_listener.Shutdown(SocketShutdown.Both);
+			_listener.Close();
 			_log.Debug($"{_nameof} successfully stoped");
 			(_log as FileLogger)?.Dispose();
 			await base.StopAsync(cancellationToken);
@@ -123,9 +123,11 @@ namespace S031.MetaStack.Services
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
 			_token = stoppingToken;
-			_listener = TcpListener.Create(_options.Parameters.GetValue<int>("Port", 8001));
+			//_listener = TcpListener.Create(_options.Parameters.GetValue<int>("Port", 8001));
+			_listener = new Socket(SocketType.Stream, ProtocolType.Tcp);
 			_maxReceivedMessageSize = _options.Parameters.GetValue<int>("MaxReceivedMessageSize", 1048576);
-			_listener.Start();
+			_listener.Bind(new IPEndPoint(IPAddress.Loopback, _options.Parameters.GetValue<int>("Port", 8001)));
+			_listener.Listen(120);
 			_log.Debug($"{_nameof} successfully started");
 			await Listen();
 		}
