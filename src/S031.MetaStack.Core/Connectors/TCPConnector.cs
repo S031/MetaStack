@@ -25,12 +25,8 @@ namespace S031.MetaStack.WinForms.Connectors
 		const string _endPointConfigName = "TCPConnector";
 		static readonly RSAEncryptionPadding _padding = RSAEncryptionPadding.OaepSHA256;
 
-		//private Socket _socket;
-		//private NetworkStream _stream;
 		private readonly string _host;
 		private readonly int _port;
-		//Connection info
-		private bool _connected = false;
 		private string _userName;
 		private Guid _ticket;
 		private Aes _clientAes;
@@ -57,43 +53,27 @@ namespace S031.MetaStack.WinForms.Connectors
 				_port = (int)j["Port"];
 			}
 #endif
-			InitSocket();
+			Connected = false;
 		}
 
-		private void InitSocket()
-		{
-			//_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-			//_socket.Connect(_host, _port);
-			//_stream = new NetworkStream(_socket);
-			_connected = false;
-		}
 
-		public bool Connected => _connected; // _socket != null && _socket.Connected && _connected;
+		public bool Connected { get; private set; } = false;
 
 		public void Dispose()
 		{
 			Disconnect();
 			_clientAes?.Dispose();
-			//_stream.Close();
-			//_socket.Close();
-			//_stream.Dispose();
-			//_socket.Dispose();
+			SocketPool.Clear();
 		}
 
 		public TCPConnector Connect(string userName, string password)
 		{
-			//if (_socket == null || !_socket.Connected)
-			//	InitSocket();
-			if (!_connected)
+			if (!Connected)
 				Connecting(userName, password);
 			return this;
 		}
 		private void Disconnect()
 		{
-			//if (_socket == null || !_socket.Connected)
-			//	return;
-			if (!_connected)
-				return;
 			Execute("Sys.Logout")
 				.Dispose();
 		}
@@ -107,6 +87,8 @@ namespace S031.MetaStack.WinForms.Connectors
 		{
 			//for paranoya mode
 			//var request = new DataPackage(paramTable.ToArray());
+			if (paramTable == null)
+				paramTable = new DataPackage("Col1.Int.1.Null");
 			paramTable.Headers["ActionID"] = actionID;
 			paramTable.Headers["UserName"] = _userName;
 			paramTable.Headers["SessionID"] = _loginInfo.SessionID.ToString();
@@ -180,7 +162,7 @@ namespace S031.MetaStack.WinForms.Connectors
 						var token = (string)response["Ticket"];
 						_ticket = new Guid(_clientAes.DecryptBin(token.ToByteArray()).Take(16).ToArray());
 						_userName = userName;
-						_connected = true;
+						Connected = true;
 					}
 				}
 			}
@@ -188,42 +170,11 @@ namespace S031.MetaStack.WinForms.Connectors
 
 		private DataPackage SendAndRecieve(DataPackage p)
 		{
-			using (var socket = CreateSocket(_host, _port))
-			using (var stream = new NetworkStream(socket))
-			{
-				var data = p.ToArray();
-				stream.Write(BitConverter.GetBytes(data.Length), 0, 4);
-				stream.Write(data, 0, data.Length);
+			var socket = SocketPool.Rent(_host, _port);
+			var res = SocketPool.SendAndResieve(socket, p.ToArray());
+			SocketPool.Return(socket);
+			return new DataPackage(res);
 
-				var buffer = new byte[4];
-				int ReadBytes = 0;
-				while (4 > ReadBytes)
-				{
-					ReadBytes += stream.Read(buffer, ReadBytes, 4 - ReadBytes);
-					if (ReadBytes == 0)
-						break;
-				}
-
-				var byteCount = BitConverter.ToInt32(buffer, 0);
-				var res = new byte[byteCount];
-				ReadBytes = 0;
-				while (byteCount > ReadBytes)
-				{
-					ReadBytes += stream.Read(res, ReadBytes, byteCount - ReadBytes);
-					if (ReadBytes == 0)
-						break;
-				}
-				socket.Shutdown(SocketShutdown.Both);
-				socket.Disconnect(false);
-				socket.Close();
-				return new DataPackage(res);
-			}
-		}
-		private static Socket CreateSocket(string host, int port)
-		{
-			var _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-			_socket.Connect(host, port);
-			return _socket;
 		}
 	}
 
@@ -248,4 +199,82 @@ namespace S031.MetaStack.WinForms.Connectors
 			return (string)remoteErrorPackage[key];
 		}
 	}
+
+	static class SocketPool
+	{
+		const int pool_size = 15;
+		private static readonly System.Threading.ThreadLocal<object> obj4Lock
+			= new System.Threading.ThreadLocal<object>(() => new object());
+
+		private static readonly Socket[] _sockets = new Socket[pool_size];
+		private static readonly IntPtr[] _rented = new IntPtr[pool_size];
+
+		public static Socket Rent(string host, int port)
+		{
+			int i;
+			lock (obj4Lock)
+			{
+				for (i = GetFreeIndex(); i == pool_size; i = GetFreeIndex())
+					System.Threading.Thread.Sleep(10);
+				_rented[i] = new IntPtr(1);
+			}
+
+			if (_sockets[i] == null)
+			{
+				var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+				socket.Connect(host, port);
+				_sockets[i] = socket;
+			}
+			_rented[i] = _sockets[i].Handle;
+			return _sockets[i];
+		}
+
+		private static int GetFreeIndex()
+		{
+			int i;
+			for (i = 0; i < pool_size; i++)
+				if (_rented[i] == IntPtr.Zero)
+					break;
+			return i;
+		}
+
+		public static void Return(Socket socket)
+		{
+			int i = _rented.IndexOf(socket.Handle);
+			_rented[i] = IntPtr.Zero;
+		}
+
+		public static void Clear()
+		{
+			for (int i = 0; i < pool_size; i++)
+			{
+				var socket = _sockets[i];
+				if (socket != null && socket.Connected)
+				{
+					socket.Close();
+					socket.Dispose();
+					_sockets[i] = null;
+					_rented[i] = IntPtr.Zero;
+				}
+			}
+		}
+		public static byte[] SendAndResieve(Socket socket, byte[] data)
+		{
+			lock (socket)
+			{
+				socket.Send(BitConverter.GetBytes(data.Length));
+				socket.Send(data);
+
+				var buffer = new byte[4];
+				socket.Receive(buffer);
+
+				var byteCount = BitConverter.ToInt32(buffer, 0);
+				byte[] res = new byte[byteCount];
+				socket.Receive(res);
+				return res;
+			}
+		}
+
+	}
 }
+

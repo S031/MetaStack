@@ -24,7 +24,7 @@ namespace MetaStack.Win.TestConsole
 				Console.WriteLine("Start performance test for Sys.Select");
 				//int i = 0;
 				//for (int i = 0; i < 10000; i++)
-				Parallel.For(0, 16000, (i, c) =>
+				Parallel.For(0, 50000, (i, c) =>
 				{
 					var dr = ClientGate.GetActionInfo("A_TestForFct")
 					   .GetInputParamTable()

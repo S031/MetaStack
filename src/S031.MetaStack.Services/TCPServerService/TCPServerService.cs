@@ -85,21 +85,11 @@ namespace S031.MetaStack.Services
 		{
 			Memory<byte> result = new Memory<byte>(new byte[length]);
 			await socket.ReceiveAsync(result, SocketFlags.None);
-			//byte[] result = new byte[length];
-			////byte[] result = ArrayPool<byte>.Shared.Rent(length);
-			//int ReadBytes = 0;
-			//while (length > ReadBytes)
-			//{
-			//	ReadBytes += await ns.ReadAsync(result, ReadBytes, length - ReadBytes);
-			//	if (ReadBytes == 0)
-			//		break;
-			//}
 			return result.ToArray();
 		}
 
 		public override  async Task StopAsync(CancellationToken cancellationToken)
 		{
-			//_listener.Shutdown(SocketShutdown.Both);
 			_listener.Close();
 			_log.Debug($"{_nameof} successfully stoped");
 			(_log as FileLogger)?.Dispose();
@@ -123,7 +113,6 @@ namespace S031.MetaStack.Services
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
 			_token = stoppingToken;
-			//_listener = TcpListener.Create(_options.Parameters.GetValue<int>("Port", 8001));
 			_listener = new Socket(SocketType.Stream, ProtocolType.Tcp);
 			_maxReceivedMessageSize = _options.Parameters.GetValue<int>("MaxReceivedMessageSize", 1048576);
 			_listener.Bind(new IPEndPoint(IPAddress.Loopback, _options.Parameters.GetValue<int>("Port", 8001)));
