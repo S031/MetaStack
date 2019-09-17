@@ -15,10 +15,10 @@ namespace MetApp
 {
 	internal sealed partial class MainForm : WinForm
 	{
-		CommandExecuter<DBBrowseCommandsEnum> _commands = new CommandExecuter<DBBrowseCommandsEnum>();
+		readonly CommandExecuter<DBBrowseCommandsEnum> _commands = new CommandExecuter<DBBrowseCommandsEnum>();
 		private DBGrid _grid;
-		private string _objectName;
-		private MainFormOptions _formOptions;
+		private readonly string _objectName;
+		private readonly MainFormOptions _formOptions;
 
 		ToolStripDateEdit _dateStart;
 		ToolStripDateEdit _dateFinish;

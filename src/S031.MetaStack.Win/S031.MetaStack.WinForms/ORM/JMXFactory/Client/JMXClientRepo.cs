@@ -1,25 +1,33 @@
 ﻿using S031.MetaStack.WinForms.Data;
+using System.Collections.Concurrent;
 
 namespace S031.MetaStack.WinForms.ORM
 {
 	public class JMXClientRepo: JMXRepo
 	{
+		private static readonly ConcurrentDictionary<string, JMXSchema> _schemaCache
+			= new ConcurrentDictionary<string, JMXSchema>();
 		public override JMXSchema GetSchema(string objectName)
 		{
-			using (var p = new DataPackage(
-					new string[] { "ObjectName" },
-					new object[] { objectName }))
-			using (var r = ClientGate.Execute("Sys.GetSchema", p))
+			if (!_schemaCache.TryGetValue(objectName, out JMXSchema schema))
 			{
-				r.GoDataTop();
-				if (r.Read())
+				using (var p = new DataPackage(
+						new string[] { "ObjectName" },
+						new object[] { objectName }))
+				using (var r = ClientGate.Execute("Sys.GetSchema", p))
 				{
-					JMXSchema schema = JMXSchema.Parse((string)r["ObjectSchema"]);
-					schema.SchemaRepo = this;
-					return schema;
+					r.GoDataTop();
+					if (r.Read())
+					{
+						schema = JMXSchema.Parse((string)r["ObjectSchema"]);
+						schema.SchemaRepo = this;
+						_schemaCache.TryAdd(objectName, schema);
+					}
+					else
+						return null;
 				}
 			}
-			return null;
+			return schema;
 		}
 		public override JMXSchema SaveSchema(JMXSchema schema)
 		{
