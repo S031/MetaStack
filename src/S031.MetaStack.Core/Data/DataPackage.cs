@@ -817,6 +817,84 @@ namespace S031.MetaStack.WinForms.Data
 
 		private string SaveJSON()
 		{
+			JsonWriter writer = new JsonWriter(MetaStack.Json.Formatting.None);
+			ToStringRaw(writer);
+			return writer.ToString();
+		}
+
+		private void ToStringRaw(JsonWriter writer)
+		{
+			writer.WriteStartObject();
+			writer.WriteProperty("HeaderSize", _headerSpaceSize);
+
+			#region Heders
+			writer.WritePropertyName("Headers");
+			writer.WriteStartObject();
+			_ms.Seek(_headerPos, SeekOrigin.Begin);
+			int headCount = _br.ReadInt32();
+			for (int i = 0; i < headCount; i++)
+			{
+				string key = _br.ReadString();
+				MdbType t = (MdbType)_br.ReadByte();
+				if (t != MdbType.@null)
+				{
+					Type tp = t.Type();
+					object v = _dti[tp].ReadDelegate(_br);
+					writer.WriteProperty(key, v);
+				}
+			}
+			writer.WriteEndObject();
+			#endregion Heders
+
+			#region Columns
+			writer.WritePropertyName("Columns");
+			writer.WriteStartArray();
+			for (int i = 0; i < _indexes.Count; i++)
+			{
+				ColumnInfo ci = _colInfo[i];
+				writer.WriteStartObject();
+				writer.WriteProperty("Name", _indexes[i]);
+				writer.WriteProperty("Type", MdbTypeMap.GetTypeInfo(ci.DataType).Name);
+				writer.WriteProperty("Size", ci.ColumnSize);
+				writer.WriteProperty("AllowNull", ci.AllowDBNull);
+				writer.WriteEndObject();
+			}
+			writer.WriteEndArray();
+			#endregion Columns
+
+			#region Data
+			writer.WritePropertyName("Rows");
+			writer.WriteStartArray();
+			GoDataTop();
+			for (; _ms.Position < _ms.Length - 1;)
+			{
+				writer.WriteStartObject();
+				for (int i = 0; i < _colCount; i++)
+				{
+					MdbType t = (MdbType)_br.ReadByte();
+					string colName = _indexes[i];
+					if (t == MdbType.@null)
+					{
+						writer.WritePropertyName("colName");
+						writer.WriteNull();
+					}
+					else
+					{
+						Type tp = MdbTypeMap.GetType(t);
+						object v = _dti[tp].ReadDelegate(_br);
+						writer.WriteProperty(colName, v);
+					}
+				}
+				writer.WriteEndObject();
+			}
+			writer.WriteEndArray();
+			#endregion Data
+
+			writer.WriteEndObject();
+		}
+
+		private string SaveJSON2()
+		{
 			JsonObject j = new JsonObject();
 
 			JsonObject headers = new JsonObject();
