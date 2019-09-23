@@ -48,9 +48,8 @@ namespace S031.MetaStack.WinForms.ORM
 					string.Format(Properties.Strings.S031_MetaStack_Core_ORM_JMXSchema_ctor_1, objectName));
 			foreach (var a in _schema.Attributes)
 			{
-				if (!vbo.IsEmpty(a.DefaultValue)) { }
-					//!!!
-					//this[a.AttribName] = JToken.FromObject(a.DefaultValue);
+				if (!vbo.IsEmpty(a.DefaultValue))
+					this[a.AttribName] = new JsonValue(a.DefaultValue);
 				else if (a.ConstName.ToLower() == "date_current")
 					this[a.AttribName] = DateTime.Now;
 			}
