@@ -14,7 +14,7 @@ namespace S031.MetaStack.Json
 	/// https://github.com/dotnet/corefx/blob/master/src/System.Json/src/System/Json/JavaScriptReader.cs
 	/// See changes after 2019-08-01
 	/// </summary>
-	public ref struct JsonReader
+	public sealed class JsonReader
 	{
 		private const int default_capacity = 256;
 

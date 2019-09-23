@@ -20,9 +20,6 @@ namespace S031.MetaStack.Json
 		private bool _commaExpected;
 		private int _tabCount;
 
-		private static readonly ConcurrentDictionary<Type, Action<JsonWriter, object>> _wellKnownTypes =
-			new ConcurrentDictionary<Type, Action<JsonWriter, object>>();
-
 		public JsonWriter(Formatting formatting)
 		{
 			_sb = new StringBuilder(default_capacity);
@@ -317,8 +314,8 @@ namespace S031.MetaStack.Json
 					WriteValue((TimeSpan)v.Value);
 					break;
 				default:
-					if (_wellKnownTypes.TryGetValue(v.Value.GetType(), out var f))
-						f(this, v.Value);
+					if (JsonWellKnownTypes.TryGetValue(v.Value.GetType(), out var f))
+						f.WriteDelegate(this, v.Value);
 					else
 						//!!! see for enum
 						WriteValue(v.Value.ToString());
@@ -402,8 +399,5 @@ namespace S031.MetaStack.Json
 
 		public override string ToString()
 			=> _sb.ToString();
-
-		public static void AddWellKnown(Type type, Action<JsonWriter, object> writeDelegate)
-			=> _wellKnownTypes[type] = writeDelegate;
 	}
 }

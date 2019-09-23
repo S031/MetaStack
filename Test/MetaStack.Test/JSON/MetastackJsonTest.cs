@@ -169,20 +169,22 @@ namespace MetaStack.Test.Json
 		{
 			static TestClass()
 			{
-				JsonWriter.AddWellKnown(typeof(TestClass),
-					(w, o) => (o as TestClass).WriteRaw(w));
+				JsonWellKnownTypes.Register(
+					new JsonAction(typeof(TestClass),
+					(w, o) => (o as TestClass).WriteRaw(w),
+					(r, o) => (o as TestClass).ReadRaw(r),
+					() => new TestClass()));
 			}
 
 			public TestClass()
 			{
-				ItemList = new Dictionary<string, object>();
 			}
 
 			public int ID { get; set; }
 
 			public string Name { get; set; }
 
-			public Dictionary<string, object> ItemList { get; set; }
+			public Dictionary<string, object> ItemList { get; set; }= new Dictionary<string, object>();
 
 			public void WriteRaw(JsonWriter writer)
 			{

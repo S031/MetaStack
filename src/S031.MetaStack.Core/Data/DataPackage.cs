@@ -135,8 +135,8 @@ namespace S031.MetaStack.WinForms.Data
 		//private Dictionary<string, object> _dataRow;
 		object[] _dataRow;
 		private readonly Dictionary<string, object> _headers;
-		private readonly List<string> _indexes;
-		private readonly List<ColumnInfo> _colInfo;
+		private readonly string[] _indexes;
+		private readonly ColumnInfo[] _colInfo;
 		
 		/// <summary>
 		/// Create a new instance of <see cref="DataPackage"/> from <see cref="byte"/> array
@@ -170,15 +170,15 @@ namespace S031.MetaStack.WinForms.Data
 			_ms.Seek(_headerSpaceSize + _headerPos -1, SeekOrigin.Begin);
 
 			// ColInfo start
-			_indexes = new List<string>(_colCount);
-			_colInfo = new List<ColumnInfo>(_colCount);
+			_indexes = new string[_colCount];
+			_colInfo = new ColumnInfo[_colCount];
 			for (int i = 0; i < _colCount; i++)
 			{
 				string name = _br.ReadString();
 				if (name.IsEmpty())
 					throw new DataPackageMessageFormatException($"Invalid column name for column index {i}");
-				_indexes.Add(name);
-				_colInfo.Add(ReadColumnInfo(_br));
+				_indexes[i] = name;
+				_colInfo[i] = ReadColumnInfo(_br);
 			}
 			_dataPos = _ms.Position;
 		}
@@ -249,8 +249,8 @@ namespace S031.MetaStack.WinForms.Data
 			_headers = new Dictionary<string, object>(StringComparer.Ordinal);
 
 			//Write ColInfo
-			_indexes = new List<string>(_colCount);
-			_colInfo = new List<ColumnInfo>(_colCount);
+			_indexes = new string[_colCount];
+			_colInfo = new ColumnInfo[_colCount];
 			for (int i = 0; i < _colCount; i++)
 			{
 				ColumnInfo info;
@@ -272,8 +272,8 @@ namespace S031.MetaStack.WinForms.Data
 				}
 				_bw.Write(name);
 				WriteColumnInfo(_bw, info);
-				_indexes.Add(name);
-				_colInfo.Add(info);
+				_indexes[i] = name;
+				_colInfo[i] = info;
 			}
 			_dataPos = _ms.Position;
 			if (hasValues)
@@ -838,7 +838,7 @@ namespace S031.MetaStack.WinForms.Data
 			j["Headers"] = headers;
 
 			JsonArray columns = new JsonArray();
-			for (int i = 0; i < _indexes.Count; i++)
+			for (int i = 0; i < _indexes.Length; i++)
 			{
 				ColumnInfo ci = _colInfo[i];
 
@@ -879,7 +879,7 @@ namespace S031.MetaStack.WinForms.Data
 		public DataTable ToDataTable()
 		{
 			var dt = new DataTable();
-			for (int i = 0; i < _indexes.Count; i++)
+			for (int i = 0; i < _indexes.Length; i++)
 			{
 				ColumnInfo ci = _colInfo[i];
 				DataColumn dc = new DataColumn(_indexes[i], ci.DataType);
