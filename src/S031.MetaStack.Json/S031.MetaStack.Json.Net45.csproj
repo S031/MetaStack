@@ -36,8 +36,10 @@
     <EmbeddedResource Include="Resources\Strings.ru-RU.resx" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\JsonAction.cs" />
     <Compile Include="Extensions\JsonObjectExtensions.cs" />
     <Compile Include="Extensions\JsonValueExtensions.cs" />
+    <Compile Include="Extensions\WellKnownTypes.cs" />
     <Compile Include="Json\JsonArray.cs" />
     <Compile Include="Json\JsonObject.cs" />
     <Compile Include="Json\JsonTokenType.cs" />
