@@ -81,13 +81,16 @@ namespace S031.MetaStack.Core.ORM
 
 		public IDictionary<MdbType, string> GetTypeMap() => _typeMap;
 
-		public IEnumerable<string> GetVariableLenghtDataTypes()
+		private static readonly string[] _variable_lenght_data_types = new string[]
 		{
-			yield return "char";
-			yield return "nchar";
-			yield return "varchar";
-			yield return "nvarchar";
-			yield return "varying";
-		}
+			"char",
+			"nchar",
+			"varchar",
+			"nvarchar",
+			"varying"
+		};
+
+		public IEnumerable<string> GetVariableLenghtDataTypes()
+			=> _variable_lenght_data_types;
 	}
 }

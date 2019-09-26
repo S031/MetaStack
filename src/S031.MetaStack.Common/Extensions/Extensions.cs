@@ -278,33 +278,10 @@ namespace S031.MetaStack.Common
 			else
 				return str.Substring(start);
 
-
-			//int start = 0;
-			//int len = separator.Length;
-
-			//fixed (char* pD = separator)
-			//fixed (char* pS = str)
-			//{
-			//	for (int i = 0; i < index && start != -1; i++)
-			//	{
-			//		//start = str.IndexOf(separator, start += len, StringComparison.Ordinal);
-			//		//!!! fix start += len
-			//		start = IndexOfInternal(pS, str.Length, pD, len, start += len);
-			//	}
-			//	if (start < 0) return string.Empty;
-
-			//	if (start > 0) start += len;
-			//	//int finish = str.IndexOf(separator, start, StringComparison.Ordinal);
-			//	int finish = IndexOfInternal(pS, str.Length, pD, len, start);
-			//	if (finish > 0)
-			//		return str.Substring(start, finish - start);
-			//	else
-			//		return str.Substring(start);
-			//}
 #endif
 		}
 
-		private unsafe static int IndexOfInternal(char* str, int N, char* searchStr, int M, int start = 0)
+		internal unsafe static int IndexOfInternal(char* str, int N, char* searchStr, int M, int start = 0)
 		{
 			for (int i = start; i <= N - M; i++)
 			{
