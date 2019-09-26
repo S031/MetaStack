@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using S031.MetaStack.Core.App;
+using System;
 using System.Threading.Tasks;
 
 namespace S031.MetaStack.AppServer
@@ -25,6 +26,7 @@ namespace S031.MetaStack.AppServer
 			{
 				//await host.RunAsync(ApplicationContext.CancellationToken);
 				//TestConnection();
+				Console.WriteLine("Server started. Press Ctrl+C to exit...");
 				await host.RunAsync();
 			}
 		}
