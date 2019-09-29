@@ -16,7 +16,7 @@ namespace S031.MetaStack.WinForms.ORM
             AddKeyMember(keyMemberNamnes);
         }
 		public int ID { get; set; }
-		public Guid UID { get; set; }
+        public Guid UID { get; set; } = Guid.Empty;
 		public string IndexName { get; set; }
 		public bool IsUnique { get; set; }
 		public int ClusteredOption { get; set; }
@@ -81,7 +81,7 @@ namespace S031.MetaStack.WinForms.ORM
 			writer.WritePropertyName("KeyMembers");
 			writer.WriteStartArray();
 			foreach (var item in KeyMembers)
-				item.ToStringRaw(writer);
+				item.ToJson(writer);
 			writer.WriteEndArray();
         }
     }

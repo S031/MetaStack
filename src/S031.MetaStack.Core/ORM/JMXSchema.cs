@@ -29,7 +29,7 @@ namespace S031.MetaStack.WinForms.ORM
 		Action = 5
     }
 
-	public class JMXSchema
+	public class JMXSchema: JsonSerializible
     {
         private readonly string _objectName;
         private string _areaName;
@@ -40,6 +40,7 @@ namespace S031.MetaStack.WinForms.ORM
         {
         }
         public JMXSchema(JMXObjectName objectName)
+            :base(null)
         {
             _objectName = objectName.ObjectName;
             _areaName = objectName.AreaName;
@@ -94,9 +95,92 @@ namespace S031.MetaStack.WinForms.ORM
 		public List<JMXIndex> Indexes { get; } = new List<JMXIndex>();
 		public List<JMXForeignKey> ForeignKeys { get; } = new List<JMXForeignKey>();
 		public List<JMXCondition> Conditions { get; } = new List<JMXCondition>();
-		protected void ToStringRaw(JsonWriter writer)
+        public override string ToString()
+            => this.ToString(Formatting.None);
+
+        public override string ToString(Formatting formatting)
         {
-			writer.WriteStartObject();
+            JsonWriter writer = new JsonWriter(formatting);
+            ToJson(writer);
+            return writer.ToString();
+        }
+
+        internal JMXSchema(JsonObject j):base(j)
+        {
+            JMXObjectName name;
+            JsonObject o;
+            if (j.TryGetValue("ObjectName", out JsonValue n))
+                if (n.JsonType == JsonType.String)
+                    name = new JMXObjectName((string)n);
+                else
+                {
+                    o = (n as JsonObject);
+                    name = new JMXObjectName(o.GetStringOrDefault("AreaName"), o.GetStringOrDefault("ObjectName"));
+                }
+            else
+                //!!! from resources
+                throw new InvalidOperationException("Sorce json must have ObjectName token");
+
+            JMXSchema schema = new JMXSchema(name)
+            {
+                AuditEnabled = j.GetBoolOrDefault("AuditEnabled"),
+                DbObjectType = j.GetEnum<DbObjectTypes>("DbObjectType", DbObjectTypes.Table),
+                Name = j.GetStringOrDefault("Name"),
+                ID = j.GetIntOrDefault("ID"),
+                UID = j.GetGuidOrDefault("UID", () => Guid.Empty),
+                DirectAccess = j.GetEnum<DirectAccess>("DirectAccess", DirectAccess.ForAll),
+                ReadOnly = j.GetBoolOrDefault("ReadOnly")
+            };
+
+            if (j.TryGetValue("DbObjectName", out o))
+                schema.DbObjectName = new JMXObjectName(o.GetStringOrDefault("AreaName"), o.GetStringOrDefault("ObjectName"));
+
+            if (j.TryGetValue("OwnerObject", out o))
+                schema.OwnerObject = new JMXObjectName(o.GetStringOrDefault("AreaName"), o.GetStringOrDefault("ObjectName"));
+
+            if (j.TryGetValue("PrimaryKey", out o))
+                schema.PrimaryKey = JMXPrimaryKey.ReadFrom(o);
+
+            if (j.TryGetValue("ForeignKeys", out JsonArray a))
+                foreach (JsonObject obj in a)
+                    schema.ForeignKeys.Add(JMXForeignKey.ReadFrom(obj));
+
+            if (j.TryGetValue("Indexes", out a))
+                foreach (JsonObject obj in a)
+                    schema.Indexes.Add(JMXIndex.ReadFrom(obj));
+
+            if (j.TryGetValue("Conditions", out a))
+                foreach (JsonObject obj in a)
+                    schema.Conditions.Add(JMXCondition.ReadFrom(obj));
+
+            if (j.TryGetValue("Attributes", out a))
+                foreach (JsonObject obj in a)
+                    schema.Attributes.Add(JMXAttribute.ReadFrom(obj));
+
+            if (j.TryGetValue("Parameters", out a))
+                foreach (JsonObject obj in a)
+                    schema.Parameters.Add(JMXParameter.ReadFrom(obj));
+
+
+        }
+
+        public static JMXSchema Parse(string schemaJson)
+		{
+			schemaJson.NullTest(nameof(schemaJson));
+            JsonObject j = (JsonObject)new JsonReader(ref schemaJson).Read();
+
+            return new JMXSchema(j);
+		}
+
+        public override void ToJson(JsonWriter writer)
+        {
+            writer.WriteStartObject();
+            ToJsonRaw(writer);
+            writer.WriteEndObject();
+        }
+
+        protected override void ToJsonRaw(JsonWriter writer)
+        {
             writer.WriteProperty("ID", ID);
             writer.WriteProperty("UID", UID);
             writer.WriteProperty("Name", Name);
@@ -118,134 +202,51 @@ namespace S031.MetaStack.WinForms.ORM
             writer.WriteProperty("ObjectName", DbObjectName.ObjectName);
             writer.WriteEndObject();
 
-			if (!OwnerObject.IsEmpty())
-			{
-				writer.WritePropertyName("OwnerObject");
-				writer.WriteStartObject();
-				writer.WriteProperty("AreaName", OwnerObject.AreaName);
-				writer.WriteProperty("ObjectName", OwnerObject.ObjectName);
-				writer.WriteEndObject();
-			}
+            if (!OwnerObject.IsEmpty())
+            {
+                writer.WritePropertyName("OwnerObject");
+                writer.WriteStartObject();
+                writer.WriteProperty("AreaName", OwnerObject.AreaName);
+                writer.WriteProperty("ObjectName", OwnerObject.ObjectName);
+                writer.WriteEndObject();
+            }
 
             if (PrimaryKey != null)
             {
                 writer.WritePropertyName("PrimaryKey");
-				writer.WriteStartObject();
-				PrimaryKey.ToStringRaw(writer);
-				writer.WriteEndObject();
+                PrimaryKey.ToJson(writer);
             }
 
             writer.WritePropertyName("Attributes");
             writer.WriteStartArray();
-			foreach (var item in Attributes)
-			{
-				writer.WriteStartObject();
-				item.ToStringRaw(writer);
-				writer.WriteEndObject();
-			}
+            foreach (var item in Attributes)
+                item.ToJson(writer);
             writer.WriteEndArray();
 
             writer.WritePropertyName("Parameters");
             writer.WriteStartArray();
-			foreach (var item in Parameters)
-			{
-				writer.WriteStartObject();
-				item.ToStringRaw(writer);
-				writer.WriteEndObject();
-			}
-			writer.WriteEndArray();
+            foreach (var item in Parameters)
+                item.ToJson(writer);
+            writer.WriteEndArray();
 
             writer.WritePropertyName("Indexes");
             writer.WriteStartArray();
-			foreach (var item in Indexes)
-				item.ToJson(writer);
-			writer.WriteEndArray();
+            foreach (var item in Indexes)
+                item.ToJson(writer);
+            writer.WriteEndArray();
 
             writer.WritePropertyName("ForeignKeys");
             writer.WriteStartArray();
-			foreach (var item in ForeignKeys)
-			{
-				writer.WriteStartObject();
-				item.ToStringRaw(writer);
-				writer.WriteEndObject();
-			}
-			writer.WriteEndArray();
+            foreach (var item in ForeignKeys)
+                item.ToJson(writer);
+            writer.WriteEndArray();
 
             writer.WritePropertyName("Conditions");
             writer.WriteStartArray();
-			foreach (var item in Conditions)
-				item.ToJson(writer);
-
-			writer.WriteEndArray();
-			writer.WriteEndObject();
+            foreach (var item in Conditions)
+                item.ToJson(writer);
+            writer.WriteEndArray();
         }
-		public override string ToString()
-		{
-			JsonWriter writer = new JsonWriter(MetaStack.Json.Formatting.None);
-			ToStringRaw(writer);
-			return writer.ToString();
-		}
-		public static JMXSchema Parse(string schemaJson)
-		{
-			schemaJson.NullTest(nameof(schemaJson));
-			JsonObject j = (JsonObject)new JsonReader(ref schemaJson).Read();
-
-			JMXObjectName name;
-			JsonObject o;
-			if (j.TryGetValue("ObjectName", out JsonValue n))
-				if (n.JsonType == JsonType.String)
-					name = new JMXObjectName((string)n);
-				else
-				{
-					o = (n as JsonObject);
-					name = new JMXObjectName(o.GetStringOrDefault("AreaName"), o.GetStringOrDefault("ObjectName"));
-				}
-			else
-				//!!! from resources
-				throw new InvalidOperationException("Sorce json must have ObjectName token");
-
-			JMXSchema schema = new JMXSchema(name)
-			{
-				AuditEnabled = j.GetBoolOrDefault("AuditEnabled"),
-				DbObjectType = j.GetEnum<DbObjectTypes>("DbObjectType", DbObjectTypes.Table),
-				Name = j.GetStringOrDefault("Name"),
-				ID = j.GetIntOrDefault("ID"),
-				UID = j.GetGuidOrDefault("UID", () => Guid.Empty),
-				DirectAccess = j.GetEnum<DirectAccess>("DirectAccess", DirectAccess.ForAll),
-				ReadOnly = j.GetBoolOrDefault("ReadOnly")
-			};
-
-			if (j.TryGetValue("DbObjectName", out o))
-				schema.DbObjectName = new JMXObjectName(o.GetStringOrDefault("AreaName"), o.GetStringOrDefault("ObjectName"));
-
-			if (j.TryGetValue("OwnerObject", out o))
-				schema.OwnerObject = new JMXObjectName(o.GetStringOrDefault("AreaName"), o.GetStringOrDefault("ObjectName"));
-
-			if (j.TryGetValue("PrimaryKey", out o))
-				schema.PrimaryKey = JMXPrimaryKey.ReadFrom(o);
-
-			if (j.TryGetValue("ForeignKeys", out JsonArray a))
-				foreach (JsonObject obj in a)
-					schema.ForeignKeys.Add(JMXForeignKey.ReadFrom(obj));
-
-			if (j.TryGetValue("Indexes", out a))
-				foreach (JsonObject obj in a)
-					schema.Indexes.Add(JMXIndex.ReadFrom(obj));
-
-			if (j.TryGetValue("Conditions", out a))
-				foreach (JsonObject obj in a)
-					schema.Conditions.Add(JMXCondition.ReadFrom(obj));
-			
-			if (j.TryGetValue("Attributes", out a))
-				foreach (JsonObject obj in a)
-					schema.Attributes.Add(JMXAttribute.ReadFrom(obj));
-
-			if (j.TryGetValue("Parameters", out a))
-				foreach (JsonObject obj in a)
-					schema.Parameters.Add(JMXParameter.ReadFrom(obj));
-
-			return schema;
-		}
 
 #if NETCOREAPP
 		public static JMXSchema ParseXml(string schemaXML)

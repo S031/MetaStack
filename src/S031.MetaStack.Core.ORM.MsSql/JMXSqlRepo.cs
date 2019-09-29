@@ -427,11 +427,8 @@ namespace S031.MetaStack.Core.ORM.MsSql
 			}
 			else if (schema.Attributes.Any(a => a.DataType == MdbType.@object))
 			{
-				//Requires PK for table with object attributes
-				var pk = new JMXPrimaryKey
-				{
-					KeyName = $"PK_{schema.DbObjectName.AreaName}_{schema.DbObjectName.ObjectName}"
-				};
+                //Requires PK for table with object attributes
+                var pk = new JMXPrimaryKey(keyName: $"PK_{schema.DbObjectName.AreaName}_{schema.DbObjectName.ObjectName}");
 				var att = schema.Attributes.FirstOrDefault(a => a.Identity.IsIdentity);
 				if (att == null)
 					att = schema.Attributes.FirstOrDefault(a => a.AttribName == "ID" || a.FieldName == "ID");

@@ -9,8 +9,10 @@ namespace S031.MetaStack.Core.ORM
 namespace S031.MetaStack.WinForms.ORM
 #endif
 {
-	public struct JMXKeyMember
+	public sealed class JMXKeyMember: JsonSerializible
 	{
+        public JMXKeyMember() : base(null) { }
+
         public string FieldName { get; set; }
         public int Position { get; set; }
         public bool IsDescending { get; set; }
@@ -39,23 +41,18 @@ namespace S031.MetaStack.WinForms.ORM
 		}
 		public bool IsEmpty() => string.IsNullOrEmpty(FieldName);
 
-		public override string ToString()
-		{
-			JsonWriter writer = new JsonWriter(Formatting.None);
-			ToStringRaw(writer);
-			return writer.ToString();
-		}
+        public override string ToString()
+            => this.ToString(Formatting.None);
 
-		public void ToStringRaw(JsonWriter writer)
-		{
-			writer.WriteStartObject();
-			writer.WriteProperty("FieldName", FieldName);
-			writer.WriteProperty("Position", Position);
-			writer.WriteProperty("IsDescending", IsDescending);
-			writer.WriteProperty("IsIncluded", IsIncluded);
-			writer.WriteEndObject();
-		}
-		internal JMXKeyMember(JsonObject o)
+        public override string ToString(Formatting formatting)
+        {
+            JsonWriter writer = new JsonWriter(formatting);
+            ToJson(writer);
+            return writer.ToString();
+        }
+
+        internal JMXKeyMember(JsonObject o)
+            :base(o)
 		{
 			FieldName = o.GetStringOrDefault("FieldName");
 			Position = o.GetIntOrDefault("Position");
@@ -65,5 +62,20 @@ namespace S031.MetaStack.WinForms.ORM
 
 		internal static JMXKeyMember ReadFrom(JsonObject o)
 			=> new JMXKeyMember(o);
-	}
+
+        public override void ToJson(JsonWriter writer)
+        {
+			writer.WriteStartObject();
+            ToJsonRaw(writer);
+			writer.WriteEndObject();
+        }
+
+        protected override void ToJsonRaw(JsonWriter writer)
+        {
+			writer.WriteProperty("FieldName", FieldName);
+			writer.WriteProperty("Position", Position);
+			writer.WriteProperty("IsDescending", IsDescending);
+			writer.WriteProperty("IsIncluded", IsIncluded);
+        }
+    }
 }

@@ -13,43 +13,18 @@ using S031.MetaStack.WinForms.Data;
 namespace S031.MetaStack.WinForms.ORM
 #endif
 {
-	public class JMXAttribute
+	public class JMXAttribute: JsonSerializible
 	{
 		private JMXConstraint _checkConstraint;
 		private JMXConstraint _defaultConstraint;
 
 		public JMXAttribute()
+            :base(null)
 		{
-			Identity = new JMXIdentity();
-			ListItems = new List<string>();
-			ListData = new List<object>();
-			DataType = MdbType.@null;
-			DataSize = new JMXDataSize();
-			UID = Guid.NewGuid();
-			ServerDataType = string.Empty;
-			IsNullable = true;
             _checkConstraint = new JMXConstraint(JMXConstraintTypes.checkConstraint);
             _defaultConstraint = new JMXConstraint(JMXConstraintTypes.defaultConstraint);
-
-			DisplayWidth = 10;
-			Visible = true;
-			Enabled = true;
-			Sorted = true;
-
-			CollationName = string.Empty;
-			Name = string.Empty;
-			AttribPath = string.Empty;
-			Description = string.Empty;
-			Mask = string.Empty;
-			Format = string.Empty;
-			SuperForm = string.Empty;
-			SuperObject = string.Empty;
-			SuperMethod = string.Empty;
-			SuperFilter = string.Empty;
-			FieldName = string.Empty;
-			ConstName = string.Empty;
-			Agregate = string.Empty;
 		}
+
 		public JMXAttribute(string attrtibName) : this()
 		{
 			AttribName = attrtibName;
@@ -57,19 +32,19 @@ namespace S031.MetaStack.WinForms.ORM
 
 		#region DBServerSpecificAttributes
 		public int ID { get; set; }
-		public Guid UID { get; set; }
+        public Guid UID { get; set; } = Guid.Empty;
 		public string AttribName { get; set; }
 		public int Position { get; set; }
-		public string ServerDataType { get; set; }
-		public bool IsNullable { get; set; }
+		public string ServerDataType { get; set; } = string.Empty;
+        public bool IsNullable { get; set; } = true;
 		public string NullOption { get => (IsNullable ? "NULL" : "NOT NULL"); }
 		public bool Required { get => !IsNullable; set => IsNullable = !value; }
-		public string CollationName { get; set; }
-		public bool IsPK { get; set; }
+		public string CollationName { get; set; } = string.Empty;
+        public bool IsPK { get; set; }
 		public bool IsFK { get; set; }
-		public JMXDataSize DataSize { get; set; }
-		public JMXIdentity Identity { get; set; }
-		public JMXConstraint CheckConstraint
+		public JMXDataSize DataSize { get; set; } = new JMXDataSize();
+        public JMXIdentity Identity { get; set; } = new JMXIdentity();
+        public JMXConstraint CheckConstraint
 		{
 			get => _checkConstraint;
 			set
@@ -90,11 +65,11 @@ namespace S031.MetaStack.WinForms.ORM
 		#endregion DBServerSpecificAttributes
 
 		#region AppServerSpecificAttributes
-		public string Name { get; set; }
-		public string Caption { get => Name; set => Name = value; }
+		public string Name { get; set; } = string.Empty;
+        public string Caption { get => Name; set => Name = value; }
 
-		public MdbType DataType { get; set; }
-		public int Width
+		public MdbType DataType { get; set; } = MdbType.@null;
+        public int Width
 		{
 			get => DataType.GetTypeInfo().FixedSize ? DataSize.Precision : DataSize.Size;
 			set
@@ -106,28 +81,28 @@ namespace S031.MetaStack.WinForms.ORM
 			}
 		}
 		public bool Locate { get => (Visible || !ReadOnly); }
-		public bool Visible { get; set; }
+        public bool Visible { get; set; } = true;
 		public bool ReadOnly { get; set; }
-		public bool Enabled { get; set; }
+        public bool Enabled { get; set; } = true;
 		#endregion AppServerSpecificAttributes
 
-		public string AttribPath { get; set; }
-		public string Description { get; set; }
-		public string PresentationType { get; set; }
-		public int DisplayWidth { get; set; }
-		public string Mask { get; set; }
-		public string Format { get; set; }
-		public bool Sorted { get; set; }
-		public string SuperForm { get; set; }
-		public string SuperObject { get; set; }
-		public string SuperMethod { get; set; }
-		public string SuperFilter { get; set; }
-		public List<string> ListItems { get; } = new List<string>();
+		public string AttribPath { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public string PresentationType { get; set; }
+        public int DisplayWidth { get; set; } = 10;
+		public string Mask { get; set; } = string.Empty;
+        public string Format { get; set; } = string.Empty;
+        public bool Sorted { get; set; } = true;
+		public string SuperForm { get; set; } = string.Empty;
+        public string SuperObject { get; set; } = string.Empty;
+        public string SuperMethod { get; set; } = string.Empty;
+        public string SuperFilter { get; set; } = string.Empty;
+        public List<string> ListItems { get; } = new List<string>();
 		public List<object> ListData { get; } = new List<object>();
-		public string FieldName { get; set; }
-		public string ConstName { get; set; }
-		public string Agregate { get; set; }
-		public object DefaultValue { get; set; }
+		public string FieldName { get; set; } = string.Empty;
+        public string ConstName { get; set; } = string.Empty;
+        public string Agregate { get; set; } = string.Empty;
+        public object DefaultValue { get; set; }
 
 
 		/// <summary>
@@ -136,104 +111,17 @@ namespace S031.MetaStack.WinForms.ORM
 		public string ObjectName { get; set; }
 		public bool IsArray { get; set; }
 		public JMXSchema ObjectSchema { get; set; }
-		public virtual void ToStringRaw(JsonWriter writer)
-		{
-			writer.WriteProperty("ID", ID);
-			writer.WriteProperty("UID", UID);
-			writer.WriteProperty("AttribName", AttribName);
-			writer.WriteProperty("Position", Position);
-			writer.WriteProperty("ServerDataType", ServerDataType);
-			writer.WriteProperty("IsNullable", IsNullable);
-			writer.WriteProperty("NullOption", NullOption);
-			writer.WriteProperty("Required", Required);
-			writer.WriteProperty("CollationName", CollationName);
-			writer.WriteProperty("IsPK", IsPK);
-			writer.WriteProperty("IsFK", IsFK);
+        public override string ToString()
+            => this.ToString(Formatting.None);
 
-			if (!CheckConstraint.IsEmpty())
-			{
-				writer.WritePropertyName("CheckConstraint");
-				CheckConstraint.ToJson(writer);
-			}
-
-			if (!DefaultConstraint.IsEmpty())
-			{
-				writer.WritePropertyName("DefaultConstraint");
-				DefaultConstraint.ToJson(writer);
-			}
-
-			writer.WritePropertyName("DataSize");
-			DataSize.ToJson(writer);
-
-			if (Identity.IsIdentity)
-			{
-				writer.WritePropertyName("Identity");
-				writer.WriteStartObject();
-				Identity.ToStringRaw(writer);
-				writer.WriteEndObject();
-			}
-
-			writer.WriteProperty("Name", Name);
-			writer.WriteProperty("Caption", Caption);
-			writer.WriteProperty("DataType", DataType.ToString());
-			writer.WriteProperty("Width", Width);
-			writer.WriteProperty("Locate", Locate);
-			writer.WriteProperty("Visible", Visible);
-			writer.WriteProperty("ReadOnly", ReadOnly);
-			writer.WriteProperty("Enabled", Enabled);
-			writer.WriteProperty("Description", Description);
-			writer.WriteProperty("PresentationType", PresentationType);
-			writer.WriteProperty("DisplayWidth", DisplayWidth);
-			writer.WriteProperty("Mask", Mask);
-			writer.WriteProperty("Format", Format);
-			writer.WriteProperty("Sorted", Sorted);
-			writer.WriteProperty("SuperForm", SuperForm);
-			writer.WriteProperty("SuperObject", SuperObject);
-			writer.WriteProperty("SuperMethod", SuperMethod);
-			writer.WriteProperty("SuperFilter", SuperFilter);
-
-			if (ListItems.Count > 0)
-			{
-				writer.WritePropertyName("ListItems");
-				writer.WriteStartArray();
-				foreach (var item in ListItems)
-					writer.WriteValue(item);
-				writer.WriteEndArray();
-			}
-
-			if (ListData.Count > 0)
-			{
-				writer.WritePropertyName("ListData");
-				writer.WriteStartArray();
-				foreach (var item in ListData)
-					writer.WriteValue(new JsonValue(item));
-				writer.WriteEndArray();
-			}
-
-			writer.WriteProperty("FieldName", FieldName);
-			writer.WriteProperty("ConstName", ConstName);
-			writer.WriteProperty("Agregate", Agregate);
-			writer.WriteProperty("AttribPath", AttribPath);
-			writer.WriteProperty("DefaultValue", DefaultValue);
-
-			writer.WriteProperty("ObjectName", ObjectName);
-			writer.WriteProperty("IsArray", IsArray);
-			if (ObjectName != string.Empty && ObjectSchema != null)
-			{
-
-				writer.WritePropertyName("ObjectSchema");
-				writer.WriteRaw(ObjectSchema.ToString());
-			}
-		}
-		public override string ToString()
-		{
-			JsonWriter writer = new JsonWriter(Formatting.None);
-			writer.WriteStartObject();
-			ToStringRaw(writer);
-			writer.WriteEndObject();
-			return writer.ToString();
-		}
-		protected internal JMXAttribute(JsonObject o)
+        public override string ToString(Formatting formatting)
+        {
+            JsonWriter writer = new JsonWriter(formatting);
+            ToJson(writer);
+            return writer.ToString();
+        }
+        protected internal JMXAttribute(JsonObject o)
+            :base(o)
 		{
 			ID = o.GetIntOrDefault("ID");
 			UID = o.GetGuidOrDefault("UID", () => Guid.NewGuid());
@@ -309,7 +197,103 @@ namespace S031.MetaStack.WinForms.ORM
 			else
 				Identity = new JMXIdentity();
 		}
+
+        public override void ToJson(JsonWriter writer)
+        {
+            writer.WriteStartObject();
+            ToJsonRaw(writer);
+            writer.WriteEndObject();
+        }
+
+        protected override void ToJsonRaw(JsonWriter writer)
+        {
+            writer.WriteProperty("ID", ID);
+            writer.WriteProperty("UID", UID);
+            writer.WriteProperty("AttribName", AttribName);
+            writer.WriteProperty("Position", Position);
+            writer.WriteProperty("ServerDataType", ServerDataType);
+            writer.WriteProperty("IsNullable", IsNullable);
+            writer.WriteProperty("NullOption", NullOption);
+            writer.WriteProperty("Required", Required);
+            writer.WriteProperty("CollationName", CollationName);
+            writer.WriteProperty("IsPK", IsPK);
+            writer.WriteProperty("IsFK", IsFK);
+
+            if (!CheckConstraint.IsEmpty())
+            {
+                writer.WritePropertyName("CheckConstraint");
+                CheckConstraint.ToJson(writer);
+            }
+
+            if (!DefaultConstraint.IsEmpty())
+            {
+                writer.WritePropertyName("DefaultConstraint");
+                DefaultConstraint.ToJson(writer);
+            }
+
+            writer.WritePropertyName("DataSize");
+            DataSize.ToJson(writer);
+
+            if (Identity.IsIdentity)
+            {
+                writer.WritePropertyName("Identity");
+                Identity.ToJson(writer);
+            }
+
+            writer.WriteProperty("Name", Name);
+            writer.WriteProperty("Caption", Caption);
+            writer.WriteProperty("DataType", DataType.ToString());
+            writer.WriteProperty("Width", Width);
+            writer.WriteProperty("Locate", Locate);
+            writer.WriteProperty("Visible", Visible);
+            writer.WriteProperty("ReadOnly", ReadOnly);
+            writer.WriteProperty("Enabled", Enabled);
+            writer.WriteProperty("Description", Description);
+            writer.WriteProperty("PresentationType", PresentationType);
+            writer.WriteProperty("DisplayWidth", DisplayWidth);
+            writer.WriteProperty("Mask", Mask);
+            writer.WriteProperty("Format", Format);
+            writer.WriteProperty("Sorted", Sorted);
+            writer.WriteProperty("SuperForm", SuperForm);
+            writer.WriteProperty("SuperObject", SuperObject);
+            writer.WriteProperty("SuperMethod", SuperMethod);
+            writer.WriteProperty("SuperFilter", SuperFilter);
+
+            if (ListItems.Count > 0)
+            {
+                writer.WritePropertyName("ListItems");
+                writer.WriteStartArray();
+                foreach (var item in ListItems)
+                    writer.WriteValue(item);
+                writer.WriteEndArray();
+            }
+
+            if (ListData.Count > 0)
+            {
+                writer.WritePropertyName("ListData");
+                writer.WriteStartArray();
+                foreach (var item in ListData)
+                    writer.WriteValue(new JsonValue(item));
+                writer.WriteEndArray();
+            }
+
+            writer.WriteProperty("FieldName", FieldName);
+            writer.WriteProperty("ConstName", ConstName);
+            writer.WriteProperty("Agregate", Agregate);
+            writer.WriteProperty("AttribPath", AttribPath);
+            writer.WriteProperty("DefaultValue", DefaultValue);
+
+            writer.WriteProperty("ObjectName", ObjectName);
+            writer.WriteProperty("IsArray", IsArray);
+            if (ObjectName != string.Empty && ObjectSchema != null)
+            {
+
+                writer.WritePropertyName("ObjectSchema");
+                writer.WriteRaw(ObjectSchema.ToString());
+            }
+        }
+
 		internal static JMXAttribute ReadFrom(JsonObject o)
 			=> new JMXAttribute(o);
-	}
+    }
 }

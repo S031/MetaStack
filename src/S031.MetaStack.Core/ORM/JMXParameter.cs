@@ -26,20 +26,18 @@ namespace S031.MetaStack.WinForms.ORM
 
 		public bool NullIfEmpty { get; set; }
 
-		public override void ToStringRaw(JsonWriter writer)
+		protected override void ToJsonRaw(JsonWriter writer)
 		{
 			writer.WriteProperty("Dirrect", Dirrect.ToString());
 			writer.WriteProperty("NullIfEmpty", NullIfEmpty);
-			base.ToStringRaw(writer);
+			base.ToJsonRaw(writer);
 		}
 
-		public override string ToString()
-		{
-			JsonWriter writer = new JsonWriter(Formatting.None);
+        public override void ToJson(JsonWriter writer)
+        {
 			writer.WriteStartObject();
-			ToStringRaw(writer);
+			ToJsonRaw(writer);
 			writer.WriteEndObject();
-			return writer.ToString();
 		}
 
 		internal JMXParameter(JsonObject o) : base(o)

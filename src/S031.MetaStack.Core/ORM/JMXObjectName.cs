@@ -44,7 +44,7 @@ namespace S031.MetaStack.WinForms.ORM
 		}
 		public override bool Equals(object obj)
 		{
-			return this.ToString().Equals(obj.ToString(), StringComparison.CurrentCultureIgnoreCase);
+			return this.ToString().Equals(obj.ToString(), StringComparison.Ordinal);
 		}
 		public override int GetHashCode()
 		{

@@ -7,13 +7,9 @@ namespace S031.MetaStack.Core.ORM
 namespace S031.MetaStack.WinForms.ORM
 #endif
 {
-	public sealed class JMXPrimaryKey
+	public sealed class JMXPrimaryKey: JsonSerializible
 	{
-		public JMXPrimaryKey()
-		{
-			KeyMembers = new List<JMXKeyMember>();
-		}
-		public JMXPrimaryKey(string keyName, params string[] keyMemberNames):this()
+		public JMXPrimaryKey(string keyName, params string[] keyMemberNames):base(null)
 		{
 			KeyName = keyName;
 			AddKeyMember(keyMemberNames);
@@ -21,7 +17,7 @@ namespace S031.MetaStack.WinForms.ORM
 		public int ID { get; set; }
 		public int Handle { get => ID; set => ID = value; }
 		public string KeyName { get; set; }
-		public List<JMXKeyMember> KeyMembers { get; }
+		public List<JMXKeyMember> KeyMembers { get; } = new List<JMXKeyMember>();
 		public void AddKeyMember(params JMXKeyMember[] members)
 		{
 			foreach (var m in members)
@@ -36,26 +32,17 @@ namespace S031.MetaStack.WinForms.ORM
 				position++;
 			}
 		}
-		public override string ToString()
-		{
-			JsonWriter writer = new JsonWriter(Formatting.None);
-			writer.WriteStartObject();
-			ToStringRaw(writer);
-			writer.WriteEndObject();
-			return writer.ToString();
-		}
-		public void ToStringRaw(JsonWriter writer)
-		{
-			writer.WriteProperty("ID", ID);
-			writer.WriteProperty("Handle", Handle);
-			writer.WriteProperty("KeyName", KeyName);
-			writer.WritePropertyName("KeyMembers");
-			writer.WriteStartArray();
-			foreach (var item in KeyMembers)
-				item.ToStringRaw(writer);
-			writer.WriteEndArray();
-		}
-		internal JMXPrimaryKey(JsonObject o)
+        public override string ToString()
+            => this.ToString(Formatting.None);
+
+        public override string ToString(Formatting formatting)
+        {
+            JsonWriter writer = new JsonWriter(formatting);
+            ToJson(writer);
+            return writer.ToString();
+        }
+        internal JMXPrimaryKey(JsonObject o)
+            :base(o)
 		{
 			KeyName = o.GetStringOrDefault("KeyName");
 			ID = o.GetIntOrDefault("ID");
@@ -67,5 +54,24 @@ namespace S031.MetaStack.WinForms.ORM
 		}
 		internal static JMXPrimaryKey ReadFrom(JsonObject o)
 			=> new JMXPrimaryKey(o);
-	}
+
+        public override void ToJson(JsonWriter writer)
+        {
+			writer.WriteStartObject();
+			ToJsonRaw(writer);
+			writer.WriteEndObject();
+        }
+
+        protected override void ToJsonRaw(JsonWriter writer)
+        {
+			writer.WriteProperty("ID", ID);
+			writer.WriteProperty("Handle", Handle);
+			writer.WriteProperty("KeyName", KeyName);
+			writer.WritePropertyName("KeyMembers");
+			writer.WriteStartArray();
+			foreach (var item in KeyMembers)
+				item.ToJson(writer);
+			writer.WriteEndArray();
+        }
+    }
 }

@@ -314,7 +314,9 @@ namespace S031.MetaStack.Json
 					WriteValue((TimeSpan)v.Value);
 					break;
 				default:
-					if (JsonWellKnownTypes.TryGetValue(v.Value.GetType(), out var f))
+                    if (v.Value is JsonSerializible js)
+                        js.ToJson(this);
+					else if (JsonWellKnownTypes.TryGetValue(v.Value.GetType(), out var f))
 						f.WriteDelegate(this, v.Value);
 					else
 						//!!! see for enum

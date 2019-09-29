@@ -126,13 +126,16 @@ namespace S031.MetaStack.Common
 			(typeof(Guid), Guid.Empty)
 			);
 
-		public static IEnumerable<Type> GetImplements(this Type type, Assembly assembly = null)
-		{
-			IEnumerable<Assembly> l = assembly == null ? AppDomain.CurrentDomain.GetAssemblies() : new Assembly[] { assembly };
-			foreach (var a in l)
-				foreach (Type t in a.GetTypes().Where(t => type.IsAssignableFrom(t) && !type.Equals(t)))
-					yield return t;
-		}
+        public static IEnumerable<Type> GetImplements(this Type type, Assembly assembly = null)
+        {
+            IEnumerable<Assembly> l = assembly == null ? AppDomain.CurrentDomain.GetAssemblies() : new Assembly[] { assembly };
+            foreach (var a in l)
+#if NETCOREAPP
+                if (!a.FullName.StartsWith("Microsoft.VisualStudio.TraceDataCollector", StringComparison.Ordinal))
+#endif
+                    foreach (Type t in a.GetTypes().Where(t => type.IsAssignableFrom(t) && !type.Equals(t)))
+                        yield return t;
+        }
 		public static string GetWorkName(this Assembly assembly)
 		{
 			assembly.NullTest(nameof(assembly));

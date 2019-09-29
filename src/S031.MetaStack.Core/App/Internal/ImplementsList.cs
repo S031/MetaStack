@@ -50,13 +50,16 @@ namespace S031.MetaStack.WinForms
 				}
 			}
 		}
-		private static IEnumerable<Type> getImplements(Type type, Assembly assembly = null)
-		{
-			IEnumerable<Assembly> l = assembly == null ? getAssemblies() : new List<Assembly>() { assembly };
-			foreach (var a in l)
-				foreach (Type t in a.GetTypes().Where(t => type.IsAssignableFrom(t) && !type.Equals(t)))
-					yield return t;
-		}
+        private static IEnumerable<Type> getImplements(Type type, Assembly assembly = null)
+        {
+            IEnumerable<Assembly> l = assembly == null ? getAssemblies() : new List<Assembly>() { assembly };
+            foreach (var a in l)
+#if NETCOREAPP
+                if (!a.FullName.StartsWith("Microsoft.VisualStudio.TraceDataCollector", StringComparison.Ordinal))
+#endif
+                    foreach (Type t in a.GetTypes().Where(t => type.IsAssignableFrom(t) && !type.Equals(t)))
+                        yield return t;
+        }
 
 		private static IEnumerable<Assembly> getAssemblies() => AppDomain.CurrentDomain.GetAssemblies();
 	}
