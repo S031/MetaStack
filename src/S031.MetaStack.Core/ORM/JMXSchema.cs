@@ -158,11 +158,7 @@ namespace S031.MetaStack.WinForms.ORM
             writer.WritePropertyName("Indexes");
             writer.WriteStartArray();
 			foreach (var item in Indexes)
-			{
-				writer.WriteStartObject();
-				item.ToStringRaw(writer);
-				writer.WriteEndObject();
-			}
+				item.ToJson(writer);
 			writer.WriteEndArray();
 
             writer.WritePropertyName("ForeignKeys");
@@ -178,11 +174,8 @@ namespace S031.MetaStack.WinForms.ORM
             writer.WritePropertyName("Conditions");
             writer.WriteStartArray();
 			foreach (var item in Conditions)
-			{
-				writer.WriteStartObject();
-				item.ToStringRaw(writer);
-				writer.WriteEndObject();
-			}
+				item.ToJson(writer);
+
 			writer.WriteEndArray();
 			writer.WriteEndObject();
         }
@@ -309,10 +302,9 @@ namespace S031.MetaStack.WinForms.ORM
             if (elem != null)
                 foreach (var e in elem.Elements())
                 {
-					JMXIndex idx = new JMXIndex
+					JMXIndex idx = new JMXIndex(e.elementValue("IndexName"))
 					{
 						ID = e.elementValue("ID").ToIntOrDefault(),
-						IndexName = e.elementValue("IndexName"),
 						IsUnique = e.elementValue("IsUnique").ToBoolOrDefault()
 					};
 					idx.KeyMembers.AddRange(e.Element("KeyMembers").Elements()

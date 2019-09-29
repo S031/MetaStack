@@ -12,84 +12,89 @@ namespace S031.MetaStack.WinForms.ORM
 		checkConstraint,
 		defaultConstraint
 	}
-	public sealed class JMXConstraint
-	{
-		public JMXConstraint()
-		{
-			ConstraintType = JMXConstraintTypes.none;
-			ConstraintName = string.Empty;
-			Definition = string.Empty;
-			CheckOption = true;
-		}
+    public sealed class JMXConstraint : JsonSerializible
+    {
+        public JMXConstraint(JMXConstraintTypes constraintType) : this(constraintType, string.Empty, string.Empty)
+        {
+        }
 
-		public JMXConstraint(JMXConstraintTypes constraintType, string definition) : this(constraintType, "", definition)
-		{
-		}
+        public JMXConstraint(JMXConstraintTypes constraintType, string definition) : this(constraintType, "", definition)
+        {
+        }
 
-		public JMXConstraint(JMXConstraintTypes constraintType, string constraintName, string definition)
-		{
-			ConstraintType = constraintType;
-			ConstraintName = constraintName;
-			Definition = definition;
-			CheckOption = true;
-		}
+        public JMXConstraint(JMXConstraintTypes constraintType, string constraintName, string definition)
+            : base(null)
+        {
+            ConstraintType = constraintType;
+            ConstraintName = constraintName;
+            Definition = definition;
+            CheckOption = true;
+        }
 
-		public string ConstraintName { get; set; }
+        public string ConstraintName { get; set; } = string.Empty;
 
-		public string Definition { get; set; }
+        public string Definition { get; set; } = string.Empty;
 
-		public JMXConstraintTypes ConstraintType { get; set; }
+        public JMXConstraintTypes ConstraintType { get; set; } = JMXConstraintTypes.none;
 
-		public bool CheckOption { get; set; }
+        public bool CheckOption { get; set; } = true;
 
-		public static bool operator ==(JMXConstraint m1, JMXConstraint m2)
-		{
-			return (m1.ConstraintName == m2.ConstraintName &&
-				m1.Definition == m2.Definition &&
-				m1.ConstraintType == m2.ConstraintType);
-		}
+        public static bool operator ==(JMXConstraint m1, JMXConstraint m2)
+        {
+            return (m1.ConstraintName == m2.ConstraintName &&
+                m1.Definition == m2.Definition &&
+                m1.ConstraintType == m2.ConstraintType);
+        }
 
-		public static bool operator !=(JMXConstraint m1, JMXConstraint m2)
-		{
-			return (m1.ConstraintName != m2.ConstraintName ||
-				m1.Definition != m2.Definition ||
-				m1.ConstraintType != m2.ConstraintType);
-		}
+        public static bool operator !=(JMXConstraint m1, JMXConstraint m2)
+        {
+            return (m1.ConstraintName != m2.ConstraintName ||
+                m1.Definition != m2.Definition ||
+                m1.ConstraintType != m2.ConstraintType);
+        }
 
-		public override bool Equals(object obj) 
-			=> this.GetHashCode() == obj.GetHashCode();
+        public override bool Equals(object obj)
+            => this.GetHashCode() == obj.GetHashCode();
 
-		public override int GetHashCode() 
-			=> new { ConstraintName, Definition, ConstraintType }.GetHashCode();
+        public override int GetHashCode()
+            => new { ConstraintName, Definition, ConstraintType }.GetHashCode();
 
-		public bool IsEmpty() => string.IsNullOrEmpty(Definition);
+        public bool IsEmpty() => string.IsNullOrEmpty(Definition);
 
+        public override string ToString()
+            => this.ToString(Formatting.None);
 
-		public override string ToString()
-		{
-			JsonWriter writer = new JsonWriter(Formatting.None);
-			writer.WriteStartObject();
-			ToStringRaw(writer);
-			writer.WriteEndObject();
-			return writer.ToString();
-		}
+        public override string ToString(Formatting formatting)
+        {
+            JsonWriter writer = new JsonWriter(formatting);
+            ToJson(writer);
+            return writer.ToString();
+        }
 
-		public void ToStringRaw(JsonWriter writer)
-		{
-			writer.WriteProperty("ConstraintType", ConstraintType.ToString());
-			writer.WriteProperty("Definition", Definition);
-			writer.WriteProperty("CheckOption", CheckOption);
-		}
+        internal JMXConstraint(JsonValue value): base(value)
+        {
+            JsonObject o = value as JsonObject;
+            ConstraintType = o.GetEnum<JMXConstraintTypes>("ConstraintType", JMXConstraintTypes.none);
+            Definition = o.GetStringOrDefault("Definition");
+            CheckOption = o.GetBoolOrDefault("CheckOption", true);
+            ConstraintName = o.GetStringOrDefault("ConstraintName");
+        }
 
-		internal JMXConstraint(JsonObject o)
-		{
-			ConstraintType = o.GetEnum<JMXConstraintTypes>("ConstraintType", JMXConstraintTypes.none);
-			Definition = o.GetStringOrDefault("Definition");
-			CheckOption = o.GetBoolOrDefault("CheckOption", true);
-			ConstraintName = o.GetStringOrDefault("ConstraintName");
-		}
+        internal static JMXConstraint ReadFrom(JsonObject o)
+            => new JMXConstraint(o);
 
-		internal static JMXConstraint ReadFrom(JsonObject o)
-			=> new JMXConstraint(o);
-	}
+        public override void ToJson(JsonWriter writer)
+        {
+            writer.WriteStartObject();
+            ToJsonRaw(writer);
+            writer.WriteEndObject();
+        }
+
+        protected override void ToJsonRaw(JsonWriter writer)
+        {
+            writer.WriteProperty("ConstraintType", ConstraintType.ToString());
+            writer.WriteProperty("Definition", Definition);
+            writer.WriteProperty("CheckOption", CheckOption);
+        }
+    }
 }

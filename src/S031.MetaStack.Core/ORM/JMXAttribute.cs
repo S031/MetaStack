@@ -28,8 +28,8 @@ namespace S031.MetaStack.WinForms.ORM
 			UID = Guid.NewGuid();
 			ServerDataType = string.Empty;
 			IsNullable = true;
-			_checkConstraint = new JMXConstraint() { ConstraintType = JMXConstraintTypes.checkConstraint };
-			_defaultConstraint = new JMXConstraint() { ConstraintType = JMXConstraintTypes.defaultConstraint };
+            _checkConstraint = new JMXConstraint(JMXConstraintTypes.checkConstraint);
+            _defaultConstraint = new JMXConstraint(JMXConstraintTypes.defaultConstraint);
 
 			DisplayWidth = 10;
 			Visible = true;
@@ -153,23 +153,17 @@ namespace S031.MetaStack.WinForms.ORM
 			if (!CheckConstraint.IsEmpty())
 			{
 				writer.WritePropertyName("CheckConstraint");
-				writer.WriteStartObject();
-				CheckConstraint.ToStringRaw(writer);
-				writer.WriteEndObject();
+				CheckConstraint.ToJson(writer);
 			}
 
 			if (!DefaultConstraint.IsEmpty())
 			{
 				writer.WritePropertyName("DefaultConstraint");
-				writer.WriteStartObject();
-				DefaultConstraint.ToStringRaw(writer);
-				writer.WriteEndObject();
+				DefaultConstraint.ToJson(writer);
 			}
 
 			writer.WritePropertyName("DataSize");
-			writer.WriteStartObject();
-			DataSize.ToStringRaw(writer);
-			writer.WriteEndObject();
+			DataSize.ToJson(writer);
 
 			if (Identity.IsIdentity)
 			{
@@ -295,15 +289,15 @@ namespace S031.MetaStack.WinForms.ORM
 				ListData.AddRange(a.Select(v=>v.GetValue()));
 
 
-			if (o.TryGetValue("CheckConstraint", out JsonObject j))
-				CheckConstraint = JMXConstraint.ReadFrom(j);
-			else
-				CheckConstraint = new JMXConstraint() { ConstraintType = JMXConstraintTypes.checkConstraint };
+            if (o.TryGetValue("CheckConstraint", out JsonObject j))
+                CheckConstraint = JMXConstraint.ReadFrom(j);
+            else
+                CheckConstraint = new JMXConstraint(JMXConstraintTypes.checkConstraint);
 
-			if (o.TryGetValue("DefaultConstraint", out j))
-				DefaultConstraint = JMXConstraint.ReadFrom(j);
-			else
-				DefaultConstraint = new JMXConstraint() { ConstraintType = JMXConstraintTypes.defaultConstraint };
+            if (o.TryGetValue("DefaultConstraint", out j))
+                DefaultConstraint = JMXConstraint.ReadFrom(j);
+            else
+                DefaultConstraint = new JMXConstraint(JMXConstraintTypes.defaultConstraint);
 
 			if (o.TryGetValue("DataSize", out j))
 				DataSize = JMXDataSize.ReadFrom(j);

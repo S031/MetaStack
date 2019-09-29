@@ -6,9 +6,10 @@ namespace S031.MetaStack.Core.ORM
 namespace S031.MetaStack.WinForms.ORM
 #endif
 {
-	public readonly struct JMXDataSize
+	public sealed class JMXDataSize: JsonSerializible
 	{
 		public JMXDataSize(int size = 0, int scale = 0, int precision = 0)
+            : base(null)
 		{
 			Size = size;
 			Scale = scale;
@@ -34,27 +35,41 @@ namespace S031.MetaStack.WinForms.ORM
 			return new { Size, Scale, Precision }.GetHashCode();
 		}
 		public bool IsEmpty() => Size == 0 && Scale == 0 && Precision == 0;
-		public override string ToString()
-		{
-			JsonWriter writer = new JsonWriter(Formatting.None);
+
+        public override string ToString()
+           => this.ToString(Formatting.None);
+
+        public override string ToString(Formatting formatting)
+        {
+            JsonWriter writer = new JsonWriter(formatting);
+            ToJson(writer);
+            return writer.ToString();
+        }
+
+        internal JMXDataSize(JsonValue value)
+            : base(value)
+        {
+            JsonObject o = value as JsonObject;
+            Size = o.GetIntOrDefault("Size");
+            Scale = o.GetIntOrDefault("Scale");
+            Precision = o.GetIntOrDefault("Precision");
+        }
+
+		internal static JMXDataSize ReadFrom(JsonObject o)
+			=> new JMXDataSize(o);
+
+        public override void ToJson(JsonWriter writer)
+        {
 			writer.WriteStartObject();
-			ToStringRaw(writer);
+			ToJsonRaw(writer);
 			writer.WriteEndObject();
-			return writer.ToString();
-		}
-		public void ToStringRaw(JsonWriter writer)
-		{
+        }
+
+        protected override void ToJsonRaw(JsonWriter writer)
+        {
 			writer.WriteProperty("Size", Size);
 			writer.WriteProperty("Scale", Scale);
 			writer.WriteProperty("Precision", Precision);
-		}
-		internal JMXDataSize(JsonObject o)
-		{
-			Size = o.GetIntOrDefault("Size");
-			Scale = o.GetIntOrDefault("Scale");
-			Precision = o.GetIntOrDefault("Precision");
-		}
-		internal static JMXDataSize ReadFrom(JsonObject o)
-			=> new JMXDataSize(o);
-	}
+        }
+    }
 }
