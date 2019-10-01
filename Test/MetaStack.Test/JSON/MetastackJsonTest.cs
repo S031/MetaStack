@@ -157,7 +157,7 @@ namespace MetaStack.Test.Json
 
 				//Read
 				t = new TestClass();
-				JsonReader r = new JsonReader(ref str);
+				var r = new JsonReader(ref str).Read();
 				t.ReadRaw(r);
 				w = new JsonWriter(Formatting.Indented);
 				w.WriteValue(new JsonValue(t));
@@ -172,8 +172,7 @@ namespace MetaStack.Test.Json
 				JsonWellKnownTypes.Register(
 					new JsonAction(typeof(TestClass),
 					(w, o) => (o as TestClass).WriteRaw(w),
-					(r, o) => (o as TestClass).ReadRaw(r),
-					() => new TestClass()));
+					(r, o) => (o as TestClass).ReadRaw(r)));
 			}
 
 			public TestClass()
@@ -206,9 +205,9 @@ namespace MetaStack.Test.Json
 				writer.WriteEndObject();
 			}
 
-			public void ReadRaw(JsonReader reader)
+			public void ReadRaw(JsonValue value)
 			{
-				JsonObject o = (JsonObject)reader.Read();
+				JsonObject o = value as JsonObject;
 				ID = (int)o["ID"];
 				Name = (string)o["Name"];
 				JsonArray a = (JsonArray)o["ItemList"];

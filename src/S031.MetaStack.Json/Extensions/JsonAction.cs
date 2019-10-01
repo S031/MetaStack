@@ -8,21 +8,18 @@ namespace S031.MetaStack.Json
 	{
 		public JsonAction(Type sourceType, 
 			Action<JsonWriter, object> writeAction, 
-			Action<JsonReader, object> readDelegate,
-			Func<object> ctorDelegate)
+			Action<JsonValue, object> readDelegate)
 		{
 			SourceType = sourceType;
 			WriteDelegate = writeAction;
 			ReadDelegate = readDelegate;
-			CtorDelegate = ctorDelegate;
 		}
 
 		public Type SourceType { get; }
 
 		public Action<JsonWriter, object> WriteDelegate { get; }
 
-		public Action<JsonReader, object> ReadDelegate { get; }
+		public Action<JsonValue, object> ReadDelegate { get; }
 
-		public Func<object> CtorDelegate { get; }
 	}
 }
