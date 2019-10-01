@@ -40,6 +40,7 @@
     <Compile Include="Extensions\JsonObjectExtensions.cs" />
     <Compile Include="Extensions\JsonValueExtensions.cs" />
     <Compile Include="Extensions\WellKnownTypes.cs" />
+    <Compile Include="Intefaces\JsonSerializible.cs" />
     <Compile Include="Json\JsonArray.cs" />
     <Compile Include="Json\JsonObject.cs" />
     <Compile Include="Json\JsonTokenType.cs" />
