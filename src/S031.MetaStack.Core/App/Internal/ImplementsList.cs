@@ -54,7 +54,7 @@ namespace S031.MetaStack.WinForms
         {
             IEnumerable<Assembly> l = assembly == null ? getAssemblies() : new List<Assembly>() { assembly };
             foreach (var a in l)
-#if NETCOREAPP && DEBUG
+#if NETCOREAPP //&& DEBUG
                 if (!a.FullName.StartsWith("Microsoft.VisualStudio.TraceDataCollector", StringComparison.Ordinal))
 #endif
                     foreach (Type t in a.GetTypes().Where(t => type.IsAssignableFrom(t) && !type.Equals(t)))

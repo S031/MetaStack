@@ -130,7 +130,7 @@ namespace S031.MetaStack.Common
         {
             IEnumerable<Assembly> l = assembly == null ? AppDomain.CurrentDomain.GetAssemblies() : new Assembly[] { assembly };
             foreach (var a in l)
-#if NETCOREAPP && DEBUG
+#if NETCOREAPP //&& DEBUG
 				if (!a.FullName.StartsWith("Microsoft.VisualStudio.TraceDataCollector", StringComparison.Ordinal))
 #endif
                     foreach (Type t in a.GetTypes().Where(t => type.IsAssignableFrom(t) && !type.Equals(t)))

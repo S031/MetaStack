@@ -319,7 +319,7 @@ namespace S031.MetaStack.Json
 					else if (JsonWellKnownTypes.TryGetValue(v.Value.GetType(), out var f))
 						f.WriteDelegate(this, v.Value);
 					else
-						//!!! see for enum
+						//see for enum
 						WriteValue(v.Value.ToString());
 					break;
 			}
