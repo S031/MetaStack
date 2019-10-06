@@ -46,6 +46,7 @@ namespace S031.MetaStack.Core.Actions
 							QA.AuthorizationRequired,
 							QA.AsyncMode,
 							QA.TransactionSupport,
+                            QA.IsStatic,
 							1 As WebAuthentication,
 							I.ID As IID,
 							I.InterfaceName As InterfaceID,
@@ -274,6 +275,7 @@ namespace S031.MetaStack.Core.Actions
 			ai.AuthorizationRequired = (bool)dr["AuthorizationRequired"];
 			ai.WebAuthentication = ai.AuthenticationRequired ? ActionWebAuthenticationType.Basic : ActionWebAuthenticationType.None;
 			ai.AsyncMode = (bool)dr["AsyncMode"];
+			ai.IsStatic = (bool)dr["IsStatic"];
 		}
 		private void SetParamAttributes(ParamInfoList pil, DataPackage dr)
 		{

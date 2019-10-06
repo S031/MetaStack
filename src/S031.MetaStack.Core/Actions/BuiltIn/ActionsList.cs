@@ -10,23 +10,24 @@ namespace S031.MetaStack.Core.Actions
 		public static Dictionary<string, ActionInfo> CreateActionsList()
 		{
 			Dictionary<string, ActionInfo> actions = new Dictionary<string, ActionInfo>();
-			#region Sys.LoginRequest
-			ActionInfo ai = new ActionInfo()
-			{
-				ActionID = "Sys.LoginRequest",
-				AssemblyID = typeof(ActionsList).Assembly.GetWorkName(),
-				AsyncMode = false,
-				AuthenticationRequired = false,
-				AuthorizationRequired = false,
-				ClassName = typeof(SysLoginRequest).FullName,
-				Description = "Запрос на логин (принимает Имя пользователя и открытый ключ клиента, возвращает ИД сессии + открытый ключ сервера)",
-				EMailOnError = false,
-				LogOnError = true,
-				MultipleRowsParams = false,
-				MultipleRowsResult = false,
-				TransactionSupport = TransactionActionSupport.None,
-				Name = "Запрос на логин",
-				WebAuthentication = ActionWebAuthenticationType.None
+            #region Sys.LoginRequest
+            ActionInfo ai = new ActionInfo()
+            {
+                ActionID = "Sys.LoginRequest",
+                AssemblyID = typeof(ActionsList).Assembly.GetWorkName(),
+                AsyncMode = false,
+                AuthenticationRequired = false,
+                AuthorizationRequired = false,
+                ClassName = typeof(SysLoginRequest).FullName,
+                Description = "Запрос на логин (принимает Имя пользователя и открытый ключ клиента, возвращает ИД сессии + открытый ключ сервера)",
+                EMailOnError = false,
+                LogOnError = true,
+                MultipleRowsParams = false,
+                MultipleRowsResult = false,
+                TransactionSupport = TransactionActionSupport.None,
+                Name = "Запрос на логин",
+                WebAuthentication = ActionWebAuthenticationType.None,
+                IsStatic = true
 			};
 			ParamInfo pi = new ParamInfo()
 			{
@@ -95,8 +96,9 @@ namespace S031.MetaStack.Core.Actions
 				MultipleRowsResult = false,
 				TransactionSupport = TransactionActionSupport.None,
 				Name = "Аутентификация пользователя",
-				WebAuthentication = ActionWebAuthenticationType.None
-			};
+				WebAuthentication = ActionWebAuthenticationType.None,
+                IsStatic = true
+            };
 			pi = new ParamInfo()
 			{
 				AttribName = "UserName",
@@ -180,8 +182,9 @@ namespace S031.MetaStack.Core.Actions
 				MultipleRowsResult = true,
 				TransactionSupport = TransactionActionSupport.None,
 				Name = "Выборка данных из источника",
-				WebAuthentication = ActionWebAuthenticationType.Basic
-			};
+				WebAuthentication = ActionWebAuthenticationType.Basic,
+                IsStatic = true
+            };
 			pi = new ParamInfo()
 			{
 				AttribName = "ParamName",
@@ -233,8 +236,9 @@ namespace S031.MetaStack.Core.Actions
 				MultipleRowsResult = true,
 				TransactionSupport = TransactionActionSupport.None,
 				Name = "Получить схему объекта",
-				WebAuthentication = ActionWebAuthenticationType.Basic
-			};
+				WebAuthentication = ActionWebAuthenticationType.Basic,
+                IsStatic = true
+            };
 			pi = new ParamInfo()
 			{
 				AttribName = "ObjectName",
@@ -287,8 +291,9 @@ namespace S031.MetaStack.Core.Actions
 				MultipleRowsResult = false,
 				TransactionSupport = TransactionActionSupport.None,
 				Name = "Получить схему объекта",
-				WebAuthentication = ActionWebAuthenticationType.Basic
-			};
+				WebAuthentication = ActionWebAuthenticationType.Basic,
+                IsStatic = true
+            };
 			actions.Add(ai.ActionID, ai);
 			#endregion
 
@@ -308,8 +313,9 @@ namespace S031.MetaStack.Core.Actions
 				MultipleRowsResult = true,
 				TransactionSupport = TransactionActionSupport.Support,
 				Name = "Сохранить схему объекта",
-				WebAuthentication = ActionWebAuthenticationType.Basic
-			};
+				WebAuthentication = ActionWebAuthenticationType.Basic,
+                IsStatic = true
+            };
 			pi = new ParamInfo()
 			{
 				AttribName = "ObjectSchema",
@@ -361,8 +367,9 @@ namespace S031.MetaStack.Core.Actions
 				MultipleRowsResult = true,
 				TransactionSupport = TransactionActionSupport.None,
 				Name = "Получить описание операции",
-				WebAuthentication = ActionWebAuthenticationType.Basic
-			};
+				WebAuthentication = ActionWebAuthenticationType.Basic,
+                IsStatic = true
+            };
 			pi = new ParamInfo()
 			{
 				AttribName = "ActionID",
@@ -414,8 +421,9 @@ namespace S031.MetaStack.Core.Actions
 				MultipleRowsResult = true,
 				TransactionSupport = TransactionActionSupport.None,
 				Name = "Запустить канал вывода информации для текущей сессии",
-				WebAuthentication = ActionWebAuthenticationType.Basic
-			};
+				WebAuthentication = ActionWebAuthenticationType.Basic,
+                IsStatic = true
+            };
 			pi = new ParamInfo()
 			{
 				AttribName = "Result",

@@ -70,6 +70,7 @@ namespace S031.MetaStack.WinForms.Actions
 		public bool AuthenticationRequired { get; set; }
 		public bool AuthorizationRequired { get; set; }
 		public bool AsyncMode { get; set; } = false;
+		public bool IsStatic { get; set; } = false;
 		public int IID { get; set; }
 
 		/// <summary>
@@ -96,6 +97,7 @@ namespace S031.MetaStack.WinForms.Actions
 			writer.WriteProperty("Description", Description);
 			writer.WriteProperty("MultipleRowsParams", MultipleRowsParams);
 			writer.WriteProperty("MultipleRowsResult", MultipleRowsResult);
+			writer.WriteProperty("IsStatic", IsStatic);
 
 			writer.WritePropertyName("InterfaceParameters");
 			writer.WriteStartArray();
@@ -148,7 +150,8 @@ namespace S031.MetaStack.WinForms.Actions
 				InterfaceName = j.GetStringOrDefault("InterfaceName"),
 				Description = j.GetStringOrDefault("Description"),
 				MultipleRowsParams = j.GetBoolOrDefault("MultipleRowsParams"),
-				MultipleRowsResult = j.GetBoolOrDefault("MultipleRowsResult")
+				MultipleRowsResult = j.GetBoolOrDefault("MultipleRowsResult"),
+				IsStatic = j.GetBoolOrDefault("IsStatic")
 			};
 			if (j.ContainsKey("InterfaceParameters"))
 			{

@@ -27,7 +27,7 @@ namespace S031.MetaStack.Core.Security
 		/// </summary>
 		private static readonly object _obj4Lock = new object();
 		private static readonly Dictionary<string, List<string>> _user2RolesCache
-			= new Dictionary<string, List<string>>(StringComparer.CurrentCultureIgnoreCase);
+			= new Dictionary<string, List<string>>(StringComparer.Ordinal);
 
 		private readonly MdbContext _ctx;
 		public BasicAuthorizationProvider(MdbContext sysCatContext)
@@ -44,6 +44,14 @@ namespace S031.MetaStack.Core.Security
 		{
 			if (await IsAdminAsync(actionInfo.GetContext().UserName))
 				return true;
+            /*!!!
+             * select * from users u
+             * inner join User2Roles r on u.id = r.UserID
+             * inner join permissions p on p.RoleID = r.roleId
+             * inner join actions a on a.id = p.ActionId
+             * where u.UserName = '{UserName}' and objectName = {if static action any else objectName}
+             * and a.actionname = actionInfo.actionId
+             */
 			return false;
 		}
 
@@ -66,30 +74,36 @@ namespace S031.MetaStack.Core.Security
 
 		public async Task<bool> UserInRoreAsync(string userName, string roleName)
 		{
+            string key = userName.ToUpper();
+            string role = roleName.ToUpper();
+            if (!_user2RolesCache.ContainsKey(key))
+                await SetUser2RolesCache(key);
+			return _user2RolesCache[key]
+				.Any(r => r.Equals(role, StringComparison.Ordinal));
+		}
 
-			if (!_user2RolesCache.ContainsKey(userName))
-			{
-				using (var dr = await _ctx.GetReaderAsync($@"
-				select r.RoleName
+        private async Task SetUser2RolesCache(string key)
+        {
+            string sql = $@"
+				select Upper(r.RoleName) as RoleName
 				from Users u
 				inner join Users2Roles ur on u.ID = ur.UserID
 				inner join Roles r on r.ID = ur.RoleID
-				where u.UserName LIKE '{userName}'"))
-				{
-					if (!_user2RolesCache.ContainsKey(userName))
-					{
-						lock (_obj4Lock)
-						{
-							List<string> roles = new List<string>();
-							_user2RolesCache.Add(userName, roles);
-							for (; dr.Read();)
-								roles.Add((string)dr["RoleName"]);
-						}
-					}
-				}
-			}
-			return _user2RolesCache[userName]
-				.Any(r => r.Equals(roleName, StringComparison.CurrentCultureIgnoreCase));
-		}
+				where u.UserName LIKE '{key}'";
+            
+            using (var dr = await _ctx.GetReaderAsync(sql))
+            {
+                if (!_user2RolesCache.ContainsKey(key))
+                {
+                    lock (_obj4Lock)
+                    {
+                        List<string> roles = new List<string>();
+                        _user2RolesCache.Add(key, roles);
+                        for (; dr.Read();)
+                            roles.Add((string)dr["RoleName"]);
+                    }
+                }
+            }
+        }
 	}
 }
