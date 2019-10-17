@@ -88,10 +88,10 @@ namespace S031.MetaStack.Common
 			if (string.IsNullOrEmpty(str))
 				return false;
 
-			string source = str.ToLower();
-			if (source == "1" || source == "true")
+			string source = str.ToUpper();
+			if (source == "1" || source == "TRUE")
 				return true;
-			else if (source == "0" || source == "false")
+			else if (source == "0" || source == "FALSE")
 				return false;
 			else
 				return bool.TryParse(str, out bool val) ? val : false;

@@ -72,7 +72,7 @@ namespace Metib.Business.Msfo
 
 		internal static string[] GetParamListData(ActionInfo ai, string paramName, string paramValue, string allValueKey)
 		{
-			return paramValue.ToLower() != allValueKey.ToLower()
+			return paramValue.ToUpper() != allValueKey.ToUpper()
 				? new string[] { paramValue }
 				: ai.InterfaceParameters.FirstOrDefault(p => p.Value.ParameterID == paramName)
 					.Value

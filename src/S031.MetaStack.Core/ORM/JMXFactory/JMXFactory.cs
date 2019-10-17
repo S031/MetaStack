@@ -29,12 +29,12 @@ namespace S031.MetaStack.Core.ORM
 			var l = ImplementsList.GetTypes(typeof(JMXFactory));
 			if (l == null)
 				throw new InvalidOperationException("No class inherited from JMXFactory defined");
-			string dbProviderName = sysCatMdbContext.ProviderName.ToLower();
+			string dbProviderName = sysCatMdbContext.ProviderName.ToUpper();
 			foreach (var t in l)
 			{
 				SchemaDBSyncAttribute att = (System.Attribute.GetCustomAttributes(t)?
 					.FirstOrDefault(attr => attr.GetType() == typeof(SchemaDBSyncAttribute) &&
-					(attr as SchemaDBSyncAttribute)?.DBProviderName.ToLower() == dbProviderName) as SchemaDBSyncAttribute);
+					(attr as SchemaDBSyncAttribute)?.DBProviderName.ToUpper() == dbProviderName) as SchemaDBSyncAttribute);
 				if (att != null)
 					return (JMXFactory)t.CreateInstance(sysCatMdbContext, workMdbContext, logger);
 			}

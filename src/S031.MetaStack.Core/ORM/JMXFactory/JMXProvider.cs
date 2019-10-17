@@ -2,6 +2,7 @@
 using S031.MetaStack.Common;
 using S031.MetaStack.Core.Data;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ namespace S031.MetaStack.Core.ORM
 {
 	public class JMXProvider : ManagerObjectBase, IJMXProvider, IDisposable
 	{
+		protected readonly static ConcurrentDictionary<string, string> _statementsCache = new ConcurrentDictionary<string, string>();
 		private readonly JMXFactory _factory;
 		public JMXProvider(JMXFactory factory) : 
 			base(factory.GetMdbContext(ContextTypes.SysCat), factory.GetMdbContext(ContextTypes.Work))
@@ -54,7 +56,7 @@ namespace S031.MetaStack.Core.ORM
 			throw new NotImplementedException();
 		}
 
-		public virtual Task<JMXObject> ReadAsync(JMXObjectName objectName, string alternameIndexName, params object[] parameters)
+		public virtual Task<JMXObject> ReadAsync(JMXObjectName objectName, string alterKeyIndexName, params object[] parameters)
 		{
 			throw new NotImplementedException();
 		}
