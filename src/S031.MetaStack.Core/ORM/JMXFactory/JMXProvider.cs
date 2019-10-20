@@ -24,7 +24,7 @@ namespace S031.MetaStack.Core.ORM
 		public virtual void Delete(JMXObject jmxObject) 
 			=> Delete(jmxObject.ObjectName, jmxObject.ID);
 
-		public virtual void Delete(JMXObjectName objectName, int id)
+		public virtual void Delete(JMXObjectName objectName, long id)
 			=> DeleteAsync(objectName, id).GetAwaiter().GetResult();
 
 		public virtual Task DeleteAsync(JMXObject jmxObject)
@@ -32,7 +32,7 @@ namespace S031.MetaStack.Core.ORM
 			throw new NotImplementedException();
 		}
 
-		public async virtual Task DeleteAsync(JMXObjectName objectName, int id)
+		public async virtual Task DeleteAsync(JMXObjectName objectName, long id)
 		{
 			JMXObject jo = await ReadAsync(objectName, id);
 			if (jo == null)
@@ -41,7 +41,7 @@ namespace S031.MetaStack.Core.ORM
 			await DeleteAsync(jo);
 		}
 
-		public virtual JMXObject Read(JMXObjectName objectName, int id)
+		public virtual JMXObject Read(JMXObjectName objectName, long id)
 		{
 			throw new NotImplementedException();
 		}
@@ -51,7 +51,7 @@ namespace S031.MetaStack.Core.ORM
 			throw new NotImplementedException();
 		}
 
-		public virtual Task<JMXObject> ReadAsync(JMXObjectName objectName, int id)
+		public virtual Task<JMXObject> ReadAsync(JMXObjectName objectName, long id)
 		{
 			throw new NotImplementedException();
 		}
@@ -61,22 +61,22 @@ namespace S031.MetaStack.Core.ORM
 			throw new NotImplementedException();
 		}
 
-		public virtual int Save(JMXObject jmxObject, bool isNew)
+		public virtual long Save(JMXObject jmxObject, bool isNew)
 		{
 			throw new NotImplementedException();
 		}
 
-		public virtual Task<int> SaveAsync(JMXObject jmxObject, bool isNew)
+		public virtual Task<long> SaveAsync(JMXObject jmxObject, bool isNew)
 		{
 			throw new NotImplementedException();
 		}
 
-		public virtual int SetState(string objectName, int handle, int newState, IDictionary<string, object> paramList)
+		public virtual int SetState(string objectName, long handle, int newState, IDictionary<string, object> paramList)
 		{
 			throw new NotImplementedException();
 		}
 
-		public virtual Task<int> SetStateAsync(string objectName, int handle, int newState, IDictionary<string, object> paramList)
+		public virtual Task<int> SetStateAsync(string objectName, long handle, int newState, IDictionary<string, object> paramList)
 		{
 			throw new NotImplementedException();
 		}
