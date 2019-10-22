@@ -323,26 +323,6 @@ namespace S031.MetaStack.WinForms.Data
             using (MemoryStream ms = new MemoryStream())
             using (BinaryWriter bw = new BinaryWriter(ms))
             {
-
-                //int fieldCount = dr.FieldCount;
-                //Dictionary<string, ColumnInfo> colInfo = new Dictionary<string, ColumnInfo>(StringComparer.CurrentCultureIgnoreCase);
-
-                //for (int i = 0; i < fieldCount; i++)
-                //{
-                //	string name = dr.GetName(i);
-
-                //	if (allowDublicate)
-                //	{
-                //		string nameOrig = name;
-                //		for (int j = 1; colInfo.ContainsKey(name); j++)
-                //			name = nameOrig + j.ToString();
-                //	}
-                //	else if (colInfo.ContainsKey(name))
-                //		continue;
-
-                //	colInfo.Add(name, ColumnInfo.FromType(dr.GetFieldType(i)));
-                //}
-
                 DataTable dt = dr.GetSchemaTable();
                 int fieldCount = dr.FieldCount;
                 Dictionary<string, ColumnInfo> colInfo = new Dictionary<string, ColumnInfo>(StringComparer.Ordinal);

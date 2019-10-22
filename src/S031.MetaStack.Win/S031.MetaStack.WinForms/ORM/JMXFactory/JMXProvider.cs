@@ -13,7 +13,7 @@ namespace S031.MetaStack.WinForms.ORM
 			throw new NotImplementedException();
 		}
 
-		public void Delete(JMXObjectName objectName, int id)
+		public void Delete(JMXObjectName objectName, long id)
 		{
 			throw new NotImplementedException();
 		}
@@ -23,12 +23,12 @@ namespace S031.MetaStack.WinForms.ORM
 			throw new NotImplementedException();
 		}
 
-		public Task DeleteAsync(JMXObjectName objectName, int id)
+		public Task DeleteAsync(JMXObjectName objectName, long id)
 		{
 			throw new NotImplementedException();
 		}
 
-		public JMXObject Read(JMXObjectName objectName, int id)
+		public JMXObject Read(JMXObjectName objectName, long id)
 		{
 			throw new NotImplementedException();
 		}
@@ -38,7 +38,7 @@ namespace S031.MetaStack.WinForms.ORM
 			throw new NotImplementedException();
 		}
 
-		public Task<JMXObject> ReadAsync(JMXObjectName objectName, int id)
+		public Task<JMXObject> ReadAsync(JMXObjectName objectName, long id)
 		{
 			throw new NotImplementedException();
 		}
@@ -48,22 +48,22 @@ namespace S031.MetaStack.WinForms.ORM
 			throw new NotImplementedException();
 		}
 
-		public int Save(JMXObject jmxObject, bool isNew)
+		public long Save(JMXObject jmxObject, bool isNew)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task<int> SaveAsync(JMXObject jmxObject, bool isNew)
+		public Task<long> SaveAsync(JMXObject jmxObject, bool isNew)
 		{
 			throw new NotImplementedException();
 		}
 
-		public int SetState(string objectName, int handle, int newState, IDictionary<string, object> paramList)
+		public int SetState(string objectName, long handle, int newState, IDictionary<string, object> paramList)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task<int> SetStateAsync(string objectName, int handle, int newState, IDictionary<string, object> paramList)
+		public Task<int> SetStateAsync(string objectName, long handle, int newState, IDictionary<string, object> paramList)
 		{
 			throw new NotImplementedException();
 		}

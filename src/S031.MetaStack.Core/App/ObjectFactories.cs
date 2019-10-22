@@ -16,7 +16,7 @@ namespace S031.MetaStack.Core
 		{
 			return GetFactory<T>(p => p.GetType()
 				.FullName
-				.StartsWith(invariantName, StringComparison.CurrentCultureIgnoreCase));
+				.StartsWith(invariantName, StringComparison.OrdinalIgnoreCase));
 		}
 
 		public static T GetFactory<T>(Func<T, bool> filter)

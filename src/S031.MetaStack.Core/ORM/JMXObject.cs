@@ -50,7 +50,7 @@ namespace S031.MetaStack.WinForms.ORM
 			{
 				if (!vbo.IsEmpty(a.DefaultValue))
 					this[a.AttribName] = new JsonValue(a.DefaultValue);
-				else if (a.ConstName.ToUpper() == "DATE_CURRENT")
+				else if (a.ConstName.Equals("date_current", StringComparison.OrdinalIgnoreCase))
 					this[a.AttribName] = DateTime.Now;
 			}
 		}

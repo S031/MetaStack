@@ -431,10 +431,11 @@ namespace S031.MetaStack.Core.ORM.MsSql
                 var pk = new JMXPrimaryKey(keyName: $"PK_{schema.DbObjectName.AreaName}_{schema.DbObjectName.ObjectName}");
 				var att = schema.Attributes.FirstOrDefault(a => a.Identity.IsIdentity);
 				if (att == null)
-					att = schema.Attributes.FirstOrDefault(a => a.AttribName == "ID" || a.FieldName == "ID");
+					att = schema.Attributes.FirstOrDefault(a => a.AttribName.Equals("ID", StringComparison.OrdinalIgnoreCase) 
+					|| a.FieldName.Equals("ID", StringComparison.OrdinalIgnoreCase));
 				if (att == null)
 					att = schema.Attributes.FirstOrDefault(a => a.DefaultConstraint != null &&
-						a.DefaultConstraint.Definition.ToUpper().IndexOf("NEXT VALUE FOR") > -1);
+						a.DefaultConstraint.Definition.IndexOf("next value for", StringComparison.OrdinalIgnoreCase) > -1);
 				if (att != null)
 				{
 					if (att.FieldName.IsEmpty())
@@ -685,15 +686,14 @@ namespace S031.MetaStack.Core.ORM.MsSql
 			for (int i = 0; i < count; i++)
 			{
 				var att = schema.Attributes[i];
-				//var att2 = fromDbSchema.Attributes.FirstOrDefault(a => a.ID == att.ID);
 				var att2 = fromDbSchema.Attributes.FirstOrDefault(a =>
-					a.FieldName.Equals(att.FieldName, StringComparison.CurrentCultureIgnoreCase));
-				//bool found = (att2 != null && att.FieldName.Equals(att2.FieldName, StringComparison.CurrentCultureIgnoreCase));
+					a.FieldName.Equals(att.FieldName, StringComparison.OrdinalIgnoreCase));
+
 				bool found = (att2 != null);
 				AttribCompareDiff diff = AttribCompareDiff.none;
 				if (found)
 				{
-					if (!att.ServerDataType.Equals(att2.ServerDataType, StringComparison.CurrentCultureIgnoreCase))
+					if (!att.ServerDataType.Equals(att2.ServerDataType, StringComparison.OrdinalIgnoreCase))
 						diff = AttribCompareDiff.dataTtype;
 					if (att.Required != att2.Required)
 						diff |= AttribCompareDiff.nullOptions;
@@ -703,7 +703,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 						diff |= AttribCompareDiff.identity;
 
 					if (att.DataType != MdbType.@object &&
-						!att.AttribName.Equals(att2.FieldName, StringComparison.CurrentCultureIgnoreCase))
+						!att.AttribName.Equals(att2.FieldName, StringComparison.OrdinalIgnoreCase))
 						diff |= AttribCompareDiff.name;
 
 					//Server DataTypes is equals
@@ -719,13 +719,20 @@ namespace S031.MetaStack.Core.ORM.MsSql
 								diff |= AttribCompareDiff.size;
 						}
 					}
-					if (!att.CheckConstraint.Definition.RemoveChar("[( )]".ToCharArray()).
-						Equals(att2.CheckConstraint.Definition.RemoveChar("[( )]".ToCharArray()),
-						StringComparison.CurrentCultureIgnoreCase))
+					if (!att.CheckConstraint
+						.Definition
+						.RemoveChar("[( )]".ToCharArray())
+						.Equals(att2.CheckConstraint
+							.Definition
+							.RemoveChar("[( )]".ToCharArray()),
+						StringComparison.OrdinalIgnoreCase))
 						diff |= AttribCompareDiff.constraint;
-					else if (!att.DefaultConstraint.Definition.RemoveChar("[( )]".ToCharArray()).
-						Equals(att2.DefaultConstraint.Definition.RemoveChar("[( )]".ToCharArray()),
-						StringComparison.CurrentCultureIgnoreCase))
+					else if (!att.DefaultConstraint
+						.Definition.RemoveChar("[( )]".ToCharArray())
+						.Equals(att2.DefaultConstraint
+							.Definition
+							.RemoveChar("[( )]".ToCharArray()),
+						StringComparison.OrdinalIgnoreCase))
 						diff |= AttribCompareDiff.constraint;
 				}
 				//else if (att2 != null)
@@ -738,7 +745,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 			{
 				//var att = schema.Attributes.FirstOrDefault(a => a.ID == att2.ID);
 				var att = schema.Attributes.FirstOrDefault(a =>
-					a.FieldName.Equals(att2.FieldName, StringComparison.InvariantCultureIgnoreCase));
+					a.FieldName.Equals(att2.FieldName, StringComparison.OrdinalIgnoreCase));
 				if (att == null)
 					l.Add((att, att2, AttribCompareDiff.remove));
 			}
@@ -865,7 +872,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 				else if (k1.CheckOption != k2.CheckOption ||
 					k1.DeleteRefAction != k2.DeleteRefAction ||
 					k1.UpdateRefAction != k2.UpdateRefAction ||
-					!k1.RefDbObjectName.ToString().Equals(k2.RefDbObjectName.ToString(), StringComparison.CurrentCultureIgnoreCase))
+					!k1.RefDbObjectName.ToString().Equals(k2.RefDbObjectName.ToString(), StringComparison.OrdinalIgnoreCase))
 					l.Add((k1, k2, DbObjectOnDiffActions.alter));
 				else
 				{

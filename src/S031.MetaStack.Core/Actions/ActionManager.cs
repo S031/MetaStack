@@ -187,7 +187,7 @@ namespace S031.MetaStack.Core.Actions
 				inParamStor.GoDataTop();
 			}
 			IAppEvaluator se = ImplementsList.GetTypes(typeof(IAppEvaluator))
-				.FirstOrDefault(t => t.FullName.Equals(ai.ClassName, StringComparison.CurrentCultureIgnoreCase))?
+				.FirstOrDefault(t => t.FullName.Equals(ai.ClassName, StringComparison.Ordinal))?
 				.CreateInstance<IAppEvaluator>();
 			return se;
 		}

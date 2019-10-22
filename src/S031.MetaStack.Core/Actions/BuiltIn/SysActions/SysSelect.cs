@@ -79,24 +79,38 @@ namespace S031.MetaStack.Core.Actions
 			_conditions = new List<JMXCondition>();
 			for (; dp.Read();)
 			{
-				string paramName = (string)dp["ParamName"];
-				if (paramName[0] == '@')
+				string paramName = ((string)dp["ParamName"]).ToUpper();
+				switch (paramName)
 				{
-					_parameters.Add(dp["ParamName"]);
-					_parameters.Add(dp["ParamValue"]);
+					case "_VIEWNAME":
+						_viewName = (string)dp["ParamValue"];
+						break;
+					case "_FILTER":
+						_conditions.Add(new JMXCondition(JMXConditionTypes.Where, (string)dp["ParamValue"]));
+						break;
+					case "_SORT":
+						_conditions.Add(new JMXCondition(JMXConditionTypes.OrderBy, (string)dp["ParamValue"]));
+						break;
+					case "_GROUP":
+						_conditions.Add(new JMXCondition(JMXConditionTypes.GroupBy, (string)dp["ParamValue"]));
+						break;
+					case "_HAVING":
+						_conditions.Add(new JMXCondition(JMXConditionTypes.Havind, (string)dp["ParamValue"]));
+						break;
+					case "_JOIN":
+						_conditions.Add(new JMXCondition(JMXConditionTypes.Join, (string)dp["ParamValue"]));
+						break;
+					default:
+						if (paramName[0] == '@')
+						{
+							_parameters.Add(dp["ParamName"]);
+							_parameters.Add(dp["ParamValue"]);
+						}
+						//else
+						//	//!!! to resource
+						//	throw new ArgumentException("Ivalid parameter name for DB query");
+						break;
 				}
-				else if (paramName.Equals("_viewName", StringComparison.CurrentCultureIgnoreCase))
-					_viewName = (string)dp["ParamValue"];
-				else if (paramName.Equals("_filter", StringComparison.CurrentCultureIgnoreCase))
-					_conditions.Add(new JMXCondition(JMXConditionTypes.Where, (string)dp["ParamValue"]));
-				else if (paramName.Equals("_sort", StringComparison.CurrentCultureIgnoreCase))
-					_conditions.Add(new JMXCondition(JMXConditionTypes.OrderBy, (string)dp["ParamValue"]));
-				else if (paramName.Equals("_group", StringComparison.CurrentCultureIgnoreCase))
-					_conditions.Add(new JMXCondition(JMXConditionTypes.GroupBy, (string)dp["ParamValue"]));
-				else if (paramName.Equals("_having", StringComparison.CurrentCultureIgnoreCase))
-					_conditions.Add(new JMXCondition(JMXConditionTypes.Havind, (string)dp["ParamValue"]));
-				else if (paramName.Equals("_join", StringComparison.CurrentCultureIgnoreCase))
-					_conditions.Add(new JMXCondition(JMXConditionTypes.Join, (string)dp["ParamValue"]));
 			}
 		}
 

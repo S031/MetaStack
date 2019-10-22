@@ -20,7 +20,8 @@ namespace S031.MetaStack.Core.ORM.MsSql
 
 		public JMXSqlFactory(MdbContext sysCatMdbContext, MdbContext workMdbContext, ILogger logger) : base(sysCatMdbContext, workMdbContext)
 		{
-			if (!sysCatMdbContext.ProviderName.Equals(ProviderInvariantName, StringComparison.CurrentCultureIgnoreCase))
+			if (!sysCatMdbContext.ProviderName
+				.Equals(ProviderInvariantName, StringComparison.OrdinalIgnoreCase))
 				throw new ArgumentException($"MdbContext must be created using { ProviderInvariantName} provider.");
 			this.Logger = logger;
 			_repo = new JMXSqlRepo(this);

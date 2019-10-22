@@ -57,7 +57,7 @@ namespace S031.MetaStack.Core.ORM
                     {
                         bool required = fk.KeyMembers
                             .Any(m => fromSchema.Attributes
-                                .Any(a => a.FieldName.Equals(m.FieldName, StringComparison.CurrentCultureIgnoreCase) && a.Required));
+                                .Any(a => a.FieldName.Equals(m.FieldName, StringComparison.OrdinalIgnoreCase) && a.Required));
 
                         string fkObj = _schemaSupport ?
                             fk.RefDbObjectName.ToString() :
