@@ -803,7 +803,9 @@ namespace S031.MetaStack.WinForms.Data
 #if SERIALIZEBINARY
 				return MessagePackSerializer.Typeless.Deserialize(ReadByteArray(br));
 #else
-				throw new NotImplementedException();
+				string typeName = br.ReadString();
+				Type t = Type.GetType(typeName);
+				return JSONExtensions.DeserializeObject(t, br.ReadString());
 #endif
 			}
 		}
@@ -925,11 +927,6 @@ namespace S031.MetaStack.WinForms.Data
 					writer.WritePropertyName(colName);
 					writer.WriteNull();
 				}
-				else if (t == MdbType.@object)
-				{
-					writer.WritePropertyName(colName);
-					writer.WriteRaw(MessagePack.MessagePackSerializer.ToJson(ReadByteArray(_br)));
-				}
 				else
 				{
 					Type tp = MdbTypeMap.GetType(t);
@@ -939,67 +936,6 @@ namespace S031.MetaStack.WinForms.Data
 			}
 			writer.WriteEndObject();
 		}
-
-		//private string SaveJSON2()
-		//{
-		//	JsonObject j = new JsonObject();
-
-		//	JsonObject headers = new JsonObject();
-		//	_ms.Seek(_headerPos, SeekOrigin.Begin);
-		//	int headCount = _br.ReadInt32();
-		//	for (int i = 0; i < headCount; i++)
-		//	{
-		//		string key = _br.ReadString();
-		//		MdbType t = (MdbType)_br.ReadByte();
-		//		if (t == MdbType.@null)
-		//			headers[key] = null;
-		//		else
-		//		{
-		//			Type tp = t.Type();
-		//			object v = _dti[tp].ReadDelegate(_br);
-		//			headers[key] = new JsonValue(v);
-		//		}
-		//	}
-		//	j["Headers"] = headers;
-
-		//	JsonArray columns = new JsonArray();
-		//	for (int i = 0; i < _indexes.Length; i++)
-		//	{
-		//		ColumnInfo ci = _colInfo[i];
-
-		//		columns.Add(new JsonObject{ { "Name", _indexes[i] },
-		//		{ "Type", MdbTypeMap.GetTypeInfo(ci.DataType).Name },
-		//		{ "Size", ci.ColumnSize },
-		//		{ "AllowNull", ci.AllowDBNull} });
-		//	}
-
-		//	JsonArray rows = new JsonArray();
-		//	GoDataTop();
-		//	for (; _ms.Position < _ms.Length - 1;)
-		//	{
-		//		JsonObject dr = new JsonObject();
-		//		for (int i = 0; i < _colCount; i++)
-		//		{
-		//			MdbType t = (MdbType)_br.ReadByte();
-		//			string colName = _indexes[i];
-		//			if (t == MdbType.@null)
-		//				dr[colName] = null;
-		//			else
-		//			{
-		//				Type tp = MdbTypeMap.GetType(t);
-		//				object v = _dti[tp].ReadDelegate(_br);
-		//				dr[colName] = new JsonValue(v);
-		//			}
-		//		}
-		//		rows.Add(dr);
-		//	}
-		//	//j["TableName"] = _tableName;
-		//	//j["BinaryMode"] = (byte)_bm;
-		//	j["HeaderSize"] = _headerSpaceSize;
-		//	j["Columns"] = columns;
-		//	j["Rows"] = rows;
-		//	return j.ToString();
-		//}
 
 		public DataTable ToDataTable()
 		{
@@ -1014,19 +950,21 @@ namespace S031.MetaStack.WinForms.Data
 				dt.Columns.Add(dc);
 			}
 			GoDataTop();
-			for (; _ms.Position < _ms.Length - 1;)
-			{
-				DataRow dr = dt.NewRow();
-				for (int i = 0; i < _colCount; i++)
-				{
-					MdbType t = (MdbType)_br.ReadByte();
-					if (t == MdbType.@null)
-						dr[i] = DBNull.Value;
-					else
-						dr[i] = _dti[MdbTypeMap.GetType(t)].ReadDelegate(_br);
-				}
-				dt.Rows.Add(dr);
-			}
+			for (; Read();)
+				dt.Rows.Add(_dataRow);
+			//for (; _ms.Position < _ms.Length - 1;)
+			//{
+			//	DataRow dr = dt.NewRow();
+			//	for (int i = 0; i < _colCount; i++)
+			//	{
+			//		MdbType t = (MdbType)_br.ReadByte();
+			//		if (t == MdbType.@null)
+			//			dr[i] = DBNull.Value;
+			//		else
+			//			dr[i] = _dti[MdbTypeMap.GetType(t)].ReadDelegate(_br);
+			//	}
+			//	dt.Rows.Add(dr);
+			//}
 			GoDataTop();
 			return dt;
 		}
