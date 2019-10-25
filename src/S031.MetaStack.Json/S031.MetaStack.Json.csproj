@@ -17,6 +17,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\S031.MetaStack.Common\Collections\MapTable.cs" Link="Internal\MapTable.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Resources\Strings.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -32,6 +36,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Internal\" />
     <Folder Include="Properties\" />
   </ItemGroup>
 

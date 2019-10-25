@@ -1,4 +1,5 @@
-﻿using System;
+﻿using S031.MetaStack.Common;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -7,7 +8,6 @@ namespace S031.MetaStack.Core.Services
     public class HostedServiceOptions
     {
 		private const int _delay = 60000;
-		private readonly Dictionary<string, object> _parameters = new Dictionary<string, object>();
 
 		public HostedServiceOptions() { }
 
@@ -33,7 +33,7 @@ namespace S031.MetaStack.Core.Services
 
 		public Common.Logging.FileLogSettings LogSettings { get; set; }
 
-		public Dictionary<string, object> Parameters => _parameters;
+		public MapTable<string, object> Parameters { get; } = new MapTable<string, object>(4);
 
 	}
 }

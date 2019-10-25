@@ -39,6 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collections\KeyValueList.cs" />
+    <Compile Include="Collections\MapTable.cs" />
     <Compile Include="Collections\ReadOnlyCache.cs" />
     <Compile Include="Extensions\Extensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />

@@ -515,7 +515,7 @@ namespace S031.MetaStack.Common
 					return -1;
 
 				int i = 0;
-				comparer = comparer ?? EqualityComparer<T>.Default;
+				comparer ??= EqualityComparer<T>.Default;
 				foreach (T item in source)
 				{
 					if (comparer.Equals(item, element))
@@ -576,12 +576,17 @@ namespace S031.MetaStack.Common
 				return result;
 			return defaultValue;
 		}
-		public static T GetValue<T>(this IDictionary<string, object> d, string key, object defaultValue = null)
+		public static T GetValue<T>(this IDictionary<string, object> d, string key, T defaultValue = default)
 		{
 			if (d != null && d.TryGetValue(key, out object result))
 				return result.CastOf<T>();
-			return (T)defaultValue;
-			//return d.GetValue<string, object>(key, defaultValue).CastOf<T>();
+			return defaultValue;
+		}
+		public static T GetValue<T>(this MapTable<string, object> d, string key, T defaultValue = default)
+		{
+			if (d != null && d.TryGetValue(key, out object result))
+				return result.CastOf<T>();
+			return defaultValue;
 		}
 	}
 
