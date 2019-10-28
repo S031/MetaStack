@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using System.Linq;
 
 namespace S031.MetaStack.Common
 {
+#if NO_COMMON
+	internal class MapTable<TKey, TValue> : ICollection<KeyValuePair<TKey, TValue>>
+#else
 	public class MapTable<TKey, TValue> : ICollection<KeyValuePair<TKey, TValue>>
+#endif
 	{
 		private const int default_capacity = 32;
 		private struct Entry
@@ -53,6 +59,8 @@ namespace S031.MetaStack.Common
 		public IEqualityComparer<TKey> Comparer => _comparer;
 
 		public int Count => _count - _freeCount;
+
+		public int Fragmentation => this._buckets.Count(i => i == -1) - _freeCount;
 
 		public TValue this[TKey key]
 		{
@@ -184,8 +192,11 @@ namespace S031.MetaStack.Common
 
 		private void Initialize(int capacity)
 		{
+			//int size = HashHelpers.GetPrime(capacity);
+			//int bSize = size;
 			int size = capacity;
-			_buckets = new int[size];
+			int bSize = Convert.ToInt32(size / 1.618);
+			_buckets = new int[bSize];
 			for (int i = 0; i < _buckets.Length; i++) _buckets[i] = -1;
 			_entries = new Entry[size];
 			_freeList = -1;
@@ -245,13 +256,16 @@ namespace S031.MetaStack.Common
 
 		private void Resize()
 		{
-			Resize(_count, false);
+			//Resize(HashHelpers.ExpandPrime(_count), false);
+			Resize(_count * 2, false);
 		}
 
 		private void Resize(int newSize, bool forceNewHashCodes)
 		{
 			Contract.Assert(newSize >= _entries.Length);
-			int[] newBuckets = new int[newSize];
+			int bSize = Convert.ToInt32(newSize / 1.618);
+			//int bSize = newSize;
+			int[] newBuckets = new int[bSize];
 			for (int i = 0; i < newBuckets.Length; i++) newBuckets[i] = -1;
 			Entry[] newEntries = new Entry[newSize];
 			Array.Copy(_entries, 0, newEntries, 0, _count);
@@ -269,7 +283,7 @@ namespace S031.MetaStack.Common
 			{
 				if (newEntries[i].hashCode >= 0)
 				{
-					int bucket = newEntries[i].hashCode % newSize;
+					int bucket = newEntries[i].hashCode % bSize;
 					newEntries[i].next = newBuckets[bucket];
 					newBuckets[bucket] = i;
 				}
@@ -423,5 +437,81 @@ namespace S031.MetaStack.Common
 
 			object IDictionaryEnumerator.Value => current.Value;
 		}
+	}
+
+	static class HashHelpers
+	{
+		// Table of prime numbers to use as hash table sizes. 
+		// The entry used for capacity is the smallest prime number in this array
+		// that is larger than twice the previous capacity. 
+
+		internal static readonly int[] primes = {
+			3, 7, 11, 17, 23, 29, 37, 47, 59, 71, 89, 107, 131, 163, 197, 239, 293, 353, 431, 521, 631, 761, 919,
+			1103, 1327, 1597, 1931, 2333, 2801, 3371, 4049, 4861, 5839, 7013, 8419, 10103, 12143, 14591,
+			17519, 21023, 25229, 30293, 36353, 43627, 52361, 62851, 75431, 90523, 108631, 130363, 156437,
+			187751, 225307, 270371, 324449, 389357, 467237, 560689, 672827, 807403, 968897, 1162687, 1395263,
+			1674319, 2009191, 2411033, 2893249, 3471899, 4166287, 4999559, 5999471, 7199369};
+
+		internal static bool IsPrime(int candidate)
+		{
+			if ((candidate & 1) != 0)
+			{
+				int limit = (int)Math.Sqrt(candidate);
+				for (int divisor = 3; divisor <= limit; divisor += 2)
+				{
+					if ((candidate % divisor) == 0)
+					{
+						return false;
+					}
+				}
+				return true;
+			}
+			return (candidate == 2);
+		}
+
+		internal static int GetPrime(int min)
+		{
+			Debug.Assert(min >= 0, "min less than zero; handle overflow checking before calling HashHelpers");
+
+			for (int i = 0; i < primes.Length; i++)
+			{
+				int prime = primes[i];
+				if (prime >= min)
+				{
+					return prime;
+				}
+			}
+
+			// Outside of our predefined table. Compute the hard way. 
+			for (int i = (min | 1); i < Int32.MaxValue; i += 2)
+			{
+				if (IsPrime(i))
+				{
+					return i;
+				}
+			}
+			return min;
+		}
+
+		internal static int GetMinPrime()
+		{
+			return primes[0];
+		}
+
+		// Returns size of hashtable to grow to.
+		internal static int ExpandPrime(int oldSize)
+		{
+			int newSize = 2 * oldSize;
+
+			// Allow the hashtables to grow to maximum possible size (~2G elements) before encoutering capacity overflow.
+			// Note that this check works even when _items.Length overflowed thanks to the (uint) cast
+			if ((uint)newSize > MaxPrimeArrayLength)
+				return MaxPrimeArrayLength;
+
+			return GetPrime(newSize);
+		}
+
+		// This is the maximum prime smaller than Array.MaxArrayLength
+		internal const int MaxPrimeArrayLength = 0x7FEFFFFD;
 	}
 }
