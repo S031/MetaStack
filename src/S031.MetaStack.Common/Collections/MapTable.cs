@@ -15,7 +15,7 @@ namespace S031.MetaStack.Common
 #endif
 	{
 		private const int default_capacity = 32;
-		private const int golden_ratio = 3;
+		private const float golden_ratio = 1.618f;
 		private struct Entry
 		{
 			public int hashCode;    // Lower 31 bits of hash code, -1 if unused
@@ -168,7 +168,7 @@ namespace S031.MetaStack.Common
 		private void Initialize(int capacity)
 		{
 			int size = capacity;
-			int bSize = size / golden_ratio;
+			int bSize = size;
 			_buckets = new int[bSize];
 			for (int i = 0; i < _buckets.Length; i++) _buckets[i] = -1;
 			_entries = new Entry[size];
@@ -235,7 +235,7 @@ namespace S031.MetaStack.Common
 
 		private void Resize(int newSize, bool forceNewHashCodes)
 		{
-			int bSize = newSize / golden_ratio;
+			int bSize = Convert.ToInt32(_buckets.Length * golden_ratio);
 			int[] newBuckets = new int[bSize];
 			for (int i = 0; i < newBuckets.Length; i++) newBuckets[i] = -1;
 			Entry[] newEntries = new Entry[newSize];
