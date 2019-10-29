@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Threading;
 
 namespace S031.MetaStack.Common
 {
@@ -14,6 +15,7 @@ namespace S031.MetaStack.Common
 #endif
 	{
 		private const int default_capacity = 32;
+		private const int golden_ratio = 3;
 		private struct Entry
 		{
 			public int hashCode;    // Lower 31 bits of hash code, -1 if unused
@@ -24,6 +26,7 @@ namespace S031.MetaStack.Common
 
 		private int[] _buckets;
 		private Entry[] _entries;
+
 		private int _count;
 		private int _freeList;
 		private int _freeCount;
@@ -53,7 +56,7 @@ namespace S031.MetaStack.Common
 				throw new ArgumentNullException(nameof(dictionary));
 
 			foreach (KeyValuePair<TKey, TValue> pair in dictionary)
-				Add(pair.Key, pair.Value);
+				Insert(pair.Key, pair.Value, true, false);
 		}
 
 		public IEqualityComparer<TKey> Comparer => _comparer;
@@ -66,10 +69,10 @@ namespace S031.MetaStack.Common
 		{
 			get
 			{
-				int i = FindEntry(key);
+				int i = GetEntryIndex(key);
 				if (i >= 0)
 					return _entries[i].value;
-				return default(TValue);
+				return default;
 			}
 			set => Insert(key, value, false);
 		}
@@ -79,19 +82,13 @@ namespace S031.MetaStack.Common
 		void ICollection<KeyValuePair<TKey, TValue>>.Add(KeyValuePair<TKey, TValue> keyValuePair) => Add(keyValuePair.Key, keyValuePair.Value);
 
 		bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> keyValuePair)
-		{
-			int i = FindEntry(keyValuePair.Key);
-			if (i >= 0 && EqualityComparer<TValue>.Default.Equals(_entries[i].value, keyValuePair.Value))
-			{
-				return true;
-			}
-			return false;
-		}
+			=> TryGetValue(keyValuePair.Key, out TValue value)
+				&& EqualityComparer<TValue>.Default.Equals(value, keyValuePair.Value);
 
 		bool ICollection<KeyValuePair<TKey, TValue>>.Remove(KeyValuePair<TKey, TValue> keyValuePair)
 		{
-			int i = FindEntry(keyValuePair.Key);
-			if (i >= 0 && EqualityComparer<TValue>.Default.Equals(_entries[i].value, keyValuePair.Value))
+			if (TryGetValue(keyValuePair.Key, out TValue value)
+				&& EqualityComparer<TValue>.Default.Equals(value, keyValuePair.Value))
 			{
 				Remove(keyValuePair.Key);
 				return true;
@@ -111,9 +108,8 @@ namespace S031.MetaStack.Common
 			}
 		}
 
-		public bool ContainsKey(TKey key) => FindEntry(key) >= 0;
-
-		public int IndexOf(TKey key) => FindEntry(key);
+		public bool ContainsKey(TKey key)
+			=> GetEntryIndex(key) >= 0;
 
 		public bool ContainsValue(TValue value)
 		{
@@ -163,108 +159,83 @@ namespace S031.MetaStack.Common
 			}
 		}
 
-		public Enumerator GetEnumerator() => new Enumerator(this, Enumerator.KeyValuePair);
+		public Enumerator GetEnumerator() => new Enumerator(this);
 
-		IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator() => new Enumerator(this, Enumerator.KeyValuePair);
+		IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator() => new Enumerator(this);
 
-		IEnumerator IEnumerable.GetEnumerator() => new Enumerator(this, Enumerator.KeyValuePair);
-
-		private int FindEntry(TKey key)
-		{
-			if (key == null)
-			{
-				throw new ArgumentNullException(nameof(key));
-			}
-
-			if (_buckets != null)
-			{
-				lock (obj4Lock)
-				{
-					int hashCode = _comparer.GetHashCode(key) & 0x7FFFFFFF;
-					for (int i = _buckets[hashCode % _buckets.Length]; i >= 0; i = _entries[i].next)
-					{
-						if (_entries[i].hashCode == hashCode && _comparer.Equals(_entries[i].key, key)) return i;
-					}
-				}
-			}
-			return -1;
-		}
+		IEnumerator IEnumerable.GetEnumerator() => new Enumerator(this);
 
 		private void Initialize(int capacity)
 		{
-			//int size = HashHelpers.GetPrime(capacity);
-			//int bSize = size;
 			int size = capacity;
-			int bSize = Convert.ToInt32(size / 1.618);
+			int bSize = size / golden_ratio;
 			_buckets = new int[bSize];
 			for (int i = 0; i < _buckets.Length; i++) _buckets[i] = -1;
 			_entries = new Entry[size];
 			_freeList = -1;
 		}
 
-		private void Insert(TKey key, TValue value, bool add)
+		private void Insert(TKey key, TValue value, bool add, bool acquireLock = true)
 		{
-
 			if (key == null)
-			{
 				throw new ArgumentNullException(nameof(key));
-			}
 
-			lock (obj4Lock)
+			bool lockTaken = false;
+			if (acquireLock)
+				Monitor.Enter(obj4Lock, ref lockTaken);
+
+			if (_buckets == null) Initialize(default_capacity);
+
+			GetHashCodeAndBucketIndex(key, out int hashCode, out int bucketIndex);
+			int index = GetEntryIndex(key, hashCode, bucketIndex);
+			if (index >= 0)
 			{
-				if (_buckets == null) Initialize(default_capacity);
-				int hashCode = _comparer.GetHashCode(key) & 0x7FFFFFFF;
-				int targetBucket = hashCode % _buckets.Length;
-
-				for (int i = _buckets[targetBucket]; i >= 0; i = _entries[i].next)
-				{
-					if (_entries[i].hashCode == hashCode && _comparer.Equals(_entries[i].key, key))
-					{
-						if (add)
-						{
-							throw new ArgumentException(nameof(key));
-						}
-						_entries[i].value = value;
-						return;
-					}
-				}
-				int index;
-				if (_freeCount > 0)
-				{
-					index = _freeList;
-					_freeList = _entries[index].next;
-					_freeCount--;
-				}
-				else
-				{
-					if (_count == _entries.Length)
-					{
-						Resize();
-						targetBucket = hashCode % _buckets.Length;
-					}
-					index = _count;
-					_count++;
-				}
-
-				_entries[index].hashCode = hashCode;
-				_entries[index].next = _buckets[targetBucket];
-				_entries[index].key = key;
+				if (add)
+					throw new ArgumentException($"Key already exists {key}");
 				_entries[index].value = value;
-				_buckets[targetBucket] = index;
+				return;
 			}
+
+			if (_freeCount > 0)
+			{
+				index = _freeList;
+				_freeList = _entries[index].next;
+				_freeCount--;
+			}
+			else
+			{
+				if (_count == _entries.Length)
+				{
+					Resize();
+					bucketIndex = hashCode % _buckets.Length;
+				}
+				index = _count;
+				_count++;
+			}
+
+			_entries[index].hashCode = hashCode;
+			_entries[index].next = _buckets[bucketIndex];
+			_entries[index].key = key;
+			_entries[index].value = value;
+			_buckets[bucketIndex] = index;
+			if (lockTaken)
+				Monitor.Exit(obj4Lock);
+		}
+
+		private void GetHashCodeAndBucketIndex(TKey key, out int hashCode, out int bucketIndex)
+		{
+			hashCode = _comparer.GetHashCode(key) & 0x7FFFFFFF;
+			bucketIndex = hashCode % _buckets.Length;
 		}
 
 		private void Resize()
 		{
-			//Resize(HashHelpers.ExpandPrime(_count), false);
 			Resize(_count * 2, false);
 		}
 
 		private void Resize(int newSize, bool forceNewHashCodes)
 		{
-			Contract.Assert(newSize >= _entries.Length);
-			int bSize = Convert.ToInt32(newSize / 1.618);
-			//int bSize = newSize;
+			int bSize = newSize / golden_ratio;
 			int[] newBuckets = new int[bSize];
 			for (int i = 0; i < newBuckets.Length; i++) newBuckets[i] = -1;
 			Entry[] newEntries = new Entry[newSize];
@@ -333,24 +304,33 @@ namespace S031.MetaStack.Common
 
 		public bool TryGetValue(TKey key, out TValue value)
 		{
-			int i = FindEntry(key);
-			if (i >= 0)
+			int idx = GetEntryIndex(key);
+			if (idx >= 0)
 			{
-				value = _entries[i].value;
+				value = _entries[idx].value;
 				return true;
 			}
-			value = default(TValue);
+			value = default;
 			return false;
 		}
 
-		internal TValue GetValueOrDefault(TKey key)
+		private int GetEntryIndex(TKey key)
 		{
-			int i = FindEntry(key);
-			if (i >= 0)
+			GetHashCodeAndBucketIndex(key, out int hashCode, out int bucketIndex);
+			lock (obj4Lock)
+				return GetEntryIndex(key, hashCode, bucketIndex);
+		}
+		private int GetEntryIndex(TKey key, int hashCode, int bucketIndex)
+		{
+			int i = _buckets[bucketIndex];
+			for (; i >= 0;)
 			{
-				return _entries[i].value;
+				Entry entry = _entries[i];
+				if (entry.hashCode == hashCode && _comparer.Equals(entry.key, key))
+					return i;
+				i = entry.next;
 			}
-			return default(TValue);
+			return -1;
 		}
 
 		bool ICollection<KeyValuePair<TKey, TValue>>.IsReadOnly => false;
@@ -360,46 +340,40 @@ namespace S031.MetaStack.Common
 			CopyTo(array, index);
 		}
 
-		public struct Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>,
-			IDictionaryEnumerator
+		public struct Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>
 		{
-			private readonly MapTable<TKey, TValue> dictionary;
-			private int index;
-			private KeyValuePair<TKey, TValue> current;
-			private readonly int getEnumeratorRetType;  // What should Enumerator.Current return?
+			private readonly MapTable<TKey, TValue> _dictionary;
+			private int _index;
+			private KeyValuePair<TKey, TValue> _current;
 
-			internal const int DictEntry = 1;
-			internal const int KeyValuePair = 2;
-
-			internal Enumerator(MapTable<TKey, TValue> dictionary, int getEnumeratorRetType)
+			internal Enumerator(MapTable<TKey, TValue> dictionary)
 			{
-				this.dictionary = dictionary;
-				index = 0;
-				this.getEnumeratorRetType = getEnumeratorRetType;
-				current = new KeyValuePair<TKey, TValue>();
+				this._dictionary = dictionary;
+				_index = 0;
+				_current = new KeyValuePair<TKey, TValue>();
 			}
 
 			public bool MoveNext()
 			{
 				// Use unsigned comparison since we set index to dictionary.count+1 when the enumeration ends.
 				// dictionary.count+1 could be negative if dictionary.count is Int32.MaxValue
-				while ((uint)index < (uint)dictionary._count)
+				while ((uint)_index < (uint)_dictionary._count)
 				{
-					if (dictionary._entries[index].hashCode >= 0)
+					if (_dictionary._entries[_index].hashCode >= 0)
 					{
-						current = new KeyValuePair<TKey, TValue>(dictionary._entries[index].key, dictionary._entries[index].value);
-						index++;
+						_current = new KeyValuePair<TKey, TValue>(_dictionary._entries[_index].key, _dictionary._entries[_index].value);
+						_index++;
 						return true;
 					}
-					index++;
+					_index++;
 				}
 
-				index = dictionary._count + 1;
-				current = new KeyValuePair<TKey, TValue>();
+				_index = _dictionary._count + 1;
+				_current = new KeyValuePair<TKey, TValue>();
 				return false;
 			}
 
-			public KeyValuePair<TKey, TValue> Current => current;
+			public KeyValuePair<TKey, TValue> Current => _current;
 
 			public void Dispose()
 			{
@@ -409,109 +383,19 @@ namespace S031.MetaStack.Common
 			{
 				get
 				{
-					if (index == 0 || (index == dictionary._count + 1))
-					{
+					if (_index == 0 || (_index == _dictionary._count + 1))
 						throw new InvalidOperationException();
-					}
 
-					if (getEnumeratorRetType == DictEntry)
-					{
-						return new System.Collections.DictionaryEntry(current.Key, current.Value);
-					}
-					else
-					{
-						return new KeyValuePair<TKey, TValue>(current.Key, current.Value);
-					}
+					return _current;
 				}
 			}
 
 			void IEnumerator.Reset()
 			{
-				index = 0;
-				current = new KeyValuePair<TKey, TValue>();
+				_index = 0;
+				_current = new KeyValuePair<TKey, TValue>();
 			}
 
-			DictionaryEntry IDictionaryEnumerator.Entry => new DictionaryEntry(current.Key, current.Value);
-
-			object IDictionaryEnumerator.Key => current.Key;
-
-			object IDictionaryEnumerator.Value => current.Value;
 		}
-	}
-
-	static class HashHelpers
-	{
-		// Table of prime numbers to use as hash table sizes. 
-		// The entry used for capacity is the smallest prime number in this array
-		// that is larger than twice the previous capacity. 
-
-		internal static readonly int[] primes = {
-			3, 7, 11, 17, 23, 29, 37, 47, 59, 71, 89, 107, 131, 163, 197, 239, 293, 353, 431, 521, 631, 761, 919,
-			1103, 1327, 1597, 1931, 2333, 2801, 3371, 4049, 4861, 5839, 7013, 8419, 10103, 12143, 14591,
-			17519, 21023, 25229, 30293, 36353, 43627, 52361, 62851, 75431, 90523, 108631, 130363, 156437,
-			187751, 225307, 270371, 324449, 389357, 467237, 560689, 672827, 807403, 968897, 1162687, 1395263,
-			1674319, 2009191, 2411033, 2893249, 3471899, 4166287, 4999559, 5999471, 7199369};
-
-		internal static bool IsPrime(int candidate)
-		{
-			if ((candidate & 1) != 0)
-			{
-				int limit = (int)Math.Sqrt(candidate);
-				for (int divisor = 3; divisor <= limit; divisor += 2)
-				{
-					if ((candidate % divisor) == 0)
-					{
-						return false;
-					}
-				}
-				return true;
-			}
-			return (candidate == 2);
-		}
-
-		internal static int GetPrime(int min)
-		{
-			Debug.Assert(min >= 0, "min less than zero; handle overflow checking before calling HashHelpers");
-
-			for (int i = 0; i < primes.Length; i++)
-			{
-				int prime = primes[i];
-				if (prime >= min)
-				{
-					return prime;
-				}
-			}
-
-			// Outside of our predefined table. Compute the hard way. 
-			for (int i = (min | 1); i < Int32.MaxValue; i += 2)
-			{
-				if (IsPrime(i))
-				{
-					return i;
-				}
-			}
-			return min;
-		}
-
-		internal static int GetMinPrime()
-		{
-			return primes[0];
-		}
-
-		// Returns size of hashtable to grow to.
-		internal static int ExpandPrime(int oldSize)
-		{
-			int newSize = 2 * oldSize;
-
-			// Allow the hashtables to grow to maximum possible size (~2G elements) before encoutering capacity overflow.
-			// Note that this check works even when _items.Length overflowed thanks to the (uint) cast
-			if ((uint)newSize > MaxPrimeArrayLength)
-				return MaxPrimeArrayLength;
-
-			return GetPrime(newSize);
-		}
-
-		// This is the maximum prime smaller than Array.MaxArrayLength
-		internal const int MaxPrimeArrayLength = 0x7FEFFFFD;
 	}
 }
