@@ -14,8 +14,7 @@ namespace S031.MetaStack.Common
 	public class MapTable<TKey, TValue> : ICollection<KeyValuePair<TKey, TValue>>
 #endif
 	{
-		private const int default_capacity = 32;
-		private const float golden_ratio = 1.618f;
+		private const int default_capacity = 64;
 		private const int collision_border = 17;
 		private struct Entry
 		{
@@ -36,23 +35,14 @@ namespace S031.MetaStack.Common
 		private readonly IEqualityComparer<TKey> _comparer;
 		private readonly object obj4Lock = new object();
 
-		public MapTable() : this(default_capacity, null) { }
-
-		public MapTable(int capacity) : this(capacity, null) { }
-
-		public MapTable(IEqualityComparer<TKey> comparer) : this(default_capacity, comparer) { }
-
-		public MapTable(int capacity, IEqualityComparer<TKey> comparer)
+		public MapTable(IEqualityComparer<TKey> comparer = default)
 		{
-			if (capacity < 0)
-				throw new ArgumentOutOfRangeException(nameof(capacity));
-			if (capacity > 0)
-				Initialize(capacity);
+			Initialize(default_capacity);
 			this._comparer = comparer ?? EqualityComparer<TKey>.Default;
 		}
 
 		public MapTable(IList<KeyValuePair<TKey, TValue>> dictionary, IEqualityComparer<TKey> comparer) :
-			this(dictionary != null ? dictionary.Count : 0, comparer)
+			this(comparer)
 		{
 
 			if (dictionary == null)
@@ -67,6 +57,8 @@ namespace S031.MetaStack.Common
 		public int Count => _count - _freeCount;
 
 		public int Fragmentation => this._buckets.Count(i => i == -1) - _freeCount;
+
+		public int Collisions { get; private set; } = 0;
 
 		public TValue this[TKey key]
 		{
@@ -188,18 +180,28 @@ namespace S031.MetaStack.Common
 			if (acquireLock)
 				Monitor.Enter(obj4Lock, ref lockTaken);
 
-			if (_buckets == null) Initialize(default_capacity);
+			if (_buckets == null)
+				Initialize(default_capacity);
 
-			GetHashCodeAndBucketIndex(key, out int hashCode, out int bucketIndex);
-			int index = GetEntryIndex(key, hashCode, bucketIndex);
-			if (index >= 0)
+			int hashCode = _comparer.GetHashCode(key) & 0x7FFFFFFF;
+			int targetBucket = hashCode % _buckets.Length;
+			int collisionCount = 0;
+
+			for (int i = _buckets[targetBucket]; i >= 0; i = _entries[i].next)
 			{
-				if (add)
-					throw new ArgumentException($"Key already exists {key}");
-				_entries[index].value = value;
-				return;
+				if (_entries[i].hashCode == hashCode && _comparer.Equals(_entries[i].key, key))
+				{
+					if (add)
+						throw new ArgumentException($"Key already exists {key}");
+					_entries[i].value = value;
+					return;
+				}
+                collisionCount++;
+				if (collisionCount > _collisionCount)
+					_collisionCount = collisionCount;
 			}
 
+			int index;
 			if (_freeCount > 0)
 			{
 				index = _freeList;
@@ -211,58 +213,33 @@ namespace S031.MetaStack.Common
 				if (_count == _entries.Length)
 				{
 					Resize();
-					bucketIndex = hashCode % _buckets.Length;
+					targetBucket = hashCode % _buckets.Length;
 				}
 				index = _count;
 				_count++;
 			}
 
 			_entries[index].hashCode = hashCode;
-			_entries[index].next = _buckets[bucketIndex];
+			_entries[index].next = _buckets[targetBucket];
 			_entries[index].key = key;
 			_entries[index].value = value;
-			_buckets[bucketIndex] = index;
+			_buckets[targetBucket] = index;
 			if (lockTaken)
 				Monitor.Exit(obj4Lock);
 		}
 
-		private void GetHashCodeAndBucketIndex(TKey key, out int hashCode, out int bucketIndex)
-		{
-			hashCode = _comparer.GetHashCode(key) & 0x7FFFFFFF;
-			bucketIndex = hashCode % _buckets.Length;
-		}
-
 		private void Resize()
 		{
-			Resize(_count * 2, false);
-		}
-
-		private void Resize(int newSize, bool forceNewHashCodes)
-		{
+			int newSize = _count * 2;
 			int delta = Convert.ToInt32(Math.Pow(2, _collisionCount / collision_border));
-			int bSize = _collisionCount > collision_border
-				? _buckets.Length * delta
-				//?Convert.ToInt32(newSize / golden_ratio)
-				//:Convert.ToInt32(_buckets.Length * golden_ratio);
-				: _buckets.Length * delta;
-				//newSize < Math.Pow(2, _collisionCount + 10)
-				//	? newSize * _collisionCount / 10
-				//	: _buckets.Length * _collisionCount / 10;
+			int bSize = _buckets.Length * delta;
 
 			int[] newBuckets = new int[bSize];
-			for (int i = 0; i < newBuckets.Length; i++) newBuckets[i] = -1;
+			Array.Fill(newBuckets, -1);
+
 			Entry[] newEntries = new Entry[newSize];
 			Array.Copy(_entries, 0, newEntries, 0, _count);
-			if (forceNewHashCodes)
-			{
-				for (int i = 0; i < _count; i++)
-				{
-					if (newEntries[i].hashCode != -1)
-					{
-						newEntries[i].hashCode = (_comparer.GetHashCode(newEntries[i].key) & 0x7FFFFFFF);
-					}
-				}
-			}
+
 			for (int i = 0; i < _count; i++)
 			{
 				if (newEntries[i].hashCode >= 0)
@@ -274,6 +251,8 @@ namespace S031.MetaStack.Common
 			}
 			_buckets = newBuckets;
 			_entries = newEntries;
+			if (_collisionCount > Collisions)
+				Collisions = _collisionCount;
 			_collisionCount = 0;
 		}
 
@@ -330,29 +309,16 @@ namespace S031.MetaStack.Common
 
 		private int GetEntryIndex(TKey key)
 		{
-			GetHashCodeAndBucketIndex(key, out int hashCode, out int bucketIndex);
+			int hashCode = _comparer.GetHashCode(key) & 0x7FFFFFFF;
 			lock (obj4Lock)
-				return GetEntryIndex(key, hashCode, bucketIndex);
-		}
-		private int GetEntryIndex(TKey key, int hashCode, int bucketIndex)
-		{
-			int collisionCount = 0;
-			int result = -1;
-			int i = _buckets[bucketIndex];
-			for (; i >= 0;)
 			{
-				Entry entry = _entries[i];
-				if (entry.hashCode == hashCode && _comparer.Equals(entry.key, key))
+				for (int i = _buckets[hashCode % _buckets.Length]; i >= 0; i = _entries[i].next)
 				{
-					result = i;
-					break;
+					if (_entries[i].hashCode == hashCode && _comparer.Equals(_entries[i].key, key))
+						return i;
 				}
-				i = entry.next;
-				collisionCount++;
 			}
-			if (collisionCount > _collisionCount)
-				_collisionCount = collisionCount;
-			return result;
+			return -1;
 		}
 
 		bool ICollection<KeyValuePair<TKey, TValue>>.IsReadOnly => false;

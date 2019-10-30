@@ -33,7 +33,7 @@ namespace S031.MetaStack.Core.Services
 
 		public Common.Logging.FileLogSettings LogSettings { get; set; }
 
-		public MapTable<string, object> Parameters { get; } = new MapTable<string, object>(4);
+		public MapTable<string, object> Parameters { get; } = new MapTable<string, object>();
 
 	}
 }
