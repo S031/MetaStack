@@ -16,6 +16,7 @@ namespace S031.MetaStack.Common
 	{
 		private const int default_capacity = 32;
 		private const float golden_ratio = 1.618f;
+		private const int collision_border = 17;
 		private struct Entry
 		{
 			public int hashCode;    // Lower 31 bits of hash code, -1 if unused
@@ -30,6 +31,8 @@ namespace S031.MetaStack.Common
 		private int _count;
 		private int _freeList;
 		private int _freeCount;
+		private int _collisionCount;
+
 		private readonly IEqualityComparer<TKey> _comparer;
 		private readonly object obj4Lock = new object();
 
@@ -173,6 +176,7 @@ namespace S031.MetaStack.Common
 			for (int i = 0; i < _buckets.Length; i++) _buckets[i] = -1;
 			_entries = new Entry[size];
 			_freeList = -1;
+			_collisionCount = 0;
 		}
 
 		private void Insert(TKey key, TValue value, bool add, bool acquireLock = true)
@@ -235,7 +239,16 @@ namespace S031.MetaStack.Common
 
 		private void Resize(int newSize, bool forceNewHashCodes)
 		{
-			int bSize = Convert.ToInt32(_buckets.Length * golden_ratio);
+			int delta = Convert.ToInt32(Math.Pow(2, _collisionCount / collision_border));
+			int bSize = _collisionCount > collision_border
+				? _buckets.Length * delta
+				//?Convert.ToInt32(newSize / golden_ratio)
+				//:Convert.ToInt32(_buckets.Length * golden_ratio);
+				: _buckets.Length * delta;
+				//newSize < Math.Pow(2, _collisionCount + 10)
+				//	? newSize * _collisionCount / 10
+				//	: _buckets.Length * _collisionCount / 10;
+
 			int[] newBuckets = new int[bSize];
 			for (int i = 0; i < newBuckets.Length; i++) newBuckets[i] = -1;
 			Entry[] newEntries = new Entry[newSize];
@@ -261,6 +274,7 @@ namespace S031.MetaStack.Common
 			}
 			_buckets = newBuckets;
 			_entries = newEntries;
+			_collisionCount = 0;
 		}
 
 		public bool Remove(TKey key)
@@ -322,15 +336,23 @@ namespace S031.MetaStack.Common
 		}
 		private int GetEntryIndex(TKey key, int hashCode, int bucketIndex)
 		{
+			int collisionCount = 0;
+			int result = -1;
 			int i = _buckets[bucketIndex];
 			for (; i >= 0;)
 			{
 				Entry entry = _entries[i];
 				if (entry.hashCode == hashCode && _comparer.Equals(entry.key, key))
-					return i;
+				{
+					result = i;
+					break;
+				}
 				i = entry.next;
+				collisionCount++;
 			}
-			return -1;
+			if (collisionCount > _collisionCount)
+				_collisionCount = collisionCount;
+			return result;
 		}
 
 		bool ICollection<KeyValuePair<TKey, TValue>>.IsReadOnly => false;
