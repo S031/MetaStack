@@ -45,6 +45,15 @@ namespace MetaStack.Test.Common
 					});
 					stop = DateTime.Now;
 					l.Debug($"Create Dictionary with {item_size} elements. Time = {(stop - start).TotalMilliseconds} ms");
+					
+					start = DateTime.Now;
+					ReadOnlyCache<string, int> d2 = new ReadOnlyCache<string, int>(
+						Enumerable.Range(0, item_size)
+						//.Select(i => new KeyValuePair<string, int>(fixed_key_part + i.ToString(), i))
+						.Select(i => (fixed_key_part + i.ToString(), i))
+						.ToArray());
+					stop = DateTime.Now;
+					l.Debug($"Create ReadOnlyCache with {item_size} elements. Time = {(stop - start).TotalMilliseconds} ms");
 
 
 					start = DateTime.Now;
@@ -65,6 +74,15 @@ namespace MetaStack.Test.Common
 					stop = DateTime.Now;
 					int fragmentation = (d1.GetType().GetField("_buckets", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(d1) as int[]).Count(p => p == -1);
 					l.Debug($"Dictionary TryGetValue with {loop_count} runs index of = {k} whith fragmentation = {fragmentation} total time = {(stop - start).TotalMilliseconds} ms");
+
+					start = DateTime.Now;
+					for (int i = 0; i < loop_count; i++)
+					{
+						lock (o)
+							k = d2[key];
+					}
+					stop = DateTime.Now;
+					l.Debug($"ReadOnlyCache TryGetValue with {loop_count} runs index of = {k} total time = {(stop - start).TotalMilliseconds} ms");
 				}
 
 				//ConcurrentDictionary<string, int> d2 = new ConcurrentDictionary<string, int>();

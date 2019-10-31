@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace S031.MetaStack.Common
 {
 	/// <summary>
 	/// Class for stor readonly array of data with binary search by key hash code
-	/// smaller then readonly dictionary
+	/// smaller then readonly dictionary && no memory fragmentation
 	/// </summary>
 	/// <typeparam name="TKey"></typeparam>
 	/// <typeparam name="TValue"></typeparam>
@@ -13,15 +14,16 @@ namespace S031.MetaStack.Common
 	{
 		private readonly TValue[] _data;
 		private readonly int[] _keys;
+		private readonly IEqualityComparer<TKey> _comparer;
 
 		public TValue this[TKey index] =>
-			_data[Array.BinarySearch<int>(_keys, index.GetHashCode())];
+			_data[Array.BinarySearch<int>(_keys, _comparer.GetHashCode(index))];
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool TryGetValue(TKey key, out TValue value)
 		{
 			key.NullTest(nameof(key));
-			int i = Array.BinarySearch<int>(_keys, key.GetHashCode());
+			int i = Array.BinarySearch<int>(_keys, _comparer.GetHashCode(key));
 			if (i >= 0)
 			{
 				value = _data[i];
@@ -32,11 +34,12 @@ namespace S031.MetaStack.Common
 		}
 
 		public bool Contains(TKey key)
-			=> Array.BinarySearch<int>(_keys, key.GetHashCode()) >= 0;
+			=> Array.BinarySearch<int>(_keys, _comparer.GetHashCode(key)) >= 0;
 
 		public ReadOnlyCache(params (TKey key, TValue value)[] data)
 		{
 			data.NullTest(nameof(data));
+			_comparer = EqualityComparer<TKey>.Default;
 			int size = data.Length;
 			_data = new TValue[size];
 			_keys = new int[size];
@@ -44,7 +47,23 @@ namespace S031.MetaStack.Common
 			for (int i = 0; i < size; i++)
 			{
 				_data[i] = data[i].value;
-				_keys[i] = data[i].key.GetHashCode();
+				_keys[i] =  _comparer.GetHashCode(data[i].key);
+			}
+			Array.Sort(_keys, _data);
+		}
+		
+		public ReadOnlyCache(IList<KeyValuePair<TKey, TValue>> data)
+		{
+			data.NullTest(nameof(data));
+			_comparer = EqualityComparer<TKey>.Default;
+			int size = data.Count;
+			_data = new TValue[size];
+			_keys = new int[size];
+
+			for (int i = 0; i < size; i++)
+			{
+				_data[i] = data[i].Value;
+				_keys[i] =  _comparer.GetHashCode(data[i].Key);
 			}
 			Array.Sort(_keys, _data);
 		}
@@ -54,14 +73,15 @@ namespace S031.MetaStack.Common
 	{
 		private readonly TKey[] _data;
 		private readonly int[] _keys;
+		private readonly IEqualityComparer<TKey> _comparer;
 
 		public TKey this[TKey index] =>
-			_data[Array.BinarySearch<int>(_keys, index.GetHashCode())];
+			_data[Array.BinarySearch<int>(_keys, _comparer.GetHashCode(index))];
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool TryGetValue(TKey key, out TKey value)
 		{
-			int i = Array.BinarySearch<int>(_keys, key.GetHashCode());
+			int i = Array.BinarySearch<int>(_keys, _comparer.GetHashCode(key));
 			if (i >= 0)
 			{
 				value = _data[i];
@@ -72,10 +92,11 @@ namespace S031.MetaStack.Common
 		}
 
 		public bool Contains(TKey key)
-			=> Array.BinarySearch<int>(_keys, key.GetHashCode()) >= 0;
+			=> Array.BinarySearch<int>(_keys, _comparer.GetHashCode(key)) >= 0;
 
 		public ReadOnlyCache(params TKey[] data)
 		{
+			_comparer = EqualityComparer<TKey>.Default;
 			int size = data.Length;
 			_data = new TKey[size];
 			_keys = new int[size];
@@ -83,7 +104,7 @@ namespace S031.MetaStack.Common
 			for (int i = 0; i < size; i++)
 			{
 				_data[i] = data[i];
-				_keys[i] = data[i].GetHashCode();
+				_keys[i] = _comparer.GetHashCode(data[i]);
 			}
 			Array.Sort(_keys, _data);
 		}

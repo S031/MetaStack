@@ -14,7 +14,7 @@ namespace S031.MetaStack.Common
 	public class MapTable<TKey, TValue> : ICollection<KeyValuePair<TKey, TValue>>
 #endif
 	{
-		private const int default_capacity = 64;
+		private const int default_capacity = 32;
 		private const int collision_border = 17;
 		private struct Entry
 		{
@@ -95,7 +95,11 @@ namespace S031.MetaStack.Common
 		{
 			if (_count > 0)
 			{
+#if NETCOREAPP
+				Array.Fill(_buckets, -1);
+#else
 				for (int i = 0; i < _buckets.Length; i++) _buckets[i] = -1;
+#endif
 				Array.Clear(_entries, 0, _count);
 				_freeList = -1;
 				_count = 0;
@@ -165,7 +169,11 @@ namespace S031.MetaStack.Common
 			int size = capacity;
 			int bSize = size;
 			_buckets = new int[bSize];
-			for (int i = 0; i < _buckets.Length; i++) _buckets[i] = -1;
+#if NETCOREAPP
+			Array.Fill(_buckets, -1);
+#else
+			for (int i = 0; i < bSize; i++) _buckets[i] = -1;
+#endif
 			_entries = new Entry[size];
 			_freeList = -1;
 			_collisionCount = 0;
@@ -179,9 +187,6 @@ namespace S031.MetaStack.Common
 			bool lockTaken = false;
 			if (acquireLock)
 				Monitor.Enter(obj4Lock, ref lockTaken);
-
-			if (_buckets == null)
-				Initialize(default_capacity);
 
 			int hashCode = _comparer.GetHashCode(key) & 0x7FFFFFFF;
 			int targetBucket = hashCode % _buckets.Length;
@@ -235,7 +240,11 @@ namespace S031.MetaStack.Common
 			int bSize = _buckets.Length * delta;
 
 			int[] newBuckets = new int[bSize];
+#if NETCOREAPP
 			Array.Fill(newBuckets, -1);
+#else
+			for (int i = 0; i < bSize; i++) _buckets[i] = -1;
+#endif
 
 			Entry[] newEntries = new Entry[newSize];
 			Array.Copy(_entries, 0, newEntries, 0, _count);
@@ -321,12 +330,11 @@ namespace S031.MetaStack.Common
 			return -1;
 		}
 
-		bool ICollection<KeyValuePair<TKey, TValue>>.IsReadOnly => false;
+		bool ICollection<KeyValuePair<TKey, TValue>>.IsReadOnly 
+			=> false;
 
-		void ICollection<KeyValuePair<TKey, TValue>>.CopyTo(KeyValuePair<TKey, TValue>[] array, int index)
-		{
-			CopyTo(array, index);
-		}
+		void ICollection<KeyValuePair<TKey, TValue>>.CopyTo(KeyValuePair<TKey, TValue>[] array, int index) 
+			=> CopyTo(array, index);
 
 		public struct Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>
 		{
