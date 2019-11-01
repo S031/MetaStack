@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Threading;
 
 namespace S031.MetaStack.Common
 {
+	/// <summary>
+	/// Minimalistic thread safe dictionary implementatition with minimal memory fragmentation (original algorithm collisions control)
+	/// </summary>
+	/// <typeparam name="TKey"></typeparam>
+	/// <typeparam name="TValue"></typeparam>
 #if NO_COMMON
 	internal class MapTable<TKey, TValue> : ICollection<KeyValuePair<TKey, TValue>>
 #else
@@ -15,7 +18,6 @@ namespace S031.MetaStack.Common
 #endif
 	{
 		private const int default_capacity = 32;
-		private const int collision_border = 17;
 		private struct Entry
 		{
 			public int hashCode;    // Lower 31 bits of hash code, -1 if unused
@@ -236,7 +238,8 @@ namespace S031.MetaStack.Common
 		private void Resize()
 		{
 			int newSize = _count * 2;
-			int delta = Convert.ToInt32(Math.Pow(2, _collisionCount / collision_border));
+			double border = Math.Log2(newSize);
+			int delta = Convert.ToInt32(Math.Pow(2, _collisionCount / border));
 			int bSize = _buckets.Length * delta;
 
 			int[] newBuckets = new int[bSize];
