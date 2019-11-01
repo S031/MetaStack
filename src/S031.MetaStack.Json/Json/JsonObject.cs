@@ -1,4 +1,5 @@
-﻿using System;
+﻿using S031.MetaStack.Common;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -11,11 +12,11 @@ namespace S031.MetaStack.Json
 	public class JsonObject : JsonValue, IDictionary<string, JsonValue>, ICollection<JsonPair>
 	{
 		// Use SortedDictionary to make result of ToString() deterministic
-		private readonly Dictionary<string, JsonValue> _map;
+		private readonly MapTable<string, JsonValue> _map;
 
 		public JsonObject(params JsonPair[] items)
 		{
-			_map = new Dictionary<string, JsonValue>(StringComparer.Ordinal);
+			_map = new MapTable<string, JsonValue>();
 
 			if (items != null)
 			{
@@ -30,7 +31,7 @@ namespace S031.MetaStack.Json
 				throw new ArgumentNullException(nameof(items));
 			}
 
-			_map = new Dictionary<string, JsonValue>(StringComparer.Ordinal);
+			_map = new MapTable<string, JsonValue>();
 			AddRange(items);
 		}
 

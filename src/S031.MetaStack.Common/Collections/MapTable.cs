@@ -93,6 +93,13 @@ namespace S031.MetaStack.Common
 			return false;
 		}
 
+		public ICollection<TKey> Keys
+			=> _entries.Select(e => e.key)
+			.ToArray();
+		public ICollection<TValue> Values
+			=> _entries.Select(e => e.value)
+			.ToArray();
+
 		public void Clear()
 		{
 			if (_count > 0)
