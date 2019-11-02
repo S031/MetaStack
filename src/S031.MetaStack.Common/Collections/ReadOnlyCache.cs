@@ -10,7 +10,11 @@ namespace S031.MetaStack.Common
 	/// </summary>
 	/// <typeparam name="TKey"></typeparam>
 	/// <typeparam name="TValue"></typeparam>
+#if NO_COMMON
+	internal readonly struct ReadOnlyCache<TKey, TValue>
+#else
 	public readonly struct ReadOnlyCache<TKey, TValue>
+#endif
 	{
 		private readonly TValue[] _data;
 		private readonly int[] _keys;
@@ -108,6 +112,15 @@ namespace S031.MetaStack.Common
 			}
 			Array.Sort(_keys, _data);
 		}
-
 	}
+
+#if NO_COMMON
+	internal static class ObjectExtensions
+	{
+		internal static void NullTest(this object value, string nameOf)
+		{
+			if (value == null) throw new ArgumentNullException(nameOf);
+		}
+	}
+#endif
 }

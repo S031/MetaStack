@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <Compile Include="..\S031.MetaStack.Common\Collections\MapTable.cs" Link="Internal\MapTable.cs" />
+    <Compile Include="..\S031.MetaStack.Common\Collections\ReadOnlyCache.cs" Link="Internal\ReadOnlyCache.cs" />
   </ItemGroup>
 
   <ItemGroup>
