@@ -11,6 +11,8 @@ private void Resize()
 	int newSize = _count * 2;
 	double border = Math.Log2(newSize);
 	int delta = Convert.ToInt32(Math.Pow(2, _collisionCount / border));
+	//New buckets size depended on new entries size, 
+	//collisionCount and evaluated collision border size
 	int bSize = _buckets.Length * delta;
 
 	int[] newBuckets = new int[bSize];
@@ -30,6 +32,8 @@ private void Resize()
 	}
 	_buckets = newBuckets;
 	_entries = newEntries;
+	
+	//For test only
 	if (_collisionCount > Collisions)
 		Collisions = _collisionCount;
 	_collisionCount = 0;
