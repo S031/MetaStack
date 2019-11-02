@@ -44,4 +44,5 @@ Original [Dictionary](https://github.com/microsoft/referencesource/blob/master/m
 ```csharp
 public int Fragmentation => this.buckets.Count(i => i == -1) - _freeCount;
 ```
-*MapTable* has a fragmentation less then 0.3%. without a performance degradation
+**MapTable** has a fragmentation less then [0.3%%](https://github.com/S031/MetaStack/blob/5dccc5438580ac5218e3c4e0639f31adef365e99/Test/MetaStack.Test/Common/MapTableTest.cs#L19) . without a performance degradation
+
