@@ -4,6 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace MetaStack.Test.Common
@@ -28,10 +29,13 @@ namespace MetaStack.Test.Common
 					string key = fixed_key_part + (item_size / 2).ToString();
 					DateTime start = DateTime.Now;
 					MapTable<string, int> d = new MapTable<string, int>();
+
 					for (int i = 1; i < item_size; i++)
 						d.Add(fixed_key_part + i.ToString(), i);
-					//System.Threading.Tasks.Parallel.For(0, item_size, i =>
+
+					//Parallel.For(0, item_size, i =>
 					//	d.Add(fixed_key_part + i.ToString(), i));
+
 					//MapTable<string, int> d = new MapTable<string, int>(
 					//	Enumerable.Range(0, item_size)
 					//	.Select(i => new KeyValuePair<string, int>(fixed_key_part + i.ToString(), i)).ToList(), 
@@ -42,11 +46,14 @@ namespace MetaStack.Test.Common
 					Dictionary<string, int> d1 = new Dictionary<string, int>();
 					object o = new object();
 					start = DateTime.Now;
-					System.Threading.Tasks.Parallel.For(0, item_size, i =>
-					{
-						lock (o)
+					//Parallel.For(0, item_size, i =>
+					//{
+					//	lock (o)
+					//		d1.Add(fixed_key_part + i.ToString(), i);
+					//});
+					for (int i = 1; i < item_size; i++)
+						lock(o)
 							d1.Add(fixed_key_part + i.ToString(), i);
-					});
 					stop = DateTime.Now;
 					l.Debug($"Create Dictionary with {item_size} elements. Time = {(stop - start).TotalMilliseconds} ms");
 					

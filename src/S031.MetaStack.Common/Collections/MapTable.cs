@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace S031.MetaStack.Common
@@ -75,6 +76,8 @@ namespace S031.MetaStack.Common
 		}
 
 		public void Add(TKey key, TValue value) => Insert(key, value, true);
+
+		public void AddOrUpdate(TKey key, TValue value) => Insert(key, value, false);
 
 		void ICollection<KeyValuePair<TKey, TValue>>.Add(KeyValuePair<TKey, TValue> keyValuePair) => Add(keyValuePair.Key, keyValuePair.Value);
 
@@ -193,9 +196,7 @@ namespace S031.MetaStack.Common
 			if (key == null)
 				throw new ArgumentNullException(nameof(key));
 
-			bool lockTaken = false;
-			if (acquireLock)
-				Monitor.Enter(obj4Lock, ref lockTaken);
+			MonitorEnter(acquireLock);
 
 			int hashCode = _comparer.GetHashCode(key) & 0x7FFFFFFF;
 			int targetBucket = hashCode % _buckets.Length;
@@ -206,8 +207,12 @@ namespace S031.MetaStack.Common
 				if (_entries[i].hashCode == hashCode && _comparer.Equals(_entries[i].key, key))
 				{
 					if (add)
+					{
+						MonitorExit();
 						throw new ArgumentException($"Key already exists {key}");
+					}
 					_entries[i].value = value;
+					MonitorExit();
 					return;
 				}
                 collisionCount++;
@@ -238,7 +243,21 @@ namespace S031.MetaStack.Common
 			_entries[index].key = key;
 			_entries[index].value = value;
 			_buckets[targetBucket] = index;
-			if (lockTaken)
+			MonitorExit();
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private void MonitorEnter(bool acquireLock)
+		{
+			bool lockTaken = Monitor.IsEntered(obj4Lock);
+			if (acquireLock && !lockTaken)
+				Monitor.Enter(obj4Lock, ref lockTaken);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private void MonitorExit()
+		{
+			if (Monitor.IsEntered(obj4Lock))
 				Monitor.Exit(obj4Lock);
 		}
 

@@ -9,7 +9,7 @@ namespace S031.MetaStack.Common
 	/// A simple class for working with data of type key = value, such as connection strings, etc.
 	/// </summary>
 	/// <example <see cref="Translater"/> />
-	public class KeyValueList: Dictionary <string, string>
+	public class KeyValueList: MapTable<string, string>
 	{
 		private const string _defaultListSep = ";";
 		private const string _defaultValueSep = "=";
@@ -78,7 +78,7 @@ namespace S031.MetaStack.Common
 		/// <param name="source">Source string for parse</param>
 		/// <param name="listSep">List separator</param>
 		/// <param name="valueSep">Values separator</param>
-		public KeyValueList(IDictionary<string, string> source, string listSep, string valueSep)
+		public KeyValueList(IList<KeyValuePair<string, string>> source, string listSep, string valueSep)
 			: base(source, StringComparer.CurrentCultureIgnoreCase)
 		{
 			_listSep = listSep;

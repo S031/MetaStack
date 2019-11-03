@@ -10,10 +10,10 @@ namespace S031.MetaStack.Common
 	public static class TypeExtensions
 	{
 		static readonly object _obj4Lock = new object();
-		static readonly ConcurrentDictionary<string, Func<object[], object>> _ctorCache =
-			new ConcurrentDictionary<string, Func<object[], object>>();
-		static readonly ConcurrentDictionary<Type, object> _instancesList = new ConcurrentDictionary<Type, object>();
-		static readonly ConcurrentDictionary<string, ConstructorInfo> _ctorCache2 = new ConcurrentDictionary<string, ConstructorInfo>();
+		static readonly MapTable<string, Func<object[], object>> _ctorCache =
+			new MapTable<string, Func<object[], object>>();
+		static readonly MapTable<Type, object> _instancesList = new MapTable<Type, object>();
+		static readonly MapTable<string, ConstructorInfo> _ctorCache2 = new MapTable<string, ConstructorInfo>();
 
 		/// <summary>
 		/// Create instance of Type with parameters, or returns Instance property if it exists
@@ -45,7 +45,7 @@ namespace S031.MetaStack.Common
 			instance = type.GetField("Instance", BindingFlags.Public | BindingFlags.Static)?.GetValue(null);
 			if (instance != null)
 			{
-				_instancesList.TryAdd(type, instance);
+				_instancesList.AddOrUpdate(type, instance);
 				return instance;
 			}
 
