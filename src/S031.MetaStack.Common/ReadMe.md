@@ -1,7 +1,7 @@
 # MetaStack.Common.dll
 The **Metastack.Common** library contains a set of common classes used in other Metastack modules.
 ## Collections
-[MapTable<TKey, TValue>](https://github.com/S031/MetaStack/blob/master/src/S031.MetaStack.Common/Collections/MapTable.cs) Minimalistic thread safe [dictionary](https://en.wikipedia.org/wiki/Hash_table) implementatition with minimal memory fragmentation (original algorithm collisions control) 
+[**MapTable<TKey, TValue>**](https://github.com/S031/MetaStack/blob/master/src/S031.MetaStack.Common/Collections/MapTable.cs) Minimalistic thread safe [dictionary](https://en.wikipedia.org/wiki/Hash_table) implementatition with minimal memory fragmentation (original algorithm collisions control) 
 MapTable is based on Dictionary code from Microsoft, but unlike Dictionary bucket array has a size different from the size of entries implemented in the Resize method:
 
 ```csharp
