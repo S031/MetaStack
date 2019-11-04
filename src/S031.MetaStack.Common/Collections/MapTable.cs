@@ -264,7 +264,7 @@ namespace S031.MetaStack.Common
 		private void Resize()
 		{
 			int newSize = _count * 2;
-			double border = Math.Log2(newSize);
+			double border = Math.Log(newSize, 2);
 			int delta = Convert.ToInt32(Math.Pow(2, _collisionCount / border));
 			int bSize = _buckets.Length * delta;
 

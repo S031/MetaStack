@@ -515,7 +515,7 @@ namespace S031.MetaStack.Common
 					return -1;
 
 				int i = 0;
-				comparer ??= EqualityComparer<T>.Default;
+				comparer = comparer ?? EqualityComparer<T>.Default;
 				foreach (T item in source)
 				{
 					if (comparer.Equals(item, element))

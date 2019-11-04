@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Resources;
 using System.Text;
 using System.IO;
+using System.Linq;
 
 namespace S031.MetaStack.Common
 {
@@ -31,7 +32,7 @@ namespace S031.MetaStack.Common
 				if (value == _default || value == _russian)
 					l = new KeyValueList(GetEmbeddedResource(value), Environment.NewLine, "=");
 				else
-					l = new KeyValueList(_languages[_default], Environment.NewLine, "=");
+					l = new KeyValueList(_languages[_default].ToArray(), Environment.NewLine, "=");
 
 				string path = Path.Combine(System.AppContext.BaseDirectory, "Translate", $"{value}.txt");
 				if (File.Exists(path))

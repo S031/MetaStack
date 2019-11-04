@@ -772,7 +772,7 @@ namespace S031.MetaStack.WinForms.Data
 		{
 			bw.Write((byte)MdbType.@object);
 			Type type = value.GetType();
-			if (_dti.TryGetValue(MdbTypeMap.GetType(type), out DataTypeInfo dti))
+			if (_dti.TryGetValue(type, out DataTypeInfo dti))
 			{
 				bw.Write((byte)ObjectTypeFlag.Standart);
 				dti.WriteDelegate(bw, value);

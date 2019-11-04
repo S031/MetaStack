@@ -230,7 +230,7 @@ namespace MetaStack.Test.Data
 			{
 				l.Debug("SpeedTest MessagePackSerializer custom object Start");
 				int i = 0;
-				for (i = 0; i < 1000000; i++)
+				for (i = 0; i < 1_000_000; i++)
 				{
 					TestClass test = new TestClass() { ID = i, Name = $"Item {i}" };
 					test.ItemList.Add("Item {i}", i);
@@ -239,7 +239,7 @@ namespace MetaStack.Test.Data
 				}
 				l.Debug("SpeedTest MessagePackSerializer custom object Finish");
 				l.Debug("SpeedTest JSONSerializer Start");
-				for (i = 0; i < 1000000; i++)
+				for (i = 0; i < 1_000_000; i++)
 				{
 					TestClass test = new TestClass() { ID = i, Name = $"Item {i}" };
 					test.ItemList.Add($"Item {i}", i);
@@ -249,7 +249,7 @@ namespace MetaStack.Test.Data
 				l.Debug("SpeedTest JSOSerializer Finish");
 				l.Debug("SpeedTest DateTime object Start");
 				object d = DateTime.Now;
-				for (i = 0; i < 1000000; i++)
+				for (i = 0; i < 1_000_000; i++)
 				{
 					var data = MessagePackSerializer.Typeless.Serialize(d);
 					d = MessagePack.MessagePackSerializer.Typeless.Deserialize(data);
@@ -257,6 +257,7 @@ namespace MetaStack.Test.Data
 				l.Debug("SpeedTest JSOSerializer Finish");
 			}
 		}
+
 		[MessagePackObject(keyAsPropertyName: true)]
 		public class TestClass
 		{

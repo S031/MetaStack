@@ -19,7 +19,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\Net45\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NO_COMMON</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -27,7 +27,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\Net45\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;NO_COMMON</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -36,6 +36,12 @@
     <EmbeddedResource Include="Resources\Strings.ru-RU.resx" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\S031.MetaStack.Common\Collections\MapTable.cs">
+      <Link>Internal\MapTable.cs</Link>
+    </Compile>
+    <Compile Include="..\S031.MetaStack.Common\Collections\ReadOnlyCache.cs">
+      <Link>Internal\ReadOnlyCache.cs</Link>
+    </Compile>
     <Compile Include="Extensions\JsonAction.cs" />
     <Compile Include="Extensions\JsonObjectExtensions.cs" />
     <Compile Include="Extensions\JsonValueExtensions.cs" />
@@ -57,5 +63,6 @@
   <ItemGroup>
     <Reference Include="System" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

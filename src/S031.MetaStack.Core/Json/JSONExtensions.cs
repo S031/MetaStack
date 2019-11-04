@@ -31,7 +31,24 @@ namespace S031.MetaStack.WinForms.Json
 		}
 
 		public static T DeserializeObject<T>(string value)
-			=> (T)DeserializeObject(typeof(T), value);
+		{
+			Type t = typeof(T);
+			if (typeof(JsonSerializible).IsAssignableFrom(t))
+			{
+				JsonValue jsonValue = new JsonReader(ref value).Read();
+				return t.CreateInstance<T>(jsonValue);
+			}
+			else if (JsonWellKnownTypes.TryGetValue(t, out var f))
+			{
+				JsonValue jsonValue = new JsonReader(ref value).Read();
+				var instance = t.CreateInstance();
+				f.ReadDelegate(jsonValue, instance);
+				return (T)instance;
+
+			}
+			return MessagePackSerializer.Deserialize<T>(MessagePack.MessagePackSerializer.FromJson(value));
+		}
+			//=> (T)DeserializeObject(typeof(T), value);
 
 		public static string SerializeObject(object value)
 		{
