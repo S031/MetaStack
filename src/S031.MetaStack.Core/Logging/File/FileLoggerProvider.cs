@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Concurrent;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using S031.MetaStack.Common;
 using S031.MetaStack.Common.Logging;
 
 namespace S031.MetaStack.Core.Logging
 {
-    public class FileLoggerProvider: ILoggerProvider
+	public class FileLoggerProvider: ILoggerProvider
     {
 		private readonly FileLogSettings _settings;
-		private ConcurrentDictionary<string, FileLogger> _loggerList = new ConcurrentDictionary<string, FileLogger>();
+		private MapTable<string, FileLogger> _loggerList = new MapTable<string, FileLogger>();
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="FileLogLoggerProvider"/> class.
@@ -29,8 +28,7 @@ namespace S031.MetaStack.Core.Logging
 
 		public ILogger CreateLogger(string name)
 		{
-            if (!_loggerList.ContainsKey(name))
-                _loggerList.TryAdd(name, new FileLogger(name, _settings ?? new FileLogSettings()));
+            _loggerList.TryAdd(name, new FileLogger(name, _settings ?? new FileLogSettings()));
             return _loggerList[name];
 		}
 

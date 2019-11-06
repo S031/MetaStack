@@ -1,4 +1,5 @@
-﻿using System;
+﻿using S031.MetaStack.Common;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -8,7 +9,7 @@ namespace S031.MetaStack.Core.Data
 {
 	public class ConnectInfo
 	{
-		private static readonly ConcurrentDictionary<string, ConnectInfo> _csCache = new ConcurrentDictionary<string, ConnectInfo>();
+		private static readonly MapTable<string, ConnectInfo> _csCache = new MapTable<string, ConnectInfo>();
 
 		public const string ProviderNameField = "Provider Name";
 		public const string ProviderNameDefault = "System.Data.SqlClient";
