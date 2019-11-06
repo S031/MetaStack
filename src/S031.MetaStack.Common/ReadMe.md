@@ -2,7 +2,7 @@
 The **Metastack.Common** library contains a set of common classes used in other Metastack modules.
 ## Collections
 [**MapTable<TKey, TValue>**](https://github.com/S031/MetaStack/blob/master/src/S031.MetaStack.Common/Collections/MapTable.cs) Minimalistic thread safe [dictionary](https://en.wikipedia.org/wiki/Hash_table) implementatition with minimal memory fragmentation (original algorithm collisions control) 
-MapTable is based on Dictionary code from Microsoft, but unlike Dictionary bucket array has a size different from the size of entries implemented in the Resize method:
+MapTable is based on [Dictionary code from Microsoft](https://github.com/microsoft/referencesource/blob/master/mscorlib/system/collections/generic/dictionary.cs), but unlike Dictionary bucket array has a size different from the size of entries implemented in the Resize method:
 
 ```csharp
 private void Resize()
@@ -39,7 +39,7 @@ private void Resize()
 	_collisionCount = 0;
 }
 ```
-Original [Dictionary](https://github.com/microsoft/referencesource/blob/master/mscorlib/system/collections/generic/dictionary.cs) Has a fragmentation of over 50%
+[Original Dictionary](https://github.com/microsoft/referencesource/blob/master/mscorlib/system/collections/generic/dictionary.cs) Has a fragmentation of over 50%
 
 ```csharp
 public int Fragmentation => this.buckets.Count(i => i == -1) - _freeCount;
