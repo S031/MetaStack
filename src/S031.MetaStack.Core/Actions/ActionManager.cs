@@ -30,8 +30,7 @@ namespace S031.MetaStack.Core.Actions
 	/// </summary>
 	public class ActionManager : ManagerObjectBase, IDisposable
 	{
-		private static readonly object obj4Lock = new object();
-		private static readonly Dictionary<string, ActionInfo> _actions = ActionsList.CreateActionsList();
+		private static readonly MapTable<string, ActionInfo> _actions = ActionsList.CreateActionsList();
 
 		const string _sql_actions = @"
 						Select 
@@ -218,8 +217,7 @@ namespace S031.MetaStack.Core.Actions
 				else
 					throw new KeyNotFoundException($"Action {actionID} not found");
 
-				if (!_actions.ContainsKey(actionID))
-					lock (obj4Lock) { _actions.Add(actionID, ai); }
+				_actions.TryAdd(actionID, ai);
 			}
 			return _actions[actionID];
 		}
@@ -249,8 +247,7 @@ namespace S031.MetaStack.Core.Actions
 				else
 					throw new KeyNotFoundException($"Action {actionID} not found");
 
-				if (!_actions.ContainsKey(actionID))
-					lock (obj4Lock) { _actions.Add(actionID, ai); }
+				_actions.TryAdd(actionID, ai);
 			}
 			return _actions[actionID];
 		}

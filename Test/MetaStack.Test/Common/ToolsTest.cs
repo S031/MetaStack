@@ -119,7 +119,7 @@ namespace MetaStack.Test.Common
 			}
 		}
 		/// <summary>
-		/// Работает в 10 раз медленнее
+		/// Работает в 3 раза медленнее
 		/// </summary>
 		[Fact]
 		private void fileLoggerFactoryTest()

@@ -79,6 +79,9 @@ namespace S031.MetaStack.Common
 
 		public void AddOrUpdate(TKey key, TValue value) => Insert(key, value, false);
 
+		public bool TryAdd(TKey key, TValue value)
+			=> Insert(key, value, true, true, true);
+
 		void ICollection<KeyValuePair<TKey, TValue>>.Add(KeyValuePair<TKey, TValue> keyValuePair) => Add(keyValuePair.Key, keyValuePair.Value);
 
 		bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> keyValuePair)
@@ -191,7 +194,7 @@ namespace S031.MetaStack.Common
 			_collisionCount = 0;
 		}
 
-		private void Insert(TKey key, TValue value, bool add, bool acquireLock = true)
+		private bool Insert(TKey key, TValue value, bool add, bool acquireLock = true, bool noErrorRaise = false)
 		{
 			if (key == null)
 				throw new ArgumentNullException(nameof(key));
@@ -209,11 +212,13 @@ namespace S031.MetaStack.Common
 					if (add)
 					{
 						MonitorExit();
+						if (noErrorRaise)
+							return false;
 						throw new ArgumentException($"Key already exists {key}");
 					}
 					_entries[i].value = value;
 					MonitorExit();
-					return;
+					return true;
 				}
                 collisionCount++;
 				if (collisionCount > _collisionCount)
@@ -244,6 +249,7 @@ namespace S031.MetaStack.Common
 			_entries[index].value = value;
 			_buckets[targetBucket] = index;
 			MonitorExit();
+			return true;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

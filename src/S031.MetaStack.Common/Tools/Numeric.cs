@@ -6,7 +6,7 @@ namespace S031.MetaStack.Common
 {
 	public static class Numeric
 	{
-		private static readonly Dictionary<string, string[]> numItems = new Dictionary<string, string[]>(31, StringComparer.CurrentCultureIgnoreCase)
+		private static readonly MapTable<string, string[]> numItems = new MapTable<string, string[]>(StringComparer.CurrentCultureIgnoreCase)
 			{   {"EMPTY", new string[7] { "", "", "", "", "", "", "M" }},
 				{"MR", new string[7] { "", "", "", "", "", "", "M" }},
 				{"MS", new string[7] { "", "", "", "", "", "", "W" }},
@@ -18,8 +18,6 @@ namespace S031.MetaStack.Common
 				{"978", new string[7] { "евро", "евро", "евро", "цент", "цента", "центов", "M" }},
 				{"ШТУКА", new string[7] { "штука", "штуки", "штук", "", "", "", "W" }},
 			};
-		private static string _defaultItem = "EMPTY";
-
 		static readonly string[][] aNum = {
 				new string[]{"сто","двести","триста","четыреста","пятьсот","шестьсот","семьсот","восемьсот","девятьсот"},
 				new string[]{"десять","двадцать","тридцать","сорок","пятьдесят","шестьдесят","семьдесят","восемьдесят","девяносто"},
@@ -35,7 +33,7 @@ namespace S031.MetaStack.Common
 				new string[]{"","",""},
 				};
 
-		public static string DefaultItem { get { return _defaultItem; } set { _defaultItem = value; } }
+		public static string DefaultItem { get; set; } = "EMPTY";
 
 		public static void Add(string key, string[] aItem)
 		{

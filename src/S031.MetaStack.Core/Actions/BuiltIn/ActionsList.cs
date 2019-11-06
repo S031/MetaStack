@@ -7,9 +7,9 @@ namespace S031.MetaStack.Core.Actions
 {
 	internal static class ActionsList
 	{
-		public static Dictionary<string, ActionInfo> CreateActionsList()
+		public static MapTable<string, ActionInfo> CreateActionsList()
 		{
-			Dictionary<string, ActionInfo> actions = new Dictionary<string, ActionInfo>();
+			MapTable<string, ActionInfo> actions = new MapTable<string, ActionInfo>();
             #region Sys.LoginRequest
             ActionInfo ai = new ActionInfo()
             {

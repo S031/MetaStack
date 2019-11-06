@@ -21,8 +21,8 @@ namespace S031.MetaStack.Common.Logging
 	}
 	public class FileLog : IDisposable
 	{
-		static readonly ConcurrentDictionary<string, Queue<string>> _queues =
-			new ConcurrentDictionary<string, Queue<string>>();
+		static readonly MapTable<string, Queue<string>> _queues =
+			new MapTable<string, Queue<string>>();
 
 		private readonly string _logName;
 		private readonly FileLogSettings _settings;
@@ -36,8 +36,7 @@ namespace S031.MetaStack.Common.Logging
 		{
 			_logName = logName;
 			_settings = settings;
-			if (!_queues.ContainsKey(_logName))
-				_queues[_logName] = new Queue<string>();
+			_queues.TryAdd(_logName, new Queue<string>());
 			_queue = _queues[_logName];
 		}
 		public string LogName => _logName;

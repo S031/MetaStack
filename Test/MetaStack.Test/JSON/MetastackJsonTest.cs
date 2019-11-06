@@ -56,7 +56,7 @@ namespace MetaStack.Test.Json
 				}
 				_logger.Debug($"Finish perfomance GetIntOrDefault test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
 
-				_logger.Debug($"Start perfomance ToIntOrDefault test");
+				_logger.Debug($"Start perfomance ToStringOrDefault test");
 				t = DateTime.Now;
 				for (i = 0; i < 10_000_000; i++)
 				{
