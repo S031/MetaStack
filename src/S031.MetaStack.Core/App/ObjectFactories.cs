@@ -9,8 +9,7 @@ namespace S031.MetaStack.Core
 {
 	public static class ObjectFactories
 	{
-		private static readonly object _obj4Lock = new object();
-		private static readonly Dictionary<Type, object> _objectDefaultsCache = new Dictionary<Type, object>();
+		private static readonly MapTable<Type, object> _objectDefaultsCache = new MapTable<Type, object>();
 
 		public static T GetFactory<T>(string invariantName)
 		{
@@ -43,12 +42,10 @@ namespace S031.MetaStack.Core
 				.GetServices<T>()
 				.FirstOrDefault(p => filter(p));
 		}
-		
+
 		public static void SetDefault<T>(T instance)
-		{
-			lock (_obj4Lock)
-				_objectDefaultsCache[typeof(T)] = instance;
-		}
+			=> _objectDefaultsCache[typeof(T)] = instance;
+		
 
 		public static T GetDefault<T>()
 		{

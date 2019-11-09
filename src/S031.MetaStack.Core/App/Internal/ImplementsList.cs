@@ -1,4 +1,5 @@
-﻿using System;
+﻿using S031.MetaStack.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -12,9 +13,7 @@ namespace S031.MetaStack.WinForms
 {
 	public static class ImplementsList
 	{
-		static readonly object objLock = new object();
-
-		static readonly Dictionary<Type, List<Type>> _iList = new Dictionary<Type, List<Type>>();
+		static readonly MapTable<Type, List<Type>> _iList = new MapTable<Type, List<Type>>();
 
 		public static IEnumerable<Type> GetTypes(Type type)
 		{
@@ -22,10 +21,7 @@ namespace S031.MetaStack.WinForms
 				return l;
 
 			l = getImplements(type).ToList();
-			lock (objLock)
-			{
-				_iList.Add(type, l);
-			}
+			_iList.TryAdd(type, l);
 			return l;
 		}
 
@@ -33,21 +29,15 @@ namespace S031.MetaStack.WinForms
 		{
 			if (_iList.ContainsKey(type))
 			{
-				lock (objLock)
-				{
-					var l = _iList[type];
-					l.AddRange(getImplements(type, a).Where(t => !l.Contains(t)));
-					return l;
-				}
+				var l = _iList[type];
+				l.AddRange(getImplements(type, a).Where(t => !l.Contains(t)));
+				return l;
 			}
 			else
 			{
-				lock (objLock)
-				{
-					var l = getImplements(type, a).ToList();
-					_iList.Add(type, l);
-					return l;
-				}
+				var l = getImplements(type, a).ToList();
+				_iList.Add(type, l);
+				return l;
 			}
 		}
         private static IEnumerable<Type> getImplements(Type type, Assembly assembly = null)

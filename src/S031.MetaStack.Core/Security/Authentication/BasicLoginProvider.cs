@@ -17,14 +17,12 @@ namespace S031.MetaStack.Core.Security
 		const int _maxUserSessions = 64;
 
 		static readonly RSAEncryptionPadding _padding = RSAEncryptionPadding.OaepSHA256;
-		static readonly object obj4Lock = new object();
-		static readonly object obj4LockUser = new object();
 		static DateTime _lastCheckLogedTime = DateTime.Now;
 
 		static int _tickProcess = 0;
 		static readonly Timer _timer = new Timer(Tick, null, _expirePeriod, _expirePeriod);
 		static readonly Random _random = new Random(Guid.NewGuid().GetHashCode());
-		static readonly Dictionary<string, Dictionary<Guid, LoginInfo>> _users = new Dictionary<string, Dictionary<Guid, LoginInfo>>();
+		static readonly MapTable<string, MapTable<Guid, LoginInfo>> _users = new MapTable<string, MapTable<Guid, LoginInfo>>();
 
 		public BasicLoginProvider()
 		{
@@ -51,11 +49,9 @@ namespace S031.MetaStack.Core.Security
 		{
 			var loginInfo = new LoginInfo();
 			if (_users.ContainsKey(userName))
-				lock (obj4Lock)
-					_users[userName].Add(loginInfo.SessionID, loginInfo);
+				_users[userName].Add(loginInfo.SessionID, loginInfo);
 			else
-				lock (obj4Lock)
-					_users.Add(userName, new Dictionary<Guid, LoginInfo>() { { loginInfo.SessionID, loginInfo } });
+				_users.Add(userName, new MapTable<Guid, LoginInfo>() { { loginInfo.SessionID, loginInfo } });
 
 			return RSA.Create()
 				.Import(clientPublicKey)
@@ -170,12 +166,9 @@ namespace S031.MetaStack.Core.Security
 		private static void RemoveSession(string userName, Guid sessionID)
 		{
 			if (_users.ContainsKey(userName) && _users[userName].ContainsKey(sessionID))
-				lock (obj4Lock)
-				{
-					_users[userName].Remove(sessionID);
-					if (_users[userName].Count == 0)
-						_users.Remove(userName);
-				}
+				_users[userName].Remove(sessionID);
+			if (_users[userName].Count == 0)
+				_users.Remove(userName);
 		}
 
 		private static void Tick(object state)

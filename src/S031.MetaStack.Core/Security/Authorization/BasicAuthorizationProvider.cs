@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using S031.MetaStack.Common;
 using S031.MetaStack.Core.Actions;
 using S031.MetaStack.Core.Data;
 
@@ -25,9 +26,8 @@ namespace S031.MetaStack.Core.Security
 		/// <summary>
 		/// !!! Create global cache with update or clear possibilities
 		/// </summary>
-		private static readonly object _obj4Lock = new object();
-		private static readonly Dictionary<string, List<string>> _user2RolesCache
-			= new Dictionary<string, List<string>>(StringComparer.Ordinal);
+		private static readonly MapTable<string, List<string>> _user2RolesCache
+			= new MapTable<string, List<string>>(StringComparer.Ordinal);
 
 		private readonly MdbContext _ctx;
 		public BasicAuthorizationProvider(MdbContext sysCatContext)
@@ -93,16 +93,13 @@ namespace S031.MetaStack.Core.Security
             
             using (var dr = await _ctx.GetReaderAsync(sql))
             {
-                if (!_user2RolesCache.ContainsKey(key))
-                {
-                    lock (_obj4Lock)
-                    {
-                        List<string> roles = new List<string>();
-                        _user2RolesCache.Add(key, roles);
-                        for (; dr.Read();)
-                            roles.Add((string)dr["RoleName"]);
-                    }
-                }
+				if (!_user2RolesCache.ContainsKey(key))
+				{
+					List<string> roles = new List<string>();
+					for (; dr.Read();)
+						roles.Add((string)dr["RoleName"]);
+					_user2RolesCache.TryAdd(key, roles);
+				}
             }
         }
 	}

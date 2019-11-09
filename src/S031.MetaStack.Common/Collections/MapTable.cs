@@ -110,11 +110,8 @@ namespace S031.MetaStack.Common
 		{
 			if (_count > 0)
 			{
-#if NETCOREAPP
-				Array.Fill(_buckets, -1);
-#else
-				for (int i = 0; i < _buckets.Length; i++) _buckets[i] = -1;
-#endif
+				for (int i = 0; i < _buckets.Length; i++)
+					_buckets[i] = -1;
 				Array.Clear(_entries, 0, _count);
 				_freeList = -1;
 				_count = 0;
@@ -184,11 +181,9 @@ namespace S031.MetaStack.Common
 			int size = capacity;
 			int bSize = size;
 			_buckets = new int[bSize];
-#if NETCOREAPP
-			Array.Fill(_buckets, -1);
-#else
-			for (int i = 0; i < bSize; i++) _buckets[i] = -1;
-#endif
+			for (int i = 0; i < bSize; i++)
+				_buckets[i] = -1;
+
 			_entries = new Entry[size];
 			_freeList = -1;
 			_collisionCount = 0;
@@ -275,11 +270,8 @@ namespace S031.MetaStack.Common
 			int bSize = _buckets.Length * delta;
 
 			int[] newBuckets = new int[bSize];
-#if NETCOREAPP
-			Array.Fill(newBuckets, -1);
-#else
-			for (int i = 0; i < bSize; i++) _buckets[i] = -1;
-#endif
+			for (int i = 0; i < bSize; i++)
+				newBuckets[i] = -1;
 
 			Entry[] newEntries = new Entry[newSize];
 			Array.Copy(_entries, 0, newEntries, 0, _count);

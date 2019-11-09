@@ -1,4 +1,5 @@
-﻿using S031.MetaStack.Core.Actions;
+﻿using S031.MetaStack.Common;
+using S031.MetaStack.Core.Actions;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -9,8 +10,8 @@ namespace S031.MetaStack.Core
 	
 	public class PipeService
 	{
-		readonly ConcurrentDictionary<ActionContext, ConcurrentQueue<string>> _messages = 
-			new ConcurrentDictionary<ActionContext, ConcurrentQueue<string>>(); 
+		readonly MapTable<ActionContext, ConcurrentQueue<string>> _messages = 
+			new MapTable<ActionContext, ConcurrentQueue<string>>(); 
 
 		public void Write(ActionContext ctx, string message)
 		{
@@ -36,6 +37,6 @@ namespace S031.MetaStack.Core
 			return sb.ToString();
 		}
 
-		public bool Cancel(ActionContext ctx) => _messages.TryRemove(ctx, out ConcurrentQueue<string> data);
+		public bool Cancel(ActionContext ctx) => _messages.Remove(ctx);
 	}
 }
