@@ -612,7 +612,7 @@ namespace S031.MetaStack.WinForms.Data
 			return true;
 		}
 		/// <summary>
-		/// <see cref="IDataReader.Read()"/> Not supported
+		/// <see cref="IDataReader.RecordsAffected()"/> Not supported
 		/// </summary>
 		public int RecordsAffected
 		{

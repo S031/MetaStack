@@ -123,7 +123,7 @@ namespace S031.MetaStack.WinForms
 			this.AutoGenerateColumns = false;
 			this.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize; //.ColumnHeadersHeight = 18;
 			this.RowHeadersWidth = 20;
-			this.RowTemplate.Height = (int)(this.Font.GetHeight() * 1.5);
+			this.RowTemplate.Height = (int)(this.Font.GetHeight() * 1.8);
 			this.VirtualMode = true;
 			this.KeyDown += new KeyEventHandler(DBGridBase_KeyDown);
 			this.CurrentCellChanged += new EventHandler(DBGridBase_CurrentCellChanged);
@@ -518,6 +518,8 @@ namespace S031.MetaStack.WinForms
 					this.RowTemplate.DefaultCellStyle.SelectionBackColor = System.Drawing.SystemColors.Highlight;
 					this.RowTemplate.DefaultCellStyle.SelectionForeColor = System.Drawing.SystemColors.InactiveCaptionText;
 					RaiseCell = true;
+					this.EnableHeadersVisualStyles = false;
+					this.ColumnHeadersDefaultCellStyle.SelectionBackColor = this.ColumnHeadersDefaultCellStyle.BackColor;
 				}
 				else
 				{
@@ -595,6 +597,7 @@ namespace S031.MetaStack.WinForms
 			{
 				e.CellStyle.SelectionBackColor = this.RowTemplate.DefaultCellStyle.BackColor;
 				e.CellStyle.SelectionForeColor = this.RowTemplate.DefaultCellStyle.ForeColor;
+				e.AdvancedBorderStyle.All = DataGridViewAdvancedCellBorderStyle.Single;
 				//Color color = this.RowTemplate.DefaultCellStyle.SelectionBackColor;
 				//e.CellStyle.SelectionBackColor = System.Drawing.Color.FromArgb(color.R + 32, color.G + 32, color.B - 32);
 				//e.CellStyle.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
