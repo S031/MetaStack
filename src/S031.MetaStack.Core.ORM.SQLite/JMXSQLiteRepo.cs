@@ -41,8 +41,8 @@ namespace S031.MetaStack.Core.ORM.SQLite
 		const string detail_field_prefix = "$1_";
 
 		private static readonly JMXSQLiteTypeMapping _typeMapping = new JMXSQLiteTypeMapping();
-		private static IDictionary<MdbType, string> TypeMap => _typeMapping.GetTypeMap();
-		private static IDictionary<string, MdbTypeInfo> TypeInfo => _typeMapping.GetServerTypeMap();
+		private static IReadOnlyDictionary<MdbType, string> TypeMap => _typeMapping.GetTypeMap();
+		private static IReadOnlyDictionary<string, MdbTypeInfo> TypeInfo => _typeMapping.GetServerTypeMap();
 		private static string _defaultDbSchema = string.Empty;
 		private static string _sqlVersion = string.Empty;
 

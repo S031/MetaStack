@@ -49,8 +49,8 @@ namespace S031.MetaStack.Core.ORM.MsSql
 		private static string _defaultDbSchema = string.Empty;
 		private static string _sqlVersion = string.Empty;
 		private static readonly JMXSQLTypeMapping _typeMapping = new JMXSQLTypeMapping();
-		private static IDictionary<MdbType, string> TypeMap => _typeMapping.GetTypeMap();
-		private static IDictionary<string, MdbTypeInfo> TypeInfo => _typeMapping.GetServerTypeMap();
+		private static IReadOnlyDictionary<MdbType, string> TypeMap => _typeMapping.GetTypeMap();
+		private static IReadOnlyDictionary<string, MdbTypeInfo> TypeInfo => _typeMapping.GetServerTypeMap();
 
 		public JMXSqlRepo(JMXSqlFactory factory) : base(factory)
 		{

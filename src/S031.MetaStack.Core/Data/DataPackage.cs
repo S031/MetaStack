@@ -142,7 +142,7 @@ namespace S031.MetaStack.WinForms.Data
 
 		//private Dictionary<string, object> _dataRow;
 		object[] _dataRow;
-		private readonly Dictionary<string, object> _headers;
+		private readonly MapTable<string, object> _headers;
 		private readonly string[] _indexes;
 		private readonly ColumnInfo[] _colInfo;
 
@@ -165,7 +165,7 @@ namespace S031.MetaStack.WinForms.Data
 				throw new DataPackageMessageFormatException("Invalid column count");
 			//Headers start
 			int headCount = _br.ReadInt32();
-			_headers = new Dictionary<string, object>(StringComparer.Ordinal);
+			_headers = new MapTable<string, object>(StringComparer.Ordinal);
 			for (int i = 0; i < headCount; i++)
 			{
 				string key = _br.ReadString();
@@ -254,7 +254,7 @@ namespace S031.MetaStack.WinForms.Data
 			_bw.Write(_colCount);
 			_bw.Write(0);
 			_bw.Write(new byte[headerSpaceSize - 5]);
-			_headers = new Dictionary<string, object>(StringComparer.Ordinal);
+			_headers = new MapTable<string, object>(StringComparer.Ordinal);
 
 			//Write ColInfo
 			_indexes = new string[_colCount];
@@ -456,7 +456,7 @@ namespace S031.MetaStack.WinForms.Data
 		/// <summary>
 		/// Get <see cref="DataPackage "/> headers as Dictionary<string, object>
 		/// </summary>
-		public Dictionary<string, object> Headers => _headers;
+		public MapTable<string, object> Headers => _headers;
 		public DataPackage SetHeader(string key, object value)
 		{
 			_headers[key] = value;

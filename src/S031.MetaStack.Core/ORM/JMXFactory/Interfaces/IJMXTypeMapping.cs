@@ -14,7 +14,7 @@ namespace S031.MetaStack.WinForms.ORM
 	public interface IJMXTypeMapping
 	{
 		IEnumerable<string> GetVariableLenghtDataTypes();
-		IDictionary<string, MdbTypeInfo> GetServerTypeMap();
-		IDictionary<MdbType, string> GetTypeMap();
+		IReadOnlyDictionary<string, MdbTypeInfo> GetServerTypeMap();
+		IReadOnlyDictionary<MdbType, string> GetTypeMap();
 	}
 }
