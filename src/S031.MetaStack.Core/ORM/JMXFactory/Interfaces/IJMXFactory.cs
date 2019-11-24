@@ -10,5 +10,6 @@ namespace S031.MetaStack.WinForms.ORM
 		IJMXProvider CreateJMXProvider();
 		IJMXTypeMapping CreateJMXTypeMapping();
 		JMXObject CreateObject(string objectName);
+		IJMXFactory SchemaFactory { get; }
 	}
 }

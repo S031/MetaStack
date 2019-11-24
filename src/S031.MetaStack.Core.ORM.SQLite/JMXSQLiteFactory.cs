@@ -14,17 +14,23 @@ namespace S031.MetaStack.Core.ORM.SQLite
 
 		private readonly JMXSQLiteRepo _repo;
 		private readonly JMXSQLiteProvider _jmx;
+		private readonly JMXFactory _schemaFactory;
 		public JMXSQLiteFactory(MdbContext mdbContext, ILogger logger) : this(mdbContext, mdbContext, logger)
 		{
 		}
 
 		public JMXSQLiteFactory(MdbContext sysCatMdbContext, MdbContext workMdbContext, ILogger logger) : base(sysCatMdbContext, workMdbContext)
 		{
-			if (!sysCatMdbContext.ProviderName.Equals(ProviderInvariantName, StringComparison.OrdinalIgnoreCase))
+			string providerName = workMdbContext.ProviderName;
+			if (!providerName
+				.Equals(ProviderInvariantName, StringComparison.OrdinalIgnoreCase))
 				throw new ArgumentException($"MdbContext must be created using { ProviderInvariantName} provider.");
 			this.Logger = logger;
 			_repo = new JMXSQLiteRepo(this);
 			_jmx = new JMXSQLiteProvider(this);
+			_schemaFactory = providerName.Equals(sysCatMdbContext.ProviderName, StringComparison.OrdinalIgnoreCase) ?
+				this :
+				JMXFactory.Create(sysCatMdbContext, logger);
 		}
 
 		public override IJMXRepo CreateJMXRepo() => _repo;
@@ -34,5 +40,7 @@ namespace S031.MetaStack.Core.ORM.SQLite
 		public override JMXObject CreateObject(string objectName) => new JMXObject(objectName, this);
 
 		public override SQLStatementWriter CreateSQLStatementWriter() => new SQLStatementWriter(new JMXSQLiteTypeMapping(), false);
+
+		public override IJMXFactory SchemaFactory => _schemaFactory;
 	}
 }

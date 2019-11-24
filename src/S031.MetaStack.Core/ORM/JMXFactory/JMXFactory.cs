@@ -18,6 +18,7 @@ namespace S031.MetaStack.Core.ORM
 		public JMXFactory(MdbContext sysCatMdbContext, MdbContext workMdbContext) : base(sysCatMdbContext, workMdbContext)
 		{
 		}
+		public virtual IJMXFactory SchemaFactory => throw new NotImplementedException();
 		public virtual IJMXRepo CreateJMXRepo() => throw new NotImplementedException();
 		public virtual IJMXProvider CreateJMXProvider() => throw new NotImplementedException();
 		public virtual JMXObject CreateObject(string objectName) => throw new NotImplementedException();
@@ -29,15 +30,14 @@ namespace S031.MetaStack.Core.ORM
 			var l = ImplementsList.GetTypes(typeof(JMXFactory));
 			if (l == null)
 				throw new InvalidOperationException("No class inherited from JMXFactory defined");
-			string dbProviderName = sysCatMdbContext.ProviderName;
+			string dbProviderName = workMdbContext.ProviderName;
 			foreach (var t in l)
 			{
-				SchemaDBSyncAttribute att = System.Attribute.GetCustomAttributes(t)?
+				if (System.Attribute.GetCustomAttributes(t)?
 					.FirstOrDefault(attr => attr.GetType() == typeof(SchemaDBSyncAttribute)
 						&& (attr as SchemaDBSyncAttribute)
 							.DBProviderName
-							.Equals(dbProviderName, StringComparison.OrdinalIgnoreCase)) as SchemaDBSyncAttribute;
-				if (att != null)
+							.Equals(dbProviderName, StringComparison.OrdinalIgnoreCase)) is SchemaDBSyncAttribute att)
 					return (JMXFactory)t.CreateInstance(sysCatMdbContext, workMdbContext, logger);
 			}
 			throw new InvalidOperationException("No class inherited from JMXFactory contained attribute of type SchemaDBSyncAttribute  defined");

@@ -10,6 +10,8 @@ namespace S031.MetaStack.WinForms.ORM
 	{
 		private static readonly IJMXFactory _factory = new JMXClientFactory();
 
+		public virtual IJMXFactory SchemaFactory => _factory;
+
 		public virtual IJMXProvider CreateJMXProvider() => throw new NotImplementedException();
 
 		public virtual IJMXRepo CreateJMXRepo() => throw new NotImplementedException();

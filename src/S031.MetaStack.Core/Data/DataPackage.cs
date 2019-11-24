@@ -93,27 +93,27 @@ namespace S031.MetaStack.WinForms.Data
 			External = 1
 		}
 
-		static readonly Dictionary<Type, DataTypeInfo> _dti = new Dictionary<Type, DataTypeInfo>()
-		{
-			{typeof(bool), new DataTypeInfo(){ID = MdbType.@bool, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.@bool); bw.Write((bool)obj); }, ReadDelegate = br => br.ReadBoolean()}},
-			{typeof(char), new DataTypeInfo(){ID = MdbType.@char, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.@char); bw.Write((char)obj); }, ReadDelegate = br => br.ReadChar()}},
-			{typeof(byte), new DataTypeInfo(){ID = MdbType.@byte, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.@byte);bw.Write((byte)obj); }, ReadDelegate = br => br.ReadByte()}},
-			{typeof(sbyte), new DataTypeInfo(){ID = MdbType.@sbyte, WriteDelegate = (bw, obj) => {   bw.Write((byte)MdbType.@sbyte); bw.Write((sbyte)obj); }, ReadDelegate = br => br.ReadSByte()}},
-			{typeof(short), new DataTypeInfo(){ID = MdbType.@short, WriteDelegate = (bw, obj) => {   bw.Write((byte)MdbType.@short); bw.Write((Int16)obj); }, ReadDelegate = br => br.ReadInt16()}},
-			{typeof(ushort), new DataTypeInfo(){ID = MdbType.@ushort, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.@ushort); bw.Write((UInt16)obj); }, ReadDelegate = br => br.ReadUInt16()}},
-			{typeof(int), new DataTypeInfo(){ID = MdbType.@int, WriteDelegate = (bw, obj) => {   bw.Write((byte)MdbType.@int); bw.Write((Int32)obj); }, ReadDelegate = br => br.ReadInt32()}},
-			{typeof(uint), new DataTypeInfo(){ID = MdbType.@uint, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.@uint); bw.Write((UInt32)obj); }, ReadDelegate = br => br.ReadUInt16()}},
-			{typeof(long), new DataTypeInfo(){ID = MdbType.@long, WriteDelegate = (bw, obj) => {   bw.Write((byte)MdbType.@long); bw.Write((Int64)obj); }, ReadDelegate = br => br.ReadInt64()}},
-			{typeof(ulong), new DataTypeInfo(){ID = MdbType.@ulong, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.@ulong); bw.Write((UInt64)obj); }, ReadDelegate = br => br.ReadUInt16()}},
-			{typeof(float), new DataTypeInfo(){ID = MdbType.@float, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.@float); bw.Write((Single)obj); }, ReadDelegate = br => br.ReadSingle()}},
-			{typeof(double), new DataTypeInfo(){ID = MdbType.@double, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.@double); bw.Write((double)obj); }, ReadDelegate = br => br.ReadDouble()}},
-			{typeof(decimal), new DataTypeInfo(){ID = MdbType.@decimal, WriteDelegate = (bw, obj) => {   bw.Write((byte)MdbType.@decimal); bw.Write((decimal)obj); }, ReadDelegate = br => br.ReadDecimal()}},
-			{typeof(DateTime), new DataTypeInfo(){ID = MdbType.dateTime, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.dateTime); bw.Write(((DateTime)obj).ToBinary()); }, ReadDelegate = br => DateTime.FromBinary(br.ReadInt64())}},
-			{typeof(string), new DataTypeInfo(){ID = MdbType.@string, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.@string); bw.Write((string)obj); }, ReadDelegate = br => br.ReadString()}},
-			{typeof(byte[]), new DataTypeInfo(){ID = MdbType.byteArray, WriteDelegate = (bw, obj) => {  bw.Write((byte)MdbType.byteArray); WriteByteArray(bw, (byte[])obj); }, ReadDelegate = ReadByteArray}},
-			{typeof(char[]), new DataTypeInfo(){ID = MdbType.charArray, WriteDelegate = (bw, obj) => {  bw.Write((byte)MdbType.charArray);WriteCharArray(bw, (char[])obj); }, ReadDelegate = ReadCharArray}},
-			{typeof(Guid), new DataTypeInfo(){ID = MdbType.guid, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.guid); WriteByteArray(bw, ((Guid)obj).ToByteArray()); }, ReadDelegate = br => new Guid(ReadByteArray(br))}},
-			{typeof(object), new DataTypeInfo(){ID = MdbType.@object, WriteDelegate = WriteObject, ReadDelegate = ReadObject} },
+		static readonly ReadOnlyCache<Type, DataTypeInfo> _dti = new ReadOnlyCache<Type, DataTypeInfo>
+		(
+			(typeof(bool), new DataTypeInfo(){ID = MdbType.@bool, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.@bool); bw.Write((bool)obj); }, ReadDelegate = br => br.ReadBoolean()}),
+			(typeof(char), new DataTypeInfo(){ID = MdbType.@char, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.@char); bw.Write((char)obj); }, ReadDelegate = br => br.ReadChar()}),
+			(typeof(byte), new DataTypeInfo(){ID = MdbType.@byte, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.@byte);bw.Write((byte)obj); }, ReadDelegate = br => br.ReadByte()}),
+			(typeof(sbyte), new DataTypeInfo(){ID = MdbType.@sbyte, WriteDelegate = (bw, obj) => {   bw.Write((byte)MdbType.@sbyte); bw.Write((sbyte)obj); }, ReadDelegate = br => br.ReadSByte()}),
+			(typeof(short), new DataTypeInfo(){ID = MdbType.@short, WriteDelegate = (bw, obj) => {   bw.Write((byte)MdbType.@short); bw.Write((Int16)obj); }, ReadDelegate = br => br.ReadInt16()}),
+			(typeof(ushort), new DataTypeInfo(){ID = MdbType.@ushort, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.@ushort); bw.Write((UInt16)obj); }, ReadDelegate = br => br.ReadUInt16()}),
+			(typeof(int), new DataTypeInfo(){ID = MdbType.@int, WriteDelegate = (bw, obj) => {   bw.Write((byte)MdbType.@int); bw.Write((Int32)obj); }, ReadDelegate = br => br.ReadInt32()}),
+			(typeof(uint), new DataTypeInfo(){ID = MdbType.@uint, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.@uint); bw.Write((UInt32)obj); }, ReadDelegate = br => br.ReadUInt16()}),
+			(typeof(long), new DataTypeInfo(){ID = MdbType.@long, WriteDelegate = (bw, obj) => {   bw.Write((byte)MdbType.@long); bw.Write((Int64)obj); }, ReadDelegate = br => br.ReadInt64()}),
+			(typeof(ulong), new DataTypeInfo(){ID = MdbType.@ulong, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.@ulong); bw.Write((UInt64)obj); }, ReadDelegate = br => br.ReadUInt16()}),
+			(typeof(float), new DataTypeInfo(){ID = MdbType.@float, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.@float); bw.Write((Single)obj); }, ReadDelegate = br => br.ReadSingle()}),
+			(typeof(double), new DataTypeInfo(){ID = MdbType.@double, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.@double); bw.Write((double)obj); }, ReadDelegate = br => br.ReadDouble()}),
+			(typeof(decimal), new DataTypeInfo(){ID = MdbType.@decimal, WriteDelegate = (bw, obj) => {   bw.Write((byte)MdbType.@decimal); bw.Write((decimal)obj); }, ReadDelegate = br => br.ReadDecimal()}),
+			(typeof(DateTime), new DataTypeInfo(){ID = MdbType.dateTime, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.dateTime); bw.Write(((DateTime)obj).ToBinary()); }, ReadDelegate = br => DateTime.FromBinary(br.ReadInt64())}),
+			(typeof(string), new DataTypeInfo(){ID = MdbType.@string, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.@string); bw.Write((string)obj); }, ReadDelegate = br => br.ReadString()}),
+			(typeof(byte[]), new DataTypeInfo(){ID = MdbType.byteArray, WriteDelegate = (bw, obj) => {  bw.Write((byte)MdbType.byteArray); WriteByteArray(bw, (byte[])obj); }, ReadDelegate = ReadByteArray}),
+			(typeof(char[]), new DataTypeInfo(){ID = MdbType.charArray, WriteDelegate = (bw, obj) => {  bw.Write((byte)MdbType.charArray);WriteCharArray(bw, (char[])obj); }, ReadDelegate = ReadCharArray}),
+			(typeof(Guid), new DataTypeInfo(){ID = MdbType.guid, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.guid); WriteByteArray(bw, ((Guid)obj).ToByteArray()); }, ReadDelegate = br => new Guid(ReadByteArray(br))}),
+			(typeof(object), new DataTypeInfo(){ID = MdbType.@object, WriteDelegate = WriteObject, ReadDelegate = ReadObject} )
 
 //#if SERIALIZEBINARY
 //			//For fast optimization serialization
@@ -126,7 +126,7 @@ namespace S031.MetaStack.WinForms.Data
 //				bw.Write((byte)MdbType.@object); bw.Write(JSONExtensions.SerializeObject(obj)); },
 //				ReadDelegate = br => JSONExtensions.DeserializeObject(br.ReadString())}}
 //#endif
-		};
+		);
 		//private static readonly object obj4Lock = new object();
 		private MemoryStream _ms;
 		private BinaryReader _br;

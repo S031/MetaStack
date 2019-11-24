@@ -73,7 +73,7 @@ namespace S031.MetaStack.Core
 			}
 		}
 
-		public MdbContext GetMdbContext() => _sc;
+		public MdbContext GetMdbContext() => _wc;
 
 		public MdbContext GetMdbContext(ContextTypes contextType) => 
 			contextType == ContextTypes.SysCat ? _sc : _wc;
