@@ -94,6 +94,7 @@ namespace S031.MetaStack.WinForms.ORM
 		public JMXPrimaryKey PrimaryKey { get; set; }
 		public List<JMXIndex> Indexes { get; } = new List<JMXIndex>();
 		public List<JMXForeignKey> ForeignKeys { get; } = new List<JMXForeignKey>();
+		public List<JMXForeignKey> ParentRelations { get; } = new List<JMXForeignKey>();
 		public List<JMXCondition> Conditions { get; } = new List<JMXCondition>();
         public override string ToString()
             => this.ToString(Formatting.None);
@@ -146,6 +147,10 @@ namespace S031.MetaStack.WinForms.ORM
 			if (j.TryGetValue("ForeignKeys", out JsonArray a))
 				foreach (JsonObject obj in a)
 					ForeignKeys.Add(JMXForeignKey.ReadFrom(obj));
+			
+            if (j.TryGetValue("ParentRelations", out a))
+				foreach (JsonObject obj in a)
+					ParentRelations.Add(JMXForeignKey.ReadFrom(obj));
 
 			if (j.TryGetValue("Indexes", out a))
 				foreach (JsonObject obj in a)
@@ -240,6 +245,12 @@ namespace S031.MetaStack.WinForms.ORM
             writer.WritePropertyName("ForeignKeys");
             writer.WriteStartArray();
             foreach (var item in ForeignKeys)
+                item.ToJson(writer);
+            writer.WriteEndArray();
+            
+            writer.WritePropertyName("ParentRelations");
+            writer.WriteStartArray();
+            foreach (var item in ParentRelations)
                 item.ToJson(writer);
             writer.WriteEndArray();
 

@@ -16,7 +16,9 @@
     <None Remove="SqlScripts\GetCurrentSchema.sql" />
     <None Remove="SqlScripts\GetDefaultSchema.sql" />
     <None Remove="SqlScripts\GetParentRelations.sql" />
+    <None Remove="SqlScripts\GetParentRelations_12.sql" />
     <None Remove="SqlScripts\GetTableSchema.sql" />
+    <None Remove="SqlScripts\GetTableSchema_12.sql" />
     <None Remove="SqlScripts\SQLVersion.sql" />
     <None Remove="SqlScripts\StateSysSchemas.sql" />
     <None Remove="SqlScripts\TestSchema.sql" />
@@ -36,6 +38,7 @@
     <EmbeddedResource Include="SqlScripts\GetCurrentSchema.sql" />
     <EmbeddedResource Include="SqlScripts\GetDefaultSchema.sql" />
     <EmbeddedResource Include="SqlScripts\GetParentRelations.sql" />
+    <EmbeddedResource Include="SqlScripts\GetParentRelations_12.sql" />
     <EmbeddedResource Include="SqlScripts\GetTableSchema.sql" />
     <EmbeddedResource Include="SqlScripts\SQLVersion.sql" />
     <EmbeddedResource Include="SqlScripts\StateSysSchemas.sql" />
@@ -49,6 +52,10 @@
   <ItemGroup>
     <ProjectReference Include="..\S031.MetaStack.Common\S031.MetaStack.Common.csproj" />
     <ProjectReference Include="..\S031.MetaStack.Core\S031.MetaStack.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="SqlScripts\GetTableSchema_12.sql" />
   </ItemGroup>
 
   <ItemGroup>

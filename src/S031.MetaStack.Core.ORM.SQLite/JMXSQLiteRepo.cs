@@ -521,12 +521,6 @@ namespace S031.MetaStack.Core.ORM.SQLite
 		#endregion Save Schema
 
 		#region Sync Schema
-		public override IEnumerable<string> GetChildObjects(string objectName)
-		{
-			if (_parentRelations.TryGetValue(objectName, out var childObjectList))
-				return childObjectList;
-			return new List<string>();
-		}
 		public override async Task<JMXSchema> SyncSchemaAsync(string objectName)
 		{
 			JMXObjectName name = objectName;

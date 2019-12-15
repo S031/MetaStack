@@ -16,10 +16,9 @@ namespace S031.MetaStack.Core.ORM.MsSql
 	public class JMXSqlRepo : JMXRepo
 	{
 		const int _sql_server_2017_version = 14;
-		readonly object objLock = new object();
 		static int _counter = 0;
-		static readonly Dictionary<string, JMXSchema> _schemaCache = new Dictionary<string, JMXSchema>();
-		static readonly Dictionary<string, List<string>> _parentRelations = new Dictionary<string, List<string>>();
+		private static readonly object objLock = new object();
+		static readonly MapTable<string, JMXSchema> _schemaCache = new MapTable<string, JMXSchema>();
 
 		private enum AttribCompareDiff
 		{
@@ -67,12 +66,9 @@ namespace S031.MetaStack.Core.ORM.MsSql
 				schema.SchemaRepo = this;
 				return schema;
 			}
-			schema = await GetSchemaAsync(this.GetMdbContext(), name.AreaName, name.ObjectName).ConfigureAwait(false);
-			lock (objLock)
-			{
-				if (!_schemaCache.ContainsKey(name))
-					_schemaCache.Add(name, schema);
-			}
+			schema = await GetSchemaAsync(this.GetMdbContext(ContextTypes.SysCat), name.AreaName, name.ObjectName)
+				.ConfigureAwait(false);
+			_schemaCache.TryAdd(name, schema);
 			return schema;
 		}
 
@@ -90,36 +86,46 @@ namespace S031.MetaStack.Core.ORM.MsSql
 
 		private async Task TestSysCatAsync()
 		{
-			var result = await this.GetMdbContext().ExecuteAsync<string>(SqlServer.TestSchema);
+			var mdb = this.GetMdbContext(ContextTypes.SysCat);
+			var result = await mdb.ExecuteAsync<string>(SqlServer.TestSchema);
 			if (result.IsEmpty())
 			{
-				await CreateDbSchemaAsync(this.GetMdbContext(), this.Logger);
-				_defaultDbSchema = await GetDefaultDbSchemaAsync(this.GetMdbContext());
+				await CreateDbSchemaAsync();
+				_defaultDbSchema = await GetDefaultDbSchemaAsync();
 			}
 		}
-		private static async Task<string> GetDefaultDbSchemaAsync(MdbContext mdb)
+		private async Task<string> GetDefaultDbSchemaAsync()
 		{
 			if (_defaultDbSchema.IsEmpty())
-				_defaultDbSchema = await mdb.ExecuteAsync<string>(SqlServer.GetDefaultSchema);
+			{
+				_defaultDbSchema = await this
+					.GetMdbContext(ContextTypes.SysCat)
+					.ExecuteAsync<string>(SqlServer.GetDefaultSchema);
+				if (_defaultDbSchema.IsEmpty())
+					_defaultDbSchema = await this
+						.GetMdbContext(ContextTypes.Work)
+						.ExecuteAsync<string>("select schema_name() as Name");
+			}
 			return _defaultDbSchema;
 		}
 
-		private static async Task CreateDbSchemaAsync(MdbContext mdb, ILogger log)
+		private async Task CreateDbSchemaAsync()
 		{
+			MdbContext mdb = this.GetMdbContext(ContextTypes.SysCat);
 			try
 			{
 				await mdb.BeginTransactionAsync();
-				var scripts = ((await GetSqlVersion(mdb)).ToIntOrDefault() < _sql_server_2017_version) ?
-					SqlServer.CreateSchemaObjects_12.Split(new string[] { "--go", "--GO" },
-						StringSplitOptions.RemoveEmptyEntries) :
+				var scripts = (await IsSql17(mdb)) ?
 					SqlServer.CreateSchemaObjects.Split(new string[] { "--go", "--GO" },
+						StringSplitOptions.RemoveEmptyEntries) :
+					SqlServer.CreateSchemaObjects_12.Split(new string[] { "--go", "--GO" },
 						StringSplitOptions.RemoveEmptyEntries);
 
 				foreach (string statement in scripts)
 					await mdb.ExecuteAsync(statement);
-				log.Debug($"Schema SysCat was created in database {mdb.DbName}");
-				log.Debug("Schema tables SysCat.SysAreas and SysCat.SysSchemas was created in SysCat Schema");
-				string owner = await GetDefaultDbSchemaAsync(mdb);
+				Logger.Debug($"Schema SysCat was created in database {mdb.DbName}");
+				Logger.Debug("Schema tables SysCat.SysAreas and SysCat.SysSchemas was created in SysCat Schema");
+				string owner = await GetDefaultDbSchemaAsync();
 				int id = await mdb.ExecuteAsync<int>(SqlServer.AddSysAreas,
 					new MdbParameter("@SchemaName", owner),
 					new MdbParameter("@SchemaOwner", owner),
@@ -133,7 +139,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 			catch (Exception e)
 			{
 				mdb.RollBack();
-				log.LogError($"CreateSchema error: {e.Message}");
+				Logger.LogError($"CreateSchema error: {e.Message}");
 				throw;
 			}
 		}
@@ -186,16 +192,17 @@ namespace S031.MetaStack.Core.ORM.MsSql
 		{
 			JMXObjectName name = objectName;
 			await DropSchemaAsync(name.AreaName, name.ObjectName).ConfigureAwait(false);
-			lock (objLock)
-				_schemaCache.Remove(name.ToString());
+			_schemaCache.Remove(name.ToString());
 		}
 
 		private async Task DropSchemaAsync(string areaName, string objectName)
 		{
-			MdbContext mdb = this.GetMdbContext();
+			MdbContext mdb = this.GetMdbContext(ContextTypes.SysCat);
 			ILogger logger = this.Logger;
 			var schema = await GetSchemaAsync(mdb, areaName, objectName);
-			var schemaFromDb = await GetTableSchema(mdb, schema.DbObjectName.ToString());
+			var schemaFromDb = await GetTableSchema(
+				this.GetMdbContext(ContextTypes.Work), 
+				schema.DbObjectName.ToString());
 
 			string[] sqlList;
 			if (schemaFromDb == null)
@@ -248,7 +255,8 @@ namespace S031.MetaStack.Core.ORM.MsSql
 					await WriteDropStatementsAsync(sb, schemaFromDb);
 
 			}
-			string s = (await mdb.ExecuteAsync<string>(SqlServer.GetParentRelations,
+			string s = (await mdb.ExecuteAsync<string>(
+				(await IsSql17(mdb)) ? SqlServer.GetParentRelations : SqlServer.GetParentRelations_12,
 				new MdbParameter("@table_name", fromDbSchema.DbObjectName.ToString()))) ?? "";
 			sb.WriteDropStatements(s, fromDbSchema);
 		}
@@ -290,40 +298,18 @@ namespace S031.MetaStack.Core.ORM.MsSql
 
 		#region Save Schema
 		public override JMXSchema SaveSchema(JMXSchema schema)
-		{
-			var mdb = this.GetMdbContext();
-			int id = mdb.Execute<int>(SqlServer.AddSysSchemas,
-					new MdbParameter("@uid", schema.UID),
-					new MdbParameter("@SysAreaSchemaName", schema.ObjectName.AreaName),
-					new MdbParameter("@ObjectType", (int)schema.DbObjectType),
-					new MdbParameter("@ObjectName", schema.ObjectName.ObjectName),
-					new MdbParameter("@DbObjectName", schema.DbObjectName.ObjectName),
-					new MdbParameter("@ObjectSchema", schema.ToString()),
-					new MdbParameter("@Version", schema_version));
+			=> SaveSchemaAsync(schema)
+			.GetAwaiter()
+			.GetResult();
 
-			schema.ID = id;
-			lock (objLock)
-				_schemaCache[schema.ObjectName] = schema;
-			foreach (var fk in schema.ForeignKeys)
-			{
-				if (fk.RefObjectName.IsEmpty())
-					throw new ArgumentNullException("Property RefObjectName can't be empty");
-				lock (objLock)
-				{
-					if (_parentRelations.ContainsKey(fk.RefObjectName))
-						_parentRelations[fk.RefObjectName].Add(schema.ObjectName);
-					else
-						_parentRelations.Add(fk.RefObjectName, new List<string>() { schema.ObjectName });
-				}
-			}
-			return schema;
-			//return SaveSchemaAsync(schema).GetAwaiter().GetResult();
-		}
 		public override async Task<JMXSchema> SaveSchemaAsync(JMXSchema schema)
 		{
 			var mdb = this.GetMdbContext();
 			schema = await NormalizeSchemaAsync(mdb, schema);
-			int id = ((await GetSqlVersion(mdb)).ToIntOrDefault() < _sql_server_2017_version) ?
+			int id = (await IsSql17(mdb)) ?
+				await mdb.ExecuteAsync<int>(SqlServer.AddSysSchemas,
+					new MdbParameter("@ObjectSchema", schema.ToString()),
+					new MdbParameter("@Version", schema_version)) :
 				await mdb.ExecuteAsync<int>(SqlServer.AddSysSchemas,
 					new MdbParameter("@uid", schema.UID),
 					new MdbParameter("@SysAreaSchemaName", schema.ObjectName.AreaName),
@@ -331,26 +317,10 @@ namespace S031.MetaStack.Core.ORM.MsSql
 					new MdbParameter("@ObjectName", schema.ObjectName.ObjectName),
 					new MdbParameter("@DbObjectName", schema.DbObjectName.ObjectName),
 					new MdbParameter("@ObjectSchema", schema.ToString()),
-					new MdbParameter("@Version", schema_version)) :
-				await mdb.ExecuteAsync<int>(SqlServer.AddSysSchemas,
-					new MdbParameter("@ObjectSchema", schema.ToString()),
 					new MdbParameter("@Version", schema_version));
 
 			schema.ID = id;
-			lock (objLock)
-				_schemaCache[schema.ObjectName] = schema;
-			foreach (var fk in schema.ForeignKeys)
-			{
-				if (fk.RefObjectName.IsEmpty())
-					throw new ArgumentNullException("Property RefObjectName can't be empty");
-				lock (objLock)
-				{
-					if (_parentRelations.ContainsKey(fk.RefObjectName))
-						_parentRelations[fk.RefObjectName].Add(schema.ObjectName);
-					else
-						_parentRelations.Add(fk.RefObjectName, new List<string>() { schema.ObjectName });
-				}
-			}
+			_schemaCache[schema.ObjectName] = schema;
 			return schema;
 		}
 		private static async Task<JMXSchema> NormalizeSchemaAsync(MdbContext mdb, JMXSchema schema)
@@ -551,18 +521,11 @@ namespace S031.MetaStack.Core.ORM.MsSql
 		#endregion Save Schema
 
 		#region Sync Schema
-		public override IEnumerable<string> GetChildObjects(string objectName)
-		{
-			if (_parentRelations.TryGetValue(objectName, out var childObjectList))
-				return childObjectList;
-			return new List<string>();
-		}
 		public override async Task<JMXSchema> SyncSchemaAsync(string objectName)
 		{
 			JMXObjectName name = objectName;
 			var schema = await SyncSchemaAsync(name.AreaName, name.ObjectName).ConfigureAwait(false);
-			lock (objLock)
-				_schemaCache[schema.ObjectName] = schema;
+			_schemaCache[schema.ObjectName] = schema;
 			return schema;
 		}
 		public async Task<JMXSchema> SyncSchemaAsync(string dbSchema, string objectName)
@@ -993,7 +956,8 @@ namespace S031.MetaStack.Core.ORM.MsSql
 		#region Utils
 		private static async Task<JMXSchema> GetTableSchema(MdbContext mdb, string fullTableName)
 		{
-			string s = await mdb.ExecuteAsync<string>(SqlServer.GetTableSchema,
+			string s = await mdb.ExecuteAsync<string>(
+				(await IsSql17(mdb)) ? SqlServer.GetTableSchema : SqlServer.GetTableSchema_12,
 				new MdbParameter("@table_name", fullTableName));
 			if (s != null)
 				return JMXSchema.Parse(s);
@@ -1011,6 +975,10 @@ namespace S031.MetaStack.Core.ORM.MsSql
 			}
 			return _sqlVersion;
 		}
+
+		private static async Task<bool> IsSql17(MdbContext mdb)
+			=> (await GetSqlVersion(mdb)).ToIntOrDefault() >= _sql_server_2017_version;
+
 		private static JMXObjectName[] GetDependences(JMXSchema schema)=>
 			schema.ForeignKeys.Select(fk => fk.RefDbObjectName).ToArray();
 		#endregion Utils

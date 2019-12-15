@@ -11,7 +11,6 @@ namespace S031.MetaStack.WinForms.ORM
 {
 	public interface IJMXRepo
 	{
-		IEnumerable<string> GetChildObjects(string objectName);
 		JMXSchema GetSchema(string objectName);
 		JMXSchema SaveSchema(JMXSchema schema);
 		void DropSchema(string objectName);

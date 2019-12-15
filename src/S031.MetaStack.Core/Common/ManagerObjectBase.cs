@@ -29,6 +29,7 @@ namespace S031.MetaStack.Core
 			IsLocalContext = true;
 			_sc = new MdbContext(schemaConnectInfo);
 			_wc = new MdbContext(workConnectInfo);
+			Logger = logger;
 
 		}
 		public ManagerObjectBase(MdbContext sysCatMdbContext, MdbContext workMdbContext = null)
