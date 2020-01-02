@@ -27,7 +27,7 @@ namespace S031.MetaStack.WinForms.Json
 				return instance;
 
 			}
-			return MessagePackSerializer.Typeless.Deserialize(MessagePack.MessagePackSerializer.FromJson(value));
+			return MessagePackSerializer.Typeless.Deserialize(MessagePack.MessagePackSerializer.ConvertFromJson(value));
 		}
 
 		public static T DeserializeObject<T>(string value)
@@ -46,7 +46,7 @@ namespace S031.MetaStack.WinForms.Json
 				return (T)instance;
 
 			}
-			return MessagePackSerializer.Deserialize<T>(MessagePack.MessagePackSerializer.FromJson(value));
+			return MessagePackSerializer.Deserialize<T>(MessagePack.MessagePackSerializer.ConvertFromJson(value));
 		}
 			//=> (T)DeserializeObject(typeof(T), value);
 
@@ -60,7 +60,7 @@ namespace S031.MetaStack.WinForms.Json
 				f.WriteDelegate(writer, value);
 				return writer.ToString();
 			}
-			return MessagePack.MessagePackSerializer.ToJson(MessagePackSerializer.Typeless.Serialize(value));
+			return MessagePack.MessagePackSerializer.ConvertToJson(MessagePackSerializer.Typeless.Serialize(value));
 		}
 	}
 }
