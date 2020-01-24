@@ -34,6 +34,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "S031.MetaStack.Json", "src\S031.MetaStack.Json\S031.MetaStack.Json.csproj", "{DBEEC9B0-20AA-4AFE-922B-BF817BB2F150}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "S031.MetaStack.Buffers", "src\S031.MetaStack.Buffers\S031.MetaStack.Buffers.csproj", "{317B5416-78D5-4EAC-8D31-D207BF5AF62B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -76,6 +78,10 @@ Global
 		{DBEEC9B0-20AA-4AFE-922B-BF817BB2F150}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DBEEC9B0-20AA-4AFE-922B-BF817BB2F150}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DBEEC9B0-20AA-4AFE-922B-BF817BB2F150}.Release|Any CPU.Build.0 = Release|Any CPU
+		{317B5416-78D5-4EAC-8D31-D207BF5AF62B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{317B5416-78D5-4EAC-8D31-D207BF5AF62B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{317B5416-78D5-4EAC-8D31-D207BF5AF62B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{317B5416-78D5-4EAC-8D31-D207BF5AF62B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -91,6 +97,7 @@ Global
 		{6C70E25F-11A2-47E7-9124-ECEE325DA804} = {2C526453-5795-4CA2-BBF4-42D366A6CE8B}
 		{2C526453-5795-4CA2-BBF4-42D366A6CE8B} = {1C7C4780-10A0-439A-AB42-32D923C07BDA}
 		{DBEEC9B0-20AA-4AFE-922B-BF817BB2F150} = {1C7C4780-10A0-439A-AB42-32D923C07BDA}
+		{317B5416-78D5-4EAC-8D31-D207BF5AF62B} = {1C7C4780-10A0-439A-AB42-32D923C07BDA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7ECF74F3-895D-4DD3-95B2-C79542194888}
