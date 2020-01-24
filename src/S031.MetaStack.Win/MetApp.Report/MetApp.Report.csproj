@@ -32,9 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="Stimulsoft.Base">
       <HintPath>..\Bin\Stimulsoft.Base.dll</HintPath>
     </Reference>
@@ -80,6 +77,10 @@
       <Project>{f9d7f21b-5d2f-4458-a84f-b5e39a493835}</Project>
       <Name>S031.MetaStack.Common.Net45</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\S031.MetaStack.Json\S031.MetaStack.Json.Net45.csproj">
+      <Project>{f0cafc3f-8117-49ee-b472-1d86dd8340dd}</Project>
+      <Name>S031.MetaStack.Json.Net45</Name>
+    </ProjectReference>
     <ProjectReference Include="..\S031.MetaStack.WinForms\S031.MetaStack.WinForms.csproj">
       <Project>{487C0CDC-53A2-4DDA-8BF0-A2DBB04BD587}</Project>
       <Name>S031.MetaStack.WinForms</Name>
@@ -87,7 +88,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

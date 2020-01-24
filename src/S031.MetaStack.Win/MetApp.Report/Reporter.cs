@@ -11,11 +11,12 @@ using Stimulsoft.Report;
 using Stimulsoft.Report.Components;
 using Stimulsoft.Report.Components.TextFormats;
 using S031.MetaStack.WinForms;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+//using Newtonsoft.Json;
+//using Newtonsoft.Json.Linq;
 using S031.MetaStack.Common;
 using S031.MetaStack.WinForms.ORM;
 using System.Windows.Forms;
+using S031.MetaStack.Json;
 
 namespace MetApp
 {
@@ -27,6 +28,8 @@ namespace MetApp
 		internal static readonly string[] ParentAssemblies = { "S031.MetaStack.Common", "S031.MetaStack.WinForms"};
 		internal static readonly string[] ParentUsings = { "S031.MetaStack.Common", "S031.MetaStack.WinForms" };
 
+		private static readonly ReportCreateParam _rcp = GetReportCreateParam();
+
 		public Reporter()
 		{
 			List<string> assms = new List<string>(StiOptions.Engine.ReferencedAssemblies);
@@ -35,24 +38,13 @@ namespace MetApp
 		}
 
 		#region IReporter Members
-
 		void IReporter.PrintCurrentForm(IObjectHost objectHost)
 		{
 			DBGrid grid = (objectHost as DBGrid);
 			if (grid == null)
 				return;
-			JObject setup = JObject.Parse(ConfigurationManager.AppSettings["ReportingSettings"]);
-			ReportCreateParam rcp = new ReportCreateParam()
-			{
-				FontSize = (float)setup["FontSize"],
-				TitleOnPage = (bool)setup["ColumnTitleOnPage"],
-				Period =  (bool)setup["Period"],
-				Border = (int)setup["Grid"],
-				MultiLine = (bool)setup["MultiLine"],
-				Sign = (bool)setup["Sign"]
-			};
-
-			StiReport report = MakeReport(grid, rcp);
+			
+			StiReport report = MakeReport(grid, _rcp);
 			PrepareReport(report);
 			report.Render(true);
 			report.Show(false);
@@ -63,18 +55,8 @@ namespace MetApp
 			DBGrid grid = (objectHost as DBGrid);
 			if (grid == null)
 				return;
-			JObject setup = JObject.Parse(ConfigurationManager.AppSettings["ReportingSettings"]);
-			ReportCreateParam rcp = new ReportCreateParam()
-			{
-				FontSize = (float)setup["FontSize"],
-				TitleOnPage = (bool)setup["ColumnTitleOnPage"],
-				Period = (bool)setup["Period"],
-				Border = (int)setup["Grid"],
-				MultiLine = (bool)setup["MultiLine"],
-				Sign = (bool)setup["Sign"]
-			};
 
-			StiReport report = MakeReport(grid, rcp);
+			StiReport report = MakeReport(grid, _rcp);
 			PrepareReport(report);
 			report.Design(false);
 		}
@@ -551,6 +533,23 @@ namespace MetApp
 				return new StiGeneralFormatService();
 			else
 				return new StiCustomFormatService(format);
+		}
+
+		private static ReportCreateParam GetReportCreateParam()
+		{
+			string configData = ConfigurationManager.AppSettings["ReportingSettings"];
+			JsonObject setup = (JsonObject)new JsonReader(ref configData).Read();
+			return new ReportCreateParam()
+			{
+				FontSize = (float)setup["FontSize"],
+				TitleOnPage = (bool)setup["ColumnTitleOnPage"],
+				Period = (bool)setup["Period"],
+				Border = (int)setup["Grid"],
+				MultiLine = (bool)setup["MultiLine"],
+				Sign = (bool)setup["Sign"]
+			};
+
+
 		}
 	}
 }

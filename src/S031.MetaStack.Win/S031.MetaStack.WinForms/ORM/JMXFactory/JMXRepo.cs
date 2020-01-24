@@ -43,6 +43,11 @@ namespace S031.MetaStack.WinForms.ORM
 			throw new NotImplementedException();
 		}
 
+		public Task<JMXSchema> GetTableSchemaAsync(string objectName)
+		{
+			throw new NotImplementedException();
+		}
+
 		public bool IsSchemaSupport() => true;
 
 		public virtual JMXSchema SaveSchema(JMXSchema schema)
