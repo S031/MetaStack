@@ -12,4 +12,9 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="S031.MetaStack.Buffers.Net45.project.json" />
+    <None Remove="S031.MetaStack.Buffers.Net45.project.lock.json" />
+  </ItemGroup>
+
 </Project>
