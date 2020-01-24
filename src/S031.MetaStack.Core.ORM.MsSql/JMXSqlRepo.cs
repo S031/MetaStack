@@ -17,7 +17,6 @@ namespace S031.MetaStack.Core.ORM.MsSql
 	{
 		const int _sql_server_2017_version = 14;
 		static int _counter = 0;
-		private static readonly object objLock = new object();
 		static readonly MapTable<string, JMXSchema> _schemaCache = new MapTable<string, JMXSchema>();
 
 		private enum AttribCompareDiff
@@ -255,10 +254,10 @@ namespace S031.MetaStack.Core.ORM.MsSql
 					await WriteDropStatementsAsync(sb, schemaFromDb);
 
 			}
-			string s = (await mdb.ExecuteAsync<string>(
-				(await IsSql17(mdb)) ? SqlServer.GetParentRelations : SqlServer.GetParentRelations_12,
-				new MdbParameter("@table_name", fromDbSchema.DbObjectName.ToString()))) ?? "";
-			sb.WriteDropStatements(s, fromDbSchema);
+			//string s = (await mdb.ExecuteAsync<string>(
+			//	(await IsSql17(mdb)) ? SqlServer.GetParentRelations : SqlServer.GetParentRelations_12,
+			//	new MdbParameter("@table_name", fromDbSchema.DbObjectName.ToString()))) ?? "";
+			sb.WriteDropStatements(fromDbSchema);
 		}
 
 		#endregion Drop Schema
@@ -891,15 +890,9 @@ namespace S031.MetaStack.Core.ORM.MsSql
 		{
 			int recCount = (await mdb.ExecuteAsync<int>($"select count(*) from {fromDbSchema.DbObjectName.ToString()}"));
 
-			string s = (await mdb.ExecuteAsync<string>(SqlServer.GetParentRelations,
-				new MdbParameter("@table_name", schema.DbObjectName.ToString()))) ?? "";
-			JsonArray parentRelations = null;
-			if (!s.IsEmpty())
-			{
-				parentRelations = (JsonArray)new JsonReader(ref s).Read();
-				foreach (var fk in parentRelations)
-					sb.WriteDropParentRelationStatement((JsonObject)fk);
-			}
+			foreach (var fk in fromDbSchema.ParentRelations)
+				sb.WriteDropParentRelationStatement(fk);
+
 			foreach (var fk in fromDbSchema.ForeignKeys)
 				sb.WriteDropFKStatement(fk, fromDbSchema);
 
@@ -925,10 +918,9 @@ namespace S031.MetaStack.Core.ORM.MsSql
 			foreach (var fk in schema.ForeignKeys)
 				sb.WriteCreateFKStatement(fk, schema);
 
-
-			if (parentRelations != null)
-				foreach (var fk in parentRelations)
-					sb.WriteCreateParentRelationStatement((JsonObject)fk);
+			/// Need test
+			foreach (var fk in fromDbSchema.ParentRelations)
+				sb.WriteCreateParentRelationStatement(fk);
 		}
 
 		private static string GetDiffs(AttribCompareDiff diff)

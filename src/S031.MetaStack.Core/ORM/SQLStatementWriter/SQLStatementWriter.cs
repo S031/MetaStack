@@ -182,25 +182,30 @@ namespace S031.MetaStack.Core.ORM
 			return this;
 		}
 
-		public SQLStatementWriter WriteCreateParentRelationStatement(JsonObject fk)
+		/// <summary>
+		/// Remove comment && update
+		/// </summary>
+		/// <param name="fk"></param>
+		/// <returns></returns>
+		public SQLStatementWriter WriteCreateParentRelationStatement(JMXForeignKey fk)
 		{
-			bool withCheck = (bool)fk["CheckOption"];
-			string check = withCheck ? "check" : "nocheck";
-			// Enable for new added rows
-			Write("alter table [{0}].[{1}] with {2} add constraint [{3}] foreign key (".ToFormat(
-				(string)fk["ParentObject"]["AreaName"],
-				(string)fk["ParentObject"]["ObjectName"],
-				check, (string)fk["KeyName"]));
+			//bool withCheck = (bool)fk["CheckOption"];
+			//string check = withCheck ? "check" : "nocheck";
+			//// Enable for new added rows
+			//Write("alter table [{0}].[{1}] with {2} add constraint [{3}] foreign key (".ToFormat(
+			//	(string)fk["ParentObject"]["AreaName"],
+			//	(string)fk["ParentObject"]["ObjectName"],
+			//	check, (string)fk["KeyName"]));
 
-			Write(string.Join(", ", (fk["KeyMembers"] as JsonArray).Select(m => "[" + (string)m["FieldName"] + "]").ToArray()));
-			Write(")\n");
-			Write($"references [{fk["RefObject"]["AreaName"]}].[{fk["RefObject"]["ObjectName"]}] (");
-			Write(string.Join(", ", (fk["RefKeyMembers"] as JsonArray).Select(m => "[" + (string)m["FieldName"] + "]").ToArray()));
-			Write(")\n");
-			if (withCheck)
-				// check existing rows
-				Write($"alter table [{fk["ParentObject"]["AreaName"]}].[{fk["ParentObject"]["ObjectName"]}] " +
-					$"check constraint [{(string)fk["KeyName"]}]\n");
+			//Write(string.Join(", ", (fk["KeyMembers"] as JsonArray).Select(m => "[" + (string)m["FieldName"] + "]").ToArray()));
+			//Write(")\n");
+			//Write($"references [{fk["RefObject"]["AreaName"]}].[{fk["RefObject"]["ObjectName"]}] (");
+			//Write(string.Join(", ", (fk["RefKeyMembers"] as JsonArray).Select(m => "[" + (string)m["FieldName"] + "]").ToArray()));
+			//Write(")\n");
+			//if (withCheck)
+			//	// check existing rows
+			//	Write($"alter table [{fk["ParentObject"]["AreaName"]}].[{fk["ParentObject"]["ObjectName"]}] " +
+			//		$"check constraint [{(string)fk["KeyName"]}]\n");
 			return this;
 		}
 
@@ -321,34 +326,37 @@ namespace S031.MetaStack.Core.ORM
 			return this;
 		}
 
-		public SQLStatementWriter WriteDropStatements(string parentRelationsSchema, JMXSchema fromSchema = null)
+		/// <summary>
+		/// !!! Required testing after fromSchema.ParentRelations are added
+		/// </summary>
+		/// <param name="fromSchema"></param>
+		/// <returns></returns>
+		public SQLStatementWriter WriteDropStatements(JMXSchema fromSchema = null)
 		{
 			if (fromSchema == null)
 				fromSchema = _schema;
-			if (!parentRelationsSchema.IsEmpty())
+			foreach (var fk in fromSchema.ParentRelations)
 			{
-				JsonArray a = (JsonArray)new JsonReader(ref parentRelationsSchema).Read();
-				foreach (var o in a)
-				{
-					string sch = (string)o["ParentObject"]["AreaName"];
-					string tbl = (string)o["ParentObject"]["ObjectName"];
-					if (!fromSchema.Attributes.Any(at =>
-						at.FieldName == $"{detail_field_prefix}{sch}_{tbl}"))
-						WriteDropParentRelationStatement((JsonObject)o);
-				}
+				//!!! test this
+				string sch = fk.RefDbObjectName.AreaName;
+				string tbl = fk.RefDbObjectName.ObjectName;
+				if (!fromSchema.Attributes.Any(at =>
+					at.FieldName == $"{detail_field_prefix}{sch}_{tbl}"))
+					WriteDropParentRelationStatement(fk);
 			}
 			foreach (var fk in fromSchema.ForeignKeys)
 				WriteDropFKStatement(fk);
+
 			WriteDropTableStatement();
 			return this;
 		}
 
-		public SQLStatementWriter WriteDropParentRelationStatement(JsonObject o)
+		public SQLStatementWriter WriteDropParentRelationStatement(JMXForeignKey fk)
 		{
 			Write("alter table [{0}].[{1}] drop constraint [{2}]\n".ToFormat(
-				(string)o["ParentObject"]["AreaName"],
-				(string)o["ParentObject"]["ObjectName"],
-				(string)o["KeyName"]));
+				fk.RefDbObjectName.AreaName,
+				fk.RefDbObjectName.ObjectName,
+				fk.KeyName));
 			return this;
 		}
 

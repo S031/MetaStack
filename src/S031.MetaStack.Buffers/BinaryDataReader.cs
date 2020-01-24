@@ -7,7 +7,7 @@ namespace S031.MetaStack.Buffers
 	{
 		private readonly byte[] _buffer;
 		private int _index;
-		private int _count;
+		private readonly int _count;
 
 		public BinaryDataReader(byte[] source)
 		{

@@ -243,9 +243,9 @@ namespace S031.MetaStack.Core.ORM.SQLite
 					await WriteDropStatementsAsync(sb, schemaFromDb);
 
 			}
-			string s = (await mdb.ExecuteAsync<string>(SQLite.GetParentRelations,
-				new MdbParameter("@table_name", fromDbSchema.DbObjectName.ToString()))) ?? "";
-			sb.WriteDropStatements(s, fromDbSchema);
+			//string s = (await mdb.ExecuteAsync<string>(SQLite.GetParentRelations,
+			//	new MdbParameter("@table_name", fromDbSchema.DbObjectName.ToString()))) ?? "";
+			sb.WriteDropStatements(fromDbSchema);
 		}
 
 		#endregion Drop Schema
@@ -893,15 +893,9 @@ namespace S031.MetaStack.Core.ORM.SQLite
 		{
 			int recCount = (await mdb.ExecuteAsync<int>($"select count(*) from {fromDbSchema.DbObjectName.ToString()}"));
 
-			string s = (await mdb.ExecuteAsync<string>(SQLite.GetParentRelations,
-				new MdbParameter("@table_name", schema.DbObjectName.ToString()))) ?? "";
-			JsonArray parentRelations = null;
-			if (!s.IsEmpty())
-			{
-				parentRelations = (JsonArray) new JsonReader(ref s).Read();
-				foreach (var fk in parentRelations)
-					sb.WriteDropParentRelationStatement((JsonObject)fk);
-			}
+			foreach (var fk in fromDbSchema.ParentRelations)
+				sb.WriteDropParentRelationStatement(fk);
+
 			foreach (var fk in fromDbSchema.ForeignKeys)
 				sb.WriteDropFKStatement(fk, fromDbSchema);
 
@@ -928,9 +922,8 @@ namespace S031.MetaStack.Core.ORM.SQLite
 				sb.WriteCreateFKStatement(fk, schema);
 
 
-			if (parentRelations != null)
-				foreach (var fk in parentRelations)
-					sb.WriteCreateParentRelationStatement((JsonObject)fk);
+			foreach (var fk in fromDbSchema.ParentRelations)
+				sb.WriteCreateParentRelationStatement(fk);
 		}
 
 		private static string GetDiffs(AttribCompareDiff diff)
