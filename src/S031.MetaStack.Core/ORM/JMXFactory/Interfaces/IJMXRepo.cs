@@ -20,5 +20,6 @@ namespace S031.MetaStack.WinForms.ORM
 		Task<JMXSchema> SyncSchemaAsync(string objectName);
 		Task DropSchemaAsync(string objectName);
 		Task ClearCatalogAsync();
+		Task<JMXSchema> GetTableSchemaAsync(string objectName);
 	}
 }

@@ -458,12 +458,16 @@ namespace S031.MetaStack.Common
 		/// <returns></returns>
 		public static String Between(this string source, String start, String end)
 		{
-			int i = source.IndexOf(start) + start.Length;
-			int j = source.IndexOf(end, i);
+			int i = source.IndexOf(start);
+			if (i == -1)
+				return string.Empty;
+			i += start.Length;
 
-			if (j != -1)
-				return source.Substring(i, j - i);
-			return string.Empty;
+			int j = source.IndexOf(end, i);
+			if (j == -1)
+				return string.Empty;
+
+			return source.Substring(i, j - i);
 		}
 
 		/// <summary>
@@ -475,8 +479,11 @@ namespace S031.MetaStack.Common
 		/// <returns></returns>
 		public static String Between(this string source, char start, char end)
 		{
-			int i = source.IndexOf(start) + 1;
-			int j = source.IndexOf(end, i);
+			int i = source.IndexOf(start);
+			if (i == -1)
+				return string.Empty;
+
+			int j = source.IndexOf(end, ++i);
 			if (j != -1)
 				return source.Substring(i, j - i);
 			return string.Empty;
@@ -515,7 +522,7 @@ namespace S031.MetaStack.Common
 					return -1;
 
 				int i = 0;
-				comparer = comparer ?? EqualityComparer<T>.Default;
+				comparer ??= EqualityComparer<T>.Default;
 				foreach (T item in source)
 				{
 					if (comparer.Equals(item, element))

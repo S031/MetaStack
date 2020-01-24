@@ -188,63 +188,9 @@ namespace S031.MetaStack.Core.ORM.MsSql {
         
         /// <summary>
         ///   Looks up a localized string similar to BEGIN
-        ///	DECLARE 
-        ///		@object_name	sysname,
-        ///		@object_id		int,
-        ///		@schema_name	sysname,
-        ///		@json			nvarchar(max)
-        ///
-        ///	SELECT @object_name = &apos;[&apos; + s.name + &apos;].[&apos; + o.name + &apos;]&apos;
-        ///		,@object_id = o.[object_id]
-        ///		,@table_name = o.name
-        ///		,@schema_name = s.name
-        ///	FROM sys.objects o WITH (NOWAIT)
-        ///	JOIN sys.schemas s WITH (NOWAIT) ON o.[schema_id] = s.[schema_id]
-        ///	WHERE s.name + &apos;.&apos; + o.name = @table_name
-        ///		AND o.[type] = &apos;U&apos;
-        ///		AND o.is_ms_shipped = 0
-        ///
-        ///	IF NOT @object_id IS NULL
-        ///		BEGIN
-        ///			SET @json = IsNul [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string GetParentRelations {
-            get {
-                return ResourceManager.GetString("GetParentRelations", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to BEGIN
-        ///	DECLARE 
-        ///		@object_name	sysname,
-        ///		@object_id		int,
-        ///		@schema_name	sysname,
-        ///		@json			nvarchar(max)
-        ///
-        ///	SELECT @object_name = &apos;[&apos; + s.name + &apos;].[&apos; + o.name + &apos;]&apos;
-        ///		,@object_id = o.[object_id]
-        ///		,@table_name = o.name
-        ///		,@schema_name = s.name
-        ///	FROM sys.objects o WITH (NOWAIT)
-        ///	JOIN sys.schemas s WITH (NOWAIT) ON o.[schema_id] = s.[schema_id]
-        ///	WHERE s.name + &apos;.&apos; + o.name = @table_name
-        ///		AND o.[type] = &apos;U&apos;
-        ///		AND o.is_ms_shipped = 0
-        ///
-        ///	IF NOT @object_id IS NULL
-        ///		BEGIN
-        ///			SET @json = IsNul [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string GetParentRelations_12 {
-            get {
-                return ResourceManager.GetString("GetParentRelations_12", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to BEGIN
         ///DECLARE 
+        ///	--@table_name		sysname = &apos;dbo.accnts&apos;,
+        ///	--@logic_name		sysname = null, -- убрать
         ///	@object_name	sysname,
         ///	@object_id		int,
         ///	@schema_name	sysname,
@@ -258,12 +204,7 @@ namespace S031.MetaStack.Core.ORM.MsSql {
         ///JOIN sys.schemas s WITH (NOWAIT) ON o.[schema_id] = s.[schema_id]
         ///WHERE s.name + &apos;.&apos; + o.name = @table_name
         ///	AND o.[type] = &apos;U&apos;
-        ///	AND o.is_ms_shipped = 0
-        ///
-        ///IF NOT @object_id IS NULL
-        ///BEGIN
-        ///	SET @result = (SELECT 
-        ///		CASE WHE [rest of string was truncated]&quot;;.
+        ///	AND o.is_ms_ [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string GetTableSchema {
             get {
@@ -274,10 +215,13 @@ namespace S031.MetaStack.Core.ORM.MsSql {
         /// <summary>
         ///   Looks up a localized string similar to BEGIN
         ///	DECLARE 
-        ///		@object_name	sysname,
-        ///		@object_id		int,
-        ///		@schema_name	sysname,
-        ///		@json			nvarchar(max)
+        ///	--Parameters:
+        ///	--@table_name		sysname = &apos;dbo.accnts&apos;,
+        ///	--@logic_name		sysname = null, -- убрать
+        ///	@object_name	sysname,
+        ///	@object_id		int,
+        ///	@schema_name	sysname,
+        ///	@json			nvarchar(max)
         ///
         ///	SELECT @object_name = &apos;[&apos; + s.name + &apos;].[&apos; + o.name + &apos;]&apos;
         ///		,@object_id = o.[object_id]
@@ -286,12 +230,7 @@ namespace S031.MetaStack.Core.ORM.MsSql {
         ///	FROM sys.objects o WITH (NOWAIT)
         ///	JOIN sys.schemas s WITH (NOWAIT) ON o.[schema_id] = s.[schema_id]
         ///	WHERE s.name + &apos;.&apos; + o.name = @table_name
-        ///		AND o.[type] = &apos;U&apos;
-        ///		AND o.is_ms_shipped = 0
-        ///
-        ///	IF NOT @object_id IS NULL
-        ///	BEGIN
-        ///		SET @json = IsNull( [rest of string was truncated]&quot;;.
+        ///		AND o.[typ [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string GetTableSchema_12 {
             get {

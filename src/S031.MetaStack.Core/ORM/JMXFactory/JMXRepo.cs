@@ -70,5 +70,10 @@ namespace S031.MetaStack.Core.ORM
 		{
 			throw new NotImplementedException();
 		}
+
+		public virtual Task<JMXSchema> GetTableSchemaAsync(string objectName)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

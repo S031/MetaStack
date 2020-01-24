@@ -200,7 +200,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 			MdbContext mdb = this.GetMdbContext(ContextTypes.SysCat);
 			ILogger logger = this.Logger;
 			var schema = await GetSchemaAsync(mdb, areaName, objectName);
-			var schemaFromDb = await GetTableSchema(
+			var schemaFromDb = await GetTableSchemaAsync(
 				this.GetMdbContext(ContextTypes.Work), 
 				schema.DbObjectName.ToString());
 
@@ -250,7 +250,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 			foreach (var att in fromDbSchema.Attributes.Where(a => a.FieldName.StartsWith(detail_field_prefix)))
 			{
 				string[] names = att.FieldName.Split('_');
-				var schemaFromDb = await GetTableSchema(mdb, new JMXObjectName(names[1], names[2]).ToString());
+				var schemaFromDb = await GetTableSchemaAsync(mdb, new JMXObjectName(names[1], names[2]).ToString());
 				if (schemaFromDb != null)
 					await WriteDropStatementsAsync(sb, schemaFromDb);
 
@@ -540,7 +540,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 			foreach (var o in GetDependences(schema))
 				await SyncSchemaAsync(o.AreaName, o.ObjectName);
 
-			var schemaFromDb = await GetTableSchema(mdb, schema.DbObjectName.ToString());
+			var schemaFromDb = await GetTableSchemaAsync(mdb, schema.DbObjectName.ToString());
 			bool createNew = (schemaFromDb == null);
 			string[] sqlList;
 			if (createNew)
@@ -610,7 +610,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 				if (!schema.Attributes.Any(a => a.FieldName == att.FieldName))
 				{
 					string[] names = att.FieldName.Split('_');
-					var schemaFromDb = await GetTableSchema(mdb, new JMXObjectName(names[1], names[2]).ToString());
+					var schemaFromDb = await GetTableSchemaAsync(mdb, new JMXObjectName(names[1], names[2]).ToString());
 					if (schemaFromDb != null)
 						await WriteDropStatementsAsync(sb, schemaFromDb);
 				}
@@ -631,7 +631,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 
 			foreach (var att in schema.Attributes.Where(a => a.DataType == MdbType.@object))
 			{
-				var schemaFromDb = await GetTableSchema(mdb, att.ObjectSchema.DbObjectName.ToString());
+				var schemaFromDb = await GetTableSchemaAsync(mdb, att.ObjectSchema.DbObjectName.ToString());
 				if (schemaFromDb != null)
 					await CompareSchemasStatementsAsync(sb, att.ObjectSchema, schemaFromDb);
 				else
@@ -954,7 +954,10 @@ namespace S031.MetaStack.Core.ORM.MsSql
 		#endregion Sync Schema
 
 		#region Utils
-		private static async Task<JMXSchema> GetTableSchema(MdbContext mdb, string fullTableName)
+		public override async Task<JMXSchema> GetTableSchemaAsync(string objectName)=>
+			await GetTableSchemaAsync(GetMdbContext(ContextTypes.Work), objectName);
+
+		private static async Task<JMXSchema> GetTableSchemaAsync(MdbContext mdb, string fullTableName)
 		{
 			string s = await mdb.ExecuteAsync<string>(
 				(await IsSql17(mdb)) ? SqlServer.GetTableSchema : SqlServer.GetTableSchema_12,
