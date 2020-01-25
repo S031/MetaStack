@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using S031.MetaStack.Common;
-using S031.MetaStack.Core.Data;
+using S031.MetaStack.Data;
 
 namespace S031.MetaStack.Core.ORM
 {

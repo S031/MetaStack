@@ -1,4 +1,5 @@
 ﻿using S031.MetaStack.Common;
+using S031.MetaStack.Data;
 using S031.MetaStack.Json;
 using System;
 using System.Collections.Generic;
@@ -304,7 +305,7 @@ namespace S031.MetaStack.WinForms.ORM
                     FieldName = e.elementValue("FieldName"),
                     Position = e.elementValue("Position").ToIntOrDefault(),
                     ServerDataType = e.elementValue("ServerDataType"),
-                    DataType = Data.MdbTypeMap.GetTypeInfo(Data.MdbTypeMap.GetType(e.elementValue("DataType"))).MdbType,
+                    DataType = MdbTypeMap.GetTypeInfo(MdbTypeMap.GetType(e.elementValue("DataType"))).MdbType,
                     IsNullable = e.elementValue("IsNullable").ToBoolOrDefault(),
                     DataSize = new JMXDataSize(
                         e.selectElement("DataSize").elementValue("Size").ToIntOrDefault(),

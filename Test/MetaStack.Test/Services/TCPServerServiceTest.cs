@@ -1,5 +1,5 @@
 ﻿using S031.MetaStack.Common.Logging;
-using S031.MetaStack.Core.Data;
+using S031.MetaStack.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;

@@ -1,12 +1,10 @@
 ﻿using S031.MetaStack.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using S031.MetaStack.Common;
 using System.Linq;
+using S031.MetaStack.Data;
 #if NETCOREAPP
-using S031.MetaStack.Core.Data;
 namespace S031.MetaStack.Core.ORM
 #else
 using S031.MetaStack.WinForms.Data;

@@ -15,11 +15,7 @@ using System.Threading.Tasks;
 using MessagePack;
 #endif
 
-#if NETCOREAPP
-namespace S031.MetaStack.Core.Data
-#else
-namespace S031.MetaStack.WinForms.Data
-#endif
+namespace S031.MetaStack.Data
 {
 	public enum TsExportFormat
 	{
@@ -292,8 +288,8 @@ namespace S031.MetaStack.WinForms.Data
 				Update();
 			}
 			else if (values != null)
-				//The length of the data array must be equal to the length of the array of field names
-				throw new ArgumentException(Properties.Strings.S031_MetaStack_Core_Data_writeData_1);
+				//throw new ArgumentException(Properties.Strings.S031_MetaStack_Core_Data_writeData_1);
+				throw new ArgumentException("The length of the data array must be equal to the length of the array of field names");
 		}
 		/// <summary>
 		/// Create a serialised in <see cref="byte[]"/> array <see cref="DataPackage"/> see <see cref="DataPackage(string[], object[])"/>

@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Data.Common;
-using Microsoft.Extensions.Logging;
 using S031.MetaStack.Common;
 using System.Data;
-using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using S031.MetaStack.Data;
 
 namespace S031.MetaStack.Core.Data
 {
@@ -63,7 +61,7 @@ namespace S031.MetaStack.Core.Data
 		/// <returns></returns>
 		public DataPackage[] GetReaders(string sql, params MdbParameter[] parameters)
 		{
-			List<DataPackage> rs = new List<Data.DataPackage>();
+			List<DataPackage> rs = new List<DataPackage>();
 			using (DbCommand command = getCommandInternal(sql, parameters))
 			{
 				using (DbDataReader dr = command.ExecuteReader())
@@ -329,7 +327,7 @@ namespace S031.MetaStack.Core.Data
 		/// </summary>
 		public async Task<DataPackage[]> GetReadersAsync(string sql, params MdbParameter[] parameters)
 		{
-			List<DataPackage> rs = new List<Data.DataPackage>();
+			List<DataPackage> rs = new List<DataPackage>();
 			using (DbCommand command = getCommandInternal(sql, parameters))
 			{
 				using (DbDataReader dr = await command.ExecuteReaderAsync().ConfigureAwait(false))

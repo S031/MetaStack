@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-#if NETCOREAPP
-using S031.MetaStack.Core.Data;
+﻿using System.Collections.Generic;
+using S031.MetaStack.Data;
 
+#if NETCOREAPP
 namespace S031.MetaStack.Core.ORM
 #else
-using S031.MetaStack.WinForms.Data;
-
 namespace S031.MetaStack.WinForms.ORM
 #endif
 {

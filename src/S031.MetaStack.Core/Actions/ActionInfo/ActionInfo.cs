@@ -1,13 +1,7 @@
-﻿#if NETCOREAPP
-using S031.MetaStack.Common;
-using S031.MetaStack.Core.Data;
-#else
-using S031.MetaStack.WinForms.Data;
-using S031.MetaStack.WinForms.Json;
-#endif
-using System.Linq;
+﻿using System.Linq;
 using S031.MetaStack.Json;
 using System;
+using S031.MetaStack.Data;
 
 #if NETCOREAPP
 namespace S031.MetaStack.Core.Actions

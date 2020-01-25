@@ -1,5 +1,6 @@
 ﻿using System;
 using S031.MetaStack.Common;
+using S031.MetaStack.Data;
 
 namespace S031.MetaStack.Core.Data
 {

@@ -50,10 +50,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\S031.MetaStack.Common\S031.MetaStack.Common.Net45.csproj">
-      <Project>{f9d7f21b-5d2f-4458-a84f-b5e39a493835}</Project>
-      <Name>S031.MetaStack.Common.Net45</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\src\S031.MetaStack.Win\S031.MetaStack.WinForms\S031.MetaStack.WinForms.csproj">
       <Project>{487c0cdc-53a2-4dda-8bf0-a2dbb04bd587}</Project>
       <Name>S031.MetaStack.WinForms</Name>

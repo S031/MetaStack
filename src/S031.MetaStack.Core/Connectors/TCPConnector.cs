@@ -4,9 +4,9 @@ using System.Net.Sockets;
 using System.Security.Cryptography;
 using S031.MetaStack.Common;
 using System.Linq;
+using S031.MetaStack.Data;
 #if NETCOREAPP
 using S031.MetaStack.Core.App;
-using S031.MetaStack.Core.Data;
 using S031.MetaStack.Core.Security;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
