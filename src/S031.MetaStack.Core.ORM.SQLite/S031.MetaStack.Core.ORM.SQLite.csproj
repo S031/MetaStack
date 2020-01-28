@@ -46,6 +46,7 @@
   <ItemGroup>
     <ProjectReference Include="..\S031.MetaStack.Common\S031.MetaStack.Common.csproj" />
     <ProjectReference Include="..\S031.MetaStack.Core\S031.MetaStack.Core.csproj" />
+    <ProjectReference Include="..\S031.MetaStack.Data\S031.MetaStack.Data.csproj" />
   </ItemGroup>
 
   <ItemGroup>

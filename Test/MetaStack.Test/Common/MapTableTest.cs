@@ -23,7 +23,7 @@ namespace MetaStack.Test.Common
 			using (FileLog l = new FileLog("MapTableTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
 				const int loop_count = 1_000_000;
-				int[] test_data = new int[] { 32, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 65536, 131072, 524288, 1048576, 2097152/*, 4194304*/ };
+				int[] test_data = new int[] { 32, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 65536, 131072, 524288, 1048576, 2097152, 4194304/**/ };
 				foreach (int item_size in test_data)
 				{
 					string key = fixed_key_part + (item_size / 2).ToString();

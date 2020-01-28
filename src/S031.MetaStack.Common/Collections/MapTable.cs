@@ -266,8 +266,8 @@ namespace S031.MetaStack.Common
 		{
 			int newSize = _count * 2;
 			double border = Math.Log(newSize, 2);
-			int delta = Convert.ToInt32(Math.Pow(2, _collisionCount / border));
-			int bSize = _buckets.Length * delta;
+			double delta = Math.Pow(2, _collisionCount / border);
+			int bSize = Convert.ToInt32(_buckets.Length * delta);
 
 			int[] newBuckets = new int[bSize];
 			for (int i = 0; i < bSize; i++)
