@@ -49,7 +49,7 @@ namespace S031.MetaStack.Core.ORM
 			(MdbType.dateTime, "date;time;timestamp" ),
 			(MdbType.@string, "varchar;nvarchar;char;nchar" ),
 			(MdbType.byteArray, "binary;varbinary" ),
-			(MdbType.charArray, "binary" ),
+			//(MdbType.charArray, "binary" ),
 			(MdbType.guid, "binary" ),
 			(MdbType.@object, "varchar" )
 		);

@@ -107,7 +107,7 @@ namespace S031.MetaStack.Data
 			(typeof(DateTime), new DataTypeInfo(){ID = MdbType.dateTime, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.dateTime); bw.Write(((DateTime)obj).ToBinary()); }, ReadDelegate = br => DateTime.FromBinary(br.ReadInt64())}),
 			(typeof(string), new DataTypeInfo(){ID = MdbType.@string, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.@string); bw.Write((string)obj); }, ReadDelegate = br => br.ReadString()}),
 			(typeof(byte[]), new DataTypeInfo(){ID = MdbType.byteArray, WriteDelegate = (bw, obj) => {  bw.Write((byte)MdbType.byteArray); WriteByteArray(bw, (byte[])obj); }, ReadDelegate = ReadByteArray}),
-			(typeof(char[]), new DataTypeInfo(){ID = MdbType.charArray, WriteDelegate = (bw, obj) => {  bw.Write((byte)MdbType.charArray);WriteCharArray(bw, (char[])obj); }, ReadDelegate = ReadCharArray}),
+			//(typeof(char[]), new DataTypeInfo(){ID = MdbType.charArray, WriteDelegate = (bw, obj) => {  bw.Write((byte)MdbType.charArray);WriteCharArray(bw, (char[])obj); }, ReadDelegate = ReadCharArray}),
 			(typeof(Guid), new DataTypeInfo(){ID = MdbType.guid, WriteDelegate = (bw, obj) => { bw.Write((byte)MdbType.guid); WriteByteArray(bw, ((Guid)obj).ToByteArray()); }, ReadDelegate = br => new Guid(ReadByteArray(br))}),
 			(typeof(object), new DataTypeInfo(){ID = MdbType.@object, WriteDelegate = WriteObject, ReadDelegate = ReadObject} )
 
@@ -482,8 +482,8 @@ namespace S031.MetaStack.Data
 						len += ((string)value).Length * 2;
 					else if (t.MdbType == MdbType.byteArray)
 						len += ((byte[])value).Length;
-					else if (t.MdbType == MdbType.charArray)
-						len += ((char[])value).Length;
+					//else if (t.MdbType == MdbType.charArray)
+					//	len += ((char[])value).Length;
 					else if (t.MdbType == MdbType.@object)
 #if SERIALIZEBINARY
 						len += MessagePackSerializer.Typeless.Serialize(value).Length;

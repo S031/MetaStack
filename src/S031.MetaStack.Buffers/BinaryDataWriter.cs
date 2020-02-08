@@ -1,37 +1,84 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace S031.MetaStack.Buffers
 {
+	/// <summary>
+	/// Inherited from <see cref="MdbType"/> 
+	/// </summary>
 	public enum ExportedDataTypes : byte
 	{
-		@null = 0,
-		@false = 1,
-		@true = 2,
-		@sbyte = 3,
-		@byte = 4,
-		@short = 5,
-		@ushort = 6,
-		@int = 7,
-		@uint = 8,
-		@long = 9,
-		@ulong = 10,
-		@float = 11,
-		@double = 12,
-		@decimal = 13,
-		@string = 14,
-		@byteArray = 15,
-		@guid = 16,
-		@url = 17,
-		@date = 18,
-		@asciiString = 19,
-		@utf8String = 20,
-		@object = 253,
-		@array = 254,
-		@none = 255
+		@none = MdbType.none,
+		@object = MdbType.@object,
+		@null = MdbType.@null,
+		@bool = MdbType.@bool,
+		@char = MdbType.@char,
+		@sbyte = MdbType.@sbyte,
+		@byte = MdbType.@byte,
+		@short = MdbType.@short,
+		@ushort = MdbType.@ushort,
+		@int = MdbType.@int,
+		@uint = MdbType.@uint,
+		@long = MdbType.@long,
+		@ulong = MdbType.@ulong,
+		@float = MdbType.@float,
+		@double = MdbType.@double,
+		@decimal = MdbType.@decimal,
+		dateTime = MdbType.@dateTime,
+		@guid = MdbType.@guid,
+		@string = MdbType.@string,
+		byteArray = MdbType.@byteArray,
+
+		@asciiString = MdbType.@byteArray + 1,
+		@utf8String = @asciiString + 1,
+		@array = @utf8String + 1,
 	}
-	public ref struct BinaryDataWriter
+
+
+	public struct BinaryDataWriter
 	{
+		unsafe static readonly Action<BinaryDataWriter, object>[] _delegates = new Action<BinaryDataWriter, object>[]
+		{
+			(writer, value)=>writer.Write(),
+			(writer, value)=>
+			{
+				Type t = value.GetType();
+				if (typeof(IDictionary<string, object>).IsAssignableFrom(t))
+					writer.Write((IDictionary<string, object>)value);
+				else if (typeof(IList<object>).IsAssignableFrom(t))
+					writer.Write((IList<object>)value);
+			},
+			(writer, value)=>writer.WriteNull(),
+			(writer, value)=>writer.Write((bool)value),
+			(writer, value)=>writer.Write((char)value),
+			(writer, value)=>writer.Write((sbyte)value),
+			(writer, value)=>writer.Write((byte)value),
+			(writer, value)=>writer.Write((short)value),
+			(writer, value)=>writer.Write((ushort)value),
+			(writer, value)=>writer.Write((int)value),
+			(writer, value)=>writer.Write((uint)value),
+			(writer, value)=>writer.Write((long)value),
+			(writer, value)=>writer.Write((ulong)value),
+			(writer, value)=>writer.Write((float)value),
+			(writer, value)=>writer.Write((double)value),
+			(writer, value)=>writer.Write((decimal)value),
+			(writer, value)=>writer.Write((DateTime)value),
+			(writer, value)=>writer.Write((Guid)value),
+			(writer, value)=>writer.Write((string)value),
+			(writer, value)=>writer.Write((byte[])value),
+			(writer, value) =>
+			{
+				string source = (string)value;
+				int len = source.Length;
+				fixed (char * ptr = source)
+					writer.Write(ptr, len);
+			},
+			(writer, value) => writer.Write((char[])value),
+			(writer, value) => writer.Write((IList<object>)value)
+		};
+
+
 		private const int base_size = 4;
 		private static readonly int[] _sizerStatistic = new int[32];
 
@@ -45,12 +92,18 @@ namespace S031.MetaStack.Buffers
 			_index = 0;
 		}
 
+		internal BinaryDataWriter(byte[] source)
+		{
+			_buffer = source;
+			_index = _buffer.Length;
+		}
+
 		private static int GetCapacity(int value)
 		{
 			int maxValue = _sizerStatistic[0];
 			int indexForMaxValue = 0;
-			for (int i = 1; i < _sizerStatistic.Length; i++) 
-			{ 
+			for (int i = 1; i < _sizerStatistic.Length; i++)
+			{
 				if (_sizerStatistic[i] > maxValue)
 				{
 					maxValue = _sizerStatistic[i];
@@ -60,13 +113,30 @@ namespace S031.MetaStack.Buffers
 			return Math.Max(Convert.ToInt32(Math.Pow(2, base_size + indexForMaxValue)), value);
 		}
 
+		public int Position
+		{
+			get { return _index; }
+			set
+			{
+				if (value < 0 || value > Source.Length)
+					throw new ArgumentOutOfRangeException(nameof(value));
+				_index = value;
+			}
+		}
+
 		public int Length
 			=> _index;
+
+		public byte[] Source
+			=> _buffer;
 
 		public unsafe byte[] GetBytes()
 		{
 			//Update statistics
 			int newPosition = Math.Min(Convert.ToInt32(Math.Log(_index, 2)) - base_size, _sizerStatistic.Length);
+			if (newPosition < 0)
+				newPosition = 0;
+
 			_sizerStatistic[newPosition]++;
 
 			byte[] result = new byte[_index];
@@ -78,19 +148,14 @@ namespace S031.MetaStack.Buffers
 
 		}
 
+		public void Write()
+			=> Write((byte)ExportedDataTypes.none);
+
 		public void WriteNull()
-		{
-			CheckAndResizeBuffer(1);
-			_buffer[_index] = (byte)ExportedDataTypes.@null;
-			_index++;
-		}
+			=> Write((byte)ExportedDataTypes.@null);
 
 		public void Write(bool value)
-		{
-			CheckAndResizeBuffer(sizeof(bool));
-			_buffer[_index] = (byte)(value ? ExportedDataTypes.@true : ExportedDataTypes.@false);
-			_index++;
-		}
+			=> Write((byte)(value ? 1 : 0), ExportedDataTypes.@bool);
 
 		public unsafe void Write(sbyte value)
 		{
@@ -103,10 +168,10 @@ namespace S031.MetaStack.Buffers
 			_index++;
 		}
 
-		public void Write(byte value)
+		public void Write(byte value, ExportedDataTypes type = ExportedDataTypes.@byte)
 		{
 			CheckAndResizeBuffer(sizeof(byte) + 1);
-			_buffer[_index] = (byte)ExportedDataTypes.@byte;
+			_buffer[_index] = (byte)type;
 			_index++;
 
 			_buffer[_index] = value;
@@ -123,6 +188,7 @@ namespace S031.MetaStack.Buffers
 				*(short*)(ptr + _index) = value;
 			_index += sizeof(short);
 		}
+
 		public void Write(ushort value)
 			=> Write((short)value, ExportedDataTypes.@ushort);
 
@@ -172,10 +238,10 @@ namespace S031.MetaStack.Buffers
 			=> Write(*(long*)&value, ExportedDataTypes.@double);
 
 		public void Write(DateTime value)
-			=> Write(value.Ticks, ExportedDataTypes.@date);
-		
+			=> Write(value.Ticks, ExportedDataTypes.dateTime);
+
 		public void Write(TimeSpan value)
-			=> Write(value.Ticks, ExportedDataTypes.@date);
+			=> Write(value.Ticks, ExportedDataTypes.dateTime);
 
 		public unsafe void Write(char[] value)
 		{
@@ -197,19 +263,6 @@ namespace S031.MetaStack.Buffers
 				Buffer.MemoryCopy(source, dest + _index, size, size);
 			_index += size;
 		}
-
-		//static byte[] EncodeToBytes(string str)
-		//{
-		//	byte[] bytes = new byte[str.Length * sizeof(char)];
-		//	System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
-		//	return bytes;
-		//}
-		//static string DecodeToString(byte[] bytes)
-		//{
-		//	char[] chars = new char[bytes.Length / sizeof(char)];
-		//	System.Buffer.BlockCopy(bytes, 0, chars, 0, bytes.Length);
-		//	return new string(chars);
-		//}
 
 		/// <summary>
 		/// Write string in two byte array
@@ -283,6 +336,7 @@ namespace S031.MetaStack.Buffers
 				_index += size;
 			}
 		}
+
 		public unsafe void Write(Guid value)
 		{
 			int size = 36;
@@ -302,6 +356,32 @@ namespace S031.MetaStack.Buffers
 
 		public unsafe void WriteArrayHeader(int count)
 			=> Write(count, ExportedDataTypes.@array);
+
+		public void Write(IDictionary<string, object> map)
+		{
+			WriteMapHeader(map.Count);
+			foreach (var pair in map)
+			{
+				WritePropertyName(pair.Key);
+				Write(pair.Value);
+			}
+		}
+
+		public void Write(IList<object> array)
+		{
+			WriteArrayHeader(array.Count);
+			foreach (var value in array)
+				Write(value);
+		}
+
+		private unsafe void WritePropertyName(string name)
+		{
+			fixed (char* source = name)
+				Write(source, name.Length);
+		}
+
+		public void Write(object value)
+			=> _delegates[(int)MdbTypeMap.GetTypeInfo(value.GetType()).MdbType](this, value);
 
 		private unsafe void CheckAndResizeBuffer(int sizeHint)
 		{

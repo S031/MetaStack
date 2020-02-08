@@ -26,7 +26,7 @@ namespace S031.MetaStack.Core.ORM.SQLite
 			(MdbType.dateTime, "date;datetime;datetime2;smalldatetime;time"),
 			(MdbType.@string, "varchar;nvarchar;text;ntext;char;nchar;xml"),
 			(MdbType.byteArray, "binary;varbinary;image;rowversion;timestamp;sql_variant"),
-			(MdbType.charArray, "char;nchar"),
+			//(MdbType.charArray, "char;nchar"),
 			(MdbType.guid, "uniqueidentifier"),
 			(MdbType.@object, "varchar")
 		);
