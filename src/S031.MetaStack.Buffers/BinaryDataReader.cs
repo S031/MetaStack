@@ -1,4 +1,5 @@
-﻿using System;
+﻿using S031.MetaStack.Common;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -300,7 +301,7 @@ namespace S031.MetaStack.Buffers
 				case ExportedDataTypes.byteArray:
 					return ReadBytes();
 				case ExportedDataTypes.@object:
-					MapTable<string, object> map = new Data.MapTable<string, object>();
+					MapTable<string, object> map = new MapTable<string, object>();
 					ReadRaw(map);
 					return map;
 				case ExportedDataTypes.@array:

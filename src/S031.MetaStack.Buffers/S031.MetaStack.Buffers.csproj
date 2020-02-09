@@ -13,4 +13,12 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netcoreapp3.1|AnyCPU'">
+    <DefineConstants>TRACE;NO_COMMON</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\S031.MetaStack.Common\Collections\MapTable.cs" Link="MapTable.cs" />
+  </ItemGroup>
+
 </Project>

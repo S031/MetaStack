@@ -9,30 +9,29 @@ namespace S031.MetaStack.Buffers
 	/// </summary>
 	public enum ExportedDataTypes : byte
 	{
-		@none = MdbType.none,
-		@object = MdbType.@object,
-		@null = MdbType.@null,
-		@bool = MdbType.@bool,
-		@char = MdbType.@char,
-		@sbyte = MdbType.@sbyte,
-		@byte = MdbType.@byte,
-		@short = MdbType.@short,
-		@ushort = MdbType.@ushort,
-		@int = MdbType.@int,
-		@uint = MdbType.@uint,
-		@long = MdbType.@long,
-		@ulong = MdbType.@ulong,
-		@float = MdbType.@float,
-		@double = MdbType.@double,
-		@decimal = MdbType.@decimal,
-		dateTime = MdbType.@dateTime,
-		@guid = MdbType.@guid,
-		@string = MdbType.@string,
-		byteArray = MdbType.@byteArray,
-
-		@asciiString = MdbType.@byteArray + 1,
-		@utf8String = @asciiString + 1,
-		@array = @utf8String + 1,
+		@none = TypeCode.Empty,
+		@object = TypeCode.Object,
+		@null = TypeCode.DBNull,
+		@bool = TypeCode.Boolean,
+		@char = TypeCode.Char,
+		@sbyte = TypeCode.SByte,
+		@byte = TypeCode.Byte,
+		@short = TypeCode.Int16,
+		@ushort = TypeCode.UInt16,
+		@int = TypeCode.Int32,
+		@uint = TypeCode.UInt32,
+		@long = TypeCode.Int64,
+		@ulong = TypeCode.UInt64,
+		@float = TypeCode.Single,
+		@double = TypeCode.Double,
+		@decimal = TypeCode.Decimal,
+		dateTime = TypeCode.DateTime,
+		@guid = TypeCode.String - 1,
+		@string = TypeCode.String,
+		@byteArray = TypeCode.String + 1,
+		@asciiString = TypeCode.String + 2,
+		@utf8String = TypeCode.String + 3,
+		@array = TypeCode.String + 4,
 	}
 
 
@@ -77,6 +76,24 @@ namespace S031.MetaStack.Buffers
 			(writer, value) => writer.Write((char[])value),
 			(writer, value) => writer.Write((IList<object>)value)
 		};
+
+		internal static ExportedDataTypes GetExportedType(Type t)
+		{
+			TypeCode tcode = System.Type.GetTypeCode(t);
+
+			if (tcode == TypeCode.Object)
+			{
+				if (t == typeof(byte[]))
+					return ExportedDataTypes.byteArray;
+				else if (t == typeof(Guid))
+					return ExportedDataTypes.guid;
+				else if (typeof(IDictionary<string, object>).IsAssignableFrom(t))
+					return ExportedDataTypes.@object;
+				else if (typeof(IList<object>).IsAssignableFrom(t))
+					return ExportedDataTypes.array;;
+			}
+			return (ExportedDataTypes)tcode;
+		}
 
 
 		private const int base_size = 4;
@@ -381,7 +398,7 @@ namespace S031.MetaStack.Buffers
 		}
 
 		public void Write(object value)
-			=> _delegates[(int)MdbTypeMap.GetTypeInfo(value.GetType()).MdbType](this, value);
+			=> _delegates[(int)GetExportedType(value.GetType())](this, value);
 
 		private unsafe void CheckAndResizeBuffer(int sizeHint)
 		{

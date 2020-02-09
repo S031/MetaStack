@@ -17,6 +17,7 @@ namespace S031.MetaStack.Common
 #else
 	public class MapTable<TKey, TValue> : ICollection<KeyValuePair<TKey, TValue>>
 #endif
+		, IDictionary<TKey, TValue>
 	{
 		private const int default_capacity = 32;
 		private struct Entry

@@ -103,8 +103,7 @@ namespace S031.MetaStack.Data
 
 		public static Type GetType(string typeName, Type defaultType)
 		{
-			MdbType t;
-			return Enum.TryParse<MdbType>(typeName, true, out t)
+			return Enum.TryParse<MdbType>(typeName, true, out MdbType t)
 				? _listTypesInfo[(int)t].Type
 				: defaultType;
 		}
