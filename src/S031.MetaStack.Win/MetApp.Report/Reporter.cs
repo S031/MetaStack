@@ -11,8 +11,6 @@ using Stimulsoft.Report;
 using Stimulsoft.Report.Components;
 using Stimulsoft.Report.Components.TextFormats;
 using S031.MetaStack.WinForms;
-//using Newtonsoft.Json;
-//using Newtonsoft.Json.Linq;
 using S031.MetaStack.Common;
 using S031.MetaStack.WinForms.ORM;
 using System.Windows.Forms;
