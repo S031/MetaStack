@@ -297,6 +297,8 @@ namespace S031.MetaStack.Buffers
 				case ExportedDataTypes.@guid:
 					return ReadGuid();
 				case ExportedDataTypes.@null:
+					return DBNull.Value;
+				case ExportedDataTypes.none:
 					return null;
 				case ExportedDataTypes.byteArray:
 					return ReadBytes();
