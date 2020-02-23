@@ -106,29 +106,69 @@ namespace S031.MetaStack.Common
 		{
 			if (str.IsEmpty())
 				return type.GetDefaultValue();
-			else if (type == typeof(bool))
-				return str.ToBoolOrDefault();
-			else if (type == typeof(DateTime))
-				return str.ToDateOrDefault();
-			else if (type == typeof(TimeSpan))
-				return str.ToTimeSpan();
-			else if (type == typeof(Guid))
-				return new Guid(str);
-			else if (type.IsNumeric(NumericTypesScope.Integral))
-				return str.ToIntOrDefault();
-			else if (type.IsNumeric(NumericTypesScope.Long))
-				return (long)str.ToDoubleOrDefault();
-			else if (type.IsNumeric(NumericTypesScope.FloatingPoint))
-				return str.ToDecimalOrDefault();
-			else
-			{
-				object ret;
-				try { ret = System.Convert.ChangeType(str, type); }
-				catch { ret = type.GetDefaultValue(); }
-				return ret;
-			}
 
+			switch (Type.GetTypeCode(type))
+			{
+				case TypeCode.String:
+					return str;
+				case TypeCode.Empty:
+					return null;
+				case TypeCode.DBNull:
+					return DBNull.Value;
+				case TypeCode.Boolean:
+					return str.ToBoolOrDefault();
+				case TypeCode.DateTime:
+					return str.ToDateOrDefault();
+				case TypeCode.String - 1:
+					return new Guid(str);
+				case TypeCode.Byte:
+					byte byteValue;
+					return Byte.TryParse(str, out byteValue) ? byteValue : (byte)0;
+				case TypeCode.SByte:
+					sbyte sbyteValue;
+					return SByte.TryParse(str, out sbyteValue) ? sbyteValue : (sbyte)0;
+				case TypeCode.Char:
+					char charValue;
+					return Char.TryParse(str, out charValue) ? charValue : (char)0;
+				case TypeCode.Int16:
+					short shortValue;
+					return short.TryParse(str, out shortValue) ? shortValue : (short)0;
+				case TypeCode.UInt16:
+					ushort ushortValue;
+					return ushort.TryParse(str, out ushortValue) ? ushortValue : (ushort)0;
+				case TypeCode.Int32:
+					int intValue;
+					return int.TryParse(str, out intValue) ? intValue : 0;
+				case TypeCode.UInt32:
+					uint uintValue;
+					return uint.TryParse(str, out uintValue) ? uintValue : (uint)0;
+				case TypeCode.Int64:
+					long longValue;
+					return long.TryParse(str, out longValue) ? longValue : 0L;
+				case TypeCode.UInt64:
+					ulong ulongValue;
+					return ulong.TryParse(str, out ulongValue) ? ulongValue : (ulong)0;
+				case TypeCode.Single:
+					float floatValue;
+					return float.TryParse(str, out floatValue) ? floatValue : 0f;
+				case TypeCode.Double:
+					double doubleValue;
+					return double.TryParse(str, out doubleValue) ? doubleValue : 0d;
+				case TypeCode.Decimal:
+					decimal decimalValue;
+					return decimal.TryParse(str, out decimalValue) ? decimalValue : 0m;
+				default:
+					try 
+					{ 
+						return System.Convert.ChangeType(str, type); 
+					}
+					catch 
+					{ 
+						return type.GetDefaultValue(); 
+					}
+			}
 		}
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static byte[] ToByteArray(this string str, System.Text.Encoding encoding = null)
 		{

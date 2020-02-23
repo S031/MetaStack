@@ -7,10 +7,10 @@ namespace S031.MetaStack.Common
 {
 	public enum NumericTypesScope
 	{
-		All,
+		None,
 		Integral,
-		Long,
-		FloatingPoint
+		FloatingPoint,
+		All,
 	}
 
 	public static class vbo
@@ -49,39 +49,6 @@ namespace S031.MetaStack.Common
 		/// Соотношение большего катета к меньшему, при соотношении гипотенузы к меньшему катету 1.618х1
 		/// </summary>
 		public static readonly double GoldenRatio2 = Math.Sqrt(GoldenRatio * GoldenRatio - 1);
-
-		internal static readonly ReadOnlyCache<Type> AllNumericTypes =
-			new ReadOnlyCache<Type>(
-				typeof(int),
-				typeof(long),
-				typeof(decimal),
-				typeof(char),
-				typeof(sbyte),
-				typeof(byte),
-				typeof(short),
-				typeof(ushort),
-				typeof(uint),
-				typeof(ulong),
-				typeof(float),
-				typeof(double));
-
-		internal static readonly ReadOnlyCache<Type> IntegralTypes =
-			new ReadOnlyCache<Type>(
-				typeof(int),
-				typeof(long),
-				typeof(char),
-				typeof(sbyte),
-				typeof(byte),
-				typeof(short),
-				typeof(ushort),
-				typeof(uint),
-				typeof(ulong));
-
-		internal static readonly ReadOnlyCache<Type> FloatingPointTypes =
-			new ReadOnlyCache<Type>(
-				typeof(decimal),
-				typeof(float),
-				typeof(double));
 
 		public static DateTime Date()
 			=> DateTime.Now.Date;

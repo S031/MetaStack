@@ -229,44 +229,34 @@ namespace MetaStack.Test.Common
 				Type t = this.GetType();
 				for (int i = 0; i < 1000000; i++)
 				{
-					object value = typeof(string).GetDefaultValue();
+					object value = typeof(decimal).GetDefaultValue();
 				}
 				DateTime stop = DateTime.Now;
-				l.Debug("GetDefaultValue Return for 1,000,000 runs took " + (stop - start).TotalMilliseconds + "ms");
+				l.Debug($"GetDefaultValue Return for 1,000,000 runs took value = {GetDefaultValue(typeof(decimal))} {(stop - start).TotalMilliseconds} ms");
 
 				start = DateTime.Now;
 				for (int i = 0; i < 1000000; i++)
 				{
-					var value = GetDefaultValue(typeof(string));
+					var value = GetDefaultValue(typeof(decimal));
 				}
 				stop = DateTime.Now;
-				l.Debug($"GetDefaultValue Return for 1,000,000 runs took value = {GetDefaultValue(typeof(int))} {(stop - start).TotalMilliseconds} ms");
+				l.Debug($"GetDefaultValue Return for 1,000,000 runs took value = {GetDefaultValue(typeof(decimal))} {(stop - start).TotalMilliseconds} ms");
 
 				start = DateTime.Now;
 				for (int i = 0; i < 1000000; i++)
 				{
-					var value = typeof(int).Match<Type, object>(
-						(tp => tp == typeof(string), _ => string.Empty),
-						(tp => tp == typeof(DateTime), _ => DateTime.MinValue),
-						(tp => tp == typeof(bool), _ => false),
-						(tp => tp == typeof(byte), _ => 0),
-						(tp => tp == typeof(char), _ => '\0'),
-						(tp => tp == typeof(decimal), _ => 0m),
-						(tp => tp == typeof(double), _ => 0d),
-						(tp => tp == typeof(float), _ => 0f),
-						(tp => tp == typeof(int), _ => 0),
-						(tp => tp == typeof(long), _ => 0L),
-						(tp => tp == typeof(sbyte), _ => 0),
-						(tp => tp == typeof(short), _ => 0),
-						(tp => tp == typeof(uint), _ => 0),
-						(tp => tp == typeof(ulong), _ => 0),
-						(tp => tp == typeof(ushort), _ => 0),
-						(tp => tp == typeof(Guid), _ => Guid.Empty),
-						(tp => true, _ => null)
-						);
+					var value = GetDefaultValue2(typeof(decimal));
 				}
 				stop = DateTime.Now;
-				l.Debug($"GetDefaultValue Return for 1,000,000 runs took value = {GetDefaultValue(typeof(int))} {(stop - start).TotalMilliseconds} ms");
+				l.Debug($"GetDefaultValue Return for 1,000,000 runs took value = {GetDefaultValue2(typeof(decimal))} {(stop - start).TotalMilliseconds} ms");
+				
+				start = DateTime.Now;
+				for (int i = 0; i < 1000000; i++)
+				{
+					var value = "1234567".ToObjectOf(typeof(int));
+				}
+				stop = DateTime.Now;
+				l.Debug($"ToObjectOf Return for 1,000,000 runs took value = {"1234567".ToObjectOf(typeof(int))} {(stop - start).TotalMilliseconds} ms");
 			}
 		}
 
@@ -275,8 +265,40 @@ namespace MetaStack.Test.Common
 			return _defaults[type];
 		}
 
-		//public static object GetDefaultValue(Type type) => _defaults.FirstOrDefault(p => p.Key == type).Value;
+		public static object GetDefaultValue2(Type type)
+		{
+			TypeCode code = Type.GetTypeCode(type);
+			if (code == TypeCode.Object)
+			{
+				if (type.IsValueType || type.IsPrimitive)
+					return type.CreateInstance();
+				return default;
+			}
+			return _defaults2[(int)code];
+		}
 
+		private static readonly object[] _defaults2 = new object[]
+		{
+			null,
+			null,
+			DBNull.Value,
+			false,
+			'\0',
+			(sbyte)0,
+			(byte)0,
+			(short)0,
+			(ushort)0,
+			0,
+			(uint)0,
+			0L,
+			(ulong)0,
+			0f,
+			0d,
+			0m,
+			default(DateTime),
+			Guid.Empty,
+			string.Empty,
+		};
 
 		private static readonly ReadOnlyCache<Type, System.ValueType> _defaults = new ReadOnlyCache<Type, System.ValueType>(
 			(typeof(string), '\0'),

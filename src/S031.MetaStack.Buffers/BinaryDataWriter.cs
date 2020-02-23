@@ -35,7 +35,7 @@ namespace S031.MetaStack.Buffers
 	}
 
 
-	public struct BinaryDataWriter
+	public class BinaryDataWriter
 	{
 		unsafe static readonly Action<BinaryDataWriter, object>[] _delegates = new Action<BinaryDataWriter, object>[]
 		{

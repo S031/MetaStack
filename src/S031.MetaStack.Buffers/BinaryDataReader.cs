@@ -6,7 +6,7 @@ using System.Text;
 
 namespace S031.MetaStack.Buffers
 {
-	public ref struct BinaryDataReader
+	public class BinaryDataReader
 	{
 		private readonly byte[] _buffer;
 		private int _index;

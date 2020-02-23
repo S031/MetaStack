@@ -83,50 +83,7 @@ namespace S031.MetaStack.Common
 			lock (_obj4Lock) _ctorCache2[key] = ctor;
 			return (T)ctor.Invoke(args);
 		}
-		public static bool IsNumeric(this Type type, NumericTypesScope scope = NumericTypesScope.All)
-		{
-			type.NullTest(nameof(type));
-			if (scope == NumericTypesScope.All)
-				return vbo.AllNumericTypes.Contains(type);
-			else if (scope == NumericTypesScope.Integral)
-				return vbo.IntegralTypes.Contains(type);
-			else if (scope == NumericTypesScope.Long)
-				return type == typeof(long);
-			else if (scope == NumericTypesScope.FloatingPoint)
-				return vbo.FloatingPointTypes.Contains(type);
-			return vbo.AllNumericTypes.Contains(type);
-		}
-
-		public static object GetDefaultValue(this Type type)
-		{
-			type.NullTest(nameof(type));
-			if (_defaults.TryGetValue(type, out object result))
-				return result;
-			else if (type.IsValueType || type.IsPrimitive)
-				return CreateInstance(type);
-			return default;
-		}
-
-		private static readonly ReadOnlyCache<Type, object> _defaults = new ReadOnlyCache<Type, object>(
-			(typeof(string), string.Empty),
-			(typeof(DateTime), DateTime.MinValue),
-			(typeof(bool), false),
-			(typeof(byte), 0),
-			(typeof(char), '\0'),
-			(typeof(decimal), 0m),
-			(typeof(double), 0d),
-			(typeof(float), 0f),
-			(typeof(int), 0),
-			(typeof(long), 0L),
-			(typeof(sbyte), 0),
-			(typeof(short), 0),
-			(typeof(uint), 0),
-			(typeof(ulong), 0),
-			(typeof(ushort), 0),
-			(typeof(Guid), Guid.Empty)
-			);
-
-        public static IEnumerable<Type> GetImplements(this Type type, Assembly assembly = null)
+		public static IEnumerable<Type> GetImplements(this Type type, Assembly assembly = null)
         {
             IEnumerable<Assembly> l = assembly == null ? AppDomain.CurrentDomain.GetAssemblies() : new Assembly[] { assembly };
             foreach (var a in l)
@@ -141,6 +98,73 @@ namespace S031.MetaStack.Common
 			assembly.NullTest(nameof(assembly));
 			string fullName = assembly.FullName;
 			return fullName.Left(fullName.IndexOf(','));
+		}
+		
+		public static object GetDefaultValue(this Type type)
+		{
+			TypeCode code = Type.GetTypeCode(type);
+			if (code == TypeCode.Object)
+			{
+				if (type.IsValueType || type.IsPrimitive)
+					return type.CreateInstance();
+				return default;
+			}
+			return _defaults[(int)code].DefaultValue;
+		}
+
+		private struct __typeInfo
+		{
+			public readonly object DefaultValue;
+			public readonly NumericTypesScope NumericType;
+
+			public __typeInfo(object defaultValue, NumericTypesScope numericType)
+			{
+				DefaultValue = defaultValue;
+				NumericType = numericType;
+			}
+		}
+
+		private static readonly __typeInfo[] _defaults = new __typeInfo[]
+		{
+			new __typeInfo( null, NumericTypesScope.None ),
+			new __typeInfo( null, NumericTypesScope.None ),
+			new __typeInfo( DBNull.Value, NumericTypesScope.None ),
+			new __typeInfo( false, NumericTypesScope.None ),
+			new __typeInfo( '\0', NumericTypesScope.Integral ),
+			new __typeInfo( (sbyte)0, NumericTypesScope.Integral ),
+			new __typeInfo( (byte)0, NumericTypesScope.Integral ),
+			new __typeInfo( (sbyte)0, NumericTypesScope.Integral ),
+			new __typeInfo( (short)0, NumericTypesScope.Integral ),
+			new __typeInfo( (ushort)0, NumericTypesScope.Integral ),
+			new __typeInfo( 0, NumericTypesScope.Integral ),
+			new __typeInfo( (uint)0, NumericTypesScope.Integral ),
+			new __typeInfo( 0L, NumericTypesScope.Integral ),
+			new __typeInfo( (ulong)0, NumericTypesScope.Integral ),
+			new __typeInfo( 0f, NumericTypesScope.FloatingPoint ),
+			new __typeInfo( 0d, NumericTypesScope.FloatingPoint ),
+			new __typeInfo( 0m, NumericTypesScope.FloatingPoint ),
+			new __typeInfo( default(DateTime), NumericTypesScope.None ),
+			new __typeInfo( Guid.Empty, NumericTypesScope.None ),
+			new __typeInfo( string.Empty, NumericTypesScope.None )
+		};
+
+
+		public static bool IsNumeric(this Type type, NumericTypesScope scope = NumericTypesScope.All)
+		{
+			if (type == null)
+				return false;
+
+			if (type.IsEnum &&
+				(scope == NumericTypesScope.All || scope == NumericTypesScope.Integral))
+				return true;
+
+			TypeCode code = Type.GetTypeCode(type);
+			__typeInfo ti = _defaults[(int)code];
+			if (scope == NumericTypesScope.All)
+				return ti.NumericType == NumericTypesScope.Integral
+					|| ti.NumericType == NumericTypesScope.FloatingPoint;
+			
+			return ti.NumericType == scope;
 		}
 	}
 }
