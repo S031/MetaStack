@@ -1,67 +1,65 @@
-﻿using S031.MetaStack.Common;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
+using S031.MetaStack.Common;
 
 namespace S031.MetaStack.Buffers
 {
 	public class BinaryDataReader
 	{
-		private readonly byte[] _buffer;
-		private int _index;
-		private readonly int _count;
-
-		public BinaryDataReader(byte[] source)
+		readonly BinaryDataBuffer _buffer;
+		public BinaryDataReader(BinaryDataBuffer buffer)
 		{
-			_buffer = source;
-			_index = 0;
-			_count = _buffer.Length;
+			_buffer = buffer;
 		}
 
-		public byte[] Source
-			=> _buffer;
+		internal BinaryDataReader(byte[] source)
+			: this(new BinaryDataBuffer(source, 0, source.Length, true))
+		{
+		}
+
+		internal byte[] Source
+			=> _buffer.Source;
 
 		public int Lenght
-			=> _count;
+			=> _buffer.Length;
 
 		public int Position
 		{
-			get { return _index; }
-			set
-			{
-				if (value < 0 || value > _count)
-					throw new ArgumentOutOfRangeException(nameof(value));
-				_index = value;
-			}
-		}			
+			get { return _buffer.Position; }
+			set { _buffer.Position = value; }
+		}
 
-		public ExportedDataTypes ReadNext()
+		public bool EOF
+			=> _buffer.Position >= _buffer.Length;
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public unsafe ExportedDataTypes ReadNext()
 		{
-			if (_index >= _count)
+			if (EOF)
 				return ExportedDataTypes.none;
 			
-			var result = (ExportedDataTypes)_buffer[_index];
-			_index++;
+			var result = (ExportedDataTypes)(*_buffer.Ref);
+			_buffer.Skip();
 			return result;
 		}
 
 		public unsafe string ReadString()
 		{
-			if (_index >= _count)
+			if (EOF)
 				throw new IndexOutOfRangeException();
 
 			int size = ReadInt32();
-			if (_index + size > _count)
+			if (_buffer.Position + size > _buffer.Length)
 				throw new IndexOutOfRangeException();
 
 			if (size > 0)
 			{
-				fixed (byte* source = &_buffer[_index])
 				fixed (char* dest = new char[size])
 				{
-					Buffer.MemoryCopy(source, dest, size, size);
-					_index += size;
+					Buffer.MemoryCopy(_buffer.Ref, dest, size, size);
+					_buffer.Skip(size);
 					return new string(dest);
 				};
 			}
@@ -70,42 +68,40 @@ namespace S031.MetaStack.Buffers
 
 		public unsafe string ReadAsciiString()
 		{
-			if (_index >= _count)
+			if (EOF)
 				throw new IndexOutOfRangeException();
 
 			int size = ReadInt32();
-			if (_index + size > _count)
+			if (_buffer.Position + size > _buffer.Length)
 				throw new IndexOutOfRangeException();
 
 			if (size > 0)
 			{
-				fixed (byte* source = &_buffer[_index])
-				fixed (char* dest = new char[size])
-				{
-					for (int i = 0; i < size; i++)
-						dest[i] = (char)source[i];
-					_index += size;
-					return new string(dest);
-				};
+				byte* source = _buffer.Ref;
+				char[] dest = new char[size];
+
+				for (int i = 0; i < size; i++)
+					dest[i] = (char)source[i];
+
+				_buffer.Skip(size);
+				return new string(dest);
 			}
 			return string.Empty;
 		}
 
 		public unsafe string ReadUtf8String()
 		{
-			if (_index >= _count)
+			if (EOF)
 				throw new IndexOutOfRangeException();
 
 			int size = ReadInt32();
-			if (_index + size > _count)
+			if (_buffer.Position + size > _buffer.Length)
 				throw new IndexOutOfRangeException();
+
 			if (size > 0)
 			{
-				fixed (byte* source = &_buffer[_index])
-				{
-					_index += size;
-					return Encoding.UTF8.GetString(source, size);
-				};
+				_buffer.Skip(size);
+				return Encoding.UTF8.GetString(_buffer.Ref, size);
 			}
 			return string.Empty;
 		}
@@ -113,29 +109,28 @@ namespace S031.MetaStack.Buffers
 		public bool ReadBool()
 			=> ReadByte() == 0 ? false : true;
 
-		public Byte ReadByte()
+		public unsafe Byte ReadByte()
 		{
-			byte result = _buffer[_index];
-			_index++;
+			byte result = *_buffer.Ref;
+			_buffer.Skip();
 			return result;
 		}
 
 		public unsafe byte[] ReadBytes()
 		{
-			if (_index >= _count)
+			if (EOF)
 				throw new IndexOutOfRangeException();
 
 			int size = ReadInt32();
-			if (_index + size > _count)
+			if (_buffer.Position + size > _buffer.Length)
 				throw new IndexOutOfRangeException();
 
 			if (size > 0)
 			{
 				byte[] data = new byte[size];
-				fixed (byte* source = &_buffer[_index])
 				fixed (byte* dest = data)
-					Buffer.MemoryCopy(source, dest, size, size);
-				_index += size;
+					Buffer.MemoryCopy(_buffer.Ref, dest, size, size);
+				_buffer.Skip(size);
 				return data;
 			}
 			return new byte[] { };
@@ -143,77 +138,72 @@ namespace S031.MetaStack.Buffers
 
 		public unsafe sbyte ReadSByte()
 		{
-			sbyte result;
-			fixed (byte* p = &_buffer[_index])
-				result = *(sbyte*)p;
-			_index += sizeof(sbyte);
+			sbyte result = *(sbyte*)_buffer.Ref;
+			_buffer.Skip(sizeof(sbyte));
 			return result;
 		}
 
-		public short ReadInt16()
+		public unsafe short ReadInt16()
 		{
-			short result = BitConverter.ToInt16(_buffer, _index);
-			_index+=sizeof(short);
+			short result = *(short*)_buffer.Ref;
+			_buffer.Skip(sizeof(short));
 			return result;
 		}
 		
-		public ushort ReadUInt16()
+		public unsafe ushort ReadUInt16()
 		{
-			ushort result = BitConverter.ToUInt16(_buffer, _index);
-			_index+=sizeof(UInt16);
+			ushort result =*(ushort*)_buffer.Ref;
+			_buffer.Skip(sizeof(ushort));
 			return result;
 		}
 		
-		public int ReadInt32()
+		public unsafe int ReadInt32()
 		{
-			int result = BitConverter.ToInt32(_buffer, _index);
-			_index+=sizeof(int);
+			int result = *(int*)_buffer.Ref;
+			//int result = BitConverter.ToInt32(_buffer, 1);
+			_buffer.Skip(sizeof(int));
 			return result;
 		}
 		
-		public uint ReadUInt32()
+		public unsafe uint ReadUInt32()
 		{
-			uint result = BitConverter.ToUInt32(_buffer, _index);
-			_index+=sizeof(UInt32);
+			uint result = *(uint*)_buffer.Ref;
+			_buffer.Skip(sizeof(uint));
 			return result;
 		}
 
-		public long ReadInt64()
+		public unsafe long ReadInt64()
 		{
-			long result = BitConverter.ToInt64(_buffer, _index);
-			_index+=sizeof(long);
+			long result = *(long*)_buffer.Ref;
+			_buffer.Skip(sizeof(long));
 			return result;
 		}
 
-		public ulong ReadUInt64()
+		public unsafe ulong ReadUInt64()
 		{
-			ulong result = BitConverter.ToUInt64(_buffer, _index);
-			_index+=sizeof(ulong);
+			ulong result = *(ulong*)_buffer.Ref;
+			_buffer.Skip(sizeof(ulong));
 			return result;
 		}
 
-		public float ReadSingle()
+		public unsafe float ReadSingle()
 		{
-			float result = BitConverter.ToSingle(_buffer, _index);
-			_index+=sizeof(float);
+			float result = *(float*)_buffer.Ref;
+			_buffer.Skip(sizeof(float));
 			return result;
 		}
 
-		public double ReadDouble()
+		public unsafe double ReadDouble()
 		{
-			double result = BitConverter.ToDouble(_buffer, _index);
-			_index+=sizeof(double);
+			double result = *(double*)_buffer.Ref;
+			_buffer.Skip(sizeof(double));
 			return result;
 		}
 
 		public unsafe decimal ReadDecimal()
 		{
-			decimal result;
-			fixed (byte* p = &_buffer[_index])
-			{
-				result = *(decimal*)p;
-			}
-			_index += sizeof(decimal);
+			decimal result = *(decimal*)_buffer.Ref;
+			_buffer.Skip(sizeof(decimal));
 			return result;
 		}
 
@@ -222,21 +212,20 @@ namespace S031.MetaStack.Buffers
 		
 		public unsafe Guid ReadGuid()
 		{
-			const int guid_len = 36;
+			const int guid_len = 16;
 
 			byte[] data = new byte[guid_len];
-			fixed (byte* source = &_buffer[_index])
 			fixed (byte* dest =  data)
-				Buffer.MemoryCopy(source, dest, guid_len, guid_len);
+				Buffer.MemoryCopy(_buffer.Ref, dest, guid_len, guid_len);
 
 			Guid result = new Guid(data);
-			_index += guid_len;
+			_buffer.Skip(guid_len);
 			return result;
 		}
 
 		public void ReadRaw(IDictionary<string, object> map)
 		{
-			int count = ReadInt32();
+			int count = Read<int>();
 			for (int i = 0; i < count; i++)
 			{
 				var t = ReadNext();
@@ -258,8 +247,71 @@ namespace S031.MetaStack.Buffers
 				array.Add(ReadValue());
 		}
 
+		static readonly Func<BinaryDataReader, object>[] _delegates = new Func<BinaryDataReader, object>[]
+		{
+			(reader)=>null,
+			(reader)=>
+			{
+					MapTable<string, object> map = new MapTable<string, object>();
+					reader.ReadRaw(map);
+					return map;
+			},
+			(reader)=>DBNull.Value,
+			(reader)=>reader.ReadBool(),
+			(reader)=>(char)reader.ReadInt16(),
+			(reader)=>reader.ReadSByte(),
+			(reader)=>reader.ReadByte(),
+			(reader)=>reader.ReadInt16(),
+			(reader)=>reader.ReadUInt16(),
+			(reader)=>reader.ReadInt32(),
+			(reader)=>reader.ReadUInt32(),
+			(reader)=>reader.ReadUInt64(),
+			(reader)=>reader.ReadUInt64(),
+			(reader)=>reader.ReadSingle(),
+			(reader)=>reader.ReadDouble(),
+			(reader)=>reader.ReadDecimal(),
+			(reader)=>reader.ReadDate(),
+			(reader)=>reader.ReadGuid(),
+			(reader)=>reader.ReadString(),
+			(reader)=>reader.ReadBytes(),
+			(reader) =>reader.ReadAsciiString(),
+			(reader) => reader.ReadUtf8String(),
+			(reader) => 
+			{
+				List<object> a = new List<object>();
+				reader.ReadArrayRaw(a);
+				return a;
+			}
+		};
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public object ReadValue()
+			=> _delegates[(int)ReadNext()](this);
+
+		public object[] ReadValues(int count)
+		{
+			object[] result = new object[count];
+			for (int i = 0; i<count;i++)
+				result[i] = _delegates[(int)ReadNext()](this);
+			return result;
+		}
+
+#if NETCOREAPP
+		public unsafe T Read<T>()
+			where T : unmanaged
+		{
+			ReadNext();
+			T result = *(T*)_buffer.Ref;
+			_buffer.Skip(sizeof(T));
+			return result;
+		}
+#else
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public T Read<T>()
+			=> (T)_delegates[(int)ReadNext()](this);
+#endif
+
+		public object ReadValue2()
 		{
 			var t = ReadNext();
 			switch (t)
@@ -315,4 +367,5 @@ namespace S031.MetaStack.Buffers
 			}
 		}
 	}
+
 }

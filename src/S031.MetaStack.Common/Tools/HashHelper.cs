@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Metib.Data
+namespace S031.MetaStack.Common
 {
 	public unsafe static class HashHelper
 	{
@@ -16,7 +16,7 @@ namespace Metib.Data
 		/// </summary>
 		/// <param name="s"></param>
 		/// <returns></returns>
-		internal static uint ComputeHash(this string s)
+		public static uint ComputeHash(this string s)
 		{
 			uint num = FNV_basis;
 			fixed (char* source = s)

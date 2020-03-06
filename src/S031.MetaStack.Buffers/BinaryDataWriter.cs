@@ -5,7 +5,7 @@ using System.Text;
 namespace S031.MetaStack.Buffers
 {
 	/// <summary>
-	/// Inherited from <see cref="MdbType"/> 
+	/// Inherited from <see cref="TypeCode"/> 
 	/// </summary>
 	public enum ExportedDataTypes : byte
 	{
@@ -95,81 +95,55 @@ namespace S031.MetaStack.Buffers
 			return (ExportedDataTypes)tcode;
 		}
 
-
-		private const int base_size = 4;
-		private static readonly int[] _sizerStatistic = new int[32];
-
-		byte[] _buffer;
-		int _index;
-
-		public BinaryDataWriter(int capacity)
+		readonly BinaryDataBuffer _buffer;
+		public BinaryDataWriter(BinaryDataBuffer buffer)
 		{
-			capacity = GetCapacity(capacity);
-			_buffer = new byte[capacity];
-			_index = 0;
+			_buffer = buffer;
+		}
+
+		public BinaryDataWriter(int capacity) 
+			: this(new BinaryDataBuffer(capacity))
+		{
 		}
 
 		internal BinaryDataWriter(byte[] source)
+			: this(new BinaryDataBuffer(source, 0, source.Length, false))
 		{
-			_buffer = source;
-			_index = _buffer.Length;
-		}
-
-		private static int GetCapacity(int value)
-		{
-			int maxValue = _sizerStatistic[0];
-			int indexForMaxValue = 0;
-			for (int i = 1; i < _sizerStatistic.Length; i++)
-			{
-				if (_sizerStatistic[i] > maxValue)
-				{
-					maxValue = _sizerStatistic[i];
-					indexForMaxValue = i;
-				}
-			}
-			return Math.Max(Convert.ToInt32(Math.Pow(2, base_size + indexForMaxValue)), value);
 		}
 
 		public int Position
 		{
-			get { return _index; }
-			set
-			{
-				if (value < 0 || value > Source.Length)
-					throw new ArgumentOutOfRangeException(nameof(value));
-				_index = value;
-			}
+			get { return _buffer.Position; }
+			set { _buffer.Position = value; }
 		}
 
 		public int Length
-			=> _index;
+			=> _buffer.Length;
 
-		public byte[] Source
-			=> _buffer;
+		internal byte[] Source
+			=> _buffer.Source;
 
 		public unsafe byte[] GetBytes()
+			=> _buffer.GetBytes();
+
+		public unsafe void Write(ExportedDataTypes type)
 		{
-			//Update statistics
-			int newPosition = Math.Min(Convert.ToInt32(Math.Log(_index, 2)) - base_size, _sizerStatistic.Length);
-			if (newPosition < 0)
-				newPosition = 0;
-
-			_sizerStatistic[newPosition]++;
-
-			byte[] result = new byte[_index];
-
-			fixed (byte* source = _buffer)
-			fixed (byte* dest = result)
-				Buffer.MemoryCopy(source, dest, _index, _index);
-			return result;
-
+			CheckAndResizeBuffer(sizeof(byte));
+			*(byte*)_buffer.Ref = (byte)type;
+			_buffer.Skip();
 		}
 
 		public void Write()
-			=> Write((byte)ExportedDataTypes.none);
+			=> Write(ExportedDataTypes.none);
 
 		public void WriteNull()
-			=> Write((byte)ExportedDataTypes.@null);
+			=> Write(ExportedDataTypes.@null);
+
+		public void WriteSpace(int count)
+		{
+			_buffer.CheckAndResizeBuffer(count);
+			_buffer.Skip(count);
+		}
 
 		public void Write(bool value)
 			=> Write((byte)(value ? 1 : 0), ExportedDataTypes.@bool);
@@ -177,33 +151,31 @@ namespace S031.MetaStack.Buffers
 		public unsafe void Write(sbyte value)
 		{
 			CheckAndResizeBuffer(sizeof(sbyte) + 1);
-			_buffer[_index] = (byte)ExportedDataTypes.@sbyte;
-			_index++;
+			*(byte*)_buffer.Ref = (byte)ExportedDataTypes.@sbyte;
+			_buffer.Skip();			
 
-			fixed (byte* ptr = _buffer)
-				*(sbyte*)(ptr + _index) = value;
-			_index++;
+			*(sbyte*)_buffer.Ref = value;
+			_buffer.Skip();
 		}
 
-		public void Write(byte value, ExportedDataTypes type = ExportedDataTypes.@byte)
+		public unsafe void Write(byte value, ExportedDataTypes type = ExportedDataTypes.@byte)
 		{
 			CheckAndResizeBuffer(sizeof(byte) + 1);
-			_buffer[_index] = (byte)type;
-			_index++;
+			*(byte*)_buffer.Ref = (byte)type;
+			_buffer.Skip();
 
-			_buffer[_index] = value;
-			_index++;
+			*(byte*)_buffer.Ref = value;
+			_buffer.Skip();
 		}
 
 		public unsafe void Write(short value, ExportedDataTypes type = ExportedDataTypes.@short)
 		{
 			CheckAndResizeBuffer(sizeof(short) + 1);
-			_buffer[_index] = (byte)type;
-			_index++;
+			*(byte*)_buffer.Ref = (byte)type;
+			_buffer.Skip();
 
-			fixed (byte* ptr = _buffer)
-				*(short*)(ptr + _index) = value;
-			_index += sizeof(short);
+			*(short*)_buffer.Ref = value;
+			_buffer.Skip(sizeof(short));
 		}
 
 		public void Write(ushort value)
@@ -212,12 +184,11 @@ namespace S031.MetaStack.Buffers
 		public unsafe void Write(int value, ExportedDataTypes type = ExportedDataTypes.@int)
 		{
 			CheckAndResizeBuffer(sizeof(int) + 1);
-			_buffer[_index] = (byte)type;
-			_index++;
+			*(byte*)_buffer.Ref = (byte)type;
+			_buffer.Skip();
 
-			fixed (byte* ptr = _buffer)
-				*(int*)(ptr + _index) = value;
-			_index += sizeof(int);
+			*(int*)_buffer.Ref = value;
+			_buffer.Skip(sizeof(int));
 		}
 
 		public unsafe void Write(uint value)
@@ -226,23 +197,21 @@ namespace S031.MetaStack.Buffers
 		public unsafe void Write(long value, ExportedDataTypes type = ExportedDataTypes.@long)
 		{
 			CheckAndResizeBuffer(sizeof(long) + 1);
-			_buffer[_index] = (byte)type;
-			_index++;
+			*(byte*)_buffer.Ref = (byte)type;
+			_buffer.Skip();
 
-			fixed (byte* ptr = _buffer)
-				*(long*)(ptr + _index) = value;
-			_index += sizeof(long);
+			*(long*)_buffer.Ref = value;
+			_buffer.Skip(sizeof(long));
 		}
 
 		public unsafe void Write(decimal value)
 		{
 			CheckAndResizeBuffer(sizeof(decimal) + 1);
-			_buffer[_index] = (byte)ExportedDataTypes.@decimal;
-			_index++;
+			*(byte*)_buffer.Ref = (byte)ExportedDataTypes.@decimal;
+			_buffer.Skip();
 
-			fixed (byte* ptr = _buffer)
-				*(decimal*)(ptr + _index) = value;
-			_index += sizeof(decimal);
+			*(decimal*)_buffer.Ref = value;
+			_buffer.Skip(sizeof(decimal));
 		}
 
 		public void Write(ulong value)
@@ -268,17 +237,15 @@ namespace S031.MetaStack.Buffers
 			int size = data.Length;
 
 			CheckAndResizeBuffer(size + sizeof(int) + 1);
-			_buffer[_index] = (byte)ExportedDataTypes.utf8String;
-			_index++;
+			*(byte*)_buffer.Ref = (byte)ExportedDataTypes.utf8String;
+			_buffer.Skip();
 
-			fixed (byte* ptr = _buffer)
-				*(int*)(ptr + _index) = size;
-			_index += sizeof(int);
+			*(int*)_buffer.Ref = size;
+			_buffer.Skip(sizeof(int));
 
 			fixed (byte* source = data)
-			fixed (byte* dest = _buffer)
-				Buffer.MemoryCopy(source, dest + _index, size, size);
-			_index += size;
+				Buffer.MemoryCopy(source, _buffer.Ref, size, size);
+			_buffer.Skip(size);
 		}
 
 		/// <summary>
@@ -290,19 +257,17 @@ namespace S031.MetaStack.Buffers
 			int size = value.Length * sizeof(char);
 			CheckAndResizeBuffer(size + sizeof(int) + 1);
 
-			_buffer[_index] = (byte)ExportedDataTypes.@string;
-			_index++;
+			*(byte*)_buffer.Ref = (byte)ExportedDataTypes.@string;
+			_buffer.Skip();
 
-			fixed (byte* ptr = _buffer)
-				*(int*)(ptr + _index) = size;
-			_index += sizeof(int);
+			*(int*)_buffer.Ref = size;
+			_buffer.Skip(sizeof(int));
 
 			if (size > 0)
 			{
 				fixed (char* source = value)
-				fixed (byte* dest = &_buffer[_index])
-					Buffer.MemoryCopy(source, dest, size, size);
-				_index += size;
+					Buffer.MemoryCopy(source, _buffer.Ref, size, size);
+				_buffer.Skip(size);
 			}
 		}
 
@@ -314,58 +279,51 @@ namespace S031.MetaStack.Buffers
 		public unsafe void Write(char* value, int size)
 		{
 			CheckAndResizeBuffer(size + sizeof(int) + 1);
+			*(byte*)_buffer.Ref = (byte)ExportedDataTypes.asciiString;
+			_buffer.Skip();
 
-			_buffer[_index] = (byte)ExportedDataTypes.asciiString;
-			_index++;
-
-			fixed (byte* ptr = _buffer)
-				*(int*)(ptr + _index) = size;
-			_index += sizeof(int);
+			*(int*)_buffer.Ref = size;
+			_buffer.Skip(sizeof(int));
 
 			if (size > 0)
 			{
-				fixed (byte* dest = &_buffer[_index])
-				{
-					for (int i = 0; i < size; i++)
-						dest[i] = (byte)value[i];
-				}
-				_index += size;
+				byte* dest = _buffer.Ref;
+				for (int i = 0; i < size; i++)
+					dest[i] = (byte)value[i];
+				_buffer.Skip(size);
 			}
 		}
 
 		public unsafe void Write(byte[] value)
 		{
-			int size = value.Length;// * sizeof(char);
+			int size = value.Length;
 			CheckAndResizeBuffer(size + sizeof(int) + 1);
 
-			_buffer[_index] = (byte)ExportedDataTypes.byteArray;
-			_index++;
+			*(byte*)_buffer.Ref = (byte)ExportedDataTypes.byteArray;
+			_buffer.Skip();
 
-			fixed (byte* ptr = _buffer)
-				*(int*)(ptr + _index) = size;
-			_index += sizeof(int);
+			*(int*)_buffer.Ref = size;
+			_buffer.Skip(sizeof(int));
 
 			if (size > 0)
 			{
 				fixed (byte* source = value)
-				fixed (byte* dest = _buffer)
-					Buffer.MemoryCopy(source, dest + _index, size, size);
-				_index += size;
+					Buffer.MemoryCopy(source, _buffer.Ref, size, size);
+				_buffer.Skip(size);
 			}
 		}
 
 		public unsafe void Write(Guid value)
 		{
-			int size = 36;
+			const int size = 16;
 			CheckAndResizeBuffer(size + 1);
 
-			_buffer[_index] = (byte)ExportedDataTypes.guid;
-			_index++;
+			*(byte*)_buffer.Ref = (byte)ExportedDataTypes.guid;
+			_buffer.Skip();
 
 			fixed (byte* source = value.ToByteArray())
-			fixed (byte* dest = _buffer)
-				Buffer.MemoryCopy(source, dest + _index, size, size);
-			_index += size;
+				Buffer.MemoryCopy(source, _buffer.Ref, size, size);
+			_buffer.Skip(size);
 		}
 
 		public unsafe void WriteMapHeader(int count)
@@ -398,25 +356,14 @@ namespace S031.MetaStack.Buffers
 		}
 
 		public void Write(object value)
-			=> _delegates[(int)GetExportedType(value.GetType())](this, value);
+		{
+			if (value == null)
+				Write();
+			else
+				_delegates[(int)GetExportedType(value.GetType())](this, value);
+		}
 
 		private unsafe void CheckAndResizeBuffer(int sizeHint)
-		{
-			int availableSpace = _buffer.Length - _index;
-
-			if (sizeHint > availableSpace)
-			{
-				int growBy = Math.Max(sizeHint, _buffer.Length);
-
-				int newSize = checked(_buffer.Length + growBy);
-
-				byte[] oldBuffer = _buffer;
-				_buffer = new byte[newSize];
-
-				fixed (byte* source = oldBuffer)
-				fixed (byte* dest = _buffer)
-					Buffer.MemoryCopy(source, dest, newSize, _index);
-			}
-		}
+			=> _buffer.CheckAndResizeBuffer(sizeHint);
 	}
 }
