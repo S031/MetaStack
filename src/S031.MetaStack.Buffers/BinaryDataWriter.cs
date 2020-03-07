@@ -47,6 +47,8 @@ namespace S031.MetaStack.Buffers
 					writer.Write((IDictionary<string, object>)value);
 				else if (typeof(IList<object>).IsAssignableFrom(t))
 					writer.Write((IList<object>)value);
+				else
+					throw new InvalidOperationException($"Can't write {t} as binary data");
 			},
 			(writer, value)=>writer.WriteNull(),
 			(writer, value)=>writer.Write((bool)value),

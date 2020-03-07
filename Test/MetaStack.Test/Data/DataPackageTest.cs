@@ -41,7 +41,7 @@ namespace MetaStack.Test.Data
 						Name = (string)p["Col2"]
 					};
 					c.ItemList.Add(p["Col4"].ToString(), p["Col4"]);
-					p["Col5"] = c;
+					p["Col5"] = null;
 					p.Update();
 				}
 				p.GoDataTop();
@@ -52,6 +52,9 @@ namespace MetaStack.Test.Data
 				l.Debug(p.ToString(TsExportFormat.JSON));
 
 				p = new DataPackage("Col1", 999999999999, "Col2", "Свойство 1", "Col3", DateTime.Now, "Col4", Guid.NewGuid());
+				p.SetHeader("HeaderValue1", 100)
+					.SetHeader("HeaderValue2", DateTime.Now)
+					.UpdateHeaders();
 				p.GoDataTop();
 				p.Read();
 				l.Debug(p.GetRowJSON());
@@ -72,7 +75,6 @@ namespace MetaStack.Test.Data
 				for (i = 0; i < loopCount; i++)
 					p = GetTestData(count, false, false);
 				l.Debug($"SpeedTest Finish {i} packages with {count} rows");
-				i = 0;
 				for (i = 0; i < loopCount; i++)
 					p.GoDataTop();
 					for (; p.Read();)
@@ -99,8 +101,7 @@ namespace MetaStack.Test.Data
 				.SetHeader("Sign", UnicodeEncoding.UTF8.GetBytes("Сергей"))
 				.UpdateHeaders();
 
-			int i = 0;
-			for (i = 0; i < rowsCount; i++)
+			for (int i = 0; i < rowsCount; i++)
 			{
 				p.AddNew()
 					.SetValue(0, i)
@@ -123,7 +124,7 @@ namespace MetaStack.Test.Data
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
 				int i = 5;
-				DataPackage p = GetTestData(i, true, true);
+				DataPackage p = GetTestData(i, true, false);
 				l.Debug($"byteArrayTest source {i} rows added");
 				l.Debug(p.ToString(TsExportFormat.JSON));
 				int hash = p.ToString(TsExportFormat.JSON).GetHashCode();
@@ -186,8 +187,8 @@ namespace MetaStack.Test.Data
 					p["Col3"] = DateTime.Now.AddDays(i);
 					p["Col4"] = Guid.NewGuid();
 					//без сериализации работает в 1.5 раза быстрееp
-					//p["Col5"] = null;
-					p["Col5"] = new TestClass() { ID = i, Name = (string)p["Col2"] };
+					p["Col5"] = null;
+					//p["Col5"] = new TestClass() { ID = i, Name = (string)p["Col2"] };
 					p.Update();
 				}
 				l.Debug($"headerTest source {i} rows added");
@@ -200,11 +201,11 @@ namespace MetaStack.Test.Data
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
 				int i = 5;
-				DataPackage p = GetTestData(i, true, true);
+				DataPackage p = GetTestData(i, true, false);
 				l.Debug($"writeDataTest source {i} rows added");
 				l.Debug(p.ToString(TsExportFormat.JSON));
 				int hash = p.ToString(TsExportFormat.JSON).GetHashCode();
-				var p1 = DataPackage.WriteData(p);
+				var p1 = new DataPackage(p);
 				l.Debug($"writeDataTest after conversion");
 				l.Debug(p.ToString(TsExportFormat.JSON));
 				Assert.True(hash == p.ToString(TsExportFormat.JSON).GetHashCode());
@@ -216,7 +217,7 @@ namespace MetaStack.Test.Data
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
 				int i = 5;
-				DataPackage p = GetTestData(i, false, true);
+				DataPackage p = GetTestData(i, false, false);
 				l.Debug($"writeDataTest source {i} rows added");
 				var t = p.ToDataTable();
 				DisplayData(t, l);

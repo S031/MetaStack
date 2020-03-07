@@ -10,7 +10,6 @@ namespace S031.MetaStack.WinForms.Json
 {
 	public static class JSONExtensions
     {
-
 		public static object DeserializeObject(Type t, string value)
 		{
 			if (typeof(JsonSerializible).IsAssignableFrom(t))
@@ -26,7 +25,6 @@ namespace S031.MetaStack.WinForms.Json
 				return instance;
 
 			}
-			//return MessagePackSerializer.Typeless.Deserialize(MessagePack.MessagePackSerializer.ConvertFromJson(value));
 			throw new NotImplementedException();
 		}
 
@@ -46,10 +44,8 @@ namespace S031.MetaStack.WinForms.Json
 				return (T)instance;
 
 			}
-			//return MessagePackSerializer.Deserialize<T>(MessagePack.MessagePackSerializer.ConvertFromJson(value));
 			throw new NotImplementedException();
 		}
-			//=> (T)DeserializeObject(typeof(T), value);
 
 		public static string SerializeObject(object value)
 		{
@@ -61,7 +57,6 @@ namespace S031.MetaStack.WinForms.Json
 				f.WriteDelegate(writer, value);
 				return writer.ToString();
 			}
-			//return MessagePack.MessagePackSerializer.ConvertToJson(MessagePackSerializer.Typeless.Serialize(value));
 			throw new NotImplementedException();
 		}
 	}

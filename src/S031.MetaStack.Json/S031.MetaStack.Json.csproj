@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;netstandard2.1;net48</TargetFrameworks>
-	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	  <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='net48'">
@@ -12,12 +12,17 @@
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup>
     <DefineConstants>TRACE;NO_COMMON</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>TRACE;NO_COMMON</DefineConstants>
-  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Json\_JsonValue.cs" />
+    <Compile Remove="Reader\StringReader.cs" />
+    <Compile Remove="Reader\UTF8Reader.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Include="..\S031.MetaStack.Common\Collections\MapTable.cs" Link="Internal\MapTable.cs" />

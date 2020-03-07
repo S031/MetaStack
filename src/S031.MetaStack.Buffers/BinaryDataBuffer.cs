@@ -111,7 +111,7 @@ namespace S031.MetaStack.Buffers
 				throw new InvalidOperationException($"{nameof(BinaryDataBuffer)} is read only");
 
 			//for not read only start == 0 forever
-			_dataSize = _index + sizeHint;
+			_dataSize = Math.Max(_dataSize, _index + sizeHint);
 
 			if (_dataSize > _buffer.Length)
 			{

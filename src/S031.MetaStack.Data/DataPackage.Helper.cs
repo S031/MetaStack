@@ -1,4 +1,6 @@
-﻿using System;
+﻿using S031.MetaStack.Buffers;
+using S031.MetaStack.Common;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
@@ -17,15 +19,14 @@ namespace S031.MetaStack.Data
 				AddException(p, inner);
 			return p;
 		}
+
 		static void AddException(DataPackage p, Exception e)
 		{
-			p.AddNew();
-			p["ErrorCode"] = e.GetType().FullName;
-			p["ErrorDescription"] = e.Message;
-			p["Source"] = e.Source;
-			p["StackTrace"] = e.StackTrace;
-			p.Update();
+			p.AddNew()
+				.SetValues(e.GetType().FullName, e.Message, e.Source, e.StackTrace)
+				.Update();
 		}
+
 		public static DataPackage CreateOKPackage(int result = 0, string message = "Operation status OK")
 		{
 			return new DataPackage(new string[] { "Result.Int", "Message.String.256" })
@@ -35,5 +36,6 @@ namespace S031.MetaStack.Data
 				.SetValue("Message", message)
 				.Update();
 		}
+
 	}
 }

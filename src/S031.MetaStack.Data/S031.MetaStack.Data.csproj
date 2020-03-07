@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\S031.MetaStack.Buffers\S031.MetaStack.Buffers.csproj" />
     <ProjectReference Include="..\S031.MetaStack.Common\S031.MetaStack.Common.csproj" />
     <ProjectReference Include="..\S031.MetaStack.Json\S031.MetaStack.Json.csproj" />
   </ItemGroup>

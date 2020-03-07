@@ -66,9 +66,9 @@ namespace S031.MetaStack.Core.Data
 			{
 				using (DbDataReader dr = command.ExecuteReader())
 				{
-					rs.Add(new DataPackage(DataPackage.WriteData(dr)));
+					rs.Add(new DataPackage(dr));
 					for (; dr.NextResult();)
-						rs.Add(new DataPackage(DataPackage.WriteData(dr)));
+						rs.Add(new DataPackage(dr));
 				}
 			}
 			return rs.ToArray();
@@ -332,9 +332,9 @@ namespace S031.MetaStack.Core.Data
 			{
 				using (DbDataReader dr = await command.ExecuteReaderAsync().ConfigureAwait(false))
 				{
-					rs.Add(new DataPackage(DataPackage.WriteData(dr)));
+					rs.Add(new DataPackage(dr));
 					for (; await dr.NextResultAsync().ConfigureAwait(false);)
-						rs.Add(new DataPackage(DataPackage.WriteData(dr)));
+						rs.Add(new DataPackage(dr));
 				}
 			}
 			return rs.ToArray();
