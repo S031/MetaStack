@@ -2,6 +2,7 @@
 using S031.MetaStack.Common.Logging;
 using S031.MetaStack.Core.Json;
 using S031.MetaStack.Data;
+using S031.MetaStack.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -94,7 +95,7 @@ namespace MetaStack.Test.Data
 		private static readonly DateTime _dateTest = DateTime.Now.Date;
 		private static DataPackage GetTestData(int rowsCount = 5, bool withHeader = false, bool withObjectData = false)
 		{
-			DataPackage p = new DataPackage(new string[] { "Col1.int", "Col2.string.255", "Col3.datetime.10", "Col4.Guid.34", "Col5.object" });
+			DataPackage p = new DataPackage(new string[] { "Col1.int", "Col2.string.255", "Col3.datetime.10", "Col4.Guid.34", "Col5.object.10.true" });
 			if (withHeader)
 				p.SetHeader("Username", "Сергей")
 				.SetHeader("Password", "1234567T")
@@ -262,14 +263,58 @@ namespace MetaStack.Test.Data
 		[MessagePackObject(keyAsPropertyName: true)]
 		public class TestClass
 		{
+			static TestClass()
+			{
+				JsonWellKnownTypes.Register(
+					new JsonAction(typeof(TestClass),
+					(w, o) => (o as TestClass).WriteRaw(w),
+					(r, o) => (o as TestClass).ReadRaw(r)));
+			}
+
 			public TestClass()
 			{
-				ItemList = new Dictionary<string, object>();
 			}
+
 			public int ID { get; set; }
+
 			public string Name { get; set; }
-			public Dictionary<string, object> ItemList { get; set; }
+
+			public Dictionary<string, object> ItemList { get; set; } = new Dictionary<string, object>();
+
+			public void WriteRaw(JsonWriter writer)
+			{
+				writer.WriteStartObject();
+				writer.WriteProperty("ID", ID);
+				writer.WriteProperty("Name", Name);
+				if (ItemList.Count > 0)
+				{
+					writer.WritePropertyName("ItemList");
+					writer.WriteStartArray();
+					foreach (var item in ItemList)
+					{
+						writer.WriteStartObject();
+						writer.WriteProperty(item.Key, item.Value);
+						writer.WriteEndObject();
+					}
+					writer.WriteEndArray();
+				}
+				writer.WriteEndObject();
+			}
+
+			public void ReadRaw(JsonValue value)
+			{
+				JsonObject o = value as JsonObject;
+				ID = o.GetIntOrDefault("ID");
+				Name = o.GetStringOrDefault("Name");
+				JsonArray a = (JsonArray)o["ItemList"];
+				foreach (var item in a)
+				{
+					var pair = (item as JsonObject).GetPair();
+					ItemList.Add(pair.Key, pair.Value);
+				}
+			}
 		}
+
 		private static void DisplayData(System.Data.DataTable table, FileLog l)
 		{
 			StringBuilder sb = new StringBuilder();
@@ -277,7 +322,7 @@ namespace MetaStack.Test.Data
 			{
 				foreach (System.Data.DataColumn col in table.Columns)
 				{
-					sb.AppendFormat("{0} = {1}\t", col.ColumnName, row[col]);
+					sb.AppendFormat("{0} = {1}\t", col.ColumnName, DBNull.Value.Equals(row[col]) ? "Null" : row[col]);
 				}
 				sb.AppendLine();
 			}
