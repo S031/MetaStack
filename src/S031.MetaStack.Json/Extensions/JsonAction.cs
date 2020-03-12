@@ -4,7 +4,7 @@ using System.Text;
 
 namespace S031.MetaStack.Json
 {
-	public struct JsonAction
+	public readonly struct JsonAction
 	{
 		public JsonAction(Type sourceType, 
 			Action<JsonWriter, object> writeAction, 
