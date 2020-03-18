@@ -77,6 +77,7 @@
     <ProjectReference Include="..\..\src\S031.MetaStack.Core.ORM.SQLite\S031.MetaStack.Core.ORM.SQLite.csproj" />
     <ProjectReference Include="..\..\src\S031.MetaStack.Core\S031.MetaStack.Core.csproj" />
     <ProjectReference Include="..\..\src\S031.MetaStack.Data\S031.MetaStack.Data.csproj" />
+    <ProjectReference Include="..\..\src\S031.MetaStack.Integral\S031.MetaStack.Integral.csproj" />
   </ItemGroup>
 
   <ItemGroup>

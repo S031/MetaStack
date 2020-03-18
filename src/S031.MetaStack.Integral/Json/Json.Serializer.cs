@@ -1,15 +1,10 @@
-﻿using System;
-using S031.MetaStack.Common;
-using S031.MetaStack.Json;
+﻿using S031.MetaStack.Common;
+using System;
 
-#if NETCOREAPP
-namespace S031.MetaStack.Core.Json
-#else
-namespace S031.MetaStack.WinForms.Json
-#endif
+namespace S031.MetaStack.Json
 {
-	public static class JSONExtensions
-    {
+	public static partial class JsonExtensions
+	{
 		public static object DeserializeObject(Type t, string value)
 		{
 			if (typeof(JsonSerializible).IsAssignableFrom(t))

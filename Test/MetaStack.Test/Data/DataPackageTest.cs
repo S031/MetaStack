@@ -1,6 +1,5 @@
 ﻿using MessagePack;
 using S031.MetaStack.Common.Logging;
-using S031.MetaStack.Core.Json;
 using S031.MetaStack.Data;
 using S031.MetaStack.Json;
 using System;
@@ -245,8 +244,8 @@ namespace MetaStack.Test.Data
 				{
 					TestClass test = new TestClass() { ID = i, Name = $"Item {i}" };
 					test.ItemList.Add($"Item {i}", i);
-					var data = JSONExtensions.SerializeObject(test);
-					test = JSONExtensions.DeserializeObject<TestClass>(data);
+					var data = JsonExtensions.SerializeObject(test);
+					test = JsonExtensions.DeserializeObject<TestClass>(data);
 				}
 				l.Debug("SpeedTest JSOSerializer Finish");
 				l.Debug("SpeedTest DateTime object Start");
