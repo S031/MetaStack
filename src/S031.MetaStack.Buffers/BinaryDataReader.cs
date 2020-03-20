@@ -1,8 +1,8 @@
-﻿using System;
+﻿using S031.MetaStack.Common;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
-using S031.MetaStack.Common;
 
 namespace S031.MetaStack.Buffers
 {
@@ -227,17 +227,19 @@ namespace S031.MetaStack.Buffers
 		{
 			int count = Read<int>();
 			for (int i = 0; i < count; i++)
-			{
-				var t = ReadNext();
-				if (t != ExportedDataTypes.asciiString)
-					throw new FormatException("Expected property name string");
+				map[ReadPropertyName()] = ReadValue();
+		}
 
-				string propertyName = ReadAsciiString();
-				if (string.IsNullOrEmpty(propertyName))
-					throw new FormatException("Property name string must have a value");
+		private string ReadPropertyName()
+		{
+			var t = ReadNext();
+			if (t != ExportedDataTypes.asciiString)
+				throw new FormatException("Expected property name string");
 
-				map[propertyName] = ReadValue();
-			}
+			string propertyName = ReadAsciiString();
+			if (string.IsNullOrEmpty(propertyName))
+				throw new FormatException("Property name string must have a value");
+			return propertyName;
 		}
 
 		private void ReadArrayRaw(IList<object> array)
@@ -281,7 +283,8 @@ namespace S031.MetaStack.Buffers
 				List<object> a = new List<object>();
 				reader.ReadArrayRaw(a);
 				return a;
-			}
+			},
+			(reader) => reader.ReadWithFormatter()
 		};
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -297,74 +300,28 @@ namespace S031.MetaStack.Buffers
 		}
 
 #if NETCOREAPP
-		public unsafe T Read<T>()
-			where T : unmanaged
-		{
-			ReadNext();
-			T result = *(T*)_buffer.Ref;
-			_buffer.Skip(sizeof(T));
-			return result;
-		}
-#else
+		//public unsafe T Read<T>()
+		//	where T : unmanaged
+		//{
+		//	ReadNext();
+		//	T result = *(T*)_buffer.Ref;
+		//	_buffer.Skip(sizeof(T));
+		//	return result;
+		//}
+#endif
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public T Read<T>()
 			=> (T)_delegates[(int)ReadNext()](this);
-#endif
 
-		public object ReadValue2()
+		private object ReadWithFormatter()
 		{
-			var t = ReadNext();
-			switch (t)
-			{
-				case ExportedDataTypes.@int:
-					return ReadInt32();
-				case ExportedDataTypes.asciiString:
-					return ReadAsciiString();
-				case ExportedDataTypes.@string:
-					return ReadString();
-				case ExportedDataTypes.utf8String:
-					return ReadUtf8String();
-				case ExportedDataTypes.@bool:
-					return ReadByte() == 1 ? true : false;
-				case ExportedDataTypes.@byte:
-					return ReadByte();
-				case ExportedDataTypes.@short:
-					return ReadInt16();
-				case ExportedDataTypes.@ushort:
-					return ReadUInt16();
-				case ExportedDataTypes.@uint:
-					return ReadUInt32();
-				case ExportedDataTypes.@long:
-					return ReadInt64();
-				case ExportedDataTypes.@ulong:
-					return ReadUInt64();
-				case ExportedDataTypes.@float:
-					return ReadSingle();
-				case ExportedDataTypes.@double:
-					return ReadDouble();
-				case ExportedDataTypes.@decimal:
-					return ReadDecimal();
-				case ExportedDataTypes.dateTime:
-					return ReadDate();
-				case ExportedDataTypes.@guid:
-					return ReadGuid();
-				case ExportedDataTypes.@null:
-					return DBNull.Value;
-				case ExportedDataTypes.none:
-					return null;
-				case ExportedDataTypes.byteArray:
-					return ReadBytes();
-				case ExportedDataTypes.@object:
-					MapTable<string, object> map = new MapTable<string, object>();
-					ReadRaw(map);
-					return map;
-				case ExportedDataTypes.@array:
-					List<object> a = new List<object>();
-					ReadArrayRaw(a);
-					return a;
-				default:
-					throw new FormatException($"Not supported ExportedDataType {t}");
-			}
+			string typeName = ReadPropertyName();
+			var t = TypeExtensions.GetTypeByAssemblyQualifiedName(typeName);
+
+			IBinaryDataFormatter f;
+			if (!BinaryDataFormatterService.Resolve(t, out f))
+				throw new InvalidOperationException($"Can't read {typeName} from binary data, formatter not found");
+			return f.Read(t, this);
 		}
 	}
 

@@ -7,13 +7,44 @@ using System.Collections.Concurrent;
 
 namespace S031.MetaStack.Common
 {
+#if NO_COMMON
+	internal enum NumericTypesScope
+	{
+		None,
+		Integral,
+		FloatingPoint,
+		All,
+	}
+	internal static class TypeExtensions
+	{
+		public static void NullTest(this object value, string valueName) =>
+			NullTest(value, valueName, (v, n) => { throw new ArgumentNullException(n); });
+
+		public static void NullTest(this object value, string valueName, Action<object, string> action)
+		{
+			if (value == null) action(value, valueName);
+		}
+#else
 	public static class TypeExtensions
 	{
+#endif
 		static readonly object _obj4Lock = new object();
 		static readonly MapTable<string, Func<object[], object>> _ctorCache =
 			new MapTable<string, Func<object[], object>>();
 		static readonly MapTable<Type, object> _instancesList = new MapTable<Type, object>();
 		static readonly MapTable<string, ConstructorInfo> _ctorCache2 = new MapTable<string, ConstructorInfo>();
+
+		private static MapTable<string, Type> _typeCache = new MapTable<string, Type>();
+
+		public static Type GetTypeByAssemblyQualifiedName(string name)
+		{
+			if (!_typeCache.TryGetValue(name, out Type t))
+			{
+				t = Type.GetType(name);
+				_typeCache.Add(name, t);
+			}
+			return t;
+		}
 
 		/// <summary>
 		/// Create instance of Type with parameters, or returns Instance property if it exists
@@ -97,7 +128,7 @@ namespace S031.MetaStack.Common
 		{
 			assembly.NullTest(nameof(assembly));
 			string fullName = assembly.FullName;
-			return fullName.Left(fullName.IndexOf(','));
+			return fullName.Substring(0, fullName.IndexOf(','));
 		}
 		
 		public static object GetDefaultValue(this Type type)

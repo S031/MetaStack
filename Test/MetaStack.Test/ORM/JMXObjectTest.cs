@@ -1,16 +1,7 @@
 ﻿//using Newtonsoft.Json;
-using Newtonsoft.Json;
-using S031.MetaStack.Common;
 using S031.MetaStack.Common.Logging;
-using S031.MetaStack.Core;
 using S031.MetaStack.Core.App;
-using S031.MetaStack.Core.Data;
-using S031.MetaStack.Core.Json;
 using S031.MetaStack.Core.ORM;
-using S031.MetaStack.Json;
-using System;
-using System.Data;
-using System.Linq;
 using System.Text;
 using Xunit;
 

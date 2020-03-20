@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <Compile Include="..\S031.MetaStack.Common\Collections\MapTable.cs" Link="MapTable.cs" />
+    <Compile Include="..\S031.MetaStack.Common\Extensions\TypeExtensions.cs" Link="TypeExtensions.cs" />
   </ItemGroup>
 
 </Project>

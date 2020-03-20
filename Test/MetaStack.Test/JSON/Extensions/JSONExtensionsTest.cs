@@ -1,6 +1,4 @@
-﻿using S031.MetaStack.Common;
-using S031.MetaStack.Common.Logging;
-using S031.MetaStack.Core.Json;
+﻿using S031.MetaStack.Common.Logging;
 using System;
 using Xunit;
 using S031.MetaStack.Json;

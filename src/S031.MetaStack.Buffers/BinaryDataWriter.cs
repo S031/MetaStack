@@ -32,6 +32,7 @@ namespace S031.MetaStack.Buffers
 		@asciiString = TypeCode.String + 2,
 		@utf8String = TypeCode.String + 3,
 		@array = TypeCode.String + 4,
+		@serial = TypeCode.String + 5
 	}
 
 
@@ -40,16 +41,7 @@ namespace S031.MetaStack.Buffers
 		unsafe static readonly Action<BinaryDataWriter, object>[] _delegates = new Action<BinaryDataWriter, object>[]
 		{
 			(writer, value)=>writer.Write(),
-			(writer, value)=>
-			{
-				Type t = value.GetType();
-				if (typeof(IDictionary<string, object>).IsAssignableFrom(t))
-					writer.Write((IDictionary<string, object>)value);
-				else if (typeof(IList<object>).IsAssignableFrom(t))
-					writer.Write((IList<object>)value);
-				else
-					throw new InvalidOperationException($"Can't write {t} as binary data");
-			},
+			(writer, value)=>writer.Write((IDictionary<string, object>)value),
 			(writer, value)=>writer.WriteNull(),
 			(writer, value)=>writer.Write((bool)value),
 			(writer, value)=>writer.Write((char)value),
@@ -76,7 +68,8 @@ namespace S031.MetaStack.Buffers
 					writer.Write(ptr, len);
 			},
 			(writer, value) => writer.Write((char[])value),
-			(writer, value) => writer.Write((IList<object>)value)
+			(writer, value) => writer.Write((IList<object>)value),
+			(writer, value) => writer.WriteWithFormatter(value)
 		};
 
 		internal static ExportedDataTypes GetExportedType(Type t)
@@ -92,7 +85,9 @@ namespace S031.MetaStack.Buffers
 				else if (typeof(IDictionary<string, object>).IsAssignableFrom(t))
 					return ExportedDataTypes.@object;
 				else if (typeof(IList<object>).IsAssignableFrom(t))
-					return ExportedDataTypes.array;;
+					return ExportedDataTypes.array;
+				else
+					return ExportedDataTypes.serial;
 			}
 			return (ExportedDataTypes)tcode;
 		}
@@ -363,6 +358,18 @@ namespace S031.MetaStack.Buffers
 				Write();
 			else
 				_delegates[(int)GetExportedType(value.GetType())](this, value);
+		}
+
+		private void WriteWithFormatter(object value)
+		{
+			IBinaryDataFormatter f;
+			Type t = value.GetType();
+			if (!BinaryDataFormatterService.Resolve(t, out f))
+				throw new InvalidOperationException($"Can't write {t} as binary data, formatter not found");
+
+			Write(ExportedDataTypes.serial);
+			WritePropertyName(t.AssemblyQualifiedName);
+			f.Write(this, value);
 		}
 
 		private unsafe void CheckAndResizeBuffer(int sizeHint)

@@ -37,52 +37,50 @@ namespace MetaStack.Test.Buffers
 
 		void WriterPerformanceTest(FileLog _logger)
 		{
-			//byte[] data = new byte[10];
+			byte[] data = new byte[10];
+			var c = Customer.CreateTestCustomer();
 
 			DateTime start = DateTime.Now;
-			for (int i = 0; i < 1_000_000; i++)
+			for (int i = 0; i < 1000000; i++)
 			{
-				//_w.Position = 0;
+				_w.Position = 0;
 				_w.Write(i);
 				_w.Write(i + 0.12d);
 				_w.Write(test_string);
-				//fixed (char* source = ascii_test_string)
-				//	_w.Write(source, ascii_test_string.Length);
-				_w.Write(ascii_test_string);
 				_w.Write();
+				_w.Write(c);
 			}
 
 			TimeSpan ts = DateTime.Now - start;
-			BinaryDataReader r2 = new BinaryDataReader(_b) { Position = 0 };
-			_logger.Debug($"Result: {r2.ReadValues(5)[1]} in {ts.TotalMilliseconds} ms");
+			_r.Position = 0;
+			_logger.Debug($"Result: {_r.ReadValues(5)[4]} in {ts.TotalMilliseconds} ms");
 		}
 
 		void ReaderPerformanceTest(FileLog _logger)
 		{
 			DateTime start = DateTime.Now;
-			_r.Position = 0;
-			for (int i = 0; i < 1_000_000; i++)
+			for (int i = 0; i < 1000000; i++)
 			{
+				_r.Position = 0;
 				_r.ReadNext();
 				_r.ReadInt32();
-				//_r.ReadValues(4);
 				_r.ReadNext();
 				_r.ReadDouble();
 				_r.ReadNext();
 				_r.ReadString();
-				_r.ReadNext();
-				_r.ReadString();
 				_r.ReadValue();
+				_r.Read<Customer>();
 			}
+
 			TimeSpan ts = DateTime.Now - start;
-			BinaryDataReader r2 = new BinaryDataReader(_b) { Position = 0 };
-			_logger.Debug($"Result: {r2.ReadValues(5)[1]} in {ts.TotalMilliseconds} ms");
+			_r.Position = 0;
+			_logger.Debug($"Result: {_r.ReadValues(5)[4]} in {ts.TotalMilliseconds} ms with size {_r.Lenght} bytes");
 		}
 
 		[Fact]
 		public void ComputeHashTest()
 		{
-			using (FileLog _logger = new FileLog("MetaStackBinaryReader.PerformanceTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			using (FileLog _logger = new FileLog("MetaStackBuffers.ComputeHashTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
 				DateTime start = DateTime.Now;
 				for (int i = 0; i < 1000000; i++)
@@ -90,7 +88,7 @@ namespace MetaStack.Test.Buffers
 					i.GetType().ToString().ComputeHash();
 				}
 				TimeSpan ts = DateTime.Now - start;
-				_logger.Debug($"Result: {typeof(int).ToString().ComputeHash()} in {ts.Milliseconds} ms");
+				_logger.Debug($"Result: {typeof(int).ToString().ComputeHash()} in {ts.TotalMilliseconds} ms");
 				_logger.Debug($"{typeof(bool).FullName}: {typeof(bool).Name.ComputeHash()}");
 				_logger.Debug($"{typeof(sbyte).Name}: {typeof(sbyte).Name.ComputeHash()}");
 				_logger.Debug($"{typeof(byte).Name}: {typeof(byte).Name.ComputeHash()}");
@@ -100,5 +98,44 @@ namespace MetaStack.Test.Buffers
 				_logger.Debug($"{typeof(ushort).Name}: {typeof(ushort).Name.ComputeHash()}");
 			}
 		}
+		
+		[Fact]
+		public void GetTypeSpeedTest()
+		{
+			using (FileLog _logger = new FileLog("MetaStackBuffers.GetTypeSpeedTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			{
+				var c = Customer.CreateTestCustomer();
+				string typeName = typeof(Customer).AssemblyQualifiedName;
+
+				DateTime start = DateTime.Now;
+				for (int i = 0; i < 1000000; i++)
+				{
+					_ = Type.GetType(typeName).CreateInstance();
+				}
+				TimeSpan ts = DateTime.Now - start;
+				_logger.Debug($"Result Type.GetType: {ts.TotalMilliseconds} ms");
+				
+				start = DateTime.Now;
+				for (int i = 0; i < 1000000; i++)
+				{
+					_ = GetType(typeName).CreateInstance();
+				}
+				ts = DateTime.Now - start;
+				_logger.Debug($"Result Fast.GetType: {ts.TotalMilliseconds} ms");
+			}
+		}
+
+		private static MapTable<string, Type> _typeCache = new MapTable<string, Type>();
+
+		private static Type GetType(string name)
+		{
+			if (!_typeCache.TryGetValue(name, out Type t))
+			{
+				t = Type.GetType(name);
+				_typeCache.Add(name, t);
+			}
+			return t;
+		}
+
 	}
 }

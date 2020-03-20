@@ -1,10 +1,7 @@
 ﻿//using Newtonsoft.Json;
-using Newtonsoft.Json;
 using S031.MetaStack.Common;
 using S031.MetaStack.Common.Logging;
 using S031.MetaStack.Core;
-using S031.MetaStack.Core.Data;
-using S031.MetaStack.Core.Json;
 using S031.MetaStack.Core.ORM;
 using S031.MetaStack.Data;
 using S031.MetaStack.Json;
