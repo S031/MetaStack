@@ -34,7 +34,7 @@ namespace MetaStack.Test.ORM
 				JsonObject j = null;
 				for (i = 0; i < 1_000; i++)
 				{
-					j = (JsonObject)new S031.MetaStack.Json.JsonReader(ref str).Read();
+					j = (JsonObject)new S031.MetaStack.Json.JsonReader(str).Read();
 				}
 				_logger.Debug($"Finish perfomance parse string test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
 

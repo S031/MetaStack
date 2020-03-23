@@ -9,12 +9,12 @@ namespace S031.MetaStack.Json
 		{
 			if (typeof(JsonSerializible).IsAssignableFrom(t))
 			{
-				JsonValue jsonValue = new JsonReader(ref value).Read();
+				JsonValue jsonValue = new JsonReader(value).Read();
 				return t.CreateInstance(jsonValue);
 			}
 			else if (JsonWellKnownTypes.TryGetValue(t, out var f))
 			{
-				JsonValue jsonValue = new JsonReader(ref value).Read();
+				JsonValue jsonValue = new JsonReader(value).Read();
 				var instance = t.CreateInstance();
 				f.ReadDelegate(jsonValue, instance);
 				return instance;
@@ -28,12 +28,12 @@ namespace S031.MetaStack.Json
 			Type t = typeof(T);
 			if (typeof(JsonSerializible).IsAssignableFrom(t))
 			{
-				JsonValue jsonValue = new JsonReader(ref value).Read();
+				JsonValue jsonValue = new JsonReader(value).Read();
 				return t.CreateInstance<T>(jsonValue);
 			}
 			else if (JsonWellKnownTypes.TryGetValue(t, out var f))
 			{
-				JsonValue jsonValue = new JsonReader(ref value).Read();
+				JsonValue jsonValue = new JsonReader(value).Read();
 				var instance = t.CreateInstance();
 				f.ReadDelegate(jsonValue, instance);
 				return (T)instance;

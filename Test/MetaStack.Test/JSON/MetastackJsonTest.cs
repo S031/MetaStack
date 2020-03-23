@@ -34,12 +34,12 @@ namespace MetaStack.Test.Json
 				DateTime t = DateTime.Now;
 				for (i = 0; i < 10_000; i++)
 				{
-					var j = new JsonReader(ref str).Read();
+					var j = new JsonReader(str).Read();
 				}
 				_logger.Debug($"Finish perfomance parse string test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
 
 				_logger.Debug($"Start perfomance ToString test");
-				var json = (JsonObject)new JsonReader(ref str).Read();
+				var json = (JsonObject)new JsonReader(str).Read();
 				//_logger.Debug(json.ToString());
 				t = DateTime.Now;
 				for (i = 0; i < 10_000; i++)
@@ -82,14 +82,14 @@ namespace MetaStack.Test.Json
 			using (FileLog _logger = new FileLog(" MetaStackJson.JsonWriterTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
 				var str = _sourceJsonString;
-				var json = (JsonObject)(new JsonReader(ref str).Read());
+				var json = (JsonObject)(new JsonReader(str).Read());
 				json["EscapedString"] = str;
 				var newStr = json.ToString(Formatting.Indented);
-				json = (JsonObject)(new JsonReader(ref newStr).Read());
+				json = (JsonObject)(new JsonReader(newStr).Read());
 				Assert.Equal(json["EscapedString"], str);
 				_logger.Debug(json.ToString(Formatting.Indented));
 				str = _sourceUtf8JsonString;
-				var jsonArray = (JsonArray)(new JsonReader(ref str).Read());
+				var jsonArray = (JsonArray)(new JsonReader(str).Read());
 				_logger.Debug(jsonArray.ToString(Formatting.Indented));
 			}
 		}
@@ -136,7 +136,7 @@ namespace MetaStack.Test.Json
 				logger.Debug(str);
 				a = ActionInfo.Create(str);
 				Assert.Equal(str, a.ToString());
-				var json = (JsonObject)(new JsonReader(ref str).Read());
+				var json = (JsonObject)(new JsonReader(str).Read());
 				logger.Debug((string)json["InterfaceParameters"][2]["Agregate"]);
 			}
 		}
@@ -157,7 +157,7 @@ namespace MetaStack.Test.Json
 
 				//Read
 				t = new TestClass();
-				var r = new JsonReader(ref str).Read();
+				var r = new JsonReader(str).Read();
 				t.ReadRaw(r);
 				w = new JsonWriter(Formatting.Indented);
 				w.WriteValue(new JsonValue(t));

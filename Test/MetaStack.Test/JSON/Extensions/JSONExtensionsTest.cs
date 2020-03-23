@@ -11,7 +11,7 @@ namespace MetaStack.Test.Json
 		private static readonly string _sourceJsonString = Encoding.UTF8.GetString(Resources.TestData.TestJson);
 		private static readonly string _sourceJsonString2 = CommonTest.testData1.testJsonData;
 		private static readonly byte[] _sourceJsonData = Resources.TestData.TestJsonData;
-		private static readonly JsonValue _v = new JsonReader(ref _sourceJsonString).Read();
+		private static readonly JsonValue _v = new JsonReader(_sourceJsonString).Read();
 
 		public JSONExtensionsTest()
 		{

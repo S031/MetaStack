@@ -1,10 +1,6 @@
-﻿using S031.MetaStack.Common;
+﻿using S031.MetaStack.Buffers;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
 
 #if NETCOREAPP
 namespace S031.MetaStack.Core.Security
@@ -17,20 +13,30 @@ namespace S031.MetaStack.WinForms.Security
 		public static byte[] ExportBin(this RSA rsa)
 		{
 			RSAParameters ps = rsa.ExportParameters(false);
-			return BitConverter.GetBytes(ps.Modulus.Length)
-				.Concat(ps.Modulus)
-				.Concat(ps.Exponent)
-				.ToArray();
+			return new BinaryDataWriter(1024)
+				.Write(ps.Modulus)
+				.Write(ps.Exponent)
+				.GetBytes();
+			//return BitConverter.GetBytes(ps.Modulus.Length)
+			//	.Concat(ps.Modulus)
+			//	.Concat(ps.Exponent)
+			//	.ToArray();
 		}
 		public static string Export(this RSA rsa) => Convert.ToBase64String(rsa.ExportBin());
 
 		public static RSA ImportBin(this RSA rsa, byte[] publicKey)
 		{
-			int modLen = BitConverter.ToInt32(publicKey.Take(4).ToArray(), 0);
+			//int modLen = BitConverter.ToInt32(publicKey.Take(4).ToArray(), 0);
+			//RSAParameters ps = new RSAParameters()
+			//{
+			//	Modulus = publicKey.Skip(4).Take(modLen).ToArray(),
+			//	Exponent = publicKey.Skip(4 + modLen).Take(publicKey.Length - 4 - modLen).ToArray()
+			//};
+			BinaryDataReader reader = new BinaryDataReader((BinaryDataBuffer)publicKey);
 			RSAParameters ps = new RSAParameters()
 			{
-				Modulus = publicKey.Skip(4).Take(modLen).ToArray(),
-				Exponent = publicKey.Skip(4 + modLen).Take(publicKey.Length - 4 - modLen).ToArray()
+				Modulus = reader.Read<byte[]>(),
+				Exponent = reader.Read<byte[]>()
 			};
 			rsa.ImportParameters(ps);
 			return rsa;
@@ -41,18 +47,25 @@ namespace S031.MetaStack.WinForms.Security
 
 		public static byte[] ExportBin(this Aes aes)
 		{
-			return BitConverter.GetBytes(aes.Key.Length)
-				.Concat(aes.Key)
-				.Concat(aes.IV)
-				.ToArray();
+			return new BinaryDataWriter(1024)
+				.Write(aes.Key)
+				.Write(aes.IV)
+				.GetBytes();
+			//return BitConverter.GetBytes(aes.Key.Length)
+			//	.Concat(aes.Key)
+			//	.Concat(aes.IV)
+			//	.ToArray();
 		}
 		public static string Export(this Aes aes) => Convert.ToBase64String(aes.ExportBin());
 
 		public static Aes ImportBin(this Aes aes, byte[] publicKey)
 		{
-			int keyLen = BitConverter.ToInt32(publicKey.Take(4).ToArray(), 0);
-			aes.Key = publicKey.Skip(4).Take(keyLen).ToArray();
-			aes.IV = publicKey.Skip(4 + keyLen).Take(publicKey.Length - 4 - keyLen).ToArray();
+			//int keyLen = BitConverter.ToInt32(publicKey.Take(4).ToArray(), 0);
+			//aes.Key = publicKey.Skip(4).Take(keyLen).ToArray();
+			//aes.IV = publicKey.Skip(4 + keyLen).Take(publicKey.Length - 4 - keyLen).ToArray();
+			BinaryDataReader reader = new BinaryDataReader((BinaryDataBuffer)publicKey);
+			aes.Key = reader.Read<byte[]>();
+			aes.IV = reader.Read<byte[]>();
 			return aes;
 		}
 

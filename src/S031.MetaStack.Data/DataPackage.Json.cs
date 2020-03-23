@@ -94,7 +94,7 @@ namespace S031.MetaStack.Data
 
 		public static DataPackage Parse(int headerSpaceSize, string jsonString)
 		{
-			JsonObject j = (JsonObject)new JsonReader(ref jsonString).Read();
+			JsonObject j = (JsonObject)new JsonReader(jsonString).Read();
 			DataPackage ts = new DataPackage(headerSpaceSize,
 				j.Select(kvp => kvp.Key).ToArray<string>(),
 				j.Select(kvp => kvp.Value?.GetValue()).ToArray<object>());
@@ -105,7 +105,7 @@ namespace S031.MetaStack.Data
 
 		public static DataPackage Parse(string jsonString)
 		{
-			JsonObject j = (JsonObject)new JsonReader(ref jsonString).Read();
+			JsonObject j = (JsonObject)new JsonReader(jsonString).Read();
 			int headerSpaceSize = (int)j["HeaderSize"];
 
 			JsonArray columns = (j["Columns"] as JsonArray);

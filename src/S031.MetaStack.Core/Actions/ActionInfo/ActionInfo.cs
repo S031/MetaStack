@@ -119,7 +119,7 @@ namespace S031.MetaStack.WinForms.Actions
 
 		public static ActionInfo Create(string serializedJsonString)
 		{
-			JsonObject j = (JsonObject)(new JsonReader(ref serializedJsonString).Read());
+			JsonObject j = (JsonObject)(new JsonReader(serializedJsonString).Read());
 			ActionInfo a = new ActionInfo
 			{
 				ActionID = j.GetStringOrDefault("ActionID"),

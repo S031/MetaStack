@@ -123,29 +123,31 @@ namespace S031.MetaStack.Buffers
 		public unsafe byte[] GetBytes()
 			=> _buffer.GetBytes();
 
-		public unsafe void Write(ExportedDataTypes type)
+		public unsafe BinaryDataWriter Write(ExportedDataTypes type)
 		{
 			CheckAndResizeBuffer(sizeof(byte));
 			*(byte*)_buffer.Ref = (byte)type;
 			_buffer.Skip();
+			return this;
 		}
 
-		public void Write()
+		public BinaryDataWriter Write()
 			=> Write(ExportedDataTypes.none);
 
-		public void WriteNull()
+		public BinaryDataWriter WriteNull()
 			=> Write(ExportedDataTypes.@null);
 
-		public void WriteSpace(int count)
+		public BinaryDataWriter WriteSpace(int count)
 		{
 			_buffer.CheckAndResizeBuffer(count);
 			_buffer.Skip(count);
+			return this;
 		}
 
-		public void Write(bool value)
+		public BinaryDataWriter Write(bool value)
 			=> Write((byte)(value ? 1 : 0), ExportedDataTypes.@bool);
 
-		public unsafe void Write(sbyte value)
+		public unsafe BinaryDataWriter Write(sbyte value)
 		{
 			CheckAndResizeBuffer(sizeof(sbyte) + 1);
 			*(byte*)_buffer.Ref = (byte)ExportedDataTypes.@sbyte;
@@ -153,9 +155,10 @@ namespace S031.MetaStack.Buffers
 
 			*(sbyte*)_buffer.Ref = value;
 			_buffer.Skip();
+			return this;
 		}
 
-		public unsafe void Write(byte value, ExportedDataTypes type = ExportedDataTypes.@byte)
+		public unsafe BinaryDataWriter Write(byte value, ExportedDataTypes type = ExportedDataTypes.@byte)
 		{
 			CheckAndResizeBuffer(sizeof(byte) + 1);
 			*(byte*)_buffer.Ref = (byte)type;
@@ -163,9 +166,10 @@ namespace S031.MetaStack.Buffers
 
 			*(byte*)_buffer.Ref = value;
 			_buffer.Skip();
+			return this;
 		}
 
-		public unsafe void Write(short value, ExportedDataTypes type = ExportedDataTypes.@short)
+		public unsafe BinaryDataWriter Write(short value, ExportedDataTypes type = ExportedDataTypes.@short)
 		{
 			CheckAndResizeBuffer(sizeof(short) + 1);
 			*(byte*)_buffer.Ref = (byte)type;
@@ -173,12 +177,13 @@ namespace S031.MetaStack.Buffers
 
 			*(short*)_buffer.Ref = value;
 			_buffer.Skip(sizeof(short));
+			return this;
 		}
 
-		public void Write(ushort value)
+		public BinaryDataWriter Write(ushort value)
 			=> Write((short)value, ExportedDataTypes.@ushort);
 
-		public unsafe void Write(int value, ExportedDataTypes type = ExportedDataTypes.@int)
+		public unsafe BinaryDataWriter Write(int value, ExportedDataTypes type = ExportedDataTypes.@int)
 		{
 			CheckAndResizeBuffer(sizeof(int) + 1);
 			*(byte*)_buffer.Ref = (byte)type;
@@ -186,12 +191,13 @@ namespace S031.MetaStack.Buffers
 
 			*(int*)_buffer.Ref = value;
 			_buffer.Skip(sizeof(int));
+			return this;
 		}
 
-		public unsafe void Write(uint value)
+		public unsafe BinaryDataWriter Write(uint value)
 			=> Write((int)value, ExportedDataTypes.@uint);
 
-		public unsafe void Write(long value, ExportedDataTypes type = ExportedDataTypes.@long)
+		public unsafe BinaryDataWriter Write(long value, ExportedDataTypes type = ExportedDataTypes.@long)
 		{
 			CheckAndResizeBuffer(sizeof(long) + 1);
 			*(byte*)_buffer.Ref = (byte)type;
@@ -199,9 +205,10 @@ namespace S031.MetaStack.Buffers
 
 			*(long*)_buffer.Ref = value;
 			_buffer.Skip(sizeof(long));
+			return this;
 		}
 
-		public unsafe void Write(decimal value)
+		public unsafe BinaryDataWriter Write(decimal value)
 		{
 			CheckAndResizeBuffer(sizeof(decimal) + 1);
 			*(byte*)_buffer.Ref = (byte)ExportedDataTypes.@decimal;
@@ -209,24 +216,25 @@ namespace S031.MetaStack.Buffers
 
 			*(decimal*)_buffer.Ref = value;
 			_buffer.Skip(sizeof(decimal));
+			return this;
 		}
 
-		public void Write(ulong value)
+		public BinaryDataWriter Write(ulong value)
 			=> Write((long)value, ExportedDataTypes.@ulong);
 
-		public unsafe void Write(float value)
+		public unsafe BinaryDataWriter Write(float value)
 			=> Write(*(int*)&value, ExportedDataTypes.@float);
 
-		public unsafe void Write(double value)
+		public unsafe BinaryDataWriter Write(double value)
 			=> Write(*(long*)&value, ExportedDataTypes.@double);
 
-		public void Write(DateTime value)
+		public BinaryDataWriter Write(DateTime value)
 			=> Write(value.Ticks, ExportedDataTypes.dateTime);
 
-		public void Write(TimeSpan value)
+		public BinaryDataWriter Write(TimeSpan value)
 			=> Write(value.Ticks, ExportedDataTypes.dateTime);
 
-		public unsafe void Write(char[] value)
+		public unsafe BinaryDataWriter Write(char[] value)
 		{
 			var encoding = Encoding.UTF8;
 
@@ -243,13 +251,14 @@ namespace S031.MetaStack.Buffers
 			fixed (byte* source = data)
 				Buffer.MemoryCopy(source, _buffer.Ref, size, size);
 			_buffer.Skip(size);
+			return this;
 		}
 
 		/// <summary>
 		/// Write string in two byte array
 		/// </summary>
 		/// <param name="value"></param>
-		public unsafe void Write(string value)
+		public unsafe BinaryDataWriter Write(string value)
 		{
 			int size = value.Length * sizeof(char);
 			CheckAndResizeBuffer(size + sizeof(int) + 1);
@@ -266,6 +275,7 @@ namespace S031.MetaStack.Buffers
 					Buffer.MemoryCopy(source, _buffer.Ref, size, size);
 				_buffer.Skip(size);
 			}
+			return this;
 		}
 
 		/// <summary>
@@ -273,7 +283,7 @@ namespace S031.MetaStack.Buffers
 		/// </summary>
 		/// <param name="value"></param>
 		/// <param name="size"></param>
-		public unsafe void Write(char* value, int size)
+		public unsafe BinaryDataWriter Write(char* value, int size)
 		{
 			CheckAndResizeBuffer(size + sizeof(int) + 1);
 			*(byte*)_buffer.Ref = (byte)ExportedDataTypes.asciiString;
@@ -289,9 +299,10 @@ namespace S031.MetaStack.Buffers
 					dest[i] = (byte)value[i];
 				_buffer.Skip(size);
 			}
+			return this;
 		}
 
-		public unsafe void Write(byte[] value)
+		public unsafe BinaryDataWriter Write(byte[] value)
 		{
 			int size = value.Length;
 			CheckAndResizeBuffer(size + sizeof(int) + 1);
@@ -308,9 +319,10 @@ namespace S031.MetaStack.Buffers
 					Buffer.MemoryCopy(source, _buffer.Ref, size, size);
 				_buffer.Skip(size);
 			}
+			return this;
 		}
 
-		public unsafe void Write(Guid value)
+		public unsafe BinaryDataWriter Write(Guid value)
 		{
 			const int size = 16;
 			CheckAndResizeBuffer(size + 1);
@@ -321,15 +333,16 @@ namespace S031.MetaStack.Buffers
 			fixed (byte* source = value.ToByteArray())
 				Buffer.MemoryCopy(source, _buffer.Ref, size, size);
 			_buffer.Skip(size);
+			return this;
 		}
 
-		public unsafe void WriteMapHeader(int count)
+		public unsafe BinaryDataWriter WriteMapHeader(int count)
 			=> Write(count, ExportedDataTypes.@object);
 
-		public unsafe void WriteArrayHeader(int count)
+		public unsafe BinaryDataWriter WriteArrayHeader(int count)
 			=> Write(count, ExportedDataTypes.@array);
 
-		public void Write(IDictionary<string, object> map)
+		public BinaryDataWriter Write(IDictionary<string, object> map)
 		{
 			WriteMapHeader(map.Count);
 			foreach (var pair in map)
@@ -337,13 +350,15 @@ namespace S031.MetaStack.Buffers
 				WritePropertyName(pair.Key);
 				Write(pair.Value);
 			}
+			return this;
 		}
 
-		public void Write(IList<object> array)
+		public BinaryDataWriter Write(IList<object> array)
 		{
 			WriteArrayHeader(array.Count);
 			foreach (var value in array)
 				Write(value);
+			return this;
 		}
 
 		private unsafe void WritePropertyName(string name)
@@ -352,24 +367,25 @@ namespace S031.MetaStack.Buffers
 				Write(source, name.Length);
 		}
 
-		public void Write(object value)
+		public BinaryDataWriter Write(object value)
 		{
 			if (value == null)
 				Write();
 			else
 				_delegates[(int)GetExportedType(value.GetType())](this, value);
+			return this;
 		}
 
-		private void WriteWithFormatter(object value)
+		private BinaryDataWriter WriteWithFormatter(object value)
 		{
-			IBinaryDataFormatter f;
 			Type t = value.GetType();
-			if (!BinaryDataFormatterService.Resolve(t, out f))
+			if (!BinaryDataFormatterService.Resolve(t, out IBinaryDataFormatter f))
 				throw new InvalidOperationException($"Can't write {t} as binary data, formatter not found");
 
 			Write(ExportedDataTypes.serial);
 			WritePropertyName(t.AssemblyQualifiedName);
 			f.Write(this, value);
+			return this;
 		}
 
 		private unsafe void CheckAndResizeBuffer(int sizeHint)

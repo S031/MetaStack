@@ -175,7 +175,7 @@ namespace S031.MetaStack.WinForms.ORM
         public static JMXSchema Parse(string schemaJson)
 		{
 			schemaJson.NullTest(nameof(schemaJson));
-            JsonObject j = (JsonObject)new JsonReader(ref schemaJson).Read();
+            JsonObject j = (JsonObject)new JsonReader(schemaJson).Read();
 
             return new JMXSchema(j);
 		}

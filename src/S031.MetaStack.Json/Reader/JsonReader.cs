@@ -33,7 +33,7 @@ namespace S031.MetaStack.Json
 		private int _cur;
 		private bool _has_peek;
 
-		public JsonReader(ref string source)
+		public JsonReader(string source)
 		{
 			Debug.Assert(source != null);
 #if DEBUG

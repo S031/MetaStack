@@ -106,7 +106,7 @@ namespace S031.MetaStack.WinForms.ORM
 
 		public static JMXObject Parse(string json, IJMXFactory schemaFactory)
 		{
-			JMXObject instance = (JMXObject)new JsonReader(ref json).Read();
+			JMXObject instance = (JMXObject)new JsonReader(json).Read();
 			try
 			{
 				instance._schema = schemaFactory
@@ -123,7 +123,7 @@ namespace S031.MetaStack.WinForms.ORM
 
 		public static async Task<JMXObject> ParseAsync(string json, IJMXFactory schemaFactory)
 		{
-			JMXObject instance = (JMXObject)new JsonReader(ref json).Read();
+			JMXObject instance = (JMXObject)new JsonReader(json).Read();
 			try
 			{
 				instance._schema = await schemaFactory

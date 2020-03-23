@@ -1,4 +1,5 @@
-﻿using System;
+﻿using S031.MetaStack.Buffers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -28,19 +29,30 @@ namespace S031.MetaStack.WinForms.Security
 
 		public byte[] CryptoKey { get; private set; }
 
-		public byte[] Export() =>
-			SessionID.ToByteArray()
-			.Concat(Ticket.ToByteArray())
-			.Concat(BitConverter.GetBytes(LastTime.ToBinary()))
-			.Concat(CryptoKey)
-			.ToArray();
+		public byte[] Export()
+			=> new BinaryDataWriter(128)
+				.Write(SessionID)
+				.Write(Ticket)
+				.Write(LastTime)
+				.Write(CryptoKey)
+				.GetBytes();
+			//SessionID.ToByteArray()
+			//.Concat(Ticket.ToByteArray())
+			//.Concat(BitConverter.GetBytes(LastTime.ToBinary()))
+			//.Concat(CryptoKey)
+			//.ToArray();
 
 		public LoginInfo Import(byte[] data)
 		{
-			SessionID = new Guid(data.Take(16).ToArray());
-			Ticket = new Guid(data.Skip(16).Take(16).ToArray());
-			LastTime = DateTime.FromBinary(BitConverter.ToInt64(data.Skip(32).Take(8).ToArray(), 0));
-			CryptoKey = data.Skip(40).Take(52).ToArray();
+			BinaryDataReader reader = new BinaryDataReader((BinaryDataBuffer)data);
+			SessionID = reader.Read<Guid>();
+			Ticket = reader.Read<Guid>();
+			LastTime = reader.Read<DateTime>();
+			CryptoKey = reader.Read<byte[]>();
+			//SessionID = new Guid(data.Take(16).ToArray());
+			//Ticket = new Guid(data.Skip(16).Take(16).ToArray());
+			//LastTime = DateTime.FromBinary(BitConverter.ToInt64(data.Skip(32).Take(8).ToArray(), 0));
+			//CryptoKey = data.Skip(40).Take(52).ToArray();
 			return this;
 		}
 
