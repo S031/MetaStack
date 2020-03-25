@@ -40,6 +40,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "S031.MetaStack.Json", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "S031.MetaStack.Integral", "src\S031.MetaStack.Integral\S031.MetaStack.Integral.csproj", "{B9A5811F-AF74-4278-98C5-6CA5988DBDA9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S031.Metastack.ORM", "src\S031.Metastack.ORM\S031.Metastack.ORM.csproj", "{E86E9E02-CE96-47C4-AA53-2D7FD7A1B12B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -94,6 +96,10 @@ Global
 		{B9A5811F-AF74-4278-98C5-6CA5988DBDA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9A5811F-AF74-4278-98C5-6CA5988DBDA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9A5811F-AF74-4278-98C5-6CA5988DBDA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E86E9E02-CE96-47C4-AA53-2D7FD7A1B12B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E86E9E02-CE96-47C4-AA53-2D7FD7A1B12B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E86E9E02-CE96-47C4-AA53-2D7FD7A1B12B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E86E9E02-CE96-47C4-AA53-2D7FD7A1B12B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -112,6 +118,7 @@ Global
 		{3E0761D0-9C73-4130-BD97-6A4F8CD0D1BA} = {1C7C4780-10A0-439A-AB42-32D923C07BDA}
 		{5C4AD09F-41EF-4FC6-A81D-FB1BB6A5C4FB} = {1C7C4780-10A0-439A-AB42-32D923C07BDA}
 		{B9A5811F-AF74-4278-98C5-6CA5988DBDA9} = {1C7C4780-10A0-439A-AB42-32D923C07BDA}
+		{E86E9E02-CE96-47C4-AA53-2D7FD7A1B12B} = {1C7C4780-10A0-439A-AB42-32D923C07BDA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7ECF74F3-895D-4DD3-95B2-C79542194888}
