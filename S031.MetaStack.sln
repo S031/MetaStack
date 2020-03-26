@@ -40,7 +40,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "S031.MetaStack.Json", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "S031.MetaStack.Integral", "src\S031.MetaStack.Integral\S031.MetaStack.Integral.csproj", "{B9A5811F-AF74-4278-98C5-6CA5988DBDA9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S031.Metastack.ORM", "src\S031.Metastack.ORM\S031.Metastack.ORM.csproj", "{E86E9E02-CE96-47C4-AA53-2D7FD7A1B12B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "S031.MetaStack.ORM", "src\S031.Metastack.ORM\S031.MetaStack.ORM.csproj", "{E86E9E02-CE96-47C4-AA53-2D7FD7A1B12B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

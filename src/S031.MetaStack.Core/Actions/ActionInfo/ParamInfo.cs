@@ -10,8 +10,8 @@ namespace S031.MetaStack.WinForms.Actions
 {
 	public enum ParamDirrect
 	{
-		Input = 1000,
-		Output = 2000
+		Input = S031.MetaStack.Data.ParamDirrect.Input,
+		Output = S031.MetaStack.Data.ParamDirrect.Output
 	}
 
 	public class ParamInfo : AttribInfo

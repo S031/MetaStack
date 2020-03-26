@@ -18,7 +18,11 @@ namespace S031.MetaStack.ORM
 
 		public string AreaName => this.Count > 0 ? this[0] : string.Empty;
 
+#if NETCOREAPP
 		public string ObjectName => this.Count > 1 ? string.Join(_sep, this) : string.Empty;
+#else
+		public string ObjectName => this.Count > 1 ? string.Join(_sep.ToString(), this) : string.Empty;
+#endif
 
 		public override string ToString()
 		{

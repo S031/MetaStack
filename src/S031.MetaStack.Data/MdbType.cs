@@ -3,6 +3,12 @@ using System.Collections.Generic;
 
 namespace S031.MetaStack.Data
 {
+	public enum ParamDirrect
+	{
+		Input = 1000,
+		Output = 2000
+	}
+
 	/// <summary>
 	/// Inherited from <see cref="TypeCode"/> 
 	/// </summary>
