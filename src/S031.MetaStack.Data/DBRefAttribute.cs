@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace S031.MetaStack.Core.ORM
+namespace S031.MetaStack.Data
 {
 	[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
-	public sealed class  SchemaDBSyncAttribute : System.Attribute
+	public sealed class  DBRefAttribute : System.Attribute
     {
 		public string DBProviderName { get; set; }
     }

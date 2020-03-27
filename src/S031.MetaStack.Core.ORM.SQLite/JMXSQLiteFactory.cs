@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.Extensions.Logging;
-using S031.MetaStack.Common;
 using S031.MetaStack.Core.Data;
+using S031.MetaStack.Data;
+using S031.MetaStack.ORM;
 
 namespace S031.MetaStack.Core.ORM.SQLite
 {
-	[SchemaDBSync(DBProviderName = "System.Data.Sqlite")]
+	[DBRef(DBProviderName = "System.Data.Sqlite")]
 	public class JMXSQLiteFactory: JMXFactory
 	{
 		public const string ProviderInvariantName = "System.Data.Sqlite";

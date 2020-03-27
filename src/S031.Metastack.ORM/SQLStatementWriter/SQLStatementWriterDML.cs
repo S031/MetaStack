@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 
 
-namespace S031.MetaStack.Core.ORM
+namespace S031.MetaStack.ORM
 {
     public partial class SQLStatementWriter : StringWriter
     {

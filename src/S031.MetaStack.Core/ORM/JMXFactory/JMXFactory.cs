@@ -1,12 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using S031.MetaStack.Common;
 using S031.MetaStack.Core.Data;
+using S031.MetaStack.Data;
+using S031.MetaStack.ORM;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace S031.MetaStack.Core.ORM
 {
@@ -34,10 +32,10 @@ namespace S031.MetaStack.Core.ORM
 			foreach (var t in l)
 			{
 				if (System.Attribute.GetCustomAttributes(t)?
-					.FirstOrDefault(attr => attr.GetType() == typeof(SchemaDBSyncAttribute)
-						&& (attr as SchemaDBSyncAttribute)
+					.FirstOrDefault(attr => attr.GetType() == typeof(DBRefAttribute)
+						&& (attr as DBRefAttribute)
 							.DBProviderName
-							.Equals(dbProviderName, StringComparison.OrdinalIgnoreCase)) is SchemaDBSyncAttribute att)
+							.Equals(dbProviderName, StringComparison.OrdinalIgnoreCase)) is DBRefAttribute att)
 					return (JMXFactory)t.CreateInstance(sysCatMdbContext, workMdbContext, logger);
 			}
 			throw new InvalidOperationException("No class inherited from JMXFactory contained attribute of type SchemaDBSyncAttribute  defined");

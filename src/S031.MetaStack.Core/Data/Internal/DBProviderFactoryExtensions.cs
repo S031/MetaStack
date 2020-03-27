@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Data.Common;
 
 namespace S031.MetaStack.Core
 {
-    internal static class DBProviderFactoryExtensions
+	internal static class DBProviderFactoryExtensions
     {
 		/// <summary>
 		/// Create and Open <see cref="DbConnection"/>

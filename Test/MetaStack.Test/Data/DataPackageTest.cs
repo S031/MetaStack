@@ -1,5 +1,4 @@
-﻿using MessagePack;
-using S031.MetaStack.Common.Logging;
+﻿using S031.MetaStack.Common.Logging;
 using S031.MetaStack.Data;
 using S031.MetaStack.Json;
 using System;
@@ -229,18 +228,28 @@ namespace MetaStack.Test.Data
 		{
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
-				l.Debug("SpeedTest MessagePackSerializer custom object Start");
-				int i = 0;
-				for (i = 0; i < 1_000_000; i++)
-				{
-					TestClass test = new TestClass() { ID = i, Name = $"Item {i}" };
-					test.ItemList.Add("Item {i}", i);
-					var data = MessagePackSerializer.Typeless.Serialize(test);
-					test = (TestClass)MessagePackSerializer.Typeless.Deserialize(data);
-				}
-				l.Debug("SpeedTest MessagePackSerializer custom object Finish");
+				//l.Debug("SpeedTest MessagePackSerializer custom object Start");
+				//int i = 0;
+				//for (i = 0; i < 1_000_000; i++)
+				//{
+				//	TestClass test = new TestClass() { ID = i, Name = $"Item {i}" };
+				//	test.ItemList.Add("Item {i}", i);
+				//	var data = MessagePackSerializer.Typeless.Serialize(test);
+				//	test = (TestClass)MessagePackSerializer.Typeless.Deserialize(data);
+				//}
+				//l.Debug("SpeedTest MessagePackSerializer custom object Finish");
+
+				//l.Debug("SpeedTest DateTime object Start");
+				//object d = DateTime.Now;
+				//for (i = 0; i < 1_000_000; i++)
+				//{
+				//	var data = MessagePackSerializer.Typeless.Serialize(d);
+				//	d = MessagePack.MessagePackSerializer.Typeless.Deserialize(data);
+				//}
+				//l.Debug("SpeedTest JSOSerializer Finish");
+
 				l.Debug("SpeedTest JSONSerializer Start");
-				for (i = 0; i < 1_000_000; i++)
+				for (int i = 0; i < 1_000_000; i++)
 				{
 					TestClass test = new TestClass() { ID = i, Name = $"Item {i}" };
 					test.ItemList.Add($"Item {i}", i);
@@ -248,18 +257,9 @@ namespace MetaStack.Test.Data
 					test = JsonExtensions.DeserializeObject<TestClass>(data);
 				}
 				l.Debug("SpeedTest JSOSerializer Finish");
-				l.Debug("SpeedTest DateTime object Start");
-				object d = DateTime.Now;
-				for (i = 0; i < 1_000_000; i++)
-				{
-					var data = MessagePackSerializer.Typeless.Serialize(d);
-					d = MessagePack.MessagePackSerializer.Typeless.Deserialize(data);
-				}
-				l.Debug("SpeedTest JSOSerializer Finish");
 			}
 		}
 
-		[MessagePackObject(keyAsPropertyName: true)]
 		public class TestClass
 		{
 			static TestClass()

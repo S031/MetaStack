@@ -4,7 +4,7 @@ using System;
 using System.IO;
 using System.Linq;
 
-namespace S031.MetaStack.Core.ORM
+namespace S031.MetaStack.ORM
 {
 	public partial class SQLStatementWriter : StringWriter
 	{
@@ -13,12 +13,12 @@ namespace S031.MetaStack.Core.ORM
 		private readonly IJMXTypeMapping _typeMapping;
 		private readonly bool _schemaSupport = true;
 
-
 		public SQLStatementWriter(IJMXTypeMapping typeMapping)
 		{
 			_typeMapping = typeMapping;
 			_schemaSupport = true;
 		}
+
 		public SQLStatementWriter(IJMXTypeMapping typeMapping, bool schemaSupport)
 		{
 			_typeMapping = typeMapping;

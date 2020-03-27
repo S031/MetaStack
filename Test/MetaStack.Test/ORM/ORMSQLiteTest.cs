@@ -4,6 +4,7 @@ using S031.MetaStack.Core.Data;
 using S031.MetaStack.Core.Logging;
 using S031.MetaStack.Core.ORM;
 using S031.MetaStack.Data;
+using S031.MetaStack.ORM;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -152,26 +153,26 @@ namespace MetaStack.Test.ORM
 			{
 				using (MdbContext mdb = new MdbContext(_ci))
 				{
-					string s1 = mdb.Execute<string>("SysCat.Get_TableSchema_xml",
-						new MdbParameter("@table_name", "dbo.OrderDetails"));
-					_logger.Debug(s1);
-					_logger.Debug(JMXSchema.ParseXml(s1).ToString());
-					s1 = mdb.Execute<string>("SysCat.Get_TableSchema",
-						new MdbParameter("@table_name", "dbo.Orders"));
-					_logger.Debug(s1);
+					//string s1 = mdb.Execute<string>("SysCat.Get_TableSchema_xml",
+					//	new MdbParameter("@table_name", "dbo.OrderDetails"));
+					//_logger.Debug(s1);
+					//_logger.Debug(JMXSchema.ParseXml(s1).ToString());
+					//s1 = mdb.Execute<string>("SysCat.Get_TableSchema",
+					//	new MdbParameter("@table_name", "dbo.Orders"));
+					//_logger.Debug(s1);
 
-					_logger.Debug("Start speed test for SysCat.Get_TableSchema_xml");
-					for (int i = 0; i < 100; i++)
-					{
-						s1 = mdb.Execute<string>("SysCat.Get_TableSchema_xml",
-							new MdbParameter("@table_name", "dbo.OrderDetails"));
-						var schema = JMXSchema.ParseXml(s1);
-					}
-					_logger.Debug("End speed test for SysCat.Get_TableSchema_xml");
+					//_logger.Debug("Start speed test for SysCat.Get_TableSchema_xml");
+					//for (int i = 0; i < 100; i++)
+					//{
+					//	s1 = mdb.Execute<string>("SysCat.Get_TableSchema_xml",
+					//		new MdbParameter("@table_name", "dbo.OrderDetails"));
+					//	var schema = JMXSchema.ParseXml(s1);
+					//}
+					//_logger.Debug("End speed test for SysCat.Get_TableSchema_xml");
 					_logger.Debug("Start speed test for SysCat.Get_TableSchema");
 					for (int i = 0; i < 100; i++)
 					{
-						s1 = mdb.Execute<string>("SysCat.Get_TableSchema",
+						var s1 = mdb.Execute<string>("SysCat.Get_TableSchema",
 							new MdbParameter("@table_name", "dbo.OrderDetails"));
 						var schema = JMXSchema.Parse(s1);
 					}

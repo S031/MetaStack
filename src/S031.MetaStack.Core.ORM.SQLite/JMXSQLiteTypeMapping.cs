@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using S031.MetaStack.Data;
+using S031.MetaStack.ORM;
 
 namespace S031.MetaStack.Core.ORM.SQLite
 {

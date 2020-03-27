@@ -10,6 +10,7 @@ using S031.MetaStack.Core.Data;
 using S031.MetaStack.Core.Logging;
 using S031.MetaStack.Data;
 using S031.MetaStack.Json;
+using S031.MetaStack.ORM;
 
 namespace S031.MetaStack.Core.ORM.MsSql
 {

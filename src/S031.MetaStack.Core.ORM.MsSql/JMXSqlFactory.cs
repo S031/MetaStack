@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.Extensions.Logging;
-using S031.MetaStack.Common;
 using S031.MetaStack.Core.Data;
+using S031.MetaStack.Data;
+using S031.MetaStack.ORM;
 
 namespace S031.MetaStack.Core.ORM.MsSql
 {
-	[SchemaDBSync(DBProviderName = "System.Data.SqlClient")]
+	[DBRef(DBProviderName = "System.Data.SqlClient")]
 	public class JMXSqlFactory: JMXFactory
 	{
 		public const string ProviderInvariantName = "System.Data.SqlClient";
