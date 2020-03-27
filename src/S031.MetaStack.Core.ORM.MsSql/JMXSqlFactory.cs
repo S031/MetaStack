@@ -14,6 +14,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 		private readonly JMXSqlRepo _repo;
 		private readonly JMXSqlProvider _jmx;
 		private readonly JMXFactory _schemaFactory;
+
 		public JMXSqlFactory(MdbContext mdbContext, ILogger logger) : this(mdbContext, mdbContext, logger)
 		{
 		}

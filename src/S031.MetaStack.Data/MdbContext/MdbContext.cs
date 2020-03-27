@@ -5,9 +5,8 @@ using System.Data;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using S031.MetaStack.Data;
 
-namespace S031.MetaStack.Core.Data
+namespace S031.MetaStack.Data
 {
 	public class MdbContext : IDisposable
 	{

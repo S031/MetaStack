@@ -2,7 +2,7 @@
 using System;
 using System.Data.Common;
 
-namespace S031.MetaStack.Core.Data
+namespace S031.MetaStack.Data
 {
 	public class ConnectInfo
 	{
