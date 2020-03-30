@@ -1,4 +1,4 @@
-﻿using S031.MetaStack.WinForms.Data;
+﻿using S031.MetaStack.ORM;
 using System.Collections.Concurrent;
 
 namespace S031.MetaStack.WinForms.ORM

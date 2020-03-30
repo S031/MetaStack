@@ -34,9 +34,22 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="S031.MetaStack.Buffers">
+      <HintPath>..\..\S031.MetaStack.Buffers\bin\Release\net48\S031.MetaStack.Buffers.dll</HintPath>
+    </Reference>
     <Reference Include="S031.MetaStack.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\S031.MetaStack.Common\bin\Release\net48\S031.MetaStack.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="S031.MetaStack.Data">
+      <HintPath>..\..\S031.MetaStack.Data\bin\Release\net48\S031.MetaStack.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="S031.MetaStack.Json, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\S031.MetaStack.Json\bin\Release\net48\S031.MetaStack.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="S031.Metastack.ORM">
+      <HintPath>..\..\S031.Metastack.ORM\bin\Release\net48\S031.Metastack.ORM.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -66,72 +79,6 @@
     </Compile>
     <Compile Include="..\..\S031.MetaStack.Core\Connectors\TCPConnector.cs">
       <Link>Connectors\TCPConnector.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\Data\DataPackage.cs">
-      <Link>Data\DataPackage.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\Data\DataPackageExt.cs">
-      <Link>Data\DataPackageExt.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\Data\MdbType.cs">
-      <Link>Data\MdbType.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\Json\JSONExtensions.cs">
-      <Link>Json\JSONExtensions.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\ORM\Internal\FastMethodInfo.cs">
-      <Link>ORM\Internal\FastMethodInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXAttribute.cs">
-      <Link>ORM\JMXAttribute.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXCondition.cs">
-      <Link>ORM\JMXCondition.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXConstraint.cs">
-      <Link>ORM\JMXConstraint.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXDataSize.cs">
-      <Link>ORM\JMXDataSize.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXFactory\Interfaces\IJMXFactory.cs">
-      <Link>ORM\JMXFactory\Interfaces\IJMXFactory.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXFactory\Interfaces\IJMXProvider.cs">
-      <Link>ORM\JMXFactory\Interfaces\IJMXProvider.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXFactory\Interfaces\IJMXRepo.cs">
-      <Link>ORM\JMXFactory\Interfaces\IJMXRepo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXFactory\Interfaces\IJMXTypeMapping.cs">
-      <Link>ORM\JMXFactory\Interfaces\IJMXTypeMapping.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXForeignKey.cs">
-      <Link>ORM\JMXForeignKey.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXIdentity.cs">
-      <Link>ORM\JMXIdentity.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXIndex.cs">
-      <Link>ORM\JMXIndex.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXKeyMember.cs">
-      <Link>ORM\JMXKeyMember.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXObject.cs">
-      <Link>ORM\JMXObject.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXObjectName.cs">
-      <Link>ORM\JMXObjectName.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXParameter.cs">
-      <Link>ORM\JMXParameter.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXPrimaryKey.cs">
-      <Link>ORM\JMXPrimaryKey.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\ORM\JMXSchema.cs">
-      <Link>ORM\JMXSchema.cs</Link>
     </Compile>
     <Compile Include="..\..\S031.MetaStack.Core\Security\Authentication\AuthExceptions.cs">
       <Link>Security\Authentication\AuthExceptions.cs</Link>
@@ -345,9 +292,7 @@
       <Name>ICSharpCode.TextEditor</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ORM\Extensions\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using S031.MetaStack.ORM;
+using System;
 
 namespace S031.MetaStack.WinForms.ORM
 {

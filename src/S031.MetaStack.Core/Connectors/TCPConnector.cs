@@ -13,7 +13,6 @@ using Microsoft.Extensions.Configuration;
 
 namespace S031.MetaStack.Core.Connectors
 #else
-using S031.MetaStack.WinForms.Data;
 using S031.MetaStack.WinForms.Security;
 using S031.MetaStack.Json;
 
@@ -45,7 +44,7 @@ namespace S031.MetaStack.WinForms.Connectors
 			_port = config.GetValue<int>("Port");
 #else
 			string setting = System.Configuration.ConfigurationManager.AppSettings["TCPConnector"].Replace('\'', '"');
-			var j = new JsonReader(ref setting)
+			var j = new JsonReader(setting)
 				.Read();
 			if (j != null)
 			{

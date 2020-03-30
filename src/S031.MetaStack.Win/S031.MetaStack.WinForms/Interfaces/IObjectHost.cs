@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using S031.MetaStack.ORM;
 using S031.MetaStack.WinForms.ORM;
 
 namespace S031.MetaStack.WinForms
