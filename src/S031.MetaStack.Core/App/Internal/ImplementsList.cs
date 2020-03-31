@@ -20,7 +20,7 @@ namespace S031.MetaStack.WinForms
 			if (_iList.TryGetValue(type, out var l))
 				return l;
 
-			l = getImplements(type).ToList();
+			l = GetImplements(type).ToList();
 			_iList.TryAdd(type, l);
 			return l;
 		}
@@ -30,19 +30,19 @@ namespace S031.MetaStack.WinForms
 			if (_iList.ContainsKey(type))
 			{
 				var l = _iList[type];
-				l.AddRange(getImplements(type, a).Where(t => !l.Contains(t)));
+				l.AddRange(GetImplements(type, a).Where(t => !l.Contains(t)));
 				return l;
 			}
 			else
 			{
-				var l = getImplements(type, a).ToList();
+				var l = GetImplements(type, a).ToList();
 				_iList.Add(type, l);
 				return l;
 			}
 		}
-        private static IEnumerable<Type> getImplements(Type type, Assembly assembly = null)
+        private static IEnumerable<Type> GetImplements(Type type, Assembly assembly = null)
         {
-            IEnumerable<Assembly> l = assembly == null ? getAssemblies() : new List<Assembly>() { assembly };
+            IEnumerable<Assembly> l = assembly == null ? GetAssemblies() : new List<Assembly>() { assembly };
             foreach (var a in l)
 #if NETCOREAPP //&& DEBUG
                 if (!a.FullName.StartsWith("Microsoft.VisualStudio.TraceDataCollector", StringComparison.Ordinal))
@@ -51,6 +51,6 @@ namespace S031.MetaStack.WinForms
                         yield return t;
         }
 
-		private static IEnumerable<Assembly> getAssemblies() => AppDomain.CurrentDomain.GetAssemblies();
+		private static IEnumerable<Assembly> GetAssemblies() => AppDomain.CurrentDomain.GetAssemblies();
 	}
 }

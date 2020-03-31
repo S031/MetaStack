@@ -2,25 +2,21 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Security.Cryptography;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using S031.MetaStack.Core.Security;
 using S031.MetaStack.Core.Logging;
 using S031.MetaStack.Common.Logging;
-using System.Data.Common;
 using System.Reflection;
 using System.Runtime.Loader;
 using S031.MetaStack.Common;
 using S031.MetaStack.Core.ORM;
-using S031.MetaStack.Core.Data;
 using S031.MetaStack.Core.Actions;
+using S031.MetaStack.Data;
 
 namespace S031.MetaStack.Core.App
 {
-    public static class ApplicationContext
+	public static class ApplicationContext
     {
 		static IServiceProvider _lastBuildServiceProvider = null;
 		static int _lastBuildHash = 0;

@@ -34,7 +34,6 @@
     <Compile Remove="App\AppHost.cs" />
     <Compile Remove="App\AppHostExtensions.cs" />
     <Compile Remove="App\Internal\PluginManager.cs" />
-    <Compile Remove="Data\DbProviderFactories.cs" />
     <Compile Remove="ORM\JMXSchemaProviderFactory.cs" />
   </ItemGroup>
 

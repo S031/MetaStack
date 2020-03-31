@@ -23,14 +23,14 @@ namespace S031.MetaStack.Data
 		{
 			connectionString.NullTest(nameof(connectionString));
 			_connectInfo = new ConnectInfo(connectionString);
-			Factory = ObjectFactories.GetFactory<DbProviderFactory>(_connectInfo.ProviderName);
+			Factory = DbProviderFactories.GetFactory(_connectInfo.ProviderName);
 			Connection = Factory.CreateConnection(_connectInfo.ConnectionString);
 		}
 		public MdbContext(ConnectInfo connectionInfo)
 		{
 			connectionInfo.NullTest(nameof(connectionInfo));
 			_connectInfo = connectionInfo;
-			Factory = ObjectFactories.GetFactory<DbProviderFactory>(_connectInfo.ProviderName);
+			Factory = DbProviderFactories.GetFactory(_connectInfo.ProviderName);
 			Connection = Factory.CreateConnection(_connectInfo.ConnectionString);
 		}
 		public string ProviderName => _connectInfo.ProviderName;
@@ -60,7 +60,7 @@ namespace S031.MetaStack.Data
 		public DataPackage[] GetReaders(string sql, params MdbParameter[] parameters)
 		{
 			List<DataPackage> rs = new List<DataPackage>();
-			using (DbCommand command = getCommandInternal(sql, parameters))
+			using (DbCommand command = GetCommandInternal(sql, parameters))
 			{
 				using (DbDataReader dr = command.ExecuteReader())
 				{
@@ -96,7 +96,7 @@ namespace S031.MetaStack.Data
 			}
 			return pList.ToArray();
 		}
-		static string array2List(object a)
+		static string Array2List(object a)
 		{
 			Type t = a.GetType().GetInterfaces().FirstOrDefault(type => type.Name == "IEnumerable`1");
 
@@ -161,7 +161,7 @@ namespace S031.MetaStack.Data
 		/// <returns><see cref="int"/></returns>
 		public int Execute(string sql, params MdbParameter[] parameters)
 		{
-			using (DbCommand command = getCommandInternal(sql, parameters))
+			using (DbCommand command = GetCommandInternal(sql, parameters))
 			{
 				return command.ExecuteNonQuery();
 			}
@@ -175,12 +175,12 @@ namespace S031.MetaStack.Data
 		/// <returns><see cref="int"/></returns>
 		public T Execute<T>(string sql, params MdbParameter[] parameters)
 		{
-			using (DbCommand command = getCommandInternal(sql, parameters))
+			using (DbCommand command = GetCommandInternal(sql, parameters))
 			{
 				return command.ExecuteScalar().CastOf<T>();
 			}
 		}
-		DbCommand getCommandInternal(string sql, params MdbParameter[] parameters)
+		DbCommand GetCommandInternal(string sql, params MdbParameter[] parameters)
 		{
 			if (Connection.State != ConnectionState.Open)
 				Connection.Open();
@@ -208,7 +208,7 @@ namespace S031.MetaStack.Data
 						else if (t == typeof(string))
 							pValue = "'" + p.ToString().Replace("'", "''") + "'";
 						else if (t != typeof(byte[]) && t.GetInterfaces().FirstOrDefault(type => type.Name == "IEnumerable`1") != null)
-							pValue = array2List(p);
+							pValue = Array2List(p);
 						else
 							replace = false;
 					}
@@ -307,14 +307,14 @@ namespace S031.MetaStack.Data
 		/// </summary>
 		public async Task<int> ExecuteAsync(string sql, params MdbParameter[] parameters)
 		{
-			using (DbCommand command = getCommandInternal(sql, parameters))
+			using (DbCommand command = GetCommandInternal(sql, parameters))
 			{
 				return await command.ExecuteNonQueryAsync().ConfigureAwait(false);
 			}
 		}
 		public async Task<T> ExecuteAsync<T>(string sql, params MdbParameter[] parameters)
 		{
-			using (DbCommand command = getCommandInternal(sql, parameters))
+			using (DbCommand command = GetCommandInternal(sql, parameters))
 			{
 				var result = await command.ExecuteScalarAsync().ConfigureAwait(false);
 				return (T)result;
@@ -326,7 +326,7 @@ namespace S031.MetaStack.Data
 		public async Task<DataPackage[]> GetReadersAsync(string sql, params MdbParameter[] parameters)
 		{
 			List<DataPackage> rs = new List<DataPackage>();
-			using (DbCommand command = getCommandInternal(sql, parameters))
+			using (DbCommand command = GetCommandInternal(sql, parameters))
 			{
 				using (DbDataReader dr = await command.ExecuteReaderAsync().ConfigureAwait(false))
 				{
@@ -371,6 +371,8 @@ namespace S031.MetaStack.Data
 		{
 			await Task.Run(() => Commit()).ConfigureAwait(false);
 		}
+		public static DbProviderFactory GetFactory(string providerInvariantName)
+			=> DbProviderFactories.GetFactory(providerInvariantName);
 		#endregion async_methods
 	}
 

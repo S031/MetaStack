@@ -1,10 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using S031.MetaStack.Common.Logging;
 using S031.MetaStack.Core.App;
-using S031.MetaStack.Core.Data;
+using S031.MetaStack.Data;
 using S031.MetaStack.Core.Logging;
 using S031.MetaStack.Core.ORM;
-using S031.MetaStack.Data;
 using S031.MetaStack.ORM;
 using System.Collections.Generic;
 using System.Data.Common;

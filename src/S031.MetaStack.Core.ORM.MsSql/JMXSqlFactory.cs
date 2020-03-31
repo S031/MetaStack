@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
-using S031.MetaStack.Core.Data;
 using S031.MetaStack.Data;
 using S031.MetaStack.ORM;
 
