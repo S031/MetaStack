@@ -119,8 +119,8 @@ namespace S031.MetaStack.Common
 					return str.ToBoolOrDefault();
 				case TypeCode.DateTime:
 					return str.ToDateOrDefault();
-				case TypeCode.String - 1:
-					return new Guid(str);
+				//case TypeCode.String - 1:
+				//	return new Guid(str);
 				case TypeCode.Byte:
 					byte byteValue;
 					return Byte.TryParse(str, out byteValue) ? byteValue : (byte)0;
@@ -158,13 +158,18 @@ namespace S031.MetaStack.Common
 					decimal decimalValue;
 					return decimal.TryParse(str, out decimalValue) ? decimalValue : 0m;
 				default:
-					try 
-					{ 
-						return System.Convert.ChangeType(str, type); 
-					}
-					catch 
-					{ 
-						return type.GetDefaultValue(); 
+					if (type == typeof(Guid))
+						return new Guid(str);
+					else
+					{
+						try
+						{
+							return System.Convert.ChangeType(str, type);
+						}
+						catch
+						{
+							return type.GetDefaultValue();
+						}
 					}
 			}
 		}

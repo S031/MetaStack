@@ -98,7 +98,7 @@ namespace S031.MetaStack.Data
 			DataPackage ts = new DataPackage(headerSpaceSize,
 				j.Select(kvp => kvp.Key).ToArray<string>(),
 				j.Select(kvp => kvp.Value?.GetValue()).ToArray<object>());
-			ts.Update();
+			//ts.Update();
 			ts.GoDataTop();
 			return ts;
 		}

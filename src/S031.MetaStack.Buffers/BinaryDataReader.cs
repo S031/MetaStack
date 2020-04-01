@@ -225,7 +225,7 @@ namespace S031.MetaStack.Buffers
 
 		public void ReadRaw(IDictionary<string, object> map)
 		{
-			int count = Read<int>();
+			int count = ReadInt32();
 			for (int i = 0; i < count; i++)
 				map[ReadPropertyName()] = ReadValue();
 		}

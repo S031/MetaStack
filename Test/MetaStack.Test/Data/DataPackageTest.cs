@@ -67,12 +67,12 @@ namespace MetaStack.Test.Data
 			using (FileLog l = new FileLog("DataPackageTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
 				int i = 0;
-				int count = 10_000;
+				int count = 1_000;
 				int loopCount = 1_000;
-				DataPackage p = GetTestData(count, false, false);
+				DataPackage p = GetTestData(count, true, false);
 				l.Debug("SpeedTest Start");
 				for (i = 0; i < loopCount; i++)
-					p = GetTestData(count, false, false);
+					p = GetTestData(count, true, false);
 				l.Debug($"SpeedTest Finish {i} packages with {count} rows");
 				for (i = 0; i < loopCount; i++)
 					p.GoDataTop();

@@ -61,7 +61,7 @@ namespace S031.MetaStack.Data
 
 		}
 
-		private const int header_pos = 8; // sizeof(int) *2
+		private const int header_pos = 10; // (sizeof(byte) + sizeof(int)) *2
 		private const int header_space_size_default = 512;
 
 		private readonly int _headerSpaceSize;
@@ -100,9 +100,9 @@ namespace S031.MetaStack.Data
 
 			//Read headers
 			_headers = new MapTable<string, object>(StringComparer.Ordinal);
-			_br.ReadNext();
+			_br.ReadNext(); //Must be Object
 			_br.ReadRaw(_headers);
-			_br.Position = _headerSpaceSize + (sizeof(int) + sizeof(byte)) * 2 + 1;
+			_br.Position = _headerSpaceSize + header_pos + 1;
 
 			//Read columns
 			_indexes = new string[_colCount];
@@ -191,7 +191,11 @@ namespace S031.MetaStack.Data
 
 			//Write Headers
 			if (_headers.Count > 0)
+			{
 				_bw.Write(_headers);
+				int len = _headerSpaceSize - _bw.Position;
+				_bw.WriteSpace(len);
+			}
 			else
 			{
 				_bw.Write(ExportedDataTypes.@object);
@@ -426,16 +430,11 @@ namespace S031.MetaStack.Data
 		public DataPackage UpdateHeaders()
 		{
 			_bw.Position = header_pos;
-			_bw.Write(_headers.Count);
-
 			int limit = header_pos + _headerSpaceSize;
-			foreach (var kvp in _headers)
-			{
-				_bw.Write(kvp.Key);
-				_bw.Write(kvp.Value);
-				if (_bw.Position > limit)
-					throw new OverflowException("Header size is larger than the buffer size specified in HeaderSpaceSize");
-			}
+
+			_bw.Write(_headers);
+			if (_bw.Position > limit)
+				throw new OverflowException("Header size is larger than the buffer size specified in HeaderSpaceSize");
 			return this;
 		}
 
