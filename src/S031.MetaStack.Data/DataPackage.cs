@@ -102,7 +102,7 @@ namespace S031.MetaStack.Data
 			_headers = new MapTable<string, object>(StringComparer.Ordinal);
 			_br.ReadNext(); //Must be Object
 			_br.ReadRaw(_headers);
-			_br.Position = _headerSpaceSize + header_pos + 1;
+			_br.Position = _headerSpaceSize + header_pos;
 
 			//Read columns
 			_indexes = new string[_colCount];
@@ -190,19 +190,9 @@ namespace S031.MetaStack.Data
 			_bw.Write(_colCount);
 
 			//Write Headers
-			if (_headers.Count > 0)
-			{
-				_bw.Write(_headers);
-				int len = _headerSpaceSize - _bw.Position;
-				_bw.WriteSpace(len);
-			}
-			else
-			{
-				_bw.Write(ExportedDataTypes.@object);
-				_bw.Write(0);
-				int len = _headerSpaceSize - (sizeof(byte) + sizeof(int));
-				_bw.WriteSpace(len);
-			}
+			_bw.Write(_headers);
+			int len = header_pos + _headerSpaceSize - _bw.Position;
+			_bw.WriteSpace(len);
 
 			//Write ColInfo
 			for (int i = 0; i < _colCount; i++)
