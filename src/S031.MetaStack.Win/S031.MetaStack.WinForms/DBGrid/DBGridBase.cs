@@ -1412,7 +1412,7 @@ namespace S031.MetaStack.WinForms
 		}
 		public virtual JMXObject DoObjectRead(bool isNew)
 		{
-			JMXObject jObj = new JMXObject(this.ObjectName);
+			JMXObject jObj = JMXFactory.Create().CreateObject(this.ObjectName);
 
 			if (!isNew)
 			{

@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Linq;
 using S031.MetaStack.WinForms.Connectors;
 using S031.MetaStack.Common.Logging;
+using S031.MetaStack.ORM;
+using S031.MetaStack.Data;
 
 namespace MetApp
 {
@@ -65,7 +67,7 @@ namespace MetApp
 			JMXSchema schema = _grid.Schema;
 			foreach (var att in schema.Attributes)
 			{
-				if (att.DataType == S031.MetaStack.WinForms.Data.MdbType.@object)
+				if (att.DataType == MdbType.@object)
 				{
 					JMXSchema rs = ClientGate.GetObjectSchema(att.ObjectName);
 					if (rs.DbObjectType == DbObjectTypes.Action)
@@ -97,7 +99,7 @@ namespace MetApp
 			JMXSchema schema = _grid.Schema;
 			foreach (var att in schema.Attributes)
 			{
-				if (att.DataType == S031.MetaStack.WinForms.Data.MdbType.@object)
+				if (att.DataType == MdbType.@object)
 				{
 					JMXSchema rs = ClientGate.GetObjectSchema(att.ObjectName);
 					if (rs.DbObjectType == DbObjectTypes.View)
@@ -400,7 +402,7 @@ namespace MetApp
 				return;
 
 			var colID = _grid.Schema.Attributes.FirstOrDefault(att => att.ObjectName == childFormName
-				&& att.DataType == S031.MetaStack.WinForms.Data.MdbType.@object)?.FieldName;
+				&& att.DataType == MdbType.@object)?.FieldName;
 			if (colID != null)
 			{
 				var filter = $"{colID}{_grid.GetStringForSelected()}";

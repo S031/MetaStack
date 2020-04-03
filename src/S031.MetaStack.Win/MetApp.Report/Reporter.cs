@@ -15,6 +15,7 @@ using S031.MetaStack.Common;
 using S031.MetaStack.WinForms.ORM;
 using System.Windows.Forms;
 using S031.MetaStack.Json;
+using S031.MetaStack.ORM;
 
 namespace MetApp
 {
@@ -536,7 +537,7 @@ namespace MetApp
 		private static ReportCreateParam GetReportCreateParam()
 		{
 			string configData = ConfigurationManager.AppSettings["ReportingSettings"];
-			JsonObject setup = (JsonObject)new JsonReader(ref configData).Read();
+			JsonObject setup = (JsonObject)new JsonReader(configData).Read();
 			return new ReportCreateParam()
 			{
 				FontSize = (float)setup["FontSize"],
