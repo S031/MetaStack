@@ -7,6 +7,8 @@ using System.Linq;
 using S031.MetaStack.Common;
 using S031.MetaStack.WinForms.Data;
 using S031.MetaStack.WinForms.ORM;
+using S031.MetaStack.ORM;
+using S031.MetaStack.Data;
 //using Zuby.ADGV; 
 
 namespace S031.MetaStack.WinForms

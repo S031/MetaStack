@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Threading;
-using S031.MetaStack.WinForms.Data;
+using S031.MetaStack.Data;
 
 namespace S031.MetaStack.WinForms
 {

@@ -490,7 +490,7 @@ namespace S031.MetaStack.WinForms
                 string what = document.GetText(startOffset, length);
 				try
 				{
-					var json = new JsonReader(ref what).Read();
+					var json = new JsonReader(what).Read();
 					if (json is JsonArray a)
 						what = a.ToString(Formatting.Indented);
 					else if (json is JsonObject j)

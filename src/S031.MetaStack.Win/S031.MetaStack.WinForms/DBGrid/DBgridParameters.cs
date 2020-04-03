@@ -1,4 +1,6 @@
 ﻿using S031.MetaStack.Common;
+using S031.MetaStack.Data;
+using S031.MetaStack.ORM;
 using S031.MetaStack.WinForms.Data;
 using S031.MetaStack.WinForms.ORM;
 using System;
