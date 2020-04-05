@@ -178,8 +178,12 @@ namespace S031.MetaStack.Data
 				{
 					object[] values = new object[_colCount];
 					dr.GetValues(values);
-					_bw.Write(values);
+					//_bw.Write(values);
+					AddNew();
+					SetValues(values);
+					Update();
 				}
+				GoDataTop();
 			}
 		}
 

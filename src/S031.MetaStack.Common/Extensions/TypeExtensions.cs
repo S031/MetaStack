@@ -136,6 +136,8 @@ namespace S031.MetaStack.Common
 			TypeCode code = Type.GetTypeCode(type);
 			if (code == TypeCode.Object)
 			{
+				if (type == typeof(Guid))
+					return Guid.Empty;
 				if (type.IsValueType || type.IsPrimitive)
 					return type.CreateInstance();
 				return default;
