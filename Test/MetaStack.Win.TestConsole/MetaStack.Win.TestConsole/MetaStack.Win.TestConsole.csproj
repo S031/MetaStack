@@ -40,6 +40,10 @@
     <Reference Include="S031.MetaStack.Data">
       <HintPath>..\..\..\src\S031.MetaStack.Data\bin\Release\net48\S031.MetaStack.Data.dll</HintPath>
     </Reference>
+    <Reference Include="S031.Metastack.ORM, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\src\S031.Metastack.ORM\bin\Release\net48\S031.Metastack.ORM.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

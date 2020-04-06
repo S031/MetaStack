@@ -5,11 +5,11 @@ using S031.MetaStack.WinForms.Connectors;
 using S031.MetaStack.Common;
 using System.Windows.Forms;
 using System.Configuration;
-using S031.MetaStack.WinForms.Actions;
 using S031.MetaStack.WinForms.ORM;
 using System.Data;
 using S031.MetaStack.Data;
 using S031.MetaStack.ORM;
+using S031.MetaStack.ORM.Actions;
 
 namespace S031.MetaStack.WinForms
 {

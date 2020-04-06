@@ -62,21 +62,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\S031.MetaStack.Core\Actions\ActionInfo\ActionInfo.cs">
-      <Link>Actions\ActionInfo\ActionInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\Actions\ActionInfo\AttribInfo.cs">
-      <Link>Actions\ActionInfo\AttribInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\Actions\ActionInfo\InterfaceInfo.cs">
-      <Link>Actions\ActionInfo\InterfaceInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\Actions\ActionInfo\ParamInfo.cs">
-      <Link>Actions\ActionInfo\ParamInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\App\Internal\ImplementsList.cs">
-      <Link>Tools\ImplementsList.cs</Link>
-    </Compile>
     <Compile Include="..\..\S031.MetaStack.Core\Connectors\TCPConnector.cs">
       <Link>Connectors\TCPConnector.cs</Link>
     </Compile>
