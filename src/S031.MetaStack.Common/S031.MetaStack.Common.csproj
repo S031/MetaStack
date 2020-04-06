@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Internal\JsonWriterExtensions.cs" />
+    <Compile Remove="Reflection\JsonWriterExtensions.cs" />
   </ItemGroup>
 
   <ItemGroup>

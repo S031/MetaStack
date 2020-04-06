@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
 
-#if NETCOREAPP
-namespace S031.MetaStack.Core.ORM
-#else
-namespace S031.MetaStack.WinForms.ORM
-#endif
+namespace S031.MetaStack.Common
 {
 	internal class FastMethodInfo
 	{

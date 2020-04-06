@@ -1,15 +1,9 @@
-﻿using S031.MetaStack.Common;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-#if NETCOREAPP
 
-namespace S031.MetaStack.Core
-#else
-
-namespace S031.MetaStack.WinForms
-#endif
+namespace S031.MetaStack.Common
 {
 	public static class ImplementsList
 	{

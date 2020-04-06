@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace S031.MetaStack.Core.Actions
+﻿namespace S031.MetaStack.ORM.Actions
 {
 	public class ActionContext
 	{

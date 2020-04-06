@@ -1,8 +1,4 @@
-﻿#if NETCOREAPP
-namespace S031.MetaStack.Core.Actions
-#else
-namespace S031.MetaStack.WinForms.Actions
-#endif
+﻿namespace S031.MetaStack.ORM.Actions
 {
 	public class AttribInfo
 	{

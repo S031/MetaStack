@@ -3,11 +3,7 @@ using S031.MetaStack.Json;
 using System;
 using S031.MetaStack.Data;
 
-#if NETCOREAPP
-namespace S031.MetaStack.Core.Actions
-#else
-namespace S031.MetaStack.WinForms.Actions
-#endif
+namespace S031.MetaStack.ORM.Actions
 {
 	public enum TransactionActionSupport
 	{

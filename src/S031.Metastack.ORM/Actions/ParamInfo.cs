@@ -1,18 +1,15 @@
-﻿using S031.MetaStack.Json;
+﻿using S031.MetaStack.Data;
+using S031.MetaStack.Json;
 using System.Collections.Generic;
 using System.Linq;
 
-#if NETCOREAPP
-namespace S031.MetaStack.Core.Actions
-#else
-namespace S031.MetaStack.WinForms.Actions
-#endif
+namespace S031.MetaStack.ORM.Actions
 {
-	public enum ParamDirrect
-	{
-		Input = S031.MetaStack.Data.ParamDirrect.Input,
-		Output = S031.MetaStack.Data.ParamDirrect.Output
-	}
+	//public enum ParamDirrect
+	//{
+	//	Input = S031.MetaStack.Data.ParamDirrect.Input,
+	//	Output = S031.MetaStack.Data.ParamDirrect.Output
+	//}
 
 	public class ParamInfo : AttribInfo
 	{
