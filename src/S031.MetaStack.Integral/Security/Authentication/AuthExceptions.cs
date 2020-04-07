@@ -1,14 +1,6 @@
-﻿using S031.MetaStack.Common;
-using System;
-#if NETCOREAPP
-using S031.MetaStack.Core.Actions;
+﻿using System;
 
-namespace S031.MetaStack.Core.Security
-#else
-using S031.MetaStack.WinForms.Actions;
-
-namespace S031.MetaStack.WinForms.Security
-#endif
+namespace S031.MetaStack.Security
 {
 	public class AuthenticationExceptions : Exception
 	{

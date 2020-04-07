@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using S031.MetaStack.Common;
+using S031.MetaStack.Security;
 
 namespace S031.MetaStack.Core.Security
 {

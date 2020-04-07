@@ -9,7 +9,7 @@ using S031.MetaStack.WinForms.ORM;
 using System.Data;
 using S031.MetaStack.Data;
 using S031.MetaStack.ORM;
-using S031.MetaStack.ORM.Actions;
+using S031.MetaStack.Actions;
 
 namespace S031.MetaStack.WinForms
 {

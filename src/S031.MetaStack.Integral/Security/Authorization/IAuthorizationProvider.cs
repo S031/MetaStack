@@ -1,11 +1,7 @@
-﻿using S031.MetaStack.Core.Actions;
-using S031.MetaStack.ORM.Actions;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using S031.MetaStack.Actions;
 using System.Threading.Tasks;
 
-namespace S031.MetaStack.Core.Security
+namespace S031.MetaStack.Security
 {
 	public interface IAuthorizationProvider
 	{

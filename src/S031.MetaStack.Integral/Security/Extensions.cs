@@ -2,11 +2,7 @@
 using System;
 using System.Security.Cryptography;
 
-#if NETCOREAPP
-namespace S031.MetaStack.Core.Security
-#else
-namespace S031.MetaStack.WinForms.Security
-#endif
+namespace S031.MetaStack.Security
 {
 	public static class CryptoExtensions
 	{

@@ -3,7 +3,7 @@ using S031.MetaStack.Json;
 using System;
 using S031.MetaStack.Data;
 
-namespace S031.MetaStack.ORM.Actions
+namespace S031.MetaStack.Actions
 {
 	public enum TransactionActionSupport
 	{

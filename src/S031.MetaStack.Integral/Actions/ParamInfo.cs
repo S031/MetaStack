@@ -3,7 +3,7 @@ using S031.MetaStack.Json;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace S031.MetaStack.ORM.Actions
+namespace S031.MetaStack.Actions
 {
 	//public enum ParamDirrect
 	//{

@@ -1,6 +1,6 @@
 ﻿using S031.MetaStack.Common;
 using System;
-using S031.MetaStack.ORM.Actions;
+using S031.MetaStack.Actions;
 
 namespace S031.MetaStack.Core.App
 {

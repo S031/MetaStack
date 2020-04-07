@@ -32,20 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="S031.MetaStack.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\S031.MetaStack.Common\bin\Release\net48\S031.MetaStack.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="S031.MetaStack.Data">
-      <HintPath>..\..\S031.MetaStack.Data\bin\Release\net48\S031.MetaStack.Data.dll</HintPath>
-    </Reference>
-    <Reference Include="S031.MetaStack.Json, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\S031.MetaStack.Json\bin\Release\net48\S031.MetaStack.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="S031.Metastack.ORM">
-      <HintPath>..\..\S031.Metastack.ORM\bin\Release\net48\S031.Metastack.ORM.dll</HintPath>
-    </Reference>
     <Reference Include="Stimulsoft.Base">
       <HintPath>..\Bin\Stimulsoft.Base.dll</HintPath>
     </Reference>
@@ -87,6 +73,22 @@
     <Compile Include="Reporter.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\S031.MetaStack.Common\S031.MetaStack.Common.csproj">
+      <Project>{7d82ba49-5333-424c-9a41-21358fb5f650}</Project>
+      <Name>S031.MetaStack.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\S031.MetaStack.Data\S031.MetaStack.Data.csproj">
+      <Project>{f523de1a-426d-4bd4-8e5b-8c423dd789b4}</Project>
+      <Name>S031.MetaStack.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\S031.MetaStack.Json\S031.MetaStack.Json.csproj">
+      <Project>{dc654f1c-2478-4bec-9e58-ce70a4e2019b}</Project>
+      <Name>S031.MetaStack.Json</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\S031.Metastack.ORM\S031.MetaStack.ORM.csproj">
+      <Project>{c39bc04d-5c5c-43ea-ab6f-434d815c0e77}</Project>
+      <Name>S031.MetaStack.ORM</Name>
+    </ProjectReference>
     <ProjectReference Include="..\S031.MetaStack.WinForms\S031.MetaStack.WinForms.csproj">
       <Project>{487C0CDC-53A2-4DDA-8BF0-A2DBB04BD587}</Project>
       <Name>S031.MetaStack.WinForms</Name>

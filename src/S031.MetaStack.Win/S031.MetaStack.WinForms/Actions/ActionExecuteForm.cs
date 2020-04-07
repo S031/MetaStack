@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 using System.Windows.Forms;
 using S031.MetaStack.Data;
-using S031.MetaStack.ORM.Actions;
+using S031.MetaStack.Actions;
 
 namespace S031.MetaStack.WinForms.Actions
 {

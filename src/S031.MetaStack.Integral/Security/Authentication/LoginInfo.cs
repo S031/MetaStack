@@ -1,15 +1,8 @@
 ﻿using S031.MetaStack.Buffers;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
 
-#if NETCOREAPP
-namespace S031.MetaStack.Core.Security
-#else
-namespace S031.MetaStack.WinForms.Security
-#endif
+namespace S031.MetaStack.Security
 {
 	public class LoginInfo
 	{

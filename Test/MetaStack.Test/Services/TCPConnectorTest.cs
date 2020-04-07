@@ -3,7 +3,7 @@ using S031.MetaStack.Core.Actions;
 using S031.MetaStack.Core.Connectors;
 using S031.MetaStack.Core.Logging;
 using S031.MetaStack.Data;
-using S031.MetaStack.ORM.Actions;
+using S031.MetaStack.Actions;
 using Xunit;
 
 namespace MetaStack.Test.Services

@@ -1,4 +1,4 @@
-﻿namespace S031.MetaStack.ORM.Actions
+﻿namespace S031.MetaStack.Actions
 {
 	public class ActionContext
 	{

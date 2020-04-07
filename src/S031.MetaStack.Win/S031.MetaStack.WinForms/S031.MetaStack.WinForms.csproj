@@ -34,23 +34,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="S031.MetaStack.Buffers">
-      <HintPath>..\..\S031.MetaStack.Buffers\bin\Release\net48\S031.MetaStack.Buffers.dll</HintPath>
-    </Reference>
-    <Reference Include="S031.MetaStack.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\S031.MetaStack.Common\bin\Release\net48\S031.MetaStack.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="S031.MetaStack.Data">
-      <HintPath>..\..\S031.MetaStack.Data\bin\Release\net48\S031.MetaStack.Data.dll</HintPath>
-    </Reference>
-    <Reference Include="S031.MetaStack.Json, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\S031.MetaStack.Json\bin\Release\net48\S031.MetaStack.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="S031.Metastack.ORM">
-      <HintPath>..\..\S031.Metastack.ORM\bin\Release\net48\S031.Metastack.ORM.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -64,15 +47,6 @@
   <ItemGroup>
     <Compile Include="..\..\S031.MetaStack.Core\Connectors\TCPConnector.cs">
       <Link>Connectors\TCPConnector.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\Security\Authentication\AuthExceptions.cs">
-      <Link>Security\Authentication\AuthExceptions.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\Security\Authentication\LoginInfo.cs">
-      <Link>Security\Authentication\LoginInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\S031.MetaStack.Core\Security\Extensions.cs">
-      <Link>Security\Extensions.cs</Link>
     </Compile>
     <Compile Include="Actions\ActionExecuteForm.cs">
       <SubType>Form</SubType>
@@ -272,6 +246,30 @@
     <None Include="Doc\WinForm Layout Schema.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\S031.MetaStack.Buffers\S031.MetaStack.Buffers.csproj">
+      <Project>{74f8497b-3008-4500-adb2-26262e99219a}</Project>
+      <Name>S031.MetaStack.Buffers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\S031.MetaStack.Common\S031.MetaStack.Common.csproj">
+      <Project>{7d82ba49-5333-424c-9a41-21358fb5f650}</Project>
+      <Name>S031.MetaStack.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\S031.MetaStack.Data\S031.MetaStack.Data.csproj">
+      <Project>{f523de1a-426d-4bd4-8e5b-8c423dd789b4}</Project>
+      <Name>S031.MetaStack.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\S031.MetaStack.Integral\S031.MetaStack.Integral.csproj">
+      <Project>{47b88791-1b7a-4f7e-a6b1-0be454d81890}</Project>
+      <Name>S031.MetaStack.Integral</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\S031.MetaStack.Json\S031.MetaStack.Json.csproj">
+      <Project>{dc654f1c-2478-4bec-9e58-ce70a4e2019b}</Project>
+      <Name>S031.MetaStack.Json</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\S031.Metastack.ORM\S031.MetaStack.ORM.csproj">
+      <Project>{c39bc04d-5c5c-43ea-ab6f-434d815c0e77}</Project>
+      <Name>S031.MetaStack.ORM</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ICSharpCode.TextEditor\ICSharpCode.TextEditor.csproj">
       <Project>{2d18be89-d210-49eb-a9dd-2246fbb3df6d}</Project>
       <Name>ICSharpCode.TextEditor</Name>
