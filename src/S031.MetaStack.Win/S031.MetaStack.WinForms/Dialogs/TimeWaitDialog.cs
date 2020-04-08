@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 using S031.MetaStack.Data;
+using S031.MetaStack.Interop.Connectors;
 
 namespace S031.MetaStack.WinForms
 {
@@ -12,7 +13,7 @@ namespace S031.MetaStack.WinForms
 		private BackWorkProc proc;
 		int seconds;
 
-		public Connectors.TCPConnectorException Error { get; private set; }
+		public TCPConnectorException Error { get; private set; }
 
 		public TimeWaitDialog(string text, int milliseconds)
 		{
@@ -71,7 +72,7 @@ namespace S031.MetaStack.WinForms
 		private void BackWorker_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
 		{
 			if (e.Error != null)
-				Error = new Connectors.TCPConnectorException(DataPackage.CreateErrorPackage(e.Error));
+				Error = new TCPConnectorException(DataPackage.CreateErrorPackage(e.Error));
 		}
 
 	}

@@ -78,6 +78,7 @@
     <ProjectReference Include="..\..\src\S031.MetaStack.Core\S031.MetaStack.Core.csproj" />
     <ProjectReference Include="..\..\src\S031.MetaStack.Data\S031.MetaStack.Data.csproj" />
     <ProjectReference Include="..\..\src\S031.MetaStack.Integral\S031.MetaStack.Integral.csproj" />
+    <ProjectReference Include="..\..\src\S031.MetaStack.Interop\S031.MetaStack.Interop.csproj" />
   </ItemGroup>
 
   <ItemGroup>

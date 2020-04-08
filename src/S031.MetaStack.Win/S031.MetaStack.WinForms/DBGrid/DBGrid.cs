@@ -1,4 +1,5 @@
 ﻿using S031.MetaStack.Common;
+using S031.MetaStack.Interop.Connectors;
 using S031.MetaStack.ORM;
 using S031.MetaStack.WinForms.ORM;
 using System;
@@ -167,7 +168,7 @@ namespace S031.MetaStack.WinForms
 					s = ClientGate.GetObjectSchema(ParseObjectName(value));
 					read = true;
 				}
-				catch (Connectors.TCPConnectorException e)
+				catch (TCPConnectorException e)
 				{
 					OnFormReadException(new SchemaExceptionEventArgs(e, _xc));
 					return;
@@ -242,7 +243,7 @@ namespace S031.MetaStack.WinForms
 				{
 					GetRecordset();
 				}
-				catch (Connectors.TCPConnectorException e)
+				catch (TCPConnectorException e)
 				{
 					OnGetDataException(new SchemaExceptionEventArgs(e, _xc));
 					return;

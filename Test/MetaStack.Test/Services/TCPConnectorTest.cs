@@ -1,6 +1,6 @@
 ﻿using S031.MetaStack.Common.Logging;
 using S031.MetaStack.Core.Actions;
-using S031.MetaStack.Core.Connectors;
+using S031.MetaStack.Interop.Connectors;
 using S031.MetaStack.Core.Logging;
 using S031.MetaStack.Data;
 using S031.MetaStack.Actions;

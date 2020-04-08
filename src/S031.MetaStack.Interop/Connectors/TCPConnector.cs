@@ -6,53 +6,55 @@ using S031.MetaStack.Common;
 using System.Linq;
 using S031.MetaStack.Data;
 using S031.MetaStack.Security;
-#if NETCOREAPP
-using S031.MetaStack.Core.App;
-using S031.MetaStack.Core.Security;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
 
-namespace S031.MetaStack.Core.Connectors
-#else
-using S031.MetaStack.WinForms.Security;
-using S031.MetaStack.Json;
-
-namespace S031.MetaStack.WinForms.Connectors
-#endif
+namespace S031.MetaStack.Interop.Connectors
 {
 	public class TCPConnector : IDisposable
 	{
 		const string _endPointConfigName = "TCPConnector";
 		static readonly RSAEncryptionPadding _padding = RSAEncryptionPadding.OaepSHA256;
 
-		private readonly string _host;
-		private readonly int _port;
+		private readonly string _host = "localhost";
+		private readonly int _port = 8001;
 		private string _userName;
 		private Guid _ticket;
 		private Aes _clientAes;
 		private LoginInfo _loginInfo;
 
-		public static TCPConnector Create() => new TCPConnector(_endPointConfigName);
+		/// <summary>
+		/// Create default <see cref="TCPConnector"/> with host=localhost && port=8001
+		/// </summary>
+		/// <returns></returns>
+		public static TCPConnector Create() => new TCPConnector();
 
-		TCPConnector(string endPointConfigName)
+		public static TCPConnector Create(ConnectorOptions options) => new TCPConnector(options);
+
+		TCPConnector()
 		{
-#if NETCOREAPP
-			var config = ApplicationContext
-				.GetServices()
-				.GetService<IConfiguration>()
-				.GetSection($"Connectors:{endPointConfigName}");
-			_host = config.GetValue<string>("Host");
-			_port = config.GetValue<int>("Port");
-#else
-			string setting = System.Configuration.ConfigurationManager.AppSettings["TCPConnector"].Replace('\'', '"');
-			var j = new JsonReader(setting)
-				.Read();
-			if (j != null)
-			{
-				_host = (string)j["Host"];
-				_port = (int)j["Port"];
-			}
-#endif
+			Connected = false;
+		}
+
+		TCPConnector(ConnectorOptions options)
+		{
+			//#if NETCOREAPP
+			//			var config = ApplicationContext
+			//				.GetServices()
+			//				.GetService<IConfiguration>()
+			//				.GetSection($"Connectors:{endPointConfigName}");
+			//			_host = config.GetValue<string>("Host");
+			//			_port = config.GetValue<int>("Port");
+			//#else
+			//			string setting = System.Configuration.ConfigurationManager.AppSettings["TCPConnector"].Replace('\'', '"');
+			//			var j = new JsonReader(setting)
+			//				.Read();
+			//			if (j != null)
+			//			{
+			//				_host = (string)j["Host"];
+			//				_port = (int)j["Port"];
+			//			}
+			//#endif
+			_host = options.Host;
+			_port = options.Port;
 			Connected = false;
 		}
 

@@ -1,36 +1,37 @@
 ﻿using System;
-using System.Collections.Generic;
-using S031.MetaStack.WinForms.Security;
-using S031.MetaStack.WinForms.Connectors;
 using S031.MetaStack.Common;
-using System.Windows.Forms;
 using System.Configuration;
-using S031.MetaStack.WinForms.ORM;
 using System.Data;
 using S031.MetaStack.Data;
 using S031.MetaStack.ORM;
 using S031.MetaStack.Actions;
+using S031.MetaStack.Interop.Connectors;
+using S031.MetaStack.Security;
 
 namespace S031.MetaStack.WinForms
 {
 	public static class ClientGate
 	{
-		private static readonly object obj4Lock = new object();
-
 		private static readonly string _appName = 
 			System.Diagnostics.Process.GetCurrentProcess().ProcessName;
 
-		private static readonly Dictionary<string, ActionInfo> _actionss =
-			new Dictionary<string, ActionInfo>();
+		private static readonly MapTable<string, ActionInfo> _actionss =
+			new MapTable<string, ActionInfo>();
+
+		private static readonly MapTable<string, JMXSchema> _schemaCache
+			= new MapTable<string, JMXSchema>();
 
 		private static TCPConnector _connector;
 
 		public static TCPConnector Connector =>_connector;
 
-		public static bool Logon(bool forcePassword = false)
+		public static bool Logon(bool forcePassword = false, Func<string, string> SecureRequest = null)
 		{
 			if (_connector != null && _connector.Connected)
 				return true;
+			
+			if (SecureRequest == null)
+				SecureRequest = s => string.Empty;
 
 			string userName = $@"{Environment.UserDomainName}\{Environment.UserName}";
 			bool savePassword = ConfigurationManager.AppSettings["SavePassword"].ToBoolOrDefault();
@@ -48,7 +49,9 @@ namespace S031.MetaStack.WinForms
 			else
 				password = sInfo.Password;
 
-			_connector = TCPConnector.Create();
+			_connector = TCPConnector.Create(
+				new ConnectorOptions(
+					ConfigurationManager.AppSettings["TCPConnector"].Replace('\'', '"')));
 			_connector.Connect(userName, password);
 			if (isPrompt && savePassword)
 				CredentialManager.WriteCredential(_appName, userName, password);
@@ -84,18 +87,33 @@ namespace S031.MetaStack.WinForms
 				else
 					ai = null;
 
-				lock (obj4Lock)
-					if (!_actionss.ContainsKey(actionID))
-						_actionss.Add(actionID, ai);
+				_actionss.TryAdd(actionID, ai);
 			}
 			return ai;
 		}
 
-		public static JMXSchema GetObjectSchema(string objectName) => 
-			JMXFactory
-			.Create()
-			.CreateJMXRepo()
-			.GetSchema(objectName);
+		public static JMXSchema GetObjectSchema(string objectName)
+		{
+			if (!_schemaCache.TryGetValue(objectName, out JMXSchema schema))
+			{
+				using (var p = new DataPackage(
+						new string[] { "ObjectName" },
+						new object[] { objectName }))
+				using (var r = ClientGate.Execute("Sys.GetSchema", p))
+				{
+					r.GoDataTop();
+					if (r.Read())
+					{
+						schema = JMXSchema.Parse((string)r["ObjectSchema"]);
+						_schemaCache.TryAdd(objectName, schema);
+					}
+					else
+						return null;
+				}
+			}
+			return schema;
+		}
+
 
 		public static DataTable GetData(string queryID, params object[] parameters)
 		{
@@ -136,22 +154,6 @@ namespace S031.MetaStack.WinForms
 				}
 			}
 			return ClientGate.Execute("Sys.Select", dr).ToDataTable();
-		}
-
-		private static string SecureRequest(string userName)
-		{
-			return (string)InputBox.Show(new WinFormItem("Password")
-			{
-				Caption = "Введите пароль",
-				PresentationType = typeof(TextBox),
-				ControlTrigger = (i, c) =>
-				{
-					c.FindForm().Text = $"Вход в систему пользователя {userName}";
-					TextBox tb = (c as TextBox);
-					c.Width = 100;
-					tb.PasswordChar = '*';
-				}
-			})[0];
 		}
 
 	}

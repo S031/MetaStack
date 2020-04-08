@@ -1,10 +1,7 @@
-﻿using S031.MetaStack.WinForms;
-using S031.MetaStack.WinForms.Connectors;
+﻿using S031.MetaStack.Interop.Connectors;
+using S031.MetaStack.WinForms;
 using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace MetApp
@@ -38,12 +35,12 @@ namespace MetApp
 		{
 			try
 			{
-				ClientGate.Logon();
+				ClientGate.Logon(false, SecureRequest.Show);
 			}
 			catch (Exception ex)
 			{
 				if (ex.GetType() == typeof(TCPConnectorException))
-					ClientGate.Logon(true);
+					ClientGate.Logon(true, SecureRequest.Show);
 				else
 					throw; 
 			}

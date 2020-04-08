@@ -122,6 +122,10 @@
       <Project>{47b88791-1b7a-4f7e-a6b1-0be454d81890}</Project>
       <Name>S031.MetaStack.Integral</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\S031.MetaStack.Interop\S031.MetaStack.Interop.csproj">
+      <Project>{980ed103-101f-4032-b80d-45534548689b}</Project>
+      <Name>S031.MetaStack.Interop</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\S031.MetaStack.Json\S031.MetaStack.Json.csproj">
       <Project>{dc654f1c-2478-4bec-9e58-ce70a4e2019b}</Project>
       <Name>S031.MetaStack.Json</Name>

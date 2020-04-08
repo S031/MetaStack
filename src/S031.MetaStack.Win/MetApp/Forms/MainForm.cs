@@ -3,15 +3,14 @@ using S031.MetaStack.WinForms;
 using System.Drawing;
 using System.Windows.Forms;
 using System;
-using S031.MetaStack.WinForms.ORM;
 using System.Reflection;
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Linq;
-using S031.MetaStack.WinForms.Connectors;
 using S031.MetaStack.Common.Logging;
 using S031.MetaStack.ORM;
 using S031.MetaStack.Data;
+using S031.MetaStack.Interop.Connectors;
 
 namespace MetApp
 {

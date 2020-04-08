@@ -1,4 +1,5 @@
-﻿using S031.MetaStack.ORM;
+﻿using S031.MetaStack.Interop.Connectors;
+using S031.MetaStack.ORM;
 using System;
 
 namespace S031.MetaStack.WinForms
@@ -35,11 +36,11 @@ namespace S031.MetaStack.WinForms
 
 	public class SchemaExceptionEventArgs : SchemaEventArgs
 	{
-		private readonly Connectors.TCPConnectorException _exception;
+		private readonly TCPConnectorException _exception;
 
-		public Connectors.TCPConnectorException Exception => _exception;
+		public TCPConnectorException Exception => _exception;
 
-		public SchemaExceptionEventArgs(Connectors.TCPConnectorException e, JMXSchema objSource)
+		public SchemaExceptionEventArgs(TCPConnectorException e, JMXSchema objSource)
 			: base(objSource) => _exception = e;
 	}
 }

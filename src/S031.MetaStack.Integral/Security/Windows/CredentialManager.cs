@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Win32.SafeHandles;
 
-namespace S031.MetaStack.WinForms.Security
+namespace S031.MetaStack.Security
 {
 	public static class CredentialManager
 	{

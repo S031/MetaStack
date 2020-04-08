@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 using S031.MetaStack.Common;
 
-namespace S031.MetaStack.Core.Security
+namespace S031.MetaStack.Security
 {
 	public static class Impersonator
 	{
