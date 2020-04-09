@@ -1,37 +1,12 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{63143B3E-5851-49CB-B2D8-53AFC65573B5}</ProjectGuid>
+    <TargetFrameworks>net48</TargetFrameworks>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <OutputType>Exe</OutputType>
-    <RootNamespace>MetaStack.Win.TestConsole</RootNamespace>
-    <AssemblyName>MetaStack.Win.TestConsole</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.1' OR '$(TargetFramework)' == 'netcoreapp3.1'">
+    <DefineConstants>$(DefineConstants);NETCOREAPP</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -43,45 +18,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <ProjectReference Include="..\..\..\src\S031.MetaStack.Buffers\S031.MetaStack.Buffers.csproj" />
+    <ProjectReference Include="..\..\..\src\S031.MetaStack.Common\S031.MetaStack.Common.csproj" />
+    <ProjectReference Include="..\..\..\src\S031.MetaStack.Data\S031.MetaStack.Data.csproj" />
+    <ProjectReference Include="..\..\..\src\S031.MetaStack.Integral\S031.MetaStack.Integral.csproj" />
+    <ProjectReference Include="..\..\..\src\S031.MetaStack.Interop\S031.MetaStack.Interop.csproj" />
+    <ProjectReference Include="..\..\..\src\S031.MetaStack.Json\S031.MetaStack.Json.csproj" />
+    <ProjectReference Include="..\..\..\src\S031.Metastack.ORM\S031.MetaStack.ORM.csproj" />
+    <ProjectReference Include="..\..\..\src\S031.MetaStack.Win\S031.MetaStack.WinForms\S031.MetaStack.WinForms.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\src\S031.MetaStack.Buffers\S031.MetaStack.Buffers.csproj">
-      <Project>{74f8497b-3008-4500-adb2-26262e99219a}</Project>
-      <Name>S031.MetaStack.Buffers</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\src\S031.MetaStack.Common\S031.MetaStack.Common.csproj">
-      <Project>{7d82ba49-5333-424c-9a41-21358fb5f650}</Project>
-      <Name>S031.MetaStack.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\src\S031.MetaStack.Data\S031.MetaStack.Data.csproj">
-      <Project>{f523de1a-426d-4bd4-8e5b-8c423dd789b4}</Project>
-      <Name>S031.MetaStack.Data</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\src\S031.MetaStack.Integral\S031.MetaStack.Integral.csproj">
-      <Project>{47b88791-1b7a-4f7e-a6b1-0be454d81890}</Project>
-      <Name>S031.MetaStack.Integral</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\src\S031.MetaStack.Interop\S031.MetaStack.Interop.csproj">
-      <Project>{980ed103-101f-4032-b80d-45534548689b}</Project>
-      <Name>S031.MetaStack.Interop</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\src\S031.MetaStack.Json\S031.MetaStack.Json.csproj">
-      <Project>{dc654f1c-2478-4bec-9e58-ce70a4e2019b}</Project>
-      <Name>S031.MetaStack.Json</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\src\S031.Metastack.ORM\S031.MetaStack.ORM.csproj">
-      <Project>{c39bc04d-5c5c-43ea-ab6f-434d815c0e77}</Project>
-      <Name>S031.MetaStack.ORM</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\src\S031.MetaStack.Win\S031.MetaStack.WinForms\S031.MetaStack.WinForms.csproj">
-      <Project>{487c0cdc-53a2-4dda-8bf0-a2dbb04bd587}</Project>
-      <Name>S031.MetaStack.WinForms</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
