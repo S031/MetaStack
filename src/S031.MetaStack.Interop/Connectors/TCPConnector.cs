@@ -14,9 +14,7 @@ namespace S031.MetaStack.Interop.Connectors
 		const string _endPointConfigName = "TCPConnector";
 		static readonly RSAEncryptionPadding _padding = RSAEncryptionPadding.OaepSHA256;
 
-		private readonly string _host = "localhost";
-		private readonly int _port = 8001;
-		private string _userName;
+		private readonly ConnectorOptions _options;
 		private Guid _ticket;
 		private Aes _clientAes;
 		private LoginInfo _loginInfo;
@@ -25,7 +23,7 @@ namespace S031.MetaStack.Interop.Connectors
 		/// Create default <see cref="TCPConnector"/> with host=localhost && port=8001
 		/// </summary>
 		/// <returns></returns>
-		public static TCPConnector Create() => new TCPConnector();
+		public static TCPConnector Create() => new TCPConnector(new ConnectorOptions());
 
 		public static TCPConnector Create(ConnectorOptions options) => new TCPConnector(options);
 

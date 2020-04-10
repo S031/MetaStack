@@ -33,14 +33,21 @@ namespace MetApp
 
 		private static void Logon()
 		{
+			ConnectorOptions options = new ConnectorOptions(ConfigurationManager.AppSettings["TCPConnector"].Replace('\'', '"'))
+			{
+				SecureRequest = SecureRequest.Show
+			};
 			try
 			{
-				ClientGate.Logon(false, SecureRequest.Show);
+				ClientGate.Logon(options);
 			}
 			catch (Exception ex)
 			{
 				if (ex.GetType() == typeof(TCPConnectorException))
-					ClientGate.Logon(true, SecureRequest.Show);
+				{
+					options.ForcePassword = true;
+					ClientGate.Logon(options);
+				}
 				else
 					throw; 
 			}

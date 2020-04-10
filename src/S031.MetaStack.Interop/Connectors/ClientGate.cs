@@ -25,23 +25,20 @@ namespace S031.MetaStack.WinForms
 
 		public static TCPConnector Connector =>_connector;
 
-		public static bool Logon(bool forcePassword = false, Func<string, string> SecureRequest = null)
+		public static bool Logon(ConnectorOptions connectorOptions)
 		{
 			if (_connector != null && _connector.Connected)
 				return true;
 			
-			if (SecureRequest == null)
-				SecureRequest = s => string.Empty;
-
 			string userName = $@"{Environment.UserDomainName}\{Environment.UserName}";
-			bool savePassword = ConfigurationManager.AppSettings["SavePassword"].ToBoolOrDefault();
+			bool savePassword = connectorOptions.SavePassword;
 			bool isPrompt = false;
 			var sInfo = CredentialManager.ReadCredential(_appName);
-			forcePassword = forcePassword || sInfo == null || sInfo.Password.IsEmpty() || !savePassword;
+			bool forcePassword = connectorOptions.ForcePassword || sInfo == null || sInfo.Password.IsEmpty() || !savePassword;
 			string password;
 			if (forcePassword)
 			{
-				password = SecureRequest(userName);
+				password = connectorOptions.SecureRequest(userName);
 				if (password.IsEmpty())
 					return false;
 				isPrompt = true;
@@ -49,9 +46,7 @@ namespace S031.MetaStack.WinForms
 			else
 				password = sInfo.Password;
 
-			_connector = TCPConnector.Create(
-				new ConnectorOptions(
-					ConfigurationManager.AppSettings["TCPConnector"].Replace('\'', '"')));
+			_connector = TCPConnector.Create(connectorOptions);
 			_connector.Connect(userName, password);
 			if (isPrompt && savePassword)
 				CredentialManager.WriteCredential(_appName, userName, password);

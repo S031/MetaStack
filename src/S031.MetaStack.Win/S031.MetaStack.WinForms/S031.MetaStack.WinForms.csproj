@@ -136,7 +136,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
-    <Compile Include="Tools\ClientGate.cs" />
     <Compile Include="Tools\Events.cs" />
     <Compile Include="Tools\LocalSettings.cs" />
     <Compile Include="Tools\Output\OutputWindow.cs" />
