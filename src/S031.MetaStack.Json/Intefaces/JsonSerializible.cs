@@ -6,6 +6,7 @@ namespace S031.MetaStack.Json
 {
     public abstract class JsonSerializible
     {
+
         public JsonSerializible(JsonValue source) { }
 
         public virtual string ToString(Formatting formatting = Formatting.None)

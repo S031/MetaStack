@@ -31,10 +31,9 @@ namespace S031.MetaStack.WinForms
 				return true;
 			
 			string userName = $@"{Environment.UserDomainName}\{Environment.UserName}";
-			bool savePassword = connectorOptions.SavePassword;
 			bool isPrompt = false;
 			var sInfo = CredentialManager.ReadCredential(_appName);
-			bool forcePassword = connectorOptions.ForcePassword || sInfo == null || sInfo.Password.IsEmpty() || !savePassword;
+			bool forcePassword = connectorOptions.ForcePassword || sInfo == null || sInfo.Password.IsEmpty() || !connectorOptions.SavePassword;
 			string password;
 			if (forcePassword)
 			{
@@ -48,7 +47,7 @@ namespace S031.MetaStack.WinForms
 
 			_connector = TCPConnector.Create(connectorOptions);
 			_connector.Connect(userName, password);
-			if (isPrompt && savePassword)
+			if (isPrompt && connectorOptions.SavePassword)
 				CredentialManager.WriteCredential(_appName, userName, password);
 			return true;
 		}
@@ -58,7 +57,9 @@ namespace S031.MetaStack.WinForms
 
 		public static DataPackage Execute(string actionID, DataPackage paramTable = null)
 		{
-			Logon();
+			if (_connector == null)
+				throw new InvalidOperationException("Use Logon(ConnectorOptions connectorOptions) before Execute");
+			Logon(_connector.ConnectorOptions);
 			try
 			{
 				return _connector.Execute(actionID, paramTable);
@@ -66,7 +67,7 @@ namespace S031.MetaStack.WinForms
 			catch (System.IO.IOException)
 			{
 				//For reuse socket
-				Logon();
+				Logon(_connector.ConnectorOptions);
 				return _connector.Execute(actionID, paramTable);
 			}
 		}

@@ -10,14 +10,13 @@ namespace S031.MetaStack.Interop.Connectors
 	{
 		public string Host { get; set; } = "localhost";
 		public int Port { get; set; } = 8001;
-		public string UID { get; set; }
+		public string UID { get; set; } = $@"{Environment.UserDomainName}\{Environment.UserName}";
 		public string Password { get; set; }
 		public bool ForcePassword { get; set; } = false;
 		public bool SavePassword { get; set; } = true;
 		public Func<string, string> SecureRequest { get; set; } = s => string.Empty;
 
-		public ConnectorOptions(string jsonConfig)
-			: this((JsonValue)new JsonReader(NullTest(jsonConfig, nameof(jsonConfig))).Read())
+		public ConnectorOptions() : base(null)
 		{
 		}
 
@@ -47,12 +46,6 @@ namespace S031.MetaStack.Interop.Connectors
 			writer.WriteProperty("Password", Password);
 			writer.WriteProperty("ForcePassword", ForcePassword);
 			writer.WriteProperty("SavePassword", SavePassword);
-		}
-
-		private static string NullTest(string data, string name)
-		{
-			data.NullTest(name);
-			return data;
 		}
 	}
 }

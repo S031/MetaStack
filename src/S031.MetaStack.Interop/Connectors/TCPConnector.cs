@@ -6,6 +6,7 @@ using S031.MetaStack.Common;
 using System.Linq;
 using S031.MetaStack.Data;
 using S031.MetaStack.Security;
+using S031.MetaStack.Buffers;
 
 namespace S031.MetaStack.Interop.Connectors
 {
@@ -29,33 +30,17 @@ namespace S031.MetaStack.Interop.Connectors
 
 		TCPConnector()
 		{
+			_options = new ConnectorOptions();
 			Connected = false;
 		}
 
 		TCPConnector(ConnectorOptions options)
 		{
-			//#if NETCOREAPP
-			//			var config = ApplicationContext
-			//				.GetServices()
-			//				.GetService<IConfiguration>()
-			//				.GetSection($"Connectors:{endPointConfigName}");
-			//			_host = config.GetValue<string>("Host");
-			//			_port = config.GetValue<int>("Port");
-			//#else
-			//			string setting = System.Configuration.ConfigurationManager.AppSettings["TCPConnector"].Replace('\'', '"');
-			//			var j = new JsonReader(setting)
-			//				.Read();
-			//			if (j != null)
-			//			{
-			//				_host = (string)j["Host"];
-			//				_port = (int)j["Port"];
-			//			}
-			//#endif
-			_host = options.Host;
-			_port = options.Port;
+			_options = options;
 			Connected = false;
 		}
 
+		public ConnectorOptions ConnectorOptions => _options;
 
 		public bool Connected { get; private set; } = false;
 
@@ -90,7 +75,7 @@ namespace S031.MetaStack.Interop.Connectors
 			if (paramTable == null)
 				paramTable = new DataPackage("Col1.Int.1.Null");
 			paramTable.Headers["ActionID"] = actionID;
-			paramTable.Headers["UserName"] = _userName;
+			paramTable.Headers["UserName"] = _options.UID;
 			paramTable.Headers["SessionID"] = _loginInfo.SessionID.ToString();
 			//Использовать таймстамп в сообщении и проверять его на сервере
 			paramTable.Headers["EncryptedKey"] = _clientAes
@@ -160,8 +145,9 @@ namespace S031.MetaStack.Interop.Connectors
 						response.GoDataTop();
 						response.Read();
 						var token = (string)response["Ticket"];
-						_ticket = new Guid(_clientAes.DecryptBin(token.ToByteArray()).Take(16).ToArray());
-						_userName = userName;
+						//_ticket = new Guid(_clientAes.DecryptBin(token.ToByteArray()).Take(16).ToArray());
+						_ticket = new Guid(((BinaryDataBuffer)_clientAes.DecryptBin(token.ToByteArray())).Slice(0, 16));
+						//_userName = userName;
 						Connected = true;
 					}
 				}
@@ -170,7 +156,7 @@ namespace S031.MetaStack.Interop.Connectors
 
 		private DataPackage SendAndRecieve(DataPackage p)
 		{
-			var socket = SocketPool.Rent(_host, _port);
+			var socket = SocketPool.Rent(_options.Host, _options.Port);
 			var res = SocketPool.SendAndResieve(socket, p.ToArray());
 			SocketPool.Return(socket);
 			return new DataPackage(res);
