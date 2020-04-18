@@ -1,4 +1,5 @@
 ﻿using S031.MetaStack.Interop.Connectors;
+using S031.MetaStack.Json;
 using S031.MetaStack.WinForms;
 using System;
 using System.Configuration;
@@ -33,7 +34,8 @@ namespace MetApp
 
 		private static void Logon()
 		{
-			ConnectorOptions options = new ConnectorOptions(ConfigurationManager.AppSettings["TCPConnector"].Replace('\'', '"'))
+			var config = new JsonReader(ConfigurationManager.AppSettings["TCPConnector"].Replace('\'', '"')).Read();
+			ConnectorOptions options = new ConnectorOptions(config)
 			{
 				SecureRequest = SecureRequest.Show
 			};

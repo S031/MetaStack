@@ -1,46 +1,23 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{487C0CDC-53A2-4DDA-8BF0-A2DBB04BD587}</ProjectGuid>
+    <TargetFrameworks>net48</TargetFrameworks>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>S031.MetaStack.WinForms</RootNamespace>
-    <AssemblyName>S031.MetaStack.WinForms</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;SERIALIZEBINARY</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <LangVersion>latest</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;SERIALIZEBINARY</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <LangVersion>latest</LangVersion>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.1' OR '$(TargetFramework)' == 'netcoreapp3.1'">
+    <DefineConstants>$(DefineConstants);NETCOREAPP</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -230,58 +207,20 @@
     <EmbeddedResource Include="Resources\Textbox.png" />
     <EmbeddedResource Include="Resources\Undo.png" />
     <EmbeddedResource Include="Resources\Warning.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\Logo.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Logo.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="Doc\WinForm Layout Schema.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\S031.MetaStack.Buffers\S031.MetaStack.Buffers.csproj">
-      <Project>{74f8497b-3008-4500-adb2-26262e99219a}</Project>
-      <Name>S031.MetaStack.Buffers</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\S031.MetaStack.Common\S031.MetaStack.Common.csproj">
-      <Project>{7d82ba49-5333-424c-9a41-21358fb5f650}</Project>
-      <Name>S031.MetaStack.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\S031.MetaStack.Data\S031.MetaStack.Data.csproj">
-      <Project>{f523de1a-426d-4bd4-8e5b-8c423dd789b4}</Project>
-      <Name>S031.MetaStack.Data</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\S031.MetaStack.Integral\S031.MetaStack.Integral.csproj">
-      <Project>{47b88791-1b7a-4f7e-a6b1-0be454d81890}</Project>
-      <Name>S031.MetaStack.Integral</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\S031.MetaStack.Interop\S031.MetaStack.Interop.csproj">
-      <Project>{980ed103-101f-4032-b80d-45534548689b}</Project>
-      <Name>S031.MetaStack.Interop</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\S031.MetaStack.Json\S031.MetaStack.Json.csproj">
-      <Project>{dc654f1c-2478-4bec-9e58-ce70a4e2019b}</Project>
-      <Name>S031.MetaStack.Json</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\S031.Metastack.ORM\S031.MetaStack.ORM.csproj">
-      <Project>{c39bc04d-5c5c-43ea-ab6f-434d815c0e77}</Project>
-      <Name>S031.MetaStack.ORM</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ICSharpCode.TextEditor\ICSharpCode.TextEditor.csproj">
-      <Project>{2d18be89-d210-49eb-a9dd-2246fbb3df6d}</Project>
-      <Name>ICSharpCode.TextEditor</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\..\S031.MetaStack.Buffers\S031.MetaStack.Buffers.csproj" />
+    <ProjectReference Include="..\..\S031.MetaStack.Common\S031.MetaStack.Common.csproj" />
+    <ProjectReference Include="..\..\S031.MetaStack.Data\S031.MetaStack.Data.csproj" />
+    <ProjectReference Include="..\..\S031.MetaStack.Integral\S031.MetaStack.Integral.csproj" />
+    <ProjectReference Include="..\..\S031.MetaStack.Interop\S031.MetaStack.Interop.csproj" />
+    <ProjectReference Include="..\..\S031.MetaStack.Json\S031.MetaStack.Json.csproj" />
+    <ProjectReference Include="..\..\S031.Metastack.ORM\S031.MetaStack.ORM.csproj" />
+    <ProjectReference Include="..\ICSharpCode.TextEditor\ICSharpCode.TextEditor.csproj" />
   </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

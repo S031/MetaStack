@@ -20,15 +20,15 @@ namespace S031.MetaStack.Interop.Connectors
 		{
 		}
 
-		ConnectorOptions(JsonValue config) : base(config)
+		public ConnectorOptions(JsonValue config) : base(config)
 		{
 			JsonObject j = (config as JsonObject);
-			Host = j.GetStringOrDefault("Host");
-			Port = j.GetIntOrDefault("Port");
-			UID = j.GetStringOrDefault("UID");
-			Password = j.GetStringOrDefault("Password");
-			ForcePassword = j.GetBoolOrDefault("ForcePassword");
-			SavePassword = j.GetBoolOrDefault("SavePassword");
+			if (j.ContainsKey("Host")) Host = j["Host"];
+			if (j.ContainsKey("Port")) Port = j["Port"];
+			if (j.ContainsKey("UID")) UID = j["UID"];
+			if (j.ContainsKey("Password")) Password = j["Password"];
+			if (j.ContainsKey("ForcePassword")) ForcePassword = j["ForcePassword"];
+			if (j.ContainsKey("SavePassword")) SavePassword = j["SavePassword"];
 		}
 
 		public override void ToJson(JsonWriter writer)

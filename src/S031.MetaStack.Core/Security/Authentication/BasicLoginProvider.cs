@@ -182,7 +182,7 @@ namespace S031.MetaStack.Core.Security
 			try
 			{
 				RemoveExpired(t, false);
-				if ((t - _lastCheckLogedTime).Milliseconds > _expirePeriod4Loged)
+				if ((t - _lastCheckLogedTime).TotalMilliseconds > _expirePeriod4Loged)
 				{
 					RemoveExpired(t, true);
 					_lastCheckLogedTime = t;

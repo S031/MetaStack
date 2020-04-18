@@ -145,8 +145,8 @@ namespace S031.MetaStack.Interop.Connectors
 						response.GoDataTop();
 						response.Read();
 						var token = (string)response["Ticket"];
-						//_ticket = new Guid(_clientAes.DecryptBin(token.ToByteArray()).Take(16).ToArray());
-						_ticket = new Guid(((BinaryDataBuffer)_clientAes.DecryptBin(token.ToByteArray())).Slice(0, 16));
+						_ticket = new Guid(_clientAes.DecryptBin(token.ToByteArray()).Take(16).ToArray());
+						//_ticket = new Guid(((BinaryDataBuffer)_clientAes.DecryptBin(token.ToByteArray())).Slice(0, 16));
 						//_userName = userName;
 						Connected = true;
 					}

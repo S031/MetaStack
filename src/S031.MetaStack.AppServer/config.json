@@ -2,7 +2,7 @@
   "appSettings": {
     "auditEnabled": true,
     "language": "ru-RU",
-    "defaultConnection": "bankLocal",
+    "defaultConnection": "test",
     "SysCatConnection": "SQliteDb"
   },
   "ApplicationLogSettings": {
@@ -49,7 +49,7 @@
     "AseDb": {
       "Description": "Sybase ASE 15 server",
       "providerName": "AdoNetCore.AseClient",
-      "connectionString": "Data Source=dias-db01,5050;Initial Catalog=msfodb;User ID=LoaderF;Password=;Max Pool Size=200;"
+      "connectionString": "Data Source=db01,5000;Initial Catalog=test;User ID=test;Password=;Max Pool Size=200;"
     }
 
   },

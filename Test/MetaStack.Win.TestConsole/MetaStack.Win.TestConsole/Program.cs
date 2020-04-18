@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Configuration;
 using System.Threading.Tasks;
 using S031.MetaStack.Common.Logging;
+using S031.MetaStack.Interop.Connectors;
+using S031.MetaStack.Json;
 using S031.MetaStack.WinForms;
 
 namespace MetaStack.Win.TestConsole
@@ -13,7 +16,8 @@ namespace MetaStack.Win.TestConsole
 			//var connectionName = "SqliteDb";
 			using (FileLog l = new FileLog("TCPConnectorConnectTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
-				ClientGate.Logon();
+				var config = new JsonReader(ConfigurationManager.AppSettings["TCPConnector"].Replace('\'', '"')).Read();
+				ClientGate.Logon(new ConnectorOptions(config));
 				DateTime t = DateTime.Now;
 				Console.WriteLine("Start performance test for Sys.Select");
 				//int i = 0;
