@@ -10,7 +10,6 @@ namespace S031.MetaStack.Services
 {
 	internal class MessagePipeline : IDisposable
 	{
-		private static readonly object obj4Lock = new object();
 		readonly DataPackage _message = null;
 		DataPackage _result = null;
 		public MessagePipeline(DataPackage message)
@@ -20,7 +19,7 @@ namespace S031.MetaStack.Services
 				actionID.ToString().IsEmpty())
 				throw new MessagePipelineException("The title of the message does not contain ActionID");
 			else if (!message.Headers.TryGetValue("UserName", out object UserID) ||
-				actionID.ToString().IsEmpty())
+				UserID.ToString().IsEmpty())
 				throw new MessagePipelineException("The title of the message does not contain user name");
 			_message = message;
 		}

@@ -92,11 +92,7 @@ namespace S031.MetaStack.Actions
 			writer.WritePropertyName("InterfaceParameters");
 			writer.WriteStartArray();
 			foreach (var item in InterfaceParameters)
-			{
-				writer.WriteStartObject();
-				item.Value.ToStringRaw(writer);
-				writer.WriteEndObject();
-			}
+				item.Value.ToJson(writer);
 			writer.WriteEndArray();
 		}
 

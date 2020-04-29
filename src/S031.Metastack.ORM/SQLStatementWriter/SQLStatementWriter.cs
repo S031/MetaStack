@@ -59,7 +59,7 @@ namespace S031.MetaStack.ORM
 		{
 			if (fromSchema == null)
 				fromSchema = _schema;
-			Write($"create table {fromSchema.DbObjectName.ToString()}");
+			Write($"create table {fromSchema.DbObjectName}");
 			Write("(\n");
 			int count = fromSchema.Attributes.Count;
 			for (int i = 0; i < count; i++)
@@ -129,7 +129,7 @@ namespace S031.MetaStack.ORM
 			//CREATE UNIQUE NONCLUSTERED INDEX [AK1_SysSchemas] ON [SysCat].[SysSchemas] ([SysAreaID] ASC, [ObjectName] ASC)
 			Write("create " + (index.IsUnique ? "unique " : "") + (index.ClusteredOption == 1 ? "clustered " : "nonclustered ") +
 				$"index [{index.IndexName}] " +
-				$"on {fromSchema.DbObjectName.ToString()} (");
+				$"on {fromSchema.DbObjectName} (");
 			int count = index.KeyMembers.Count;
 			for (int i = 0; i < count; i++)
 			{

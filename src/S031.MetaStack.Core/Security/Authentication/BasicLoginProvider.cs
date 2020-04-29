@@ -15,7 +15,7 @@ namespace S031.MetaStack.Core.Security
 		const int _checkTicketTimeout = 5000;
 		const int _expirePeriod = 3000;
 		const int _expirePeriod4Loged = 7200000;
-		const int _maxUserSessions = 64;
+		const int _maxUserSessions = 128;
 
 		static readonly RSAEncryptionPadding _padding = RSAEncryptionPadding.OaepSHA256;
 		static DateTime _lastCheckLogedTime = DateTime.Now;
@@ -49,8 +49,11 @@ namespace S031.MetaStack.Core.Security
 		public string LoginRequest(string userName, string clientPublicKey)
 		{
 			var loginInfo = new LoginInfo();
-			if (_users.ContainsKey(userName))
-				_users[userName].Add(loginInfo.SessionID, loginInfo);
+			if (_users.TryGetValue(userName, out var sessions))
+				if (sessions.Count <= _maxUserSessions)
+					sessions.Add(loginInfo.SessionID, loginInfo);
+				else
+					throw new AuthenticationExceptions($"Invaliod session count for user {userName}, must be less then {_maxUserSessions}");
 			else
 				_users.Add(userName, new MapTable<Guid, LoginInfo>() { { loginInfo.SessionID, loginInfo } });
 
@@ -81,7 +84,7 @@ namespace S031.MetaStack.Core.Security
 
 			if (loginInfo.IsLogedOn())
 			{
-				if (!CheckTicket(userName, loginInfo, encryptedKey.ToByteArray(), this.CheckTicketTimeout))
+				if (!CheckTicket(loginInfo, encryptedKey.ToByteArray(), this.CheckTicketTimeout))
 					throw new AuthenticationExceptions($"Invaliod session ticked for user {userName}");
 			}
 			else if (CheckPassword(userName, loginInfo, encryptedKey.ToByteArray()))
@@ -116,14 +119,14 @@ namespace S031.MetaStack.Core.Security
 
 			if (!loginInfo.IsLogedOn())
 				RemoveSession(userName, sessionUID);
-			else if (CheckTicket(userName, loginInfo, encryptedKey.ToByteArray(), this.CheckTicketTimeout))
+			else if (CheckTicket(loginInfo, encryptedKey.ToByteArray(), this.CheckTicketTimeout))
 				RemoveSession(userName, sessionUID);
 			else
 				throw new AuthenticationExceptions($"Invaliod session ticked");
 
 		}
 
-		private static bool CheckTicket(string userName, LoginInfo loginInfo, byte[] encryptedTicketData, int checkTicketTimeout)
+		private static bool CheckTicket(LoginInfo loginInfo, byte[] encryptedTicketData, int checkTicketTimeout)
 		{
 			try
 			{
