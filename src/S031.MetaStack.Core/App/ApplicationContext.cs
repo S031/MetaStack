@@ -80,8 +80,21 @@ namespace S031.MetaStack.Core.App
 		{
 			//костыль!!!
 			//return settings from configuration
-			_loginProvider = new BasicLoginProvider() { CheckTicketTimeout = _configuration["LoginFactory:CheckTicketTimeout"]?.ToIntOrDefault() ?? 0 };
-			_services.AddSingleton<ILoginProvider>(_loginProvider );
+			var options = _configuration
+				.GetSection("LoginProvider")
+				.Get<Core.Services.HostedServiceOptions>();
+
+			if (options != null)
+			{
+				_services.AddTransient<Core.Services.HostedServiceOptions>(s => options);
+				_services.Add<ILoginProvider>(options.TypeName, options.AssemblyName, options.ServiceLifetime);
+				_loginProvider = GetServices().GetService<ILoginProvider>();
+			}
+			else
+			{
+				_loginProvider = new BasicLoginProvider() { CheckTicketTimeout = 0 };
+				_services.AddSingleton<ILoginProvider>(_loginProvider);
+			}
 			return _services;
 		}
 		private static IServiceCollection ConfigureAuthorizationProvider()
@@ -100,7 +113,7 @@ namespace S031.MetaStack.Core.App
 			{
 				var options = section.Get<Core.Services.HostedServiceOptions>();
 				_services.AddTransient<Core.Services.HostedServiceOptions>(s => options);
-				_services.Add<IHostedService>(options.TypeName, options.AssemblyName);
+				_services.Add<IHostedService>(options.TypeName, options.AssemblyName, options.ServiceLifetime);
 			}
 		}
 		private static void ConfigureProvidersFromConfigFile()

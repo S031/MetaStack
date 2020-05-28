@@ -2,7 +2,7 @@
   "appSettings": {
     "auditEnabled": true,
     "language": "ru-RU",
-    "defaultConnection": "test",
+    "defaultConnection": "bankLocal",
     "SysCatConnection": "SQliteDb"
   },
   "ApplicationLogSettings": {
@@ -59,8 +59,14 @@
       "Port": 8001
     }
   },
-  "LoginFactory": {
-    "CheckTicketTimeout": 0
+  "LoginProvider": {
+    "name": "S031_MetaStack_Core_BasicLoginProvider",
+    "assemblyName": "S031.MetaStack.Core",
+    "typeName": "S031.MetaStack.Core.Security.BasicLoginProvider",
+    "serviceLifetime": "Singleton",
+    "Parameters": {
+      "CheckTicketTimeout": 0
+    }
   },
   "IAppServiceConfiguration": {
     "ImplementationList": [
