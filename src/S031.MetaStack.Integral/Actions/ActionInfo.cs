@@ -16,6 +16,7 @@ namespace S031.MetaStack.Actions
 		None = 0,
 		Basic = 1,
 		Certificate = 2,
+		Token = 3,
 		NotAllowed = -1
 	}
 

@@ -28,6 +28,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Logging\EventId.cs" />
+    <Compile Remove="Logging\ILogger.cs" />
+    <Compile Remove="Logging\LogLevel.cs" />
     <Compile Remove="Reflection\JsonWriterExtensions.cs" />
   </ItemGroup>
 
