@@ -2,7 +2,7 @@
 using S031.MetaStack.Actions;
 using System.Threading.Tasks;
 
-namespace S031.MetaStack.Core.Actions
+namespace S031.MetaStack.Actions
 {
 	public interface IAppEvaluator
 	{

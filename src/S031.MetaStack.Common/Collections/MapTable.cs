@@ -83,6 +83,21 @@ namespace S031.MetaStack.Common
 		public bool TryAdd(TKey key, TValue value)
 			=> Insert(key, value, true, true, true);
 
+		public TValue GetOrAdd(TKey key, Func<TKey, TValue> addDelegate)
+		{
+			MonitorEnter(true);
+			int i = GetEntryIndex(key);
+			if (i >= 0)
+			{
+				MonitorExit();
+				return _entries[i].value;
+			}
+
+			Insert(key, addDelegate(key), true, false);
+			TValue result = _entries[GetEntryIndex(key)].value;
+			MonitorExit();
+			return result;
+		}
 		void ICollection<KeyValuePair<TKey, TValue>>.Add(KeyValuePair<TKey, TValue> keyValuePair) => Add(keyValuePair.Key, keyValuePair.Value);
 
 		bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> keyValuePair)

@@ -8,18 +8,19 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace TaskPlus.Server
 {
 	public class Startup
 	{
 		private readonly IConfiguration _configuration;
+		private ILoggerProvider _loggerProvider;
+		private ILogger _logger;
 
-		public Startup()
+		public Startup(IConfiguration configuration)
 		{
-			_configuration = new ConfigurationBuilder()
-				.AddJsonFile("config.json", optional: false, reloadOnChange: true)
-				.Build();
+			_configuration = configuration;
 		}
 
 		public void ConfigureServices(IServiceCollection services)
@@ -30,6 +31,10 @@ namespace TaskPlus.Server
 		{
 			if (env.IsDevelopment())
 				app.UseDeveloperExceptionPage();
+			_loggerProvider = app.ApplicationServices.GetRequiredService<ILoggerProvider>();
+			_logger = _loggerProvider.CreateLogger("TaskPlus.Server");
+
+			AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 
 			app.UseRouting();
 
@@ -37,9 +42,18 @@ namespace TaskPlus.Server
 			{
 				endpoints.MapGet("/", async context =>
 				{
-					await context.Response.WriteAsync("Hello World!");
+					DateTime time = DateTime.Now;
+					for (int i = 0; i < 100000; i++)
+						_logger.LogDebug("Debug Hello World!	" + i.ToString());
+
+					await context.Response.WriteAsync($"operation time = {(DateTime.Now - time).TotalMilliseconds}");
 				});
 			});
+		}
+
+		private void CurrentDomain_ProcessExit(object sender, EventArgs e)
+		{
+			(_loggerProvider as IDisposable)?.Dispose();
 		}
 	}
 }

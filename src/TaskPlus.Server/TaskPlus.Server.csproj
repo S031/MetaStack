@@ -8,4 +8,11 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.6.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\S031.MetaStack.Buffers\S031.MetaStack.Buffers.csproj" />
+    <ProjectReference Include="..\S031.MetaStack.Common\S031.MetaStack.Common.csproj" />
+    <ProjectReference Include="..\S031.MetaStack.Data\S031.MetaStack.Data.csproj" />
+    <ProjectReference Include="..\S031.MetaStack.Json\S031.MetaStack.Json.csproj" />
+  </ItemGroup>
+
 </Project>

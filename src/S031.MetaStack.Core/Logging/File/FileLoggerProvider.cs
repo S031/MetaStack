@@ -28,7 +28,8 @@ namespace S031.MetaStack.Core.Logging
 
 		public ILogger CreateLogger(string name)
 		{
-            _loggerList.TryAdd(name, new FileLogger(name, _settings ?? new FileLogSettings()));
+			if (!_loggerList.ContainsKey(name))
+				_loggerList.TryAdd(name, new FileLogger(name, _settings ?? new FileLogSettings()));
             return _loggerList[name];
 		}
 
@@ -44,7 +45,7 @@ namespace S031.MetaStack.Core.Logging
                     }
                     catch { }
             }
-            _loggerList = null;
+            //_loggerList = null;
         }
 
     }

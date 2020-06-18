@@ -75,7 +75,9 @@ namespace S031.MetaStack.Core.Logging
 			if (settings == null)
 				settings = FileLogSettings.Default;
 
-			builder.AddProvider(new FileLoggerProvider(settings));
+			builder.Services.AddSingleton<ILoggerProvider, FileLoggerProvider>(
+				(sp) => new FileLoggerProvider(settings)
+				);
 			return builder;
 		}
 		public static void Debug(this ILogger logger, string message, [System.Runtime.CompilerServices.CallerMemberName] string callerName = "")

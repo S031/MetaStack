@@ -1,0 +1,22 @@
+{
+  "appSettings": {
+    "auditEnabled": true,
+    "language": "ru-RU",
+    "defaultConnection": "bankLocal",
+    "SysCatConnection": "SQliteDb"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information",
+    },
+    "File": {
+      "CacheSize": 100,
+      "DateFolderMask": "yyyy-MM",
+      "LevelToFlush": "Critical",
+      "LogLevel": "Debug",
+      "MaxFileSizeInMB": 20
+    }
+  }
+}
