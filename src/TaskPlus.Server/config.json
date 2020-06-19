@@ -10,13 +10,26 @@
       "Default": "Information",
       "Microsoft": "Warning",
       "Microsoft.Hosting.Lifetime": "Information",
+      "TaskPlus.Server": "Information"
     },
     "File": {
       "CacheSize": 100,
       "DateFolderMask": "yyyy-MM",
       "LevelToFlush": "Critical",
-      "LogLevel": "Debug",
+      "LogLevel": {
+        "Default": "Warning",
+        "Microsoft": "Warning",
+        "Microsoft.Hosting.Lifetime": "Information",
+        "TaskPlus.Server": "Debug"
+      },
       "MaxFileSizeInMB": 20
+    }
+  },
+  "Authentication": {
+    "Jwt": {
+      "Key": "53032C07-D702-4A34-BFA3-FBE33D45C432",
+      "Issuer": "TaskPlus.Server",
+      "Audience": "S031"
     }
   }
 }

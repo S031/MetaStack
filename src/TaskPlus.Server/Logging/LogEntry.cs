@@ -7,27 +7,25 @@ using System.Threading.Tasks;
 
 namespace TaskPlus.Server.Logging
 {
-    public class LogEntry
-    {
-        public LogEntry()
-        {
-            TimeStampUtc = DateTime.UtcNow;
-            UserName = Environment.UserName;
-        }
+	public class LogEntry
+	{
+		public LogEntry()
+		{
+		}
 
-        static public readonly string StaticHostName = System.Net.Dns.GetHostName();
+		static public readonly string StaticHostName = System.Net.Dns.GetHostName();
 
-        public string UserName { get; private set; }
-        public string HostName { get { return StaticHostName; } }
-        public DateTime TimeStampUtc { get; private set; }
-        public string Category { get; set; }
-        public LogLevel Level { get; set; }
-        public string Text { get; set; }
-        public Exception Exception { get; set; }
-        public EventId EventId { get; set; }
-        public object State { get; set; }
-        public string StateText { get; set; }
-        public MapTable<string, object> StateProperties { get; set; }
-        public List<LogScopeInfo> Scopes { get; set; }
-    }
+		public string UserName { get; } = Environment.UserName;
+		public string HostName { get; } = StaticHostName;
+		public DateTime TimeStampUtc { get; } = DateTime.UtcNow;
+		public string Category { get; set; }
+		public LogLevel Level { get; set; }
+		public string Text { get; set; }
+		public Exception Exception { get; set; }
+		public EventId EventId { get; set; }
+		public object State { get; set; }
+		public string StateText { get; set; }
+		public MapTable<string, object> StateProperties { get; set; }
+		public List<LogScopeInfo> Scopes { get; set; }
+	}
 }

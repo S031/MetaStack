@@ -10,34 +10,39 @@ using System.Threading.Tasks;
 
 namespace TaskPlus.Server.Logging.File
 {
-    static public class FileLoggerExtensions
-    {
-        static public ILoggingBuilder AddFileLogger(this ILoggingBuilder builder)
-        {
-            builder.AddConfiguration();
+	static public class FileLoggerExtensions
+	{
+		public static ILoggingBuilder AddFile(this ILoggingBuilder builder)
+		{
+			builder.AddConfiguration();
 
-            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider,
-                                              FileLoggerProvider>());
-            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton
-               <IConfigureOptions<FileLoggerOptions>, FileLoggerOptionsSetup>());
-            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton
-               <IOptionsChangeTokenSource<FileLoggerOptions>,
-               LoggerProviderOptionsChangeTokenSource<FileLoggerOptions, FileLoggerProvider>>());
-            return builder;
-        }
+			builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider,
+				FileLoggerProvider>());
+			builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton
+				<IConfigureOptions<LoggerFilterOptions>, FileLoggerOptionsSetup>());
+			builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton
+				<IConfigureOptions<FileLoggerOptions>, FileLoggerOptionsSetup>());
+			builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton
+				<IOptionsChangeTokenSource<FileLoggerOptions>,
+				LoggerProviderOptionsChangeTokenSource<FileLoggerOptions, FileLoggerProvider>>());
+			return builder;
+		}
 
-        static public ILoggingBuilder AddFileLogger
-               (this ILoggingBuilder builder, Action<FileLoggerOptions> configure)
-        {
-            if (configure == null)
-            {
-                throw new ArgumentNullException(nameof(configure));
-            }
+		public static ILoggingBuilder AddFile
+			   (this ILoggingBuilder builder, Action<FileLoggerOptions> configure)
+		{
+			if (configure == null)
+			{
+				throw new ArgumentNullException(nameof(configure));
+			}
 
-            builder.AddFileLogger();
-            builder.Services.Configure(configure);
+			builder.AddFile();
+			builder.Services.Configure(configure);
 
-            return builder;
-        }
-    }
+			return builder;
+		}
+
+		public static void LogDebug(this ILogger logger, CallerInfo caller)
+			=> logger.Log(LogLevel.Debug, 0, caller, null, null);
+	}
 }

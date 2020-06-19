@@ -14,8 +14,6 @@ namespace TaskPlus.Server.Logging.File
 
         public FileLoggerOptions() { }
 
-        public LogLevel LogLevel { get; set; } = LogLevel.Information;
-
         public string Folder => BasePath;
 
         public int MaxFileSizeInMB
@@ -53,5 +51,6 @@ namespace TaskPlus.Server.Logging.File
         /// </summary>
         public LogLevel LevelToFlush { get; set; } = LogLevel.Critical;
 
+        public Func<string, LogLevel, bool> Filter { get; set; }
     }
 }

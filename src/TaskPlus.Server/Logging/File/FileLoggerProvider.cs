@@ -17,10 +17,8 @@ namespace TaskPlus.Server.Logging.File
 	{
 		private static readonly MapTable<string, Queue<LogEntry>> _queues =
 			new MapTable<string, Queue<LogEntry>>();
-		private static object _obj4Lock = new object();
+		private static readonly object _obj4Lock = new object();
 
-		private bool _terminated;
-		private int _counter = 0;
 		private readonly string _path;
 
 		public FileLoggerProvider(IOptionsMonitor<FileLoggerOptions> Settings)
@@ -45,18 +43,8 @@ namespace TaskPlus.Server.Logging.File
 
 		protected override void Dispose(bool disposing)
 		{
-			_terminated = true;
 			Flush();
 			base.Dispose(disposing);
-		}
-
-		public override bool IsEnabled(LogLevel logLevel)
-		{
-			bool Result = logLevel != LogLevel.None
-				&& this.Settings.LogLevel != LogLevel.None
-				&& Convert.ToInt32(logLevel) >= Convert.ToInt32(this.Settings.LogLevel);
-
-			return Result;
 		}
 
 		public override void WriteLog(LogEntry info)
@@ -67,6 +55,10 @@ namespace TaskPlus.Server.Logging.File
 			if (queue.Count > Settings.CacheSize || info.Level >= Settings.LevelToFlush)
 				Flush();
 		}
+
+		public override bool IsEnabled(string category, LogLevel level)
+			=> level != LogLevel.None &&
+				(Settings.Filter == null || Settings.Filter(category, level));
 
 		public void Flush()
 		{

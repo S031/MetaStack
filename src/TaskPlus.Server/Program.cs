@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using S031.MetaStack.Common.Logging;
+using TaskPlus.Server.Logging;
 using TaskPlus.Server.Logging.File;
 
 namespace TaskPlus.Server
@@ -18,8 +21,6 @@ namespace TaskPlus.Server
 				.AddJsonFile("config.json", optional: false, reloadOnChange: true)
 				.Build();
 
-			//var logSettings = configuration.GetSection("ApplicationLogSettings")?.Get<FileLogSettings>() ?? FileLogSettings.Default;
-
 			return Host.CreateDefaultBuilder(args)
 				.ConfigureAppConfiguration(config =>
 				{
@@ -29,7 +30,7 @@ namespace TaskPlus.Server
 				{
 					logging.ClearProviders();
 					logging.AddConsole();
-					logging.AddFileLogger();
+					logging.AddFile();
 				})
 				.ConfigureWebHostDefaults(webBuilder =>
 				{

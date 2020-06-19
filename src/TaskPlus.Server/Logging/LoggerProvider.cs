@@ -71,9 +71,8 @@ namespace TaskPlus.Server.Logging
 			}
 		}
 
-		public abstract bool IsEnabled(LogLevel logLevel);
-
 		public abstract void WriteLog(LogEntry Info);
+		public abstract bool IsEnabled(string category, LogLevel level);
 
 		public Func<LogEntry, string> Formatter { get; set; }
 			= (info) =>
@@ -95,9 +94,9 @@ namespace TaskPlus.Server.Logging
 				 */
 				 return string.Join('\t',
 					info.TimeStampUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss.fff"),
-					$"[{info.Level.ToString()}]",
+					$"[{info.Level}]",
 					info.EventId != null
-						? $"EventId={info.EventId.ToString()}"
+						? $"EventId={info.EventId}"
 						: "",
 					s,
 					info.Text);

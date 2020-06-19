@@ -18,28 +18,29 @@ namespace TaskPlus.Server.Logging
 			this.Category = Category;
 		}
 
-		IDisposable ILogger.BeginScope<TState>(TState state)
+		public IDisposable BeginScope<TState>(TState state)
 		{
 			return Provider.ScopeProvider.Push(state);
 		}
 
-		bool ILogger.IsEnabled(LogLevel logLevel)
-		{
-			return Provider.IsEnabled(logLevel);
-		}
+		public bool IsEnabled(LogLevel logLevel)
+			=> Provider.IsEnabled(Category, logLevel);
 
-		void ILogger.Log<TState>(LogLevel logLevel, EventId eventId,
+
+		public void Log<TState>(LogLevel logLevel, EventId eventId,
 			TState state, Exception exception, Func<TState, Exception, string> formatter)
 		{
-			if ((this as ILogger).IsEnabled(logLevel))
+			if (IsEnabled(logLevel))
 			{
-				LogEntry Info = new LogEntry();
-				Info.Category = this.Category;
-				Info.Level = logLevel;
-				Info.Text = exception?.Message ?? state.ToString(); // formatter(state, exception)
-				Info.Exception = exception;
-				Info.EventId = eventId;
-				Info.State = state;
+				LogEntry Info = new LogEntry
+				{
+					Category = this.Category,
+					Level = logLevel,
+					Text = exception?.Message ?? state.ToString(), // formatter(state, exception)
+					Exception = exception,
+					EventId = eventId,
+					State = state
+				};
 
 				// well, you never know what it really is
 				if (state is string)
@@ -90,7 +91,6 @@ namespace TaskPlus.Server.Logging
 					},
 					state);
 				}
-
 				Provider.WriteLog(Info);
 			}
 		}
