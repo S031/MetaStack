@@ -41,10 +41,9 @@ namespace TaskPlus.Server
 			_loggerProvider = app.ApplicationServices.GetRequiredService<ILoggerProvider>();
 			_logger = _loggerProvider.CreateLogger(Assembly.GetEntryAssembly().GetWorkName());
 
-			AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
-
 			app.UseRouting();
 			app.UseEndpoints(endpoints => ConfigureEndpoints(endpoints));
+			AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
 		}
 
 		private void LoggingSpeedTest()
@@ -56,14 +55,13 @@ namespace TaskPlus.Server
 				ts.Add(Task.Factory.StartNew(() =>
 				{
 					int id = System.Threading.Thread.CurrentThread.ManagedThreadId;
-			for (int i = 1; i <= 100000; i++)
-				_logger.LogDebug(new CallerInfo($"Сообщение № {i} в потоке {id}"));
+					for (int i = 1; i <= 100000; i++)
+						_logger.LogDebug(new CallerInfo($"Сообщение № {i} в потоке {id}"));
 					//logger.LogInformation(0, new CallerInfo($"Сообщение № {i} в потоке {id}").ToString());
 					//_logger.Log<TaskPlus.Server.Startup>(LogLevel.Debug, 0, this, null, null);
 				}));
 			}
 			Task.WaitAll(ts.ToArray());
-
 		}
 
 		private void CurrentDomain_ProcessExit(object sender, EventArgs e)
@@ -76,6 +74,7 @@ namespace TaskPlus.Server
 			endpoints.MapGet("/", async context =>
 			{
 				DateTime time = DateTime.Now;
+				context.AddItem<ILogger>(_logger);
 				LoggingSpeedTest();
 				await context.Response.WriteAsync($"operation time = {(DateTime.Now - time).TotalMilliseconds}");
 			});

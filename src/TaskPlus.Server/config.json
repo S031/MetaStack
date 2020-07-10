@@ -29,7 +29,8 @@
     "Jwt": {
       "Key": "53032C07-D702-4A34-BFA3-FBE33D45C432",
       "Issuer": "TaskPlus.Server",
-      "Audience": "S031"
+      "Audience": "S031",
+      "ExpirationTime": 120
     }
   }
 }
