@@ -495,7 +495,7 @@ namespace S031.MetaStack.Data
 				dr["NumericScale"] = c.DataType.IsNumeric(NumericTypesScope.FloatingPoint) ? (int)c.ColumnSize : 0;
 				dr["DataType"] = c.DataType;
 				dr["ProviderType"] = null;
-				dr["IsLong"] = c.DataType.IsNumeric(NumericTypesScope.Integral) ? true : false;
+				dr["IsLong"] = c.DataType.IsNumeric(NumericTypesScope.Integral);
 				dr["AllowDBNull"] = c.AllowDBNull;
 				dr["IsReadOnly"] = false;
 				dr["IsRowVersion"] = false;

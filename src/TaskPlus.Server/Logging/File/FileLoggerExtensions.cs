@@ -56,7 +56,7 @@ namespace TaskPlus.Server.Logging.File
 			return context;
 		}
 
-		public static T GetItem<T>(this HttpContext context)
+		public static T GetItem<T>(this HttpContext context) where T : class
 			=> (T)context.Items[typeof(T)];
 	}
 }

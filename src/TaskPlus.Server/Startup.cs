@@ -33,12 +33,12 @@ namespace TaskPlus.Server
 		{
 		}
 
-		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerProvider loggerProvider)
 		{
 			if (env.IsDevelopment())
 				app.UseDeveloperExceptionPage();
-			
-			_loggerProvider = app.ApplicationServices.GetRequiredService<ILoggerProvider>();
+
+			_loggerProvider = loggerProvider; //app.ApplicationServices.GetRequiredService<ILoggerProvider>();
 			_logger = _loggerProvider.CreateLogger(Assembly.GetEntryAssembly().GetWorkName());
 
 			app.UseRouting();

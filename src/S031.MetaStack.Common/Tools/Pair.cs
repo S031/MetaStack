@@ -5,14 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace S031.MetaStack.Common
-{	public class Pair<T>
+{	public readonly struct Pair<T>
 	{
 		public Pair(T xValue, T yValue)
 		{
-			x = xValue;
-			y = yValue;
+			X = xValue;
+			Y = yValue;
 		}
-		public T x { get; set; }
-		public T y { get; set; }
+		public readonly T X;
+		public readonly T Y;
 	}
 }
