@@ -58,7 +58,8 @@ namespace TaskPlus.Server.Security.Authentication
 
 		private string GenerateJSONWebToken(UserModel user)
 		{
-			var config = _context.RequestServices.GetService<IConfiguration>();
+			var config = _context.RequestServices.GetService<IConfiguration>()
+				.GetSection("Authentication");
 			var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["jwt:Key"]));
 			var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
@@ -79,7 +80,9 @@ namespace TaskPlus.Server.Security.Authentication
 
 		private ClaimsPrincipal ValidateToken(string jwtToken)
 		{
-			var config = _context.RequestServices.GetService<IConfiguration>();
+			var config = _context.RequestServices
+				.GetService<IConfiguration>()
+				.GetSection("Authentication");
 			IdentityModelEventSource.ShowPII = true;
 
 			SecurityToken validatedToken;

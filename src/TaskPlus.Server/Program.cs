@@ -16,15 +16,10 @@ namespace TaskPlus.Server
 			=> CreateHostBuilder(args).Build().Run();
 
 		private static IHostBuilder CreateHostBuilder(string[] args)
-		{
-			var configuration = new ConfigurationBuilder()
-				.AddJsonFile("config.json", optional: false, reloadOnChange: true)
-				.Build();
-
-			return Host.CreateDefaultBuilder(args)
+			=> Host.CreateDefaultBuilder(args)
 				.ConfigureAppConfiguration(config =>
 				{
-					config.AddConfiguration(configuration);
+					config.AddJsonFile("config.json", optional: false, reloadOnChange: true);
 				})
 				.ConfigureLogging(logging =>
 				{
@@ -36,6 +31,5 @@ namespace TaskPlus.Server
 				{
 					webBuilder.UseStartup<Startup>();
 				});
-		}
 	}
 }
