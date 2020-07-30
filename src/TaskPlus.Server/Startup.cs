@@ -21,10 +21,6 @@ namespace TaskPlus.Server
 		private ILoggerProvider _loggerProvider;
 		private ILogger _logger;
 
-		public Startup(IConfiguration configuration)
-		{
-		}
-
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddRouting();

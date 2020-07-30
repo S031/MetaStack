@@ -93,7 +93,7 @@ namespace S031.MetaStack.Common
 			else if (str == "0" || str.Equals("false", StringComparison.OrdinalIgnoreCase))
 				return false;
 			else
-				return bool.TryParse(str, out bool val) ? val : false;
+				return bool.TryParse(str, out bool val) && val;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -567,7 +567,7 @@ namespace S031.MetaStack.Common
 					return -1;
 
 				int i = 0;
-				comparer = comparer ?? EqualityComparer<T>.Default;
+				comparer ??= EqualityComparer<T>.Default;
 				foreach (T item in source)
 				{
 					if (comparer.Equals(item, element))

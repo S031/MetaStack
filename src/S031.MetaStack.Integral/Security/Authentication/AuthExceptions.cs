@@ -11,7 +11,7 @@ namespace S031.MetaStack.Security
 	public class AuthorizationExceptions : Exception
 	{
 		/// <summary>
-		/// <see cref="S031.MetaStack.Core.App.AuthorizationExceptionsExtension.GetAuthorizationExceptionsMessage(ActionInfo, string)"/>
+		/// <see cref="MetaStack.Core.App.AuthorizationExceptionsExtension.GetAuthorizationExceptionsMessage(ActionInfo, string)"/>
 		/// </summary>
 		/// <param name="message"></param>
 		public AuthorizationExceptions(string message) : base(message)

@@ -7,6 +7,6 @@
 		public string SessionID { get; set; }
 		public override string ToString() => $"{UserName}.{SessionID}.{ConnectionName}";
 		public override int GetHashCode() => new { UserName, SessionID, ConnectionName }.GetHashCode();
-		public override bool Equals(object obj) => obj == null ? false : this.GetHashCode() == obj.GetHashCode();
+		public override bool Equals(object obj) => obj != null && this.GetHashCode() == obj.GetHashCode();
 	}
 }

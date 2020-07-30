@@ -14,8 +14,8 @@ namespace TaskPlus.Server.Middleware
 {
 	internal class PipeLineController
 	{
-		private ILogger _logger;
-		private PipeLineRouteValues _routeValues;
+		private readonly ILogger _logger;
+		private readonly PipeLineRouteValues _routeValues;
 		private readonly HttpContext _context;
 
 		public PipeLineController(HttpContext context)

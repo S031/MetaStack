@@ -85,7 +85,6 @@ namespace TaskPlus.Server.Security.Authentication
 				.GetSection("Authentication");
 			IdentityModelEventSource.ShowPII = true;
 
-			SecurityToken validatedToken;
 			TokenValidationParameters validationParameters = new TokenValidationParameters
 			{
 				ValidateIssuer = true,
@@ -97,7 +96,7 @@ namespace TaskPlus.Server.Security.Authentication
 				IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]))
 			};
 
-			ClaimsPrincipal principal = new JwtSecurityTokenHandler().ValidateToken(jwtToken, validationParameters, out validatedToken);
+			ClaimsPrincipal principal = new JwtSecurityTokenHandler().ValidateToken(jwtToken, validationParameters, out SecurityToken validatedToken);
 			return principal;
 		}
 	}
