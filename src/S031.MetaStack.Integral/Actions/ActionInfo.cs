@@ -189,10 +189,10 @@ namespace S031.MetaStack.Actions
 			return a;
 		}
 
-#if NETCOREAPP
+//#if NETCOREAPP
 		ActionContext _ctx = null;
 		public ActionContext GetContext() => _ctx;
 		public void SetContext(ActionContext context) => _ctx = context;
-#endif
+//#endif
 	}
 }

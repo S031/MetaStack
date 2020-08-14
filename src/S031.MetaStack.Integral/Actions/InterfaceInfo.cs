@@ -1,6 +1,6 @@
 ﻿namespace S031.MetaStack.Actions
 {
-	public class InterfaceInfo
+	public abstract class InterfaceInfo
 	{
 		public InterfaceInfo()
 		{
