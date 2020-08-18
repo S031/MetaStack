@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using S031.MetaStack.Common;
 using S031.MetaStack.Json;
@@ -17,10 +19,13 @@ namespace TaskPlus.Server.Middleware
 		private readonly ILogger _logger;
 		private readonly PipeLineRouteValues _routeValues;
 		private readonly HttpContext _context;
-
+		private readonly IConfiguration _config;
 		public PipeLineController(HttpContext context)
 		{
 			_context = context;
+			_config = _context
+				.RequestServices
+				.GetRequiredService<IConfiguration>();
 			_logger = _context.GetItem<ILogger>();
 			_routeValues = _context
 				.AddItem<PipeLineRouteValues>(new PipeLineRouteValues(_context))
@@ -32,12 +37,12 @@ namespace TaskPlus.Server.Middleware
 			ActionResult<JsonObject> result;
 			switch (_routeValues.ToString())
 			{
-				case "default-login":
+				case "default/login":
 					result = new JwtLoginProvider(_context).Login();
 					_context.Response.StatusCode = (int)result.StatusCode;
 					await _context.Response.WriteAsync(result.Value.ToString(Formatting.Indented));
 					break;
-				case "logger-test":
+				case "logger/test":
 					DateTime time = DateTime.Now;
 					LoggingSpeedTest();
 					await _context.Response.WriteAsync($"operation time = {(DateTime.Now - time).TotalMilliseconds}");

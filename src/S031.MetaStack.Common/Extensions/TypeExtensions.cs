@@ -34,7 +34,7 @@ namespace S031.MetaStack.Common
 		static readonly MapTable<Type, object> _instancesList = new MapTable<Type, object>();
 		static readonly MapTable<string, ConstructorInfo> _ctorCache2 = new MapTable<string, ConstructorInfo>();
 
-		private static MapTable<string, Type> _typeCache = new MapTable<string, Type>();
+		private static readonly MapTable<string, Type> _typeCache = new MapTable<string, Type>();
 
 		public static Type GetTypeByAssemblyQualifiedName(string name)
 		{

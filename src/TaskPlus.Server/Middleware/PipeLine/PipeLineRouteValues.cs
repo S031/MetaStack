@@ -35,7 +35,7 @@ namespace TaskPlus.Server.Middleware
 			&& !Version.IsEmpty();
 
 		public override string ToString()
-			=> $"{Controller}-{Action}".ToLower();
+			=> $"{Controller}/{Action}".ToLower();
 
 	}
 }

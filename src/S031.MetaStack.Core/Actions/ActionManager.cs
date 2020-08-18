@@ -26,7 +26,7 @@ namespace S031.MetaStack.Core.Actions
 	///			Sys.Execute???
 	///	Созхдать V_Permissions для запроса прав
 	/// </summary>
-	public class ActionManager : ManagerObjectBase, IDisposable
+	public class ActionManager : ManagerObjectBase, IDisposable, IActionManager
 	{
 		private static readonly MapTable<string, ActionInfo> _actions = ActionsList.CreateActionsList();
 
