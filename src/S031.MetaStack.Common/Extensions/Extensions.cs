@@ -676,33 +676,33 @@ namespace S031.MetaStack.Common
 			if (value == null)	action(value, valueName);
 		}
 
-#if NETCOREAPP
-		public static U Match<T, U>(this T val, params (Func<T, bool> qualifier, Func<T, U> func)[] matches)
-		{
-			U ret = default;
+//#if NETCOREAPP
+//		public static U Match<T, U>(this T val, params (Func<T, bool> qualifier, Func<T, U> func)[] matches)
+//		{
+//			U ret = default;
 
-			foreach (var (qualifier, func) in matches)
-			{
-				if (qualifier(val))
-				{
-					ret = func(val);
-					break;
-				}
-			}
+//			foreach (var (qualifier, func) in matches)
+//			{
+//				if (qualifier(val))
+//				{
+//					ret = func(val);
+//					break;
+//				}
+//			}
 
-			return ret;
-		}
-		public async static void MatchAsync<T>(this T val, params (Func<T, bool> qualifier, Action<T> action)[] matches)
-		{
-			foreach (var (qualifier, action) in matches)
-			{
-				if (await Task.Run(() => qualifier(val)))
-				{
-					await Task.Run(() => action(val));
-					break;
-				}
-			}
-		}
-#endif
+//			return ret;
+//		}
+//		public async static void MatchAsync<T>(this T val, params (Func<T, bool> qualifier, Action<T> action)[] matches)
+//		{
+//			foreach (var (qualifier, action) in matches)
+//			{
+//				if (await Task.Run(() => qualifier(val)))
+//				{
+//					await Task.Run(() => action(val));
+//					break;
+//				}
+//			}
+//		}
+//#endif
 	}
 }

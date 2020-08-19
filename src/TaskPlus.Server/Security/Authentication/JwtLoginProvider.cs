@@ -9,6 +9,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
+using TaskPlus.Server.Actions;
 
 namespace TaskPlus.Server.Security.Authentication
 {
@@ -107,22 +108,5 @@ namespace TaskPlus.Server.Security.Authentication
 		public string Password { get; set; }
 		public string Name { get; set; }
 		public DateTime RegisterDate { get; set; } = DateTime.Now;
-	}
-	internal class ActionResult<T> where T : class
-	{
-		public ActionResult(HttpStatusCode statusCode)
-		{
-			StatusCode = statusCode;
-		}
-
-		public HttpStatusCode StatusCode { get; }
-
-		public T Value { get; set; }
-
-		public static ActionResult<T> OK(T value)
-			=> new ActionResult<T>(HttpStatusCode.OK) { Value = value };
-
-		public static ActionResult<T> Unauthorized(T value = null)
-			=> new ActionResult<T>(HttpStatusCode.Unauthorized) { Value = value };
 	}
 }

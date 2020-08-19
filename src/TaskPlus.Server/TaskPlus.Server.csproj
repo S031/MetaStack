@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.113.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.7.1" />
   </ItemGroup>
 
@@ -12,6 +13,7 @@
     <ProjectReference Include="..\S031.MetaStack.Buffers\S031.MetaStack.Buffers.csproj" />
     <ProjectReference Include="..\S031.MetaStack.Common\S031.MetaStack.Common.csproj" />
     <ProjectReference Include="..\S031.MetaStack.Data\S031.MetaStack.Data.csproj" />
+    <ProjectReference Include="..\S031.MetaStack.Integral\S031.MetaStack.Integral.csproj" />
     <ProjectReference Include="..\S031.MetaStack.Json\S031.MetaStack.Json.csproj" />
   </ItemGroup>
 

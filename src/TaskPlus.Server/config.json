@@ -32,5 +32,28 @@
       "Audience": "S031",
       "ExpirationTime": 120
     }
+  },
+  "connectionStrings": {
+    "bankLocal": {
+      "Description": "Local SQL Express 2014 server",
+      "providerName": "System.Data.SqLClient",
+      "connectionString": "Data Source=localhost;Initial Catalog=Msfodb;Integrated Security=True;"
+    },
+    "SqliteDb": {
+      "Description": "SQLite connection fo SysCat",
+      "SchemaSupport": false,
+      "providerName": "System.Data.Sqlite",
+      "connectionString": "Data Source=DB\\SysCat.db; Mode=Memory; Version=3; Cache=Shared;Pooling=True; Max Pool Size=200"
+    },
+    "test": {
+      "Description": "Virtual SQL Express 2017 server",
+      "providerName": "System.Data.SqLClient",
+      "connectionString": "Data Source=SERGEY-SQL2016;Initial Catalog=msfodb;Integrated Security=True;"
+    },
+    "AseDb": {
+      "Description": "Sybase ASE 15 server",
+      "providerName": "AdoNetCore.AseClient",
+      "connectionString": "Data Source=db01,5000;Initial Catalog=test;User ID=test;Password=;Max Pool Size=200;"
+    }
   }
 }

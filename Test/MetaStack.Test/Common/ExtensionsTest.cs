@@ -152,41 +152,41 @@ namespace MetaStack.Test.Common
 		[Fact]
 		private void ObjectExtensionsTest()
 		{
-			using (FileLog l = new FileLog("ObjectExtensionsTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
-			{
-				string ret = 2.Match(
-				(n => n == 0, _ => "Zero"),
-				(n => n == 1, _ => "One"),
-				(n => n == 2, _ => "Two"),
-				(n => n == 3, _ => "Three"),
-				(n => n == 4, _ => "Four"));
+			//using (FileLog l = new FileLog("ObjectExtensionsTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			//{
+			//	string ret = 2.Match(
+			//	(n => n == 0, _ => "Zero"),
+			//	(n => n == 1, _ => "One"),
+			//	(n => n == 2, _ => "Two"),
+			//	(n => n == 3, _ => "Three"),
+			//	(n => n == 4, _ => "Four"));
 
-				l.Debug(ret);
-				//"Zero,One,Two,Three,Fore".Split(',').fore
+			//	l.Debug(ret);
+			//	//"Zero,One,Two,Three,Fore".Split(',').fore
 
-				5.ForEach(q =>
-				{
-					dynamic retd = q.Match<int, dynamic>(
-						(n => n == 0, _ => "Zero"),
-						(n => n == 5, n => BitConverter.GetBytes(n)),
-						(n => n == 4, n => n.ToString()),
-						(n => true, n => $"default {n}"));
-					if (retd != null)
-					{
-						l.Debug(retd.ToString());
-					}
-				});
+			//	5.ForEach(q =>
+			//	{
+			//		dynamic retd = q.Match<int, dynamic>(
+			//			(n => n == 0, _ => "Zero"),
+			//			(n => n == 5, n => BitConverter.GetBytes(n)),
+			//			(n => n == 4, n => n.ToString()),
+			//			(n => true, n => $"default {n}"));
+			//		if (retd != null)
+			//		{
+			//			l.Debug(retd.ToString());
+			//		}
+			//	});
 
-				DateTime start = DateTime.Now;
-				1000000.ForEach(q => (q % 5).Match(
-					(n => n == 0, _ => "Zero"),
-					(n => n == 1, _ => "One"),
-					(n => n == 2, _ => "Two"),
-					(n => n == 3, _ => "Three"),
-					(n => n == 4, _ => "Four")));
-				DateTime stop = DateTime.Now;
-				l.Debug("Match Return for 1,000,000 runs took " + (stop - start).TotalMilliseconds + "ms");
-			}
+			//	DateTime start = DateTime.Now;
+			//	1000000.ForEach(q => (q % 5).Match(
+			//		(n => n == 0, _ => "Zero"),
+			//		(n => n == 1, _ => "One"),
+			//		(n => n == 2, _ => "Two"),
+			//		(n => n == 3, _ => "Three"),
+			//		(n => n == 4, _ => "Four")));
+			//	DateTime stop = DateTime.Now;
+			//	l.Debug("Match Return for 1,000,000 runs took " + (stop - start).TotalMilliseconds + "ms");
+			//}
 		}
 		[Fact]
 		private void DecimalExtensionsTest()

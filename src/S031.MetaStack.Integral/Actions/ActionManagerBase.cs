@@ -63,17 +63,7 @@ namespace S031.MetaStack.Actions
 
 		private readonly string _schemaName = string.Empty;
 
-		private readonly MdbContext _mdb;
-
-		protected MdbContext SysCatContext
-			=> _mdb;
-
-		public ActionManagerBase(MdbContext mdb)
-		{
-			_mdb = mdb;
-			if (_mdb.ConnectInfo.SchemaSupport)
-				_schemaName = "SysCat.";
-		}
+		protected MdbContext SysCatDbContext;
 
 		public abstract DataPackage Execute(string actionID, DataPackage inParamStor);
 
@@ -84,14 +74,14 @@ namespace S031.MetaStack.Actions
 			actionID.NullTest(nameof(actionID));
 			if (!_actionsCache.TryGetValue(actionID, out ActionInfo ai))
 			{
-				using (var dr = _mdb.GetReader(_sql_actions.ToFormat(actionID, _schemaName)))
+				using (var dr = SysCatDbContext.GetReader(_sql_actions.ToFormat(actionID, _schemaName)))
 				{
 					if (dr.Read())
 						ai = SetActionAttributes(dr);
 				}
 				if (ai != null)
 				{
-					using (var dr = _mdb.GetReader(_sql_parameters.ToFormat(ai.IID, _schemaName)))
+					using (var dr = SysCatDbContext.GetReader(_sql_parameters.ToFormat(ai.IID, _schemaName)))
 					{
 						ParamInfoList pil = ai.InterfaceParameters;
 						for (; dr.Read();)
@@ -111,14 +101,14 @@ namespace S031.MetaStack.Actions
 			actionID.NullTest(nameof(actionID));
 			if (!_actionsCache.TryGetValue(actionID, out ActionInfo ai))
 			{
-				using (var dr = await _mdb.GetReaderAsync(_sql_actions.ToFormat(actionID, _schemaName)))
+				using (var dr = await SysCatDbContext.GetReaderAsync(_sql_actions.ToFormat(actionID, _schemaName)))
 				{
 					if (dr.Read())
 						ai = SetActionAttributes(dr);
 				}
 				if (ai != null)
 				{
-					using (var dr = await _mdb.GetReaderAsync(_sql_parameters.ToFormat(ai.IID, _schemaName)))
+					using (var dr = await SysCatDbContext.GetReaderAsync(_sql_parameters.ToFormat(ai.IID, _schemaName)))
 					{
 						ParamInfoList pil = ai.InterfaceParameters;
 						for (; dr.Read();)
