@@ -15,7 +15,7 @@ namespace S031.MetaStack.Security
 
 		public static T Execute<T>(string userName, string password, Func<T> userAction)
 		{
-			string domainName = "";
+			string domainName;
 			int pos = userName.IndexOf('\\');
 			if (pos > -1)
 			{

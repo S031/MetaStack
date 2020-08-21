@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using S031.MetaStack.Actions;
 using S031.MetaStack.Common;
 using S031.MetaStack.Data;
+using S031.MetaStack.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +16,14 @@ namespace TaskPlus.Server.Actions
 	{
 		private readonly IConfiguration _config;
 		private readonly ILogger _logger;
+		private readonly IAuthorizationProvider _authorizationProvider;
 
 		public ActionManager(IServiceProvider services) 
 		{
 			_config = services.GetRequiredService<IConfiguration>();
 			_logger = services.GetRequiredService<ILogger>();
+			_authorizationProvider = services.GetRequiredService<IAuthorizationProvider>();
+
 			var connectionName = _config.GetSection("appSettings")["SysCatConnection"];
 			//!!! wery slowwwwww
 			var connectInfo = _config.GetSection($"connectionStrings:{connectionName}").Get<ConnectInfo>();
@@ -49,7 +53,7 @@ namespace TaskPlus.Server.Actions
 			}
 		}
 		
-		private static async Task<DataPackage> ExecuteInternalAsync(ActionInfo ai, DataPackage inParamStor)
+		private async Task<DataPackage> ExecuteInternalAsync(ActionInfo ai, DataPackage inParamStor)
 		{
 			var se = CreateEvaluator(ai, inParamStor);
 			//!!! AuthorizationRequired remove from sys action list and add test authentication in procedure
@@ -58,7 +62,7 @@ namespace TaskPlus.Server.Actions
 			return await se.InvokeAsync(ai, inParamStor);
 		}
 
-		private static async Task AuthorizationAsync(ActionInfo ai, DataPackage inParamStor)
+		private async Task AuthorizationAsync(ActionInfo ai, DataPackage inParamStor)
 		{
 			ParamInfo objectNameParamInfo = ai.InterfaceParameters.GetObjectNameParamInfo();
 			string objectName = ai.ActionID;
@@ -69,9 +73,7 @@ namespace TaskPlus.Server.Actions
 					objectName = (string)inParamStor[objectNameParamInfo.AttribName];
 				inParamStor.GoDataTop();
 			}
-			if (!await ApplicationContext
-				.GetAuthorizationProvider()
-				.HasPermissionAsync(ai, objectName))
+			if (!await _authorizationProvider.HasPermissionAsync(ai, objectName))
 				//!!! GetSchema for objectName && put name of object to message
 				throw new AuthorizationExceptions(ai.GetAuthorizationExceptionsMessage(objectName));
 		}

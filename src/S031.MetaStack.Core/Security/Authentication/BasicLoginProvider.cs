@@ -71,7 +71,7 @@ namespace S031.MetaStack.Core.Security
 		/// <returns></returns>
 		public async Task<string> LogonAsync(string userName, string sessionID, string encryptedKey)
 		{
-			return await Task.Factory.StartNew(
+			return await Task.Run(
 				() => Logon(userName, sessionID, encryptedKey)).ConfigureAwait(false);
 		}
 

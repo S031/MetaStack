@@ -11,9 +11,9 @@ using System.Security.Claims;
 using System.Text;
 using TaskPlus.Server.Actions;
 
-namespace TaskPlus.Server.Security.Authentication
+namespace TaskPlus.Server.Security
 {
-	internal class JwtLoginProvider
+	public class JwtLoginProvider
 	{
 		private readonly HttpContext _context;
 

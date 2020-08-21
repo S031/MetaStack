@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TaskPlus.Server.Actions
 {
-	internal class ActionResult<T> where T : class
+	public class ActionResult<T> where T : class
 	{
 		public ActionResult(HttpStatusCode statusCode)
 		{

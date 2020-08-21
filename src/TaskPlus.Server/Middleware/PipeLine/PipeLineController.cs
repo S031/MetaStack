@@ -3,16 +3,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using S031.MetaStack.Actions;
-using S031.MetaStack.Common;
 using S031.MetaStack.Json;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using TaskPlus.Server.Actions;
 using TaskPlus.Server.Logging;
-using TaskPlus.Server.Middleware;
-using TaskPlus.Server.Security.Authentication;
 
 namespace TaskPlus.Server.Middleware
 {
@@ -29,7 +24,6 @@ namespace TaskPlus.Server.Middleware
 			_config = _context
 				.RequestServices
 				.GetRequiredService<IConfiguration>();
-			//_logger = _context.GetItem<ILogger>();
 			_logger = _context
 				.RequestServices
 				.GetRequiredService<ILogger>();
@@ -41,28 +35,36 @@ namespace TaskPlus.Server.Middleware
 		public async Task ProcessMessage()
 		{
 			ActionResult<JsonObject> result;
-			switch (_routeValues.ToString())
+			IActionManager am = _context.RequestServices.GetRequiredService<IActionManager>();
+			string actionID = (string)_routeValues.Action;
+			ActionInfo ai = am.GetActionInfo(actionID);
+			if (ai.AuthenticationRequired)
 			{
-				case "default/login":
-					result = new JwtLoginProvider(_context).Login();
-					_context.Response.StatusCode = (int)result.StatusCode;
-					string token = result.Value.ToString(Formatting.Indented);
-					_logger.LogDebug(token);
-					await _context.Response.WriteAsync(token);
-					break;
-				case "logger/test":
-					DateTime time = DateTime.Now;
-					//LoggingSpeedTest();
-					await ActionManagerCreationSpeedTest();
-					await _context.Response.WriteAsync($"operation time = {(DateTime.Now - time).TotalMilliseconds}");
-					await _context.Response.WriteAsync($"API version={_routeValues.Version}, Controller={_routeValues.Controller}, Action={_routeValues.Action}, AuthenticationType={_context.User.Identity.AuthenticationType}, Authenticated={_context.User.Identity.IsAuthenticated}");
-					break;
-				default:
-					result = new JwtLoginProvider(_context).Logon();
-					_context.Response.StatusCode = (int)result.StatusCode;
-					await _context.Response.WriteAsync($"API version={_routeValues.Version}, Controller={_routeValues.Controller}, Action={_routeValues.Action}, AuthenticationType={_context.User.Identity.AuthenticationType}, Authenticated={_context.User.Identity.IsAuthenticated}");
-					break;
+
 			}
+
+			//switch (_routeValues.ToString())
+			//{
+			//	case "default/login":
+			//		result = new JwtLoginProvider(_context).Login();
+			//		_context.Response.StatusCode = (int)result.StatusCode;
+			//		string token = result.Value.ToString(Formatting.Indented);
+			//		_logger.LogDebug(token);
+			//		await _context.Response.WriteAsync(token);
+			//		break;
+			//	case "logger/test":
+			//		DateTime time = DateTime.Now;
+			//		//LoggingSpeedTest();
+			//		await ActionManagerCreationSpeedTest();
+			//		await _context.Response.WriteAsync($"operation time = {(DateTime.Now - time).TotalMilliseconds}");
+			//		await _context.Response.WriteAsync($"API version={_routeValues.Version}, Controller={_routeValues.Controller}, Action={_routeValues.Action}, AuthenticationType={_context.User.Identity.AuthenticationType}, Authenticated={_context.User.Identity.IsAuthenticated}");
+			//		break;
+			//	default:
+			//		result = new JwtLoginProvider(_context).Logon();
+			//		_context.Response.StatusCode = (int)result.StatusCode;
+			//		await _context.Response.WriteAsync($"API version={_routeValues.Version}, Controller={_routeValues.Controller}, Action={_routeValues.Action}, AuthenticationType={_context.User.Identity.AuthenticationType}, Authenticated={_context.User.Identity.IsAuthenticated}");
+			//		break;
+			//}
 		}
 
 		private void LoggingSpeedTest()

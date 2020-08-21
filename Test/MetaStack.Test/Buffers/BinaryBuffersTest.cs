@@ -35,6 +35,26 @@ namespace MetaStack.Test.Buffers
 			}
 		}
 
+		[Fact]
+		public void SimplePerformanceTest()
+		{
+			using (FileLog _logger = new FileLog("MetaStackBuffers.PerformanceTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			{
+				SimpleValue s = new SimpleValue(0);
+				DateTime start = DateTime.Now;
+				for (int i = 0; i < 1_000_000; i++)
+				{
+					//var s = (ValueType)i;
+					//var s = new string("POST");
+					s = new SimpleValue("POST");
+				}
+
+				TimeSpan ts = DateTime.Now - start;
+				_logger.Debug($"Result: Value={s.GetString()} {ts.TotalMilliseconds} ms");
+			}
+
+		}
+
 		void WriterPerformanceTest(FileLog _logger)
 		{
 			byte[] data = new byte[10];
@@ -137,5 +157,88 @@ namespace MetaStack.Test.Buffers
 			return t;
 		}
 
+		readonly struct SimpleValue2
+		{
+			private readonly long _long;
+			private readonly double _double;
+			private readonly object _value;
+			private readonly ExportedDataTypes _type;
+
+			public SimpleValue2(int value)
+			{
+				_long = value;
+				_double = -1;
+				_value = null;
+				_type = ExportedDataTypes.@int;
+			}
+
+			public SimpleValue2(string value)
+			{
+				_long = -1;
+				_double = -1;
+				_value = value;
+				_type = ExportedDataTypes.@string;
+			}
+			public static implicit operator string(SimpleValue2 value)
+				=> value._type == ExportedDataTypes.@string
+				? (string)value._value
+				: throw new InvalidCastException();
+		}
+
+		unsafe struct SimpleValue
+		{
+			private unsafe Byte* _buffer;
+			int _size;
+
+			public unsafe SimpleValue (int value)
+			{
+				_size = sizeof(int);
+				Byte* dataBufferBytes = stackalloc Byte[_size];
+				*(int*)dataBufferBytes = value;
+				_buffer = dataBufferBytes;
+			}
+
+			public unsafe SimpleValue(string value)
+			{
+				_size = value.Length;
+				int size = _size * 2;
+				if (_size > 0)
+				{
+					//Byte* dataBufferBytes = stackalloc Byte[size];
+					Byte[] dataBufferBytes = new Byte[size];
+					fixed (char* source = value)
+					fixed (byte* dest = dataBufferBytes)
+					{
+						Buffer.MemoryCopy(source, dest, size, size);
+						_buffer = dest;
+					}
+
+					//for (int i = 0; i < _size; i++)
+					//	dataBufferBytes[i] = (byte)value[i];
+					////fixed(byte* ptr = dataBufferBytes)
+					//	_buffer = dataBufferBytes;
+				}
+				else
+					_buffer = (byte*)0;
+			}
+
+			public string GetString()
+			{
+				if (_size > 0)
+				{
+					byte* source = _buffer;
+					char[] dest = new char[_size];
+
+					for (int i = 0; i < _size; i++)
+						dest[i] = (char)source[i];
+
+					return new string(dest);
+				}
+				return string.Empty;
+			}
+
+			public int GetValue()
+				=> *(int*)_buffer;
+		}
 	}
 }
