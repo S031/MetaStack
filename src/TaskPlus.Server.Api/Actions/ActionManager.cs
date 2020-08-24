@@ -65,7 +65,7 @@ namespace TaskPlus.Server.Actions
 		private async Task AuthorizationAsync(ActionInfo ai, DataPackage inParamStor)
 		{
 			ParamInfo objectNameParamInfo = ai.InterfaceParameters.GetObjectNameParamInfo();
-			string objectName = ai.ActionID;
+			string objectName = ActionInfo.ObjectNameForStaticActions;
 			if (objectNameParamInfo != null)
 			{
 				inParamStor.GoDataTop();

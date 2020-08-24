@@ -38,6 +38,7 @@ namespace TaskPlus.Server.Middleware
 			IActionManager am = _context.RequestServices.GetRequiredService<IActionManager>();
 			string actionID = (string)_routeValues.Action;
 			ActionInfo ai = am.GetActionInfo(actionID);
+			ActionContext ctx = new ActionContext(_context.RequestServices);
 			if (ai.AuthenticationRequired)
 			{
 

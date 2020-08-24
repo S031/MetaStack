@@ -22,6 +22,7 @@ namespace S031.MetaStack.Actions
 
 	public sealed class ActionInfo : InterfaceInfo
 	{
+		public const string ObjectNameForStaticActions = "__default";
 		public string ActionID { get; set; }
 		public string AssemblyID { get; set; }
 		public string ClassName { get; set; }

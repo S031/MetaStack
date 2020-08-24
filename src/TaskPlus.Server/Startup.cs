@@ -8,8 +8,10 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using S031.MetaStack.Actions;
 using S031.MetaStack.Common;
+using S031.MetaStack.Security;
 using TaskPlus.Server.Actions;
 using TaskPlus.Server.Middleware;
+using TaskPlus.Server.Security;
 
 namespace TaskPlus.Server
 {
@@ -23,6 +25,8 @@ namespace TaskPlus.Server
 			services.AddRouting();
 			services.AddSingleton<ILogger>((svc) => _loggerProvider.CreateLogger(Assembly.GetEntryAssembly().GetWorkName()));
 			services.AddSingleton<IActionManager, ActionManager>();
+			services.AddSingleton<ILoginProvider, JwtLoginProvider>();
+			services.AddSingleton<IAuthorizationProvider, BasicAuthorizationProvider>();
 		}
 
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerProvider loggerProvider)

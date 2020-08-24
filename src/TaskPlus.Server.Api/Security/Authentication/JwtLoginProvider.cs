@@ -1,23 +1,111 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
+using S031.MetaStack.Data;
 using S031.MetaStack.Json;
+using S031.MetaStack.Security;
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Net;
 using System.Security.Claims;
+using System.Security.Principal;
 using System.Text;
+using System.Threading.Tasks;
 using TaskPlus.Server.Actions;
 
 namespace TaskPlus.Server.Security
 {
-	public class JwtLoginProvider
+	public class JwtLoginProvider : ILoginProvider
+	{
+		private readonly IServiceProvider _services;
+		private readonly IConfiguration _config;
+		private readonly ILogger _logger;
+		private readonly MdbContext _mdb;
+
+		public JwtLoginProvider(IServiceProvider services)
+		{
+			_services = services;
+			_config = services.GetRequiredService<IConfiguration>();
+			_logger = services.GetRequiredService<ILogger>();
+		}
+
+		/// <summary>
+		/// Authenticate and create JWT token for user
+		/// </summary>
+		/// <param name="userName">LOgin user name or emaile</param>
+		/// <param name="clientLoginData">user password</param>
+		/// <returns></returns>
+		public string LoginRequest(string userName, string clientLoginData)
+			=> new JwtSecurityTokenHandler()
+			.WriteToken(
+				GenerateJSONWebToken(
+					AuthenticateUser(userName, clientLoginData)));
+
+		/// <summary>
+		/// Authenticate and create JWT token for user async
+		/// </summary>
+		/// <param name="userName">LOgin user name or emaile</param>
+		/// <param name="clientLoginData">user password</param>
+		/// <returns></returns>
+		public Task<string> LoginRequestAsync(string userName, string clientLoginData)
+		{
+			throw new NotImplementedException();
+		}
+
+		public string Logon(string userName, string sessionID, string encryptedKey)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task<string> LogonAsync(string userName, string sessionID, string encryptedKey)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void Logout(string userName, string sessionID, string encryptedKey)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task LogoutAsync(string userName, string sessionID, string encryptedKey)
+		{
+			throw new NotImplementedException();
+		}
+
+		GenericPrincipal AuthenticateUser(string userName, string password)
+		{
+			GenericIdentity idn = new GenericIdentity(userName);
+			var principal = new GenericPrincipal(idn, new string[] { });
+			principal.Claims
+				.Append(new Claim(JwtRegisteredClaimNames.Sub, idn.Name))
+				.Append(new Claim(JwtRegisteredClaimNames.Email, ""))
+				.Append(new Claim("DateOfJoing", DateTime.Now.ToString("yyyy-MM-dd")))
+				.Append(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
+			return principal;
+		}
+		private JwtSecurityToken GenerateJSONWebToken(GenericPrincipal principal)
+		{
+			var config = _config.GetSection("Authentication");
+			var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["jwt:Key"]));
+			var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+			return new JwtSecurityToken(config["Jwt:Issuer"],
+				config["Jwt:Audience"],
+				principal.Claims,
+				expires: DateTime.Now.AddMinutes(120),
+				signingCredentials: credentials);
+		}
+	}
+
+	public class JwtLoginProvider2
 	{
 		private readonly HttpContext _context;
 
-		public JwtLoginProvider(HttpContext context)
+		public JwtLoginProvider2(HttpContext context)
 		{
 			_context = context;
 		}
