@@ -28,14 +28,14 @@ namespace S031.MetaStack.Core.App
 		static IConfiguration _configuration;
 		static ILogger _logger;
 		static ILoginProvider _loginProvider;
-		static IAuthorizationProvider _authorizationProvider;
+		static IBasicAuthorizationProvider _authorizationProvider;
 		static MdbContext _schemaDb = null;
 		static readonly PipeService _pipeChannel = new PipeService();
 
 		public static IConfiguration GetConfiguration() => _configuration;
 		public static ILogger GetLogger() => _logger;
 		public static ILoginProvider GetLoginProvider() => _loginProvider;
-		public static IAuthorizationProvider GetAuthorizationProvider()
+		public static IBasicAuthorizationProvider GetAuthorizationProvider()
 			=> _authorizationProvider;
 
 		public static IHostBuilder UseApplicationContext(this IHostBuilder host, IConfiguration configuration)
@@ -102,7 +102,7 @@ namespace S031.MetaStack.Core.App
 			//костыль!!!
 			//return settings from configuration
 			_authorizationProvider = new BasicAuthorizationProvider(SchemaDb);
-			_services.AddSingleton<IAuthorizationProvider>(_authorizationProvider);
+			_services.AddSingleton<IBasicAuthorizationProvider>(_authorizationProvider);
 			return _services;
 		}
 

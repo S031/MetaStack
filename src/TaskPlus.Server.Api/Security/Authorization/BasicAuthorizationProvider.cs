@@ -1,51 +1,49 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using S031.MetaStack.Actions;
+﻿using S031.MetaStack.Actions;
+using S031.MetaStack.Integral.Security.Users;
 using S031.MetaStack.Security;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace TaskPlus.Server.Security
 {
-	public class BasicAuthorizationProvider : IAuthorizationProvider
+	public class UserAuthorizationProvider : IAuthorizationProvider
 	{
-		public bool HasPermission(ActionInfo actionInfo, string objectName)
+		public bool HasPermission(ActionInfo actionInfo, UserInfo user)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task<bool> HasPermissionAsync(ActionInfo actionInfo, string objectName)
+		public Task<bool> HasPermissionAsync(ActionInfo actionInfo, UserInfo user)
 		{
 			throw new NotImplementedException();
 		}
 
-		public bool IsAdmin(string userName)
+		public bool IsAdmin(UserInfo user)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task<bool> IsAdminAsync(string userName)
+		public Task<bool> IsAdminAsync(UserInfo user)
 		{
 			throw new NotImplementedException();
 		}
 
-		public bool IsSecurityAdmin(string userName)
+		public bool IsSecurityAdmin(UserInfo user)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task<bool> IsSecurityAdminAsync(string userName)
+		public Task<bool> IsSecurityAdminAsync(UserInfo user)
 		{
 			throw new NotImplementedException();
 		}
 
-		public bool UserInRore(string userName, string roleName)
+		public bool UserInRore(UserInfo user, string roleName)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task<bool> UserInRoreAsync(string userName, string roleName)
+		public Task<bool> UserInRoreAsync(UserInfo user, string roleName)
 		{
 			throw new NotImplementedException();
 		}

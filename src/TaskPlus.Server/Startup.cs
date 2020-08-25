@@ -10,6 +10,7 @@ using S031.MetaStack.Actions;
 using S031.MetaStack.Common;
 using S031.MetaStack.Security;
 using TaskPlus.Server.Actions;
+using TaskPlus.Server.Data;
 using TaskPlus.Server.Middleware;
 using TaskPlus.Server.Security;
 
@@ -24,9 +25,10 @@ namespace TaskPlus.Server
 		{
 			services.AddRouting();
 			services.AddSingleton<ILogger>((svc) => _loggerProvider.CreateLogger(Assembly.GetEntryAssembly().GetWorkName()));
+			services.AddSingleton<IMdbContextFactory, MdbContextFactory>();
 			services.AddSingleton<IActionManager, ActionManager>();
 			services.AddSingleton<ILoginProvider, JwtLoginProvider>();
-			services.AddSingleton<IAuthorizationProvider, BasicAuthorizationProvider>();
+			services.AddSingleton<IAuthorizationProvider, UserAuthorizationProvider>();
 		}
 
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerProvider loggerProvider)
@@ -37,15 +39,6 @@ namespace TaskPlus.Server
 				app.UseDeveloperExceptionPage();
 
 			_loggerProvider = loggerProvider; 
-			//app.ApplicationServices.GetRequiredService<ILoggerProvider>();
-			//_logger = _loggerProvider.CreateLogger(Assembly.GetEntryAssembly().GetWorkName());
-			//_logger = app.ApplicationServices.GetRequiredService<ILogger>();
-
-			//app.Use(async (context, next) =>
-			//{
-			//	context.AddItem<ILogger>(_logger);
-			//	await next();
-			//});
 			app.UseRouter(router =>
 			{
 				router.DefaultHandler = new RouteHandler(context => new PipeLineController(context).ProcessMessage());

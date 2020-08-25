@@ -10,9 +10,9 @@ namespace TaskPlus.Server.Actions
 		{
 			ActionContext ctx = ai.GetContext();
 			if (ctx != null)
-				return Properties.Strings.TaskPlus_Server_SecurityAuthorizationExceptions_GetMessage_1
+				return Api.Properties.Strings.TaskPlus_Server_SecurityAuthorizationExceptions_GetMessage_1
 					.ToFormat(ctx.UserName, ai.Name, objectName);
-			return Properties.Strings.TaskPlus_Server_SecurityAuthorizationExceptions_GetMessage_1
+			return Api.Properties.Strings.TaskPlus_Server_SecurityAuthorizationExceptions_GetMessage_1
 				.ToFormat(Environment.UserName, ai.Name, objectName);
 		}
 	}

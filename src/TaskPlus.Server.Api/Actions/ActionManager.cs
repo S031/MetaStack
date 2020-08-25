@@ -6,28 +6,29 @@ using S031.MetaStack.Common;
 using S031.MetaStack.Data;
 using S031.MetaStack.Security;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TaskPlus.Server.Api.Properties;
+using TaskPlus.Server.Data;
 
 namespace TaskPlus.Server.Actions
 {
 	public sealed class ActionManager : ActionManagerBase
 	{
+		private readonly IServiceProvider _services;
 		private readonly IConfiguration _config;
 		private readonly ILogger _logger;
-		private readonly IAuthorizationProvider _authorizationProvider;
+		private readonly IBasicAuthorizationProvider _authorizationProvider;
 
 		public ActionManager(IServiceProvider services) 
 		{
+			_services = services;
 			_config = services.GetRequiredService<IConfiguration>();
 			_logger = services.GetRequiredService<ILogger>();
-			_authorizationProvider = services.GetRequiredService<IAuthorizationProvider>();
-
-			var connectionName = _config.GetSection("appSettings")["SysCatConnection"];
-			//!!! wery slowwwwww
-			var connectInfo = _config.GetSection($"connectionStrings:{connectionName}").Get<ConnectInfo>();
-			this.SysCatDbContext = new MdbContext(connectInfo);
+			_authorizationProvider = services.GetRequiredService<IBasicAuthorizationProvider>();
+			this.SysCatDbContext = services
+				.GetRequiredService<IMdbContextFactory>()
+				.GetContext(Strings.SysCatConnection);
 		}
 
 		public override DataPackage Execute(string actionID, DataPackage inParamStor)
@@ -100,7 +101,7 @@ namespace TaskPlus.Server.Actions
 					catch
 					{
 						throw new InvalidOperationException(
-							"Обязательный параметер интерфейса '{0}.{1}', не найден в списке параметров  операции '{2}'"
+							Strings.TaskPlus_Server_Actions_CreateEvaluator_1
 							.ToFormat(ai.InterfaceID, pi.ParameterID, ai.ActionID));
 					}
 				}

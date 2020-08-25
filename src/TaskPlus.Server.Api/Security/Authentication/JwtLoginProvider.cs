@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using S031.MetaStack.Data;
+using S031.MetaStack.Integral.Security.Users;
 using S031.MetaStack.Json;
 using S031.MetaStack.Security;
 using System;
@@ -16,6 +17,8 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using TaskPlus.Server.Actions;
+using TaskPlus.Server.Api.Properties;
+using TaskPlus.Server.Data;
 
 namespace TaskPlus.Server.Security
 {
@@ -31,6 +34,9 @@ namespace TaskPlus.Server.Security
 			_services = services;
 			_config = services.GetRequiredService<IConfiguration>();
 			_logger = services.GetRequiredService<ILogger>();
+			_mdb = services
+				.GetRequiredService<IMdbContextFactory>()
+				.GetContext(Strings.SysCatConnection);
 		}
 
 		/// <summary>
@@ -76,10 +82,16 @@ namespace TaskPlus.Server.Security
 			throw new NotImplementedException();
 		}
 
-		GenericPrincipal AuthenticateUser(string userName, string password)
+		UserInfo AuthenticateUser(string userName, string password)
 		{
-			GenericIdentity idn = new GenericIdentity(userName);
-			var principal = new GenericPrincipal(idn, new string[] { });
+			/*
+			 * Find in catalog (not found error)
+			 * Windows or DB imprsonate (from catalog get impersonate type)
+			 * Make UserInfo (principal)
+			 * create JwtToken
+			 */ 
+			ClaimsIdentity idn = new ClaimsIdentity(userName);
+			var principal = new UserInfo(idn);
 			principal.Claims
 				.Append(new Claim(JwtRegisteredClaimNames.Sub, idn.Name))
 				.Append(new Claim(JwtRegisteredClaimNames.Email, ""))
@@ -87,7 +99,7 @@ namespace TaskPlus.Server.Security
 				.Append(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
 			return principal;
 		}
-		private JwtSecurityToken GenerateJSONWebToken(GenericPrincipal principal)
+		private JwtSecurityToken GenerateJSONWebToken(UserInfo principal)
 		{
 			var config = _config.GetSection("Authentication");
 			var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["jwt:Key"]));
@@ -99,6 +111,10 @@ namespace TaskPlus.Server.Security
 				expires: DateTime.Now.AddMinutes(120),
 				signingCredentials: credentials);
 		}
+
+		private const string _sql_get_user_info = @"
+
+		";
 	}
 
 	public class JwtLoginProvider2

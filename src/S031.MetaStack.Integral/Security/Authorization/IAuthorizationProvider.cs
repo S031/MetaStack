@@ -1,17 +1,18 @@
 ﻿using S031.MetaStack.Actions;
+using S031.MetaStack.Integral.Security.Users;
 using System.Threading.Tasks;
 
 namespace S031.MetaStack.Security
 {
 	public interface IAuthorizationProvider
 	{
-		bool IsAdmin(string userName);
-		Task<bool> IsAdminAsync(string userName);
-		bool IsSecurityAdmin(string userName);
-		Task<bool> IsSecurityAdminAsync(string userName);
-		bool HasPermission(ActionInfo actionInfo, string objectName);
-		Task<bool> HasPermissionAsync(ActionInfo actionInfo, string objectName);
-		bool UserInRore(string userName, string roleName);
-		Task<bool> UserInRoreAsync(string userName, string roleName);
+		bool IsAdmin(UserInfo user);
+		Task<bool> IsAdminAsync(UserInfo user);
+		bool IsSecurityAdmin(UserInfo user);
+		Task<bool> IsSecurityAdminAsync(UserInfo user);
+		bool HasPermission(ActionInfo actionInfo, UserInfo user);
+		Task<bool> HasPermissionAsync(ActionInfo actionInfo, UserInfo user);
+		bool UserInRore(UserInfo user, string roleName);
+		Task<bool> UserInRoreAsync(UserInfo user, string roleName);
 	}
 }

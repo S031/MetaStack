@@ -20,6 +20,9 @@ namespace S031.MetaStack.Actions
 		NotAllowed = -1
 	}
 
+	/// <summary>
+	/// !!! not completed (modify json serialization with <see cref="JsonSerializible"/>)
+	/// </summary>
 	public sealed class ActionInfo : InterfaceInfo
 	{
 		public const string ObjectNameForStaticActions = "__default";

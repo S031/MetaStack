@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TaskPlus.Server.Properties {
+namespace TaskPlus.Server.Api.Properties {
     using System;
     
     
@@ -57,6 +57,33 @@ namespace TaskPlus.Server.Properties {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to defaultConnection.
+        /// </summary>
+        internal static string DefaultConnection {
+            get {
+                return ResourceManager.GetString("DefaultConnection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SysCatConnection.
+        /// </summary>
+        internal static string SysCatConnection {
+            get {
+                return ResourceManager.GetString("SysCatConnection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Required interface parameter &apos;{0}. {1}&apos;, not found in the parameter list of operation &apos;{2}&apos;.
+        /// </summary>
+        internal static string TaskPlus_Server_Actions_CreateEvaluator_1 {
+            get {
+                return ResourceManager.GetString("TaskPlus.Server.Actions.CreateEvaluator_1", resourceCulture);
             }
         }
         
