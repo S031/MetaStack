@@ -44,9 +44,9 @@ namespace S031.MetaStack.ORM
                 _dbObjectName = value.ObjectName;
             }
         }
-        public List<JMXKeyMember> KeyMembers { get; } = new List<JMXKeyMember>();
-        public List<JMXKeyMember> RefKeyMembers { get; } = new List<JMXKeyMember>();
-        public List<JMXKeyMember> MigrateKeyMembers { get; } = new List<JMXKeyMember>();
+        public List<JMXKeyMember> KeyMembers { get; private set; } = new List<JMXKeyMember>();
+        public List<JMXKeyMember> RefKeyMembers { get; private set; } = new List<JMXKeyMember>();
+        public List<JMXKeyMember> MigrateKeyMembers { get; private set; } = new List<JMXKeyMember>();
         public void AddKeyMember(params JMXKeyMember[] members)
         {
             foreach (var m in members)
@@ -89,21 +89,7 @@ namespace S031.MetaStack.ORM
                 position++;
             }
         }
-        public override string ToString()
-            => this.ToString(Formatting.None);
 
-        public override string ToString(Formatting formatting)
-        {
-            JsonWriter writer = new JsonWriter(formatting);
-            ToJson(writer);
-            return writer.ToString();
-        }
-        public override void ToJson(JsonWriter writer)
-        {
-            writer.WriteStartObject();
-            ToJsonRaw(writer);
-            writer.WriteEndObject();
-        }
         protected override void ToJsonRaw(JsonWriter writer)
         {
             writer.WriteProperty("ID", ID);
@@ -158,9 +144,14 @@ namespace S031.MetaStack.ORM
             }
             writer.WriteEndArray();
         }
-
         internal JMXForeignKey(JsonObject o) : base(o)
         {
+        }
+        internal static JMXForeignKey ReadFrom(JsonObject o)
+            => new JMXForeignKey(o);
+		public override void FromJson(JsonValue source)
+		{
+            var o = source as JsonObject;
             KeyName = o.GetStringOrDefault("KeyName");
             CheckOption = o.GetBoolOrDefault("CheckOption", true);
             DeleteRefAction = o.GetStringOrDefault("DeleteRefAction");
@@ -189,9 +180,6 @@ namespace S031.MetaStack.ORM
                 foreach (JsonObject m in a)
                     MigrateKeyMembers.Add(JMXKeyMember.ReadFrom(m));
         }
-        internal static JMXForeignKey ReadFrom(JsonObject o)
-            => new JMXForeignKey(o);
-
     }
 }
 

@@ -69,22 +69,10 @@ namespace S031.MetaStack.ORM
 
         internal JMXConstraint(JsonValue value): base(value)
         {
-            JsonObject o = value as JsonObject;
-            ConstraintType = o.GetEnum<JMXConstraintTypes>("ConstraintType", JMXConstraintTypes.none);
-            Definition = o.GetStringOrDefault("Definition");
-            CheckOption = o.GetBoolOrDefault("CheckOption", true);
-            ConstraintName = o.GetStringOrDefault("ConstraintName");
         }
 
         internal static JMXConstraint ReadFrom(JsonObject o)
             => new JMXConstraint(o);
-
-        public override void ToJson(JsonWriter writer)
-        {
-            writer.WriteStartObject();
-            ToJsonRaw(writer);
-            writer.WriteEndObject();
-        }
 
         protected override void ToJsonRaw(JsonWriter writer)
         {
@@ -92,5 +80,14 @@ namespace S031.MetaStack.ORM
             writer.WriteProperty("Definition", Definition);
             writer.WriteProperty("CheckOption", CheckOption);
         }
-    }
+
+		public override void FromJson(JsonValue source)
+		{
+            JsonObject o = source as JsonObject;
+            ConstraintType = o.GetEnum<JMXConstraintTypes>("ConstraintType", JMXConstraintTypes.none);
+            Definition = o.GetStringOrDefault("Definition");
+            CheckOption = o.GetBoolOrDefault("CheckOption", true);
+            ConstraintName = o.GetStringOrDefault("ConstraintName");
+		}
+	}
 }

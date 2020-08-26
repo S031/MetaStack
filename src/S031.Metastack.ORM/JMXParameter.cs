@@ -29,14 +29,6 @@ namespace S031.MetaStack.ORM
 			writer.WriteProperty("NullIfEmpty", NullIfEmpty);
 			base.ToJsonRaw(writer);
 		}
-
-        public override void ToJson(JsonWriter writer)
-        {
-			writer.WriteStartObject();
-			ToJsonRaw(writer);
-			writer.WriteEndObject();
-		}
-
 		internal JMXParameter(JsonObject o) : base(o)
 		{
 			Dirrect = o.GetEnum<ParamDirrect>("Dirrect");

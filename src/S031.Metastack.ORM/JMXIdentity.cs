@@ -11,41 +11,28 @@ namespace S031.MetaStack.ORM
             Seed = isIdentity && seed <= 0 ? 1 : seed;
             Increment = isIdentity && increment == 0 ? 1 : increment;
         }
-        public bool IsIdentity { get; }
-        public int Seed { get; }
-        public int Increment { get; }
-        public override string ToString()
-            => this.ToString(Formatting.None);
-
-        public override string ToString(Formatting formatting)
-        {
-            JsonWriter writer = new JsonWriter(formatting);
-            ToJson(writer);
-            return writer.ToString();
-        }
+        public bool IsIdentity { get; private set; }
+        public int Seed { get; private set; }
+        public int Increment { get; private set; }
+        
         internal JMXIdentity(JsonValue value)
             : base(value)
         {
-            JsonObject o = value as JsonObject;
-            IsIdentity = o.GetBoolOrDefault("IsIdentity");
-            Seed = o.GetIntOrDefault("Seed", 1);
-            Increment = o.GetIntOrDefault("Increment", 1);
         }
         internal static JMXIdentity ReadFrom(JsonObject o)
             => new JMXIdentity(o);
-
-        public override void ToJson(JsonWriter writer)
-        {
-            writer.WriteStartObject();
-            ToJsonRaw(writer);
-            writer.WriteEndObject();
-        }
-
         protected override void ToJsonRaw(JsonWriter writer)
         {
             writer.WriteProperty("IsIdentity", IsIdentity);
             writer.WriteProperty("Seed", Seed);
             writer.WriteProperty("Increment", Increment);
         }
-    }
+		public override void FromJson(JsonValue source)
+		{
+            JsonObject o = source as JsonObject;
+            IsIdentity = o.GetBoolOrDefault("IsIdentity");
+            Seed = o.GetIntOrDefault("Seed", 1);
+            Increment = o.GetIntOrDefault("Increment", 1);
+		}
+	}
 }

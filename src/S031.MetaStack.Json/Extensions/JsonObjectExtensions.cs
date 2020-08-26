@@ -10,9 +10,8 @@ namespace S031.MetaStack.Json
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool GetBoolOrDefault(this JsonObject json, string key)
 			=> json.TryGetValue(key, out JsonValue value)
-				&& value.JsonType == JsonType.Boolean
-				? (bool)value
-				: default;
+				&& value.JsonType == JsonType.Boolean 
+				&& (bool)value;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool GetBoolOrDefault(this JsonObject json, string key, bool defaultValue)

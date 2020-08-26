@@ -22,22 +22,7 @@ namespace S031.MetaStack.Interop.Connectors
 
 		public ConnectorOptions(JsonValue config) : base(config)
 		{
-			JsonObject j = (config as JsonObject);
-			if (j.ContainsKey("Host")) Host = j["Host"];
-			if (j.ContainsKey("Port")) Port = j["Port"];
-			if (j.ContainsKey("UID")) UID = j["UID"];
-			if (j.ContainsKey("Password")) Password = j["Password"];
-			if (j.ContainsKey("ForcePassword")) ForcePassword = j["ForcePassword"];
-			if (j.ContainsKey("SavePassword")) SavePassword = j["SavePassword"];
 		}
-
-		public override void ToJson(JsonWriter writer)
-		{
-			writer.WriteStartObject();
-			ToJsonRaw(writer);
-			writer.WriteEndObject();
-		}
-
 		protected override void ToJsonRaw(JsonWriter writer)
 		{
 			writer.WriteProperty("Host", Host);
@@ -46,6 +31,16 @@ namespace S031.MetaStack.Interop.Connectors
 			writer.WriteProperty("Password", Password);
 			writer.WriteProperty("ForcePassword", ForcePassword);
 			writer.WriteProperty("SavePassword", SavePassword);
+		}
+		public override void FromJson(JsonValue source)
+		{
+			JsonObject j = (source as JsonObject);
+			if (j.ContainsKey("Host")) Host = j["Host"];
+			if (j.ContainsKey("Port")) Port = j["Port"];
+			if (j.ContainsKey("UID")) UID = j["UID"];
+			if (j.ContainsKey("Password")) Password = j["Password"];
+			if (j.ContainsKey("ForcePassword")) ForcePassword = j["ForcePassword"];
+			if (j.ContainsKey("SavePassword")) SavePassword = j["SavePassword"];
 		}
 	}
 }

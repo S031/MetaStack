@@ -105,100 +105,9 @@ namespace S031.MetaStack.ORM
 		public string ObjectName { get; set; }
 		public bool IsArray { get; set; }
 		public JMXSchema ObjectSchema { get; set; }
-        public override string ToString()
-            => this.ToString(Formatting.None);
-
-        public override string ToString(Formatting formatting)
-        {
-            JsonWriter writer = new JsonWriter(formatting);
-            ToJson(writer);
-            return writer.ToString();
-        }
+        
         protected internal JMXAttribute(JsonObject o)
-            :base(o)
-		{
-			ID = o.GetIntOrDefault("ID");
-			UID = o.GetGuidOrDefault("UID", () => Guid.NewGuid());
-			AttribName = o.GetStringOrDefault("AttribName");
-			Position = o.GetIntOrDefault("Position");
-			ServerDataType = o.GetStringOrDefault("ServerDataType");
-			IsNullable = o.GetBoolOrDefault("IsNullable", true);
-			Required = o.GetBoolOrDefault("Required");
-			CollationName = o.GetStringOrDefault("CollationName");
-			IsPK = o.GetBoolOrDefault("IsPK");
-			IsFK = o.GetBoolOrDefault("IsFK");
-			Name = o.GetStringOrDefault("Name");
-			if (o.TryGetValue("Caption", out JsonValue caption))
-				Caption = o.GetStringOrDefault("Caption");
-			DataType = o.GetEnum<MdbType>("DataType");
-			Width = o.GetIntOrDefault("Width");
-			Visible = o.GetBoolOrDefault("Visible", true);
-			ReadOnly = o.GetBoolOrDefault("ReadOnly");
-			Enabled = o.GetBoolOrDefault("Enabled", true);
-			Description = o.GetStringOrDefault("Description");
-			PresentationType = o.GetStringOrDefault("PresentationType");
-			DisplayWidth = o.GetIntOrDefault("DisplayWidth", 10);
-			Mask = o.GetStringOrDefault("Mask");
-			Format = o.GetStringOrDefault("Format");
-			Sorted = o.GetBoolOrDefault("Sorted", true);
-			SuperForm = o.GetStringOrDefault("SuperForm");
-			SuperObject = o.GetStringOrDefault("SuperObject");
-			SuperMethod = o.GetStringOrDefault("SuperMethod");
-			SuperFilter = o.GetStringOrDefault("SuperFilter");
-			FieldName = o.GetStringOrDefault("FieldName");
-			ConstName = o.GetStringOrDefault("ConstName");
-			Agregate = o.GetStringOrDefault("Agregate");
-			AttribPath = o.GetStringOrDefault("AttribPath");
-
-			if (o.TryGetValue("DefaultValue", out JsonValue value)
-				&& !string.IsNullOrEmpty(value))
-				DefaultValue = ((string)value).ToObjectOf(MdbTypeMap.GetType(DataType));
-
-			if (o.TryGetValue("ObjectName", out value)
-				&& !string.IsNullOrEmpty(value))
-			{
-				ObjectName = value;
-				if (o.TryGetValue("ObjectSchema", out JsonValue schema)
-					&& !string.IsNullOrEmpty(schema))
-					ObjectSchema = JMXSchema.Parse(schema);
-				IsArray = o.GetBoolOrDefault("IsArray");
-			}
-
-			if (o.TryGetValue("ListItems", out JsonArray a))
-				ListItems.AddRange(a.Select(v => (string)v));
-
-			if (o.TryGetValue("ListData", out a))
-				ListData.AddRange(a.Select(v=>v.GetValue()));
-
-
-            if (o.TryGetValue("CheckConstraint", out JsonObject j))
-                CheckConstraint = JMXConstraint.ReadFrom(j);
-            else
-                CheckConstraint = new JMXConstraint(JMXConstraintTypes.checkConstraint);
-
-            if (o.TryGetValue("DefaultConstraint", out j))
-                DefaultConstraint = JMXConstraint.ReadFrom(j);
-            else
-                DefaultConstraint = new JMXConstraint(JMXConstraintTypes.defaultConstraint);
-
-			if (o.TryGetValue("DataSize", out j))
-				DataSize = JMXDataSize.ReadFrom(j);
-			else
-				DataSize = new JMXDataSize();
-
-			if (o.TryGetValue("Identity", out j))
-				Identity = JMXIdentity.ReadFrom(j);
-			else
-				Identity = new JMXIdentity();
-		}
-
-        public override void ToJson(JsonWriter writer)
-        {
-            writer.WriteStartObject();
-            ToJsonRaw(writer);
-            writer.WriteEndObject();
-        }
-
+            : base(o) { }
         protected override void ToJsonRaw(JsonWriter writer)
         {
             writer.WriteProperty("ID", ID);
@@ -286,8 +195,84 @@ namespace S031.MetaStack.ORM
                 writer.WriteRaw(ObjectSchema.ToString());
             }
         }
-
 		internal static JMXAttribute ReadFrom(JsonObject o)
 			=> new JMXAttribute(o);
-    }
+		public override void FromJson(JsonValue source)
+		{
+			var o = source as JsonObject;
+			ID = o.GetIntOrDefault("ID");
+			UID = o.GetGuidOrDefault("UID", () => Guid.NewGuid());
+			AttribName = o.GetStringOrDefault("AttribName");
+			Position = o.GetIntOrDefault("Position");
+			ServerDataType = o.GetStringOrDefault("ServerDataType");
+			IsNullable = o.GetBoolOrDefault("IsNullable", true);
+			Required = o.GetBoolOrDefault("Required");
+			CollationName = o.GetStringOrDefault("CollationName");
+			IsPK = o.GetBoolOrDefault("IsPK");
+			IsFK = o.GetBoolOrDefault("IsFK");
+			Name = o.GetStringOrDefault("Name");
+			if (o.TryGetValue("Caption", out JsonValue caption))
+				Caption = o.GetStringOrDefault("Caption");
+			DataType = o.GetEnum<MdbType>("DataType");
+			Width = o.GetIntOrDefault("Width");
+			Visible = o.GetBoolOrDefault("Visible", true);
+			ReadOnly = o.GetBoolOrDefault("ReadOnly");
+			Enabled = o.GetBoolOrDefault("Enabled", true);
+			Description = o.GetStringOrDefault("Description");
+			PresentationType = o.GetStringOrDefault("PresentationType");
+			DisplayWidth = o.GetIntOrDefault("DisplayWidth", 10);
+			Mask = o.GetStringOrDefault("Mask");
+			Format = o.GetStringOrDefault("Format");
+			Sorted = o.GetBoolOrDefault("Sorted", true);
+			SuperForm = o.GetStringOrDefault("SuperForm");
+			SuperObject = o.GetStringOrDefault("SuperObject");
+			SuperMethod = o.GetStringOrDefault("SuperMethod");
+			SuperFilter = o.GetStringOrDefault("SuperFilter");
+			FieldName = o.GetStringOrDefault("FieldName");
+			ConstName = o.GetStringOrDefault("ConstName");
+			Agregate = o.GetStringOrDefault("Agregate");
+			AttribPath = o.GetStringOrDefault("AttribPath");
+
+			if (o.TryGetValue("DefaultValue", out JsonValue value)
+				&& !string.IsNullOrEmpty(value))
+				DefaultValue = ((string)value).ToObjectOf(MdbTypeMap.GetType(DataType));
+
+			if (o.TryGetValue("ObjectName", out value)
+				&& !string.IsNullOrEmpty(value))
+			{
+				ObjectName = value;
+				if (o.TryGetValue("ObjectSchema", out JsonValue schema)
+					&& !string.IsNullOrEmpty(schema))
+					ObjectSchema = JMXSchema.Parse(schema);
+				IsArray = o.GetBoolOrDefault("IsArray");
+			}
+
+			if (o.TryGetValue("ListItems", out JsonArray a))
+				ListItems.AddRange(a.Select(v => (string)v));
+
+			if (o.TryGetValue("ListData", out a))
+				ListData.AddRange(a.Select(v => v.GetValue()));
+
+
+			if (o.TryGetValue("CheckConstraint", out JsonObject j))
+				CheckConstraint = JMXConstraint.ReadFrom(j);
+			else
+				CheckConstraint = new JMXConstraint(JMXConstraintTypes.checkConstraint);
+
+			if (o.TryGetValue("DefaultConstraint", out j))
+				DefaultConstraint = JMXConstraint.ReadFrom(j);
+			else
+				DefaultConstraint = new JMXConstraint(JMXConstraintTypes.defaultConstraint);
+
+			if (o.TryGetValue("DataSize", out j))
+				DataSize = JMXDataSize.ReadFrom(j);
+			else
+				DataSize = new JMXDataSize();
+
+			if (o.TryGetValue("Identity", out j))
+				Identity = JMXIdentity.ReadFrom(j);
+			else
+				Identity = new JMXIdentity();
+		}
+	}
 }
