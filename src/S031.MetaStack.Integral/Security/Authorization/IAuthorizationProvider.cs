@@ -1,5 +1,5 @@
 ﻿using S031.MetaStack.Actions;
-using S031.MetaStack.Integral.Security.Users;
+using S031.MetaStack.Integral.Security;
 using System.Threading.Tasks;
 
 namespace S031.MetaStack.Security

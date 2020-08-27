@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using S031.MetaStack.Data;
-using S031.MetaStack.Integral.Security.Users;
+using S031.MetaStack.Integral.Security;
 using S031.MetaStack.Json;
 using S031.MetaStack.Security;
 using System;

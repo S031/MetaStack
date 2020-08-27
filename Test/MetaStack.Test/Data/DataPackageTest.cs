@@ -253,8 +253,8 @@ namespace MetaStack.Test.Data
 				{
 					TestClass test = new TestClass() { ID = i, Name = $"Item {i}" };
 					test.ItemList.Add($"Item {i}", i);
-					var data = JsonExtensions.SerializeObject(test);
-					test = JsonExtensions.DeserializeObject<TestClass>(data);
+					var data = JsonSerializer.SerializeObject(test);
+					test = JsonSerializer.DeserializeObject<TestClass>(data);
 				}
 				l.Debug("SpeedTest JSOSerializer Finish");
 			}

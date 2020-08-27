@@ -3,7 +3,7 @@ using System;
 
 namespace S031.MetaStack.Json
 {
-	public static partial class JsonExtensions
+	public static partial class JsonSerializer
 	{
 		public static object DeserializeObject(Type t, string value)
 		{
@@ -15,7 +15,7 @@ namespace S031.MetaStack.Json
 			else if (typeof(IJsonSerializible).IsAssignableFrom(t))
 			{
 				JsonValue jsonValue = new JsonReader(value).Read();
-				IJsonSerializible instance = (IJsonSerializible)t.CreateInstance();
+				IJsonSerializible instance = (IJsonSerializible)t.CreateInstance(jsonValue);
 				instance.FromJson(jsonValue);
 				return instance;
 			}
@@ -41,7 +41,7 @@ namespace S031.MetaStack.Json
 			else if (typeof(IJsonSerializible).IsAssignableFrom(t))
 			{
 				JsonValue jsonValue = new JsonReader(value).Read();
-				IJsonSerializible instance = (IJsonSerializible)t.CreateInstance<T>();
+				IJsonSerializible instance = (IJsonSerializible)t.CreateInstance<T>(jsonValue);
 				instance.FromJson(jsonValue);
 				return (T)instance;
 			}

@@ -1,11 +1,12 @@
-﻿using S031.MetaStack.Json;
+﻿using S031.MetaStack.Common;
+using S031.MetaStack.Json;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 
-namespace S031.MetaStack.Integral.Security.Users
+namespace S031.MetaStack.Integral.Security
 {
 	/// <summary>
 	/// !!! not completed (add json serialization)
@@ -15,6 +16,15 @@ namespace S031.MetaStack.Integral.Security.Users
 		public UserInfo(IIdentity identity) : base(identity)
 		{
 		}
+
+		public int ID { get; internal set; }
+		public int StructuralUnitID { get; set; }
+		public string UserName
+			=> Identity.Name;
+		public string DomainName { get; set; }
+		public string Name { get; set; }
+		public int PersonID { get; set; }
+		public int AccessLevelID { get; set; }
 
 		/// <summary>
 		/// Serialize <see cref="ActionInfo"/> to json string
@@ -36,17 +46,33 @@ namespace S031.MetaStack.Integral.Security.Users
 		}
 		public void ToJsonRaw(JsonWriter writer)
 		{
+			writer.WriteProperty("ID", ID);
+			writer.WriteProperty("StructuralUnitID", StructuralUnitID);
+			writer.WriteProperty("DomainName", DomainName);
+			writer.WriteProperty("Name", Name);
+			writer.WriteProperty("PersonID", PersonID);
+			writer.WriteProperty("AccessLevelID", AccessLevelID);
 			writer.WritePropertyName("Identity");
 			writer.WriteStartObject();
 			WriteIdentityRaw(writer, this.Identity as ClaimsIdentity);
 			writer.WriteEndObject();
 
-			writer.WritePropertyName("Claims");
+			//writer.WritePropertyName("Claims");
+			//writer.WriteStartArray();
+			//foreach (var claim in Claims)
+			//{
+			//	writer.WriteStartObject();
+			//	WriteClaimRaw(writer, claim);
+			//	writer.WriteEndObject();
+			//}
+			//writer.WriteEndArray();
+			
+			writer.WritePropertyName("Identities");
 			writer.WriteStartArray();
-			foreach (var claim in Claims)
+			foreach (var idn in Identities)
 			{
 				writer.WriteStartObject();
-				WriteClaimRaw(writer, claim);
+				WriteIdentityRaw(writer, idn);
 				writer.WriteEndObject();
 			}
 			writer.WriteEndArray();
@@ -60,6 +86,15 @@ namespace S031.MetaStack.Integral.Security.Users
 				writer.WriteProperty("Label", idn.Label);
 				writer.WriteProperty("RoleClaimType", idn.RoleClaimType);
 				writer.WriteProperty("NameClaimType", idn.NameClaimType);
+				writer.WritePropertyName("Claims");
+				writer.WriteStartArray();
+				foreach (var claim in idn.Claims)
+				{
+					writer.WriteStartObject();
+					WriteClaimRaw(writer, claim);
+					writer.WriteEndObject();
+				}
+				writer.WriteEndArray();
 			}
 		}
 		private static void WriteClaimRaw(JsonWriter writer, Claim claim)
@@ -76,22 +111,38 @@ namespace S031.MetaStack.Integral.Security.Users
 		/// </summary>
 		/// <returns>json string</returns>
 		public static UserInfo ReadFrom(string serializedJsonString)
+			=>new UserInfo(new JsonReader(serializedJsonString).Read());
+
+		public UserInfo(JsonValue source)
+			: this(CreateIdentityFromJson((JsonObject)source))
 		{
-			JsonObject j = (JsonObject)(new JsonReader(serializedJsonString).Read());
-			ClaimsIdentity idn = new ClaimsIdentity();
-			return new UserInfo(idn, j);
+			FromJson(source);
 		}
-		protected internal UserInfo(IIdentity identity, JsonValue source)
-			: this(identity)
+		private static ClaimsIdentity CreateIdentityFromJson(JsonObject j)
 		{
-			if (source != null)
-				FromJson(source);
+			j.NullTest(nameof(j));
+			if (j.TryGetValue("Identity", out JsonObject o))
+			{
+				ClaimsIdentity idn = new ClaimsIdentity(o.GetStringOrDefault("AuthenticationType"), ClaimTypes.Dns, ClaimTypes.Role);
+				if (o.TryGetValue("Claims", out JsonArray a))
+					foreach (JsonObject obj in a)
+						idn.AddClaim(new Claim(
+							obj.GetStringOrDefault("Type"),
+							obj.GetStringOrDefault("Value")));
+
+				return idn;
+			}
+			throw new KeyNotFoundException("'Identity' property not fount in source json");
 		}
 		public void FromJson(JsonValue source)
 		{
-			throw new NotImplementedException();
+			var j = source as JsonObject;
+			ID = j.GetIntOrDefault("ID");
+			StructuralUnitID = j.GetIntOrDefault("StructuralUnitID");
+			PersonID = j.GetIntOrDefault("PersonID");
+			AccessLevelID = j.GetIntOrDefault("AccessLevelID");
+			DomainName = j.GetStringOrDefault("DomainName");
+			Name = j.GetStringOrDefault("Name");
 		}
-
-
 	}
 }

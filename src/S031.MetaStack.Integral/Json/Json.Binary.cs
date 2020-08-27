@@ -6,7 +6,7 @@ using JsonPair = System.Collections.Generic.KeyValuePair<string, S031.MetaStack.
 
 namespace S031.MetaStack.Json
 {
-	public static partial class JsonExtensions
+	public static partial class JsonSerializer
 	{
 		public static byte[] ToBinary(this JsonObject jsonObject)
 		{
