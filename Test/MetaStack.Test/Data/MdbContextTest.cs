@@ -20,6 +20,8 @@ namespace MetaStack.Test.Data
 		private readonly IConfiguration _configuration;
 		private readonly string _cn;
 		private readonly string _providerName;
+		private readonly string _syscat;
+		private readonly string _syscatProviderName;
 
 		internal string providerName => _providerName;
 		internal string connectionString => _cn;
@@ -31,6 +33,11 @@ namespace MetaStack.Test.Data
 			var cs = _configuration.GetSection($"connectionStrings:{connection_name}").Get<ConnectInfo>();
 			_providerName = cs.ProviderName;
 			_cn = new ConnectInfo(_providerName, cs.ConnectionString).ToString();
+
+			var s = _configuration["appSettings:SysCatConnection"];
+			cs = _configuration.GetSection($"connectionStrings:{s}").Get<ConnectInfo>();
+			_syscatProviderName = cs.ProviderName;
+			_syscat = new ConnectInfo(_syscatProviderName, cs.ConnectionString).ToString();
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
 		}
 		[Fact]
@@ -192,6 +199,48 @@ namespace MetaStack.Test.Data
 						Select * From PayDocs Where Handle = @handle1+1",
 						new MdbParameter("@handle", 3999750),
 						new MdbParameter("@handle1", 3999751)
+						);
+					foreach (var dr in drs)
+					{
+						using (dr)
+						{
+							for (; dr.Read(); i++)
+							{
+								l.Debug(dr.GetRowJSON());
+							}
+						}
+					}
+					l.Debug($"Test 1 Finish rows result {i}");
+				}
+			}
+		}
+		[Fact]
+		public void GetSysCatReadersTest()
+		{
+			using (FileLogger l = new FileLogger("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			{
+				MdbContextOptions.GetOptions().CommandTimeout = 120;
+				using (var ctx = new MdbContext(_syscat))
+				{
+					l.Debug("Test 1 Start ");
+					int i = 0;
+					var drs = ctx.GetReaders(@"
+						select u.ID,
+							   ,u.StructuralUnitID
+							   ,u.AccessLevelID
+							   ,u.UserName
+							   ,COALESCE(u.DomainName, '') as DomainName
+							   ,COALESCE(u.PersonID, 0) as PersonID
+							   ,COALESCE(u.Name, '') as Name
+							   ,COALESCE(u.JData, '') as JData
+						from Users u
+						where u.UserName LIKE '{0}';
+						select 
+							Upper(r.RoleName) as RoleName
+						from Users u
+						inner join Users2Roles ur on u.ID = ur.UserID
+						inner join Roles r on r.ID = ur.RoleID
+						where u.UserName LIKE '{0}'".ToFormat(@"hq\svostrikov")
 						);
 					foreach (var dr in drs)
 					{

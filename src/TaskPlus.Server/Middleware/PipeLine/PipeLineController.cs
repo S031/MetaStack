@@ -3,11 +3,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using S031.MetaStack.Actions;
+using S031.MetaStack.Integral.Security;
 using S031.MetaStack.Json;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using TaskPlus.Server.Actions;
 using TaskPlus.Server.Logging;
+using TaskPlus.Server.Security;
 
 namespace TaskPlus.Server.Middleware
 {
@@ -17,6 +19,11 @@ namespace TaskPlus.Server.Middleware
 		private readonly PipeLineRouteValues _routeValues;
 		private readonly HttpContext _context;
 		private readonly IConfiguration _config;
+		private readonly IUserManager _userManager;
+		private readonly IActionManager _actionManager;
+
+		private static UserInfo _guest= UserManager.GetCurrentPrincipal();
+
 
 		public PipeLineController(HttpContext context)
 		{
@@ -30,18 +37,23 @@ namespace TaskPlus.Server.Middleware
 			_routeValues = _context
 				.AddItem<PipeLineRouteValues>(new PipeLineRouteValues(_context))
 				.GetItem<PipeLineRouteValues>();
+			_actionManager = _context
+				.RequestServices
+				.GetRequiredService<IActionManager>();
+			_userManager = _context
+				.RequestServices
+				.GetRequiredService<IUserManager>();
 		}
 
 		public async Task ProcessMessage()
 		{
 			ActionResult<JsonObject> result;
-			IActionManager am = _context.RequestServices.GetRequiredService<IActionManager>();
 			string actionID = (string)_routeValues.Action;
-			ActionInfo ai = am.GetActionInfo(actionID);
+			ActionInfo ai = _actionManager.GetActionInfo(actionID);
 			ActionContext ctx = new ActionContext(_context.RequestServices);
 			if (ai.AuthenticationRequired)
 			{
-
+				var ui = _userManager.GetUserInfo("login");
 			}
 
 			//switch (_routeValues.ToString())
@@ -67,6 +79,7 @@ namespace TaskPlus.Server.Middleware
 			//		break;
 			//}
 		}
+
 
 		private void LoggingSpeedTest()
 		{

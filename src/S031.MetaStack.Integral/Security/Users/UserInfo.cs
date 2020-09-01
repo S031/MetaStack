@@ -25,6 +25,8 @@ namespace S031.MetaStack.Integral.Security
 		public string Name { get; set; }
 		public int PersonID { get; set; }
 		public int AccessLevelID { get; set; }
+		public List<string> Roles { get; private set; } = new List<string>();
+		public List<UserLogin> UserLogins { get; private set; } = new List<UserLogin>();
 
 		/// <summary>
 		/// Serialize <see cref="ActionInfo"/> to json string
@@ -57,16 +59,6 @@ namespace S031.MetaStack.Integral.Security
 			WriteIdentityRaw(writer, this.Identity as ClaimsIdentity);
 			writer.WriteEndObject();
 
-			//writer.WritePropertyName("Claims");
-			//writer.WriteStartArray();
-			//foreach (var claim in Claims)
-			//{
-			//	writer.WriteStartObject();
-			//	WriteClaimRaw(writer, claim);
-			//	writer.WriteEndObject();
-			//}
-			//writer.WriteEndArray();
-			
 			writer.WritePropertyName("Identities");
 			writer.WriteStartArray();
 			foreach (var idn in Identities)
@@ -75,6 +67,18 @@ namespace S031.MetaStack.Integral.Security
 				WriteIdentityRaw(writer, idn);
 				writer.WriteEndObject();
 			}
+			writer.WriteEndArray();
+
+			writer.WritePropertyName("Roles");
+			writer.WriteStartArray();
+			foreach (var role in Roles)
+				writer.WriteValue(role);
+			writer.WriteEndArray();
+
+			writer.WritePropertyName("UserLogins");
+			writer.WriteStartArray();
+			foreach (var login in UserLogins)
+				login.ToJson(writer);
 			writer.WriteEndArray();
 		}
 		private static void WriteIdentityRaw(JsonWriter writer, ClaimsIdentity idn)
@@ -143,6 +147,14 @@ namespace S031.MetaStack.Integral.Security
 			AccessLevelID = j.GetIntOrDefault("AccessLevelID");
 			DomainName = j.GetStringOrDefault("DomainName");
 			Name = j.GetStringOrDefault("Name");
+
+			if (j.TryGetValue("UserLogins", out JsonArray a))
+				foreach (JsonObject obj in a)
+					UserLogins.Add(new UserLogin(obj));
+
+			if (j.TryGetValue("Roles", out a))
+				foreach (string role in a)
+					Roles.Add(role);
 		}
 	}
 }

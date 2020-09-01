@@ -1,4 +1,6 @@
-﻿using S031.MetaStack.Data;
+﻿using S031.MetaStack.Common;
+using S031.MetaStack.Data;
+using S031.MetaStack.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -10,46 +12,45 @@ namespace S031.MetaStack.Integral.Security
 {
 	public class UserManagerBase: IUserManager
 	{
-		private const string sql_get_user_info = @"
-			SELECT u.ID,
-				   u.StructuralUnitID,
-				   u.AccessLevelID,
-				   u.UserName,
-				   COALESCE(u.DomainName, '') as DomainName,
-				   COALESCE(u.PersonID, 0) as PersonID,
-				   COALESCE(u.Name, '') as Name,
-				   Upper(COALESCE(r.RoleName, 'SYS.PUBLIC')) as RoleName
-			FROM Users u
-			left join Users2Roles ur on u.ID = ur.UserID
-			left join Roles r on r.ID = ur.RoleID
-			where u.UserName LIKE '{0}'";
-		
-		private const string sql_get_user_info_2 = @"
+		private const string _sql_get_user_info_2 = @"
 			select u.ID,
-				   u.StructuralUnitID,
-				   u.AccessLevelID,
-				   u.UserName,
-				   COALESCE(u.DomainName, '') as DomainName,
-				   COALESCE(u.PersonID, 0) as PersonID,
-				   COALESCE(u.Name, '') as Name			
+					,u.StructuralUnitID
+					,u.AccessLevelID
+					,u.UserName
+					,COALESCE(u.DomainName, '') as DomainName
+					,COALESCE(u.PersonID, 0) as PersonID
+					,COALESCE(u.Name, '') as Name
+					,COALESCE(u.JData, '') as JData
 			from Users u
-			where u.UserName LIKE '{}';
+			where u.UserName LIKE '{0}';
 			select 
 				Upper(r.RoleName) as RoleName
 			from Users u
 			inner join Users2Roles ur on u.ID = ur.UserID
 			inner join Roles r on r.ID = ur.RoleID
-			where u.UserName LIKE 'hq\svostrikov'";
+			where u.UserName LIKE '{0}'";
 
 		protected MdbContext mdb;
 
-		async Task<UserInfo> GetUserInfoAsync(string login)
+		public async Task<UserInfo> GetUserInfoAsync(string login)
 		{
-
+			var dr = await mdb.GetReadersAsync(_sql_get_user_info_2.ToFormat(login));
+			UserInfo ui = null;
+			if (dr[0].Read()) 
+			{
+				ui = JsonSerializer.DeserializeObject<UserInfo>((string)dr[0]["JData"]);
+				if (dr[1].Read())
+				{
+					ui.Roles.Add((string)dr[1]["RoleName"]);
+				}
+			}
+			dr[0].Dispose();
+			dr[1].Dispose();
+			return ui;
 		}
-		UserInfo GetUserInfo(string login) 
-		{ 
-			throw new NotImplementedException();
-		}
+		public UserInfo GetUserInfo(string login)
+			=> GetUserInfoAsync(login)
+			.GetAwaiter()
+			.GetResult();
 	}
 }
