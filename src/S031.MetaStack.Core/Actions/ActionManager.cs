@@ -87,9 +87,8 @@ namespace S031.MetaStack.Core.Actions
 				_schemaName = "SysCat.";
 		}
 
-		public DataPackage Execute(string actionID, DataPackage inParamStor)
+		public DataPackage Execute(ActionInfo ai, DataPackage inParamStor)
 		{
-			ActionInfo ai = GetActionInfo(actionID);
 			try
 			{
 				return ExecuteInternal(ai, inParamStor);
@@ -104,9 +103,8 @@ namespace S031.MetaStack.Core.Actions
 				throw;
 			}
 		}
-		public async Task<DataPackage> ExecuteAsync(string actionID, DataPackage inParamStor)
+		public async Task<DataPackage> ExecuteAsync(ActionInfo ai, DataPackage inParamStor)
 		{
-			ActionInfo ai = GetActionInfo(actionID);
 			try
 			{
 				return await ExecuteInternalAsync(ai, inParamStor);

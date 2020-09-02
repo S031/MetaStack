@@ -54,20 +54,21 @@ namespace S031.MetaStack.Integral.Security
 			writer.WriteProperty("Name", Name);
 			writer.WriteProperty("PersonID", PersonID);
 			writer.WriteProperty("AccessLevelID", AccessLevelID);
+			
 			writer.WritePropertyName("Identity");
 			writer.WriteStartObject();
 			WriteIdentityRaw(writer, this.Identity as ClaimsIdentity);
 			writer.WriteEndObject();
 
-			writer.WritePropertyName("Identities");
-			writer.WriteStartArray();
-			foreach (var idn in Identities)
-			{
-				writer.WriteStartObject();
-				WriteIdentityRaw(writer, idn);
-				writer.WriteEndObject();
-			}
-			writer.WriteEndArray();
+			//writer.WritePropertyName("Identities");
+			//writer.WriteStartArray();
+			//foreach (var idn in Identities)
+			//{
+			//	writer.WriteStartObject();
+			//	WriteIdentityRaw(writer, idn);
+			//	writer.WriteEndObject();
+			//}
+			//writer.WriteEndArray();
 
 			writer.WritePropertyName("Roles");
 			writer.WriteStartArray();
@@ -88,8 +89,8 @@ namespace S031.MetaStack.Integral.Security
 				writer.WriteProperty("Name", idn.Name);
 				writer.WriteProperty("AuthenticationType", idn.AuthenticationType);
 				writer.WriteProperty("Label", idn.Label);
-				writer.WriteProperty("RoleClaimType", idn.RoleClaimType);
-				writer.WriteProperty("NameClaimType", idn.NameClaimType);
+				writer.WriteProperty("RoleClaimType", ClaimsTypes.GetKey(idn.RoleClaimType));
+				writer.WriteProperty("NameClaimType", ClaimsTypes.GetKey(idn.NameClaimType));
 				writer.WritePropertyName("Claims");
 				writer.WriteStartArray();
 				foreach (var claim in idn.Claims)
@@ -104,9 +105,9 @@ namespace S031.MetaStack.Integral.Security
 		private static void WriteClaimRaw(JsonWriter writer, Claim claim)
 		{
 			writer.WriteProperty("Issuer", claim.Issuer);
-			writer.WriteProperty("Type", claim.Type);
-			writer.WriteProperty("Value", claim.Value);
-			writer.WriteProperty("ValueType", claim.ValueType);
+			writer.WriteProperty("Type",  ClaimsTypes.GetKey(claim.Type));
+			writer.WriteProperty("Value",  claim.Value);
+			writer.WriteProperty("ValueType",  ClaimsTypes.GetTypeKey(claim.ValueType));
 		}
 		
 		/// <summary>
@@ -116,7 +117,6 @@ namespace S031.MetaStack.Integral.Security
 		/// <returns>json string</returns>
 		public static UserInfo ReadFrom(string serializedJsonString)
 			=>new UserInfo(new JsonReader(serializedJsonString).Read());
-
 		public UserInfo(JsonValue source)
 			: this(CreateIdentityFromJson((JsonObject)source))
 		{
@@ -131,8 +131,9 @@ namespace S031.MetaStack.Integral.Security
 				if (o.TryGetValue("Claims", out JsonArray a))
 					foreach (JsonObject obj in a)
 						idn.AddClaim(new Claim(
-							obj.GetStringOrDefault("Type"),
-							obj.GetStringOrDefault("Value")));
+							ClaimsTypes.GetValue(obj.GetStringOrDefault("Type")),
+							obj.GetStringOrDefault("Value"),
+							ClaimsTypes.GetValue(obj.GetStringOrDefault("ValueType"))));
 
 				return idn;
 			}

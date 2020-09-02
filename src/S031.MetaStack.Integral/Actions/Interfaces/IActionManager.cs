@@ -6,8 +6,8 @@ namespace S031.MetaStack.Actions
 {
 	public interface IActionManager
 	{
-		DataPackage Execute(string actionID, DataPackage inParamStor);
-		Task<DataPackage> ExecuteAsync(string actionID, DataPackage inParamStor);
+		DataPackage Execute(ActionInfo ai, DataPackage inParamStor);
+		Task<DataPackage> ExecuteAsync(ActionInfo ai, DataPackage inParamStor);
 		ActionInfo GetActionInfo(string actionID);
 		Task<ActionInfo> GetActionInfoAsync(string actionID);
 	}

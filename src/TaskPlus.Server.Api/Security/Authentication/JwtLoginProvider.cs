@@ -112,9 +112,6 @@ namespace TaskPlus.Server.Security
 				signingCredentials: credentials);
 		}
 
-		private const string _sql_get_user_info = @"
-
-		";
 	}
 
 	public class JwtLoginProvider2

@@ -31,14 +31,13 @@ namespace TaskPlus.Server.Actions
 				.GetContext(Strings.SysCatConnection);
 		}
 
-		public override DataPackage Execute(string actionID, DataPackage inParamStor)
+		public override DataPackage Execute(ActionInfo ai, DataPackage inParamStor)
 		{
 			throw new NotImplementedException();
 		}
 
-		public override async Task<DataPackage> ExecuteAsync(string actionID, DataPackage inParamStor)
+		public override async Task<DataPackage> ExecuteAsync(ActionInfo ai, DataPackage inParamStor)
 		{
-			ActionInfo ai = GetActionInfo(actionID);
 			try
 			{
 				return await ExecuteInternalAsync(ai, inParamStor);

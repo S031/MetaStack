@@ -3,6 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using S031.MetaStack.Actions;
+using S031.MetaStack.Buffers;
+using S031.MetaStack.Data;
 using S031.MetaStack.Integral.Security;
 using S031.MetaStack.Json;
 using System.Collections.Generic;
@@ -22,7 +24,7 @@ namespace TaskPlus.Server.Middleware
 		private readonly IUserManager _userManager;
 		private readonly IActionManager _actionManager;
 
-		private static UserInfo _guest= UserManager.GetCurrentPrincipal();
+		private static readonly UserInfo _guest= UserManager.GetCurrentPrincipal();
 
 
 		public PipeLineController(HttpContext context)
@@ -44,18 +46,23 @@ namespace TaskPlus.Server.Middleware
 				.RequestServices
 				.GetRequiredService<IUserManager>();
 		}
-
+		/*
+			ArgumentException or SerializationException or FormatException is returned as a 400 BadRequest
+			NotImplementedException or NotSupportedException is returned as a 405 MethodNotAllowed
+			FileNotFoundException is return as 404 NotFound
+			AuthenticationException is returned as 401 Unauthorized
+			UnauthorizedAccessException is returned as 403 Forbidden
+			OptimisticConcurrencyException is returned as 409 Conflict
+			All Other normal C# Exceptions are returned as 500 InternalServerError
+		 */
 		public async Task ProcessMessage()
 		{
 			ActionResult<JsonObject> result;
-			string actionID = (string)_routeValues.Action;
-			ActionInfo ai = _actionManager.GetActionInfo(actionID);
-			ActionContext ctx = new ActionContext(_context.RequestServices);
-			if (ai.AuthenticationRequired)
-			{
-				var ui = _userManager.GetUserInfo("login");
-			}
+			ActionInfo ai = await BuildContext();
 
+			if (ai.AsyncMode)
+				await _actionManager.ExecuteAsync(ai, DataPackage.Parse(_context.Request.Body.));
+				
 			//switch (_routeValues.ToString())
 			//{
 			//	case "default/login":
@@ -80,6 +87,24 @@ namespace TaskPlus.Server.Middleware
 			//}
 		}
 
+		private async Task<ActionInfo> BuildContext()
+		{
+			string actionID = (string)_routeValues.Action;
+			ActionInfo ai = await _actionManager.GetActionInfoAsync(actionID);
+			ActionContext ctx = new ActionContext(_context.RequestServices);
+			ctx.CancellationToken = _context.RequestAborted;
+
+			if (ai.AuthenticationRequired)
+			{
+				var ui = _userManager.GetUserInfo("login");
+				ctx.Principal = ui;
+			}
+			else
+				ctx.Principal = _guest;
+
+			ai.SetContext(ctx);
+			return ai;
+		}
 
 		private void LoggingSpeedTest()
 		{

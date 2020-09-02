@@ -65,9 +65,9 @@ namespace S031.MetaStack.Actions
 
 		protected MdbContext SysCatDbContext;
 
-		public abstract DataPackage Execute(string actionID, DataPackage inParamStor);
+		public abstract DataPackage Execute(ActionInfo ai, DataPackage inParamStor);
 
-		public abstract Task<DataPackage> ExecuteAsync(string actionID, DataPackage inParamStor);
+		public abstract Task<DataPackage> ExecuteAsync(ActionInfo ai, DataPackage inParamStor);
 
 		public ActionInfo GetActionInfo(string actionID)
 		{

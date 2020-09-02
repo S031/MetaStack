@@ -48,14 +48,14 @@ namespace TaskPlus.Server.Security
 			objClaim.AddClaim(new Claim(ClaimTypes.Name, name));
 			objClaim.AddClaim(new Claim(ClaimTypes.Email, $"{userName}@{domainName}.{zone}"));
 
-			UserInfo MyPrincipal = new UserInfo(objClaim);
-			MyPrincipal.AccessLevelID = 1;
-			MyPrincipal.DomainName = domainName;
-			MyPrincipal.Name = name;
-			MyPrincipal.PersonID = 0;
-			MyPrincipal.StructuralUnitID = 1;
-			MyPrincipal.Roles.Add("Everyone");
-			return MyPrincipal;
+			UserInfo currentPrincipal = new UserInfo(objClaim);
+			currentPrincipal.AccessLevelID = 1;
+			currentPrincipal.DomainName = domainName;
+			currentPrincipal.Name = name;
+			currentPrincipal.PersonID = 0;
+			currentPrincipal.StructuralUnitID = 1;
+			currentPrincipal.Roles.Add("Everyone");
+			return currentPrincipal;
 		}
 
 	}

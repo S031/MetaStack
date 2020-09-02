@@ -55,9 +55,9 @@ namespace S031.MetaStack.Services
 				}
 				ai.SetContext(actionContext);
 				if (ai.AsyncMode)
-					_result = await am.ExecuteAsync(actionID, _message);
+					_result = await am.ExecuteAsync(ai, _message);
 				else
-					_result = am.Execute(actionID, _message);
+					_result = am.Execute(ai, _message);
 			}
 		}
 	}

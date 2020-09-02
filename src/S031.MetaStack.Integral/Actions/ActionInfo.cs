@@ -26,6 +26,7 @@ namespace S031.MetaStack.Actions
 	public sealed class ActionInfo : InterfaceInfo
 	{
 		public const string ObjectNameForStaticActions = "__default";
+		public ActionInfo() : base(null) { }
 		public string ActionID { get; set; }
 		public string AssemblyID { get; set; }
 		public string ClassName { get; set; }
@@ -72,7 +73,7 @@ namespace S031.MetaStack.Actions
 		/// Serialize content only <see cref="ActionInfo"/> to json string
 		/// </summary>
 		/// <returns>json string</returns>
-		public void ToStringRaw(JsonWriter writer)
+		protected override void ToJsonRaw(JsonWriter writer)
 		{
 			writer.WriteProperty("ActionID", ActionID);
 			writer.WriteProperty("AssemblyID", AssemblyID);
@@ -100,23 +101,9 @@ namespace S031.MetaStack.Actions
 				item.Value.ToJson(writer);
 			writer.WriteEndArray();
 		}
-
-		/// <summary>
-		/// Serialize <see cref="ActionInfo"/> to json string
-		/// </summary>
-		/// <returns>json string</returns>
-		public override string ToString()
+		public override void FromJson(JsonValue source)
 		{
-			JsonWriter w = new JsonWriter(Formatting.None);
-			w.WriteStartObject();
-			ToStringRaw(w);
-			w.WriteEndObject();
-			return w.ToString();
-		}
-
-		public static ActionInfo Create(string serializedJsonString)
-		{
-			JsonObject j = (JsonObject)(new JsonReader(serializedJsonString).Read());
+			JsonObject j = (source as JsonObject);
 			ActionInfo a = new ActionInfo
 			{
 				ActionID = j.GetStringOrDefault("ActionID"),
@@ -190,6 +177,72 @@ namespace S031.MetaStack.Actions
 					a.InterfaceParameters.Add(p);
 				}
 			}
+		}
+		internal ActionInfo(JsonObject j) : base(j) { }
+		public static ActionInfo Parse(string serializedJsonString)
+			=> new ActionInfo((JsonObject)new JsonReader(serializedJsonString).Read());
+		public ActionInfo Clone()
+		{
+			ActionInfo a = new ActionInfo
+			{
+				ActionID = this.ActionID,
+				AssemblyID = this.AssemblyID,
+				ClassName = this.ClassName,
+				Name = this.Name,
+				LogOnError = this.LogOnError,
+				EMailOnError = this.EMailOnError,
+				EMailGroup = this.EMailGroup,
+				TransactionSupport = this.TransactionSupport,
+				WebAuthentication = this.WebAuthentication,
+				AuthenticationRequired = this.AuthenticationRequired,
+				AuthorizationRequired = this.AuthorizationRequired,
+				AsyncMode = this.AsyncMode,
+				IID = this.IID,
+				InterfaceID = this.InterfaceID,
+				InterfaceName = this.InterfaceName,
+				Description = this.Description,
+				MultipleRowsParams = this.MultipleRowsParams,
+				MultipleRowsResult = this.MultipleRowsResult,
+				IsStatic = this.IsStatic
+			};
+			foreach (var kvp in InterfaceParameters)
+			{
+				var v = kvp.Value;
+				var p = new ParamInfo()
+				{
+					ParameterID = v.ParameterID,
+					Dirrect = v.Dirrect,
+					PresentationType = v.PresentationType,
+					Required = v.Required,
+					DefaultValue = v.DefaultValue,
+					IsObjectName = v.IsObjectName,
+					AttribName = v.AttribName,
+					AttribPath = v.AttribPath,
+					Name = v.Name,
+					Position = v.Position,
+					DataType = v.DataType,
+					Width = v.Width,
+					DisplayWidth = v.DisplayWidth,
+					Mask = v.Mask,
+					Format = v.Format,
+					IsPK = v.IsPK,
+					Locate = v.Locate,
+					Visible = v.Visible,
+					ReadOnly = v.ReadOnly,
+					Enabled = v.Enabled,
+					Sorted = v.Sorted,
+					SuperForm = v.SuperForm,
+					SuperObject = v.SuperObject,
+					SuperMethod = v.SuperMethod,
+					SuperFilter = v.SuperFilter,
+					ListItems = v.ListItems,
+					ListData = v.ListData,
+					FieldName = v.FieldName,
+					ConstName = v.ConstName,
+					Agregate = v.Agregate
+				};
+				a.InterfaceParameters.Add(kvp.Key, p);
+			}
 			return a;
 		}
 
@@ -197,6 +250,7 @@ namespace S031.MetaStack.Actions
 		ActionContext _ctx = null;
 		public ActionContext GetContext() => _ctx;
 		public void SetContext(ActionContext context) => _ctx = context;
-//#endif
+
+		//#endif
 	}
 }

@@ -22,5 +22,7 @@ namespace TaskPlus.Server.Actions
 
 		public static ActionResult<T> Unauthorized(T value = null)
 			=> new ActionResult<T>(HttpStatusCode.Unauthorized) { Value = value };
+		public static ActionResult<T> Error(T value = null)
+			=> new ActionResult<T>(HttpStatusCode.Unauthorized) { Value = value };
 	}
 }
