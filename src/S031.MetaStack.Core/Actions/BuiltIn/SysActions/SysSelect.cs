@@ -36,7 +36,7 @@ namespace S031.MetaStack.Core.Actions
 					{
 						Logger = ApplicationContext.GetLogger()
 					})
-						return am.Execute(_body, dp);
+						return am.Execute(am.GetActionInfo(_body), dp);
 				else
 					return f
 						.GetMdbContext(ContextTypes.Work)
@@ -62,7 +62,7 @@ namespace S031.MetaStack.Core.Actions
 					{
 						Logger = ApplicationContext.GetLogger()
 					})
-						return await am.ExecuteAsync(body, dp);
+						return await am.ExecuteAsync(am.GetActionInfo(body), dp);
 				else
 					return await f
 						.GetMdbContext(ContextTypes.Work)

@@ -187,8 +187,8 @@ namespace MetaStack.Test.ORM
 			using (MdbContext mdb = new MdbContext(_ci))
 			using (ActionManager m = new ActionManager(mdb) { Logger = _logger })
 			{
-				var dr = m.Execute("Sys.Select",
-					m.GetActionInfo("Sys.Select")
+				var ai = m.GetActionInfo("Sys.Select");
+				var dr = m.Execute(ai, ai
 					.GetInputParamTable()
 					.AddNew()
 					.SetValue("ParamName", "_viewName")

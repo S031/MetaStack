@@ -8,6 +8,7 @@ using S031.MetaStack.Data;
 using S031.MetaStack.Integral.Security;
 using S031.MetaStack.Json;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using TaskPlus.Server.Actions;
 using TaskPlus.Server.Logging;
@@ -60,8 +61,8 @@ namespace TaskPlus.Server.Middleware
 			ActionResult<JsonObject> result;
 			ActionInfo ai = await BuildContext();
 
-			if (ai.AsyncMode)
-				await _actionManager.ExecuteAsync(ai, DataPackage.Parse(_context.Request.Body.));
+			await _actionManager.ExecuteAsync(ai, 
+				DataPackage.Parse(await new StreamReader(_context.Request.Body).ReadToEndAsync()));
 				
 			//switch (_routeValues.ToString())
 			//{

@@ -79,7 +79,7 @@ namespace S031.MetaStack.WinForms
 				var dr = Execute("Sys.GetActionInfo",
 					new DataPackage(new string[] { "ActionID" }, new object[] { actionID }));
 				if (dr.Read())
-					ai = ActionInfo.Create((string)dr["ActionInfo"]);
+					ai = ActionInfo.Parse((string)dr["ActionInfo"]);
 				else
 					ai = null;
 

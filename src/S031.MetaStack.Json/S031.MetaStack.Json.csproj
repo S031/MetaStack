@@ -18,6 +18,10 @@
     <DefineConstants>TRACE;NO_COMMON</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.1|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="Json\_JsonValue.cs" />
     <Compile Remove="Reader\StringReader.cs" />

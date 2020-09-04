@@ -9,14 +9,15 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using Xunit;
-
+using System.IO;
 
 namespace MetaStack.Test.Json
 {
 	public class MetaStackJsonTest
 	{
 		private static readonly string _sourceJsonString = Encoding.UTF8.GetString(Resources.TestData.TestJson);
-		private static readonly byte[] _sourceJsonData = Resources.TestData.TestJsonData;
+		private static readonly byte[] _sourceJsonArrayData = Resources.TestData.TestJsonData;
+		private static readonly byte[] _sourceJsonData = Resources.TestData.TestJson;
 		private static readonly string _sourceUtf8JsonString = Encoding.UTF8.GetString(_sourceJsonData);
 
 		public MetaStackJsonTest()
@@ -39,6 +40,25 @@ namespace MetaStack.Test.Json
 					var j = new JsonReader(str).Read();
 				}
 				_logger.Debug($"Finish perfomance parse string test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
+				
+				_logger.Debug($"Start perfomance utf8 data parse test");
+				t = DateTime.Now;
+				var stream = new MemoryStream(_sourceJsonData, false);
+				for (i = 0; i < 10_000; i++)
+				{
+					stream.Position = 0;
+					var j = new JsonReader(stream).Read();
+				}
+				_logger.Debug($"Finish perfomance parse utf8 data test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
+				
+				_logger.Debug($"Start perfomance utf8 string parse test");
+				t = DateTime.Now;
+				stream.Position = 0;
+				for (i = 0; i < 10_000; i++)
+				{
+					var j = new JsonReader(Encoding.UTF8.GetString(stream.ToArray())).Read();
+				}
+				_logger.Debug($"Finish perfomance parse utf8 string test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
 
 				_logger.Debug($"Start perfomance ToString test");
 				var json = (JsonObject)new JsonReader(str).Read();
@@ -77,6 +97,16 @@ namespace MetaStack.Test.Json
 			}
 		}
 
+		[Fact]
+		public void JsonUtf8ReaderTest()
+		{
+			using (FileLog _logger = new FileLog(" MetaStackJson.JsonUtf8ReaderTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			{
+				var bs = Encoding.UTF8.GetBytes("{ \"a\": \"Тестовая строка\" }");
+				var json = (JsonObject)new JsonReader(new MemoryStream(bs)).Read();
+				_logger.Debug(json.ToString(Formatting.Indented));
+			}
+		}
 
 		[Fact]
 		public void JsonWriterTest()
@@ -136,7 +166,7 @@ namespace MetaStack.Test.Json
 				}
 				var str = a.ToString();
 				logger.Debug(str);
-				a = ActionInfo.Create(str);
+				a = ActionInfo.Parse(str);
 				Assert.Equal(str, a.ToString());
 				var json = (JsonObject)(new JsonReader(str).Read());
 				logger.Debug((string)json["InterfaceParameters"][2]["Agregate"]);

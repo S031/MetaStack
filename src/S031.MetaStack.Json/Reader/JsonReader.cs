@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
@@ -47,6 +48,13 @@ namespace S031.MetaStack.Json
 			_len = source.Length;
 			_r = source;
 		}
+
+		public JsonReader(byte[] utf8data)
+			: this(Encoding.UTF8.GetString(utf8data)) { }
+
+		public JsonReader(Stream utf8data)
+			: this(new StreamReader(utf8data, Encoding.UTF8, false, 1024, true).ReadToEnd()) { }
+
 
 		public JsonValue Read()
 		{
