@@ -31,7 +31,7 @@ namespace TaskPlus.Server.Data
 		/// <returns></returns>
 		public MdbContext GetContext(string connectionName)
 		{
-			var c = _config.GetValue<string>("appSettings:{connectionName}");
+			var c = _config.GetValue<string>($"appSettings:{connectionName}");
 			if (!string.IsNullOrEmpty(c))
 				connectionName = c;
 

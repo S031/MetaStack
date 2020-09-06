@@ -21,14 +21,14 @@ namespace TaskPlus.Server.Security
 		private readonly IServiceProvider _services;
 		private readonly IConfiguration _config;
 		private readonly ILogger _logger;
-		private readonly IBasicAuthorizationProvider _authorizationProvider;
+		private readonly IAuthorizationProvider _authorizationProvider;
 
 		public UserManager(IServiceProvider services)
 		{
 			_services = services;
 			_config = services.GetRequiredService<IConfiguration>();
 			_logger = services.GetRequiredService<ILogger>();
-			_authorizationProvider = services.GetRequiredService<IBasicAuthorizationProvider>();
+			_authorizationProvider = services.GetRequiredService<IAuthorizationProvider>();
 			mdb = services
 				.GetRequiredService<IMdbContextFactory>()
 				.GetContext(Strings.SysCatConnection);

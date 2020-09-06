@@ -12,10 +12,11 @@ namespace TaskPlus.Server.Actions
 		public static IDictionary<string, ActionInfo> CreateActionsList()
 		{
 			MapTable<string, ActionInfo> actions = new MapTable<string, ActionInfo>();
+
             #region Sys.LoginRequest
             ActionInfo ai = new ActionInfo()
             {
-                ActionID = "Sys.LoginRequest",
+                ActionID = "login",
                 AssemblyID = typeof(ActionsListInternal).Assembly.GetWorkName(),
                 AsyncMode = false,
                 AuthenticationRequired = false,

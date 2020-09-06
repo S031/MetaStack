@@ -8,12 +8,12 @@ namespace TaskPlus.Server.Security
 {
 	public class UserAuthorizationProvider : IAuthorizationProvider
 	{
-		public bool HasPermission(ActionInfo actionInfo, UserInfo user)
+		public bool HasPermission(ActionInfo actionInfo, string objectName)
 		{
 			throw new NotImplementedException();
 		}
 
-		public Task<bool> HasPermissionAsync(ActionInfo actionInfo, UserInfo user)
+		public Task<bool> HasPermissionAsync(ActionInfo actionInfo, string objectName)
 		{
 			throw new NotImplementedException();
 		}
