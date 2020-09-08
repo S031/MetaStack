@@ -23,6 +23,8 @@ namespace TaskPlus.Server.Security
 		private readonly ILogger _logger;
 		private readonly IAuthorizationProvider _authorizationProvider;
 
+		private static readonly MapTable<string, UserInfo> _uiCache = new MapTable<string, UserInfo>();
+
 		public UserManager(IServiceProvider services)
 		{
 			_services = services;
@@ -33,7 +35,16 @@ namespace TaskPlus.Server.Security
 				.GetRequiredService<IMdbContextFactory>()
 				.GetContext(Strings.SysCatConnection);
 		}
-		
+		public async override Task<UserInfo> GetUserInfoAsync(string login)
+		{
+			if (!_uiCache.TryGetValue(login, out UserInfo ui))
+			{
+				ui = await base.GetUserInfoAsync(login);
+				//if user not exists added null value
+				_uiCache.TryAdd(login, ui);
+			}
+			return ui;
+		}
 		public static UserInfo GetCurrentPrincipal()
 		{
 			string userName = Environment.UserName;

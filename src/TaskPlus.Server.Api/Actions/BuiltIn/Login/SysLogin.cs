@@ -25,9 +25,20 @@ namespace TaskPlus.Server.Actions
 				.Update();
 		}
 
-		public Task<DataPackage> InvokeAsync(ActionInfo ai, DataPackage dp)
+		public async Task<DataPackage> InvokeAsync(ActionInfo ai, DataPackage dp)
 		{
-			throw new InvalidOperationException("This action can not be executed in asynchronous mode");
+			ActionContext ctx = ai.GetContext();
+			string userName = (string)dp["UserName"];
+			string password = (string)dp["Password"];
+			var key = await ctx
+				.Services
+				.GetService<ILoginProvider>()
+				.LoginRequestAsync(userName, password);
+
+			return  ai.GetOutputParamTable()
+				.AddNew()
+				.SetValue("LoginInfo", key)
+				.Update();
 		}
 	}
 	internal class SysLogon : IAppEvaluator

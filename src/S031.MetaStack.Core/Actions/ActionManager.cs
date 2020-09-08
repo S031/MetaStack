@@ -150,7 +150,7 @@ namespace S031.MetaStack.Core.Actions
 				.GetAuthorizationProvider()
 				.HasPermissionAsync(ai, objectName))
 				//!!! GetSchema for objectName && put name of object to message
-				throw new AuthorizationExceptions(ai.GetAuthorizationExceptionsMessage(objectName));
+				throw new UnauthorizedAccessException(ai.GetAuthorizationExceptionsMessage(objectName));
 		}
 
 		private static IAppEvaluator CreateEvaluator(ActionInfo ai, DataPackage inParamStor)

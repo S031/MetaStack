@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
@@ -53,7 +54,7 @@ namespace S031.MetaStack.Core.Security
 				if (sessions.Count <= _maxUserSessions)
 					sessions.Add(loginInfo.SessionID, loginInfo);
 				else
-					throw new AuthenticationExceptions($"Invaliod session count for user {userName}, must be less then {_maxUserSessions}");
+					throw new AuthenticationException($"Invaliod session count for user {userName}, must be less then {_maxUserSessions}");
 			else
 				_users.Add(userName, new MapTable<Guid, LoginInfo>() { { loginInfo.SessionID, loginInfo } });
 
@@ -80,12 +81,12 @@ namespace S031.MetaStack.Core.Security
 			Guid sessionUID = new Guid(sessionID);
 			if (!_users.ContainsKey(userName) ||
 				!_users[userName].TryGetValue(sessionUID, out LoginInfo loginInfo))
-				throw new AuthenticationExceptions($"Timeout logon for user {userName} expired, or not LoginRequest called before");
+				throw new AuthenticationException($"Timeout logon for user {userName} expired, or not LoginRequest called before");
 
 			if (loginInfo.IsLogedOn())
 			{
 				if (!CheckTicket(loginInfo, encryptedKey.ToByteArray(), this.CheckTicketTimeout))
-					throw new AuthenticationExceptions($"Invaliod session ticked for user {userName}");
+					throw new AuthenticationException($"Invaliod session ticked for user {userName}");
 			}
 			else if (CheckPassword(userName, loginInfo, encryptedKey.ToByteArray()))
 				loginInfo.EmmitTicket();
@@ -122,7 +123,7 @@ namespace S031.MetaStack.Core.Security
 			else if (CheckTicket(loginInfo, encryptedKey.ToByteArray(), this.CheckTicketTimeout))
 				RemoveSession(userName, sessionUID);
 			else
-				throw new AuthenticationExceptions($"Invaliod session ticked");
+				throw new AuthenticationException($"Invaliod session ticked");
 
 		}
 
@@ -139,13 +140,13 @@ namespace S031.MetaStack.Core.Security
 				{
 					double ms = BitConverter.ToDouble(data, 16);
 					if (Math.Abs((DateTime.Now - DateTime.Now.Date).TotalMilliseconds - ms) > checkTicketTimeout)
-						throw new AuthenticationExceptions("Bad message timestamp");
+						throw new AuthenticationException("Bad message timestamp");
 				}
 				return loginInfo.Ticket.Equals(ticket);
 			}
 			catch (Exception ex)
 			{
-				throw new AuthenticationExceptions($"Incorrect session ticked data (inner exception:{ex.Message})");
+				throw new AuthenticationException($"Incorrect session ticked data (inner exception:{ex.Message})");
 			}
 		}
 
@@ -163,7 +164,7 @@ namespace S031.MetaStack.Core.Security
 			}
 			catch (Exception ex)
 			{
-				throw new AuthenticationExceptions($"Incorrect password for user {userName} ({ex.Message})");
+				throw new AuthenticationException($"Incorrect password for user {userName} ({ex.Message})");
 			}
 		}
 

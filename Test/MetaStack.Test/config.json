@@ -20,7 +20,7 @@
       "Description": "SQLite connection fo SysCat",
       "SchemaSupport": false,
       "providerName": "System.Data.Sqlite",
-      "connectionString": "Data Source=C:\\Source\\Repos\\MetaStack\\src\\S031.MetaStack.AppServer\\DB\\SysCat.db; Mode=Memory; Cache=Shared"
+      "connectionString": "Data Source=DB\\SysCat.db; Mode=Memory; Cache=Shared"
     },
     "test": {
       "Description": "Virtual SQL Express 2017 server",

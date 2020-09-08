@@ -1,22 +1,19 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using S031.MetaStack.Actions;
-using S031.MetaStack.Buffers;
 using S031.MetaStack.Common;
 using S031.MetaStack.Data;
 using S031.MetaStack.Integral.Security;
-using S031.MetaStack.Json;
+using S031.MetaStack.Security;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Runtime.Serialization;
-using System.Security.AccessControl;
+using System.Security.Authentication;
 using System.Threading.Tasks;
-using TaskPlus.Server.Actions;
 using TaskPlus.Server.Logging;
 using TaskPlus.Server.Security;
 
@@ -30,6 +27,7 @@ namespace TaskPlus.Server.Middleware
 		private readonly IConfiguration _config;
 		private readonly IUserManager _userManager;
 		private readonly IActionManager _actionManager;
+		private readonly ILoginProvider _loginProvider;
 
 		private static readonly UserInfo _guest = UserManager.GetCurrentPrincipal();
 
@@ -37,32 +35,26 @@ namespace TaskPlus.Server.Middleware
 		public PipeLineController(HttpContext context)
 		{
 			_context = context;
-			_config = _context
-				.RequestServices
-				.GetRequiredService<IConfiguration>();
-			_logger = _context
-				.RequestServices
-				.GetRequiredService<ILogger>();
+			var services = _context.RequestServices;
+			_config = services.GetRequiredService<IConfiguration>();
+			_logger = services.GetRequiredService<ILogger>();
+			_actionManager = services.GetRequiredService<IActionManager>();
+			_userManager = services.GetRequiredService<IUserManager>();
+			_loginProvider = services.GetRequiredService<ILoginProvider>();
 			_routeValues = _context
 				.AddItem<PipeLineRouteValues>(new PipeLineRouteValues(_context))
 				.GetItem<PipeLineRouteValues>();
-			_actionManager = _context
-				.RequestServices
-				.GetRequiredService<IActionManager>();
-			_userManager = _context
-				.RequestServices
-				.GetRequiredService<IUserManager>();
 		}
 		public async Task ProcessMessage()
 		{
 			HttpStatusCode resultCode = HttpStatusCode.OK;
-			ActionInfo ai = await BuildContext();
 			DataPackage response;
 
 			try
 			{
+				ActionInfo ai = await BuildContext();
 				response = await _actionManager.ExecuteAsync(ai,
-					DataPackage.Parse(await new StreamReader(_context.Request.Body).ReadToEndAsync()));
+					DataPackage.Parse(8, await new StreamReader(_context.Request.Body).ReadToEndAsync()));
 			}
 			catch (Exception ex)
 			{
@@ -71,29 +63,6 @@ namespace TaskPlus.Server.Middleware
 			}
 			_context.Response.StatusCode = (int)resultCode;
 			await _context.Response.WriteAsync(response.ToString());
-
-			//switch (_routeValues.ToString())
-			//{
-			//	case "default/login":
-			//		result = new JwtLoginProvider(_context).Login();
-			//		_context.Response.StatusCode = (int)result.StatusCode;
-			//		string token = result.Value.ToString(Formatting.Indented);
-			//		_logger.LogDebug(token);
-			//		await 
-			//		break;
-			//	case "logger/test":
-			//		DateTime time = DateTime.Now;
-			//		//LoggingSpeedTest();
-			//		await ActionManagerCreationSpeedTest();
-			//		await _context.Response.WriteAsync($"operation time = {(DateTime.Now - time).TotalMilliseconds}");
-			//		await _context.Response.WriteAsync($"API version={_routeValues.Version}, Controller={_routeValues.Controller}, Action={_routeValues.Action}, AuthenticationType={_context.User.Identity.AuthenticationType}, Authenticated={_context.User.Identity.IsAuthenticated}");
-			//		break;
-			//	default:
-			//		result = new JwtLoginProvider(_context).Logon();
-			//		_context.Response.StatusCode = (int)result.StatusCode;
-			//		await _context.Response.WriteAsync($"API version={_routeValues.Version}, Controller={_routeValues.Controller}, Action={_routeValues.Action}, AuthenticationType={_context.User.Identity.AuthenticationType}, Authenticated={_context.User.Identity.IsAuthenticated}");
-			//		break;
-			//}
 		}
 
 		private async Task<ActionInfo> BuildContext()
@@ -107,7 +76,7 @@ namespace TaskPlus.Server.Middleware
 
 			if (ai.AuthenticationRequired)
 			{
-				var ui = _userManager.GetUserInfo("login");
+				var ui = await _loginProvider.LogonAsync(GetToken());
 				ctx.Principal = ui;
 			}
 			else
@@ -115,6 +84,18 @@ namespace TaskPlus.Server.Middleware
 
 			ai.SetContext(ctx);
 			return ai;
+		}
+
+		private string GetToken()
+		{
+			string token = string.Empty;
+			if (_context.Request.Headers.TryGetValue("Authorization", out var values))
+			{
+				string value = values[0];
+				if (value.StartsWith("Bearer "))
+					token = value.Substring(7);
+			}
+			return token;
 		}
 
 		/*
@@ -135,7 +116,7 @@ namespace TaskPlus.Server.Middleware
 				(typeof(NotImplementedException), HttpStatusCode.MethodNotAllowed),
 				(typeof(NotSupportedException), HttpStatusCode.MethodNotAllowed),
 				(typeof(FileNotFoundException), HttpStatusCode.NotFound),
-				(typeof(System.Security.Authentication.AuthenticationException), HttpStatusCode.Unauthorized),
+				(typeof(AuthenticationException), HttpStatusCode.Unauthorized),
 				(typeof(UnauthorizedAccessException), HttpStatusCode.Forbidden),
 				(typeof(Exception), HttpStatusCode.InternalServerError)
 			);

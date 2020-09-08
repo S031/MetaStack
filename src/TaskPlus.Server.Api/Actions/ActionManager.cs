@@ -80,7 +80,7 @@ namespace TaskPlus.Server.Actions
 			}
 			if (!await _authorizationProvider.HasPermissionAsync(ai, objectName))
 				//!!! GetSchema for objectName && put name of object to message
-				throw new AuthorizationExceptions(ai.GetAuthorizationExceptionsMessage(objectName));
+				throw new UnauthorizedAccessException(ai.GetAuthorizationExceptionsMessage(objectName));
 		}
 
 		private static IAppEvaluator CreateEvaluator(ActionInfo ai, DataPackage inParamStor)

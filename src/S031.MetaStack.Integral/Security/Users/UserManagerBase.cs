@@ -13,7 +13,7 @@ namespace S031.MetaStack.Integral.Security
 	public class UserManagerBase: IUserManager
 	{
 		private const string _sql_get_user_info_2 = @"
-			select u.ID,
+			select u.ID
 					,u.StructuralUnitID
 					,u.AccessLevelID
 					,u.UserName
@@ -32,7 +32,12 @@ namespace S031.MetaStack.Integral.Security
 
 		protected MdbContext mdb;
 
-		public async Task<UserInfo> GetUserInfoAsync(string login)
+		/// <summary>
+		/// Null - if login not found no catalog
+		/// </summary>
+		/// <param name="login"></param>
+		/// <returns></returns>
+		public virtual async Task<UserInfo> GetUserInfoAsync(string login)
 		{
 			var dr = await mdb.GetReadersAsync(_sql_get_user_info_2.ToFormat(login));
 			UserInfo ui = null;
@@ -48,7 +53,7 @@ namespace S031.MetaStack.Integral.Security
 			dr[1].Dispose();
 			return ui;
 		}
-		public UserInfo GetUserInfo(string login)
+		public virtual UserInfo GetUserInfo(string login)
 			=> GetUserInfoAsync(login)
 			.GetAwaiter()
 			.GetResult();

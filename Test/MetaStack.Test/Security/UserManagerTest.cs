@@ -3,6 +3,7 @@ using S031.MetaStack.Integral.Security;
 using S031.MetaStack.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
@@ -24,7 +25,7 @@ namespace MetaStack.Test.Security
 			var u = GetCustomPrincipal();
 			using (FileLog _logger = new FileLog("MetaStackSecurity.GetUserInfoTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
-				string s = u.ToString(S031.MetaStack.Json.Formatting.Indented);
+				string s = u.ToString(S031.MetaStack.Json.Formatting.None);
 				_logger.Debug(s);
 				u = UserInfo.ReadFrom(s);
 				s = u.ToString(S031.MetaStack.Json.Formatting.Indented);
@@ -70,21 +71,25 @@ namespace MetaStack.Test.Security
 		private static UserInfo GetCustomPrincipal()
 		{
 			string userName = Environment.UserName;
-			string name = "Joe Smith";
+			string domainName = Environment.UserDomainName.ToLower();
+			string name = $@"{domainName}\{userName}";
+			string region = new RegionInfo(CultureInfo.CurrentCulture.LCID).TwoLetterISORegionName.ToLower();
+			string zone = region == "en" ? "com" : region;
 
 			ClaimsIdentity objClaim = new ClaimsIdentity("Basic", ClaimTypes.Dns, ClaimTypes.Role);
 			objClaim.AddClaim(new Claim(ClaimTypes.Dns, userName));
 			objClaim.AddClaim(new Claim(ClaimTypes.AuthenticationMethod, "Basic"));
 			objClaim.AddClaim(new Claim(ClaimTypes.Name, name));
-			objClaim.AddClaim(new Claim(ClaimTypes.Email, "test@server.com"));
+			objClaim.AddClaim(new Claim(ClaimTypes.Email, $"{userName}@{domainName}.{zone}"));
 
-			UserInfo MyPrincipal = new UserInfo(objClaim);
-			MyPrincipal.AccessLevelID = 1;
-			MyPrincipal.DomainName = "test";
-			MyPrincipal.Name = name;
-			MyPrincipal.PersonID = 0;
-			MyPrincipal.StructuralUnitID = 1;
-			return MyPrincipal;
+			UserInfo currentPrincipal = new UserInfo(objClaim);
+			currentPrincipal.AccessLevelID = 1;
+			currentPrincipal.DomainName = domainName;
+			currentPrincipal.Name = name;
+			currentPrincipal.PersonID = 0;
+			currentPrincipal.StructuralUnitID = 1;
+			currentPrincipal.Roles.Add("Everyone");
+			return currentPrincipal;
 		}
 	}
 }

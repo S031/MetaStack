@@ -25,6 +25,7 @@ namespace S031.MetaStack.Integral.Security
 		public string Name { get; set; }
 		public int PersonID { get; set; }
 		public int AccessLevelID { get; set; }
+		public string PasswordHash { get; set; }
 		public List<string> Roles { get; private set; } = new List<string>();
 		public List<UserLogin> UserLogins { get; private set; } = new List<UserLogin>();
 
@@ -54,6 +55,7 @@ namespace S031.MetaStack.Integral.Security
 			writer.WriteProperty("Name", Name);
 			writer.WriteProperty("PersonID", PersonID);
 			writer.WriteProperty("AccessLevelID", AccessLevelID);
+			writer.WriteProperty("PasswordHash", PasswordHash);
 			
 			writer.WritePropertyName("Identity");
 			writer.WriteStartObject();
@@ -148,6 +150,7 @@ namespace S031.MetaStack.Integral.Security
 			AccessLevelID = j.GetIntOrDefault("AccessLevelID");
 			DomainName = j.GetStringOrDefault("DomainName");
 			Name = j.GetStringOrDefault("Name");
+			PasswordHash = j.GetStringOrDefault("PasswordHash");
 
 			if (j.TryGetValue("UserLogins", out JsonArray a))
 				foreach (JsonObject obj in a)

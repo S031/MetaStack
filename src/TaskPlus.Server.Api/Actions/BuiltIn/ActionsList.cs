@@ -18,7 +18,7 @@ namespace TaskPlus.Server.Actions
             {
                 ActionID = "login",
                 AssemblyID = typeof(ActionsListInternal).Assembly.GetWorkName(),
-                AsyncMode = false,
+                AsyncMode = true,
                 AuthenticationRequired = false,
                 AuthorizationRequired = false,
                 ClassName = typeof(SysLoginRequest).FullName,
