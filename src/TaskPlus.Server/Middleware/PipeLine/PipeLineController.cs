@@ -48,13 +48,21 @@ namespace TaskPlus.Server.Middleware
 		public async Task ProcessMessage()
 		{
 			HttpStatusCode resultCode = HttpStatusCode.OK;
-			DataPackage response;
+			DataPackage response = null;
+			bool multipleRowsResult = false;
 
 			try
 			{
 				ActionInfo ai = await BuildContext();
 				response = await _actionManager.ExecuteAsync(ai,
-					DataPackage.Parse(8, await new StreamReader(_context.Request.Body).ReadToEndAsync()));
+					DataPackage.Parse(0, await new StreamReader(_context.Request.Body).ReadToEndAsync()));
+				//string data = await new StreamReader(_context.Request.Body).ReadToEndAsync();
+				//for (int i = 0; i < 100_000; i++)
+				//{
+				//	response = await _actionManager.ExecuteAsync(ai,
+				//		DataPackage.Parse(0, data));
+				//}
+				multipleRowsResult = ai.MultipleRowsResult;
 			}
 			catch (Exception ex)
 			{
@@ -62,7 +70,13 @@ namespace TaskPlus.Server.Middleware
 				resultCode = GetCodeFromException(ex);
 			}
 			_context.Response.StatusCode = (int)resultCode;
-			await _context.Response.WriteAsync(response.ToString());
+			if (multipleRowsResult)
+				await _context.Response.WriteAsync(response.ToString());
+			else
+			{
+				response.GoDataTop();
+				await _context.Response.WriteAsync(response.GetRowJSON());
+			}
 		}
 
 		private async Task<ActionInfo> BuildContext()
@@ -76,7 +90,7 @@ namespace TaskPlus.Server.Middleware
 
 			if (ai.AuthenticationRequired)
 			{
-				var ui = await _loginProvider.LogonAsync(GetToken());
+				var ui = await _loginProvider.LogonAsync(null, null, GetToken());
 				ctx.Principal = ui;
 			}
 			else

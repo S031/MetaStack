@@ -28,14 +28,16 @@ namespace S031.MetaStack.Security
         {
             using (SHA256 sha256Hash = SHA256.Create())
             {
-                return ComputeHash(sha256Hash, input);
+                return ComputeHash(sha256Hash, input)
+                    .RemoveChar('-');
             }
         }
         public static string ComputeMD5Hash(string input)
         {
             using (MD5 md5 = MD5.Create())
             {
-                return ComputeHash(md5, input);
+                return ComputeHash(md5, input)
+                    .RemoveChar('-');
             }
         }
     }

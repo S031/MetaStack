@@ -71,11 +71,25 @@ namespace TaskPlus.Server.Security
 				GenerateToken(
 					await AuthenticateUserAsync(userName, clientLoginData)));
 
+		/// <summary>
+		////Validate jwt token and retrieve UserInfo
+		/// </summary>
+		/// <param name="userName">Not used</param>
+		/// <param name="sessionID">Not Used</param>
+		/// <param name="encryptedKey">Base64 encoded jwt token</param>
+		/// <returns><see cref="UserInfo"/></returns>
 		public UserInfo Logon(string userName, string sessionID, string encryptedKey)
-		{
-			throw new NotImplementedException();
-		}
+			=> LogonAsync(userName, sessionID, encryptedKey)
+			.GetAwaiter()
+			.GetResult();
 
+		/// <summary>
+		////Validate jwt token and retrieve UserInfo
+		/// </summary>
+		/// <param name="userName">Not used</param>
+		/// <param name="sessionID">Not Used</param>
+		/// <param name="encryptedKey">Base64 encoded jwt token</param>
+		/// <returns><see cref="UserInfo"/></returns>
 		public async Task<UserInfo> LogonAsync(string userName, string sessionID, string encryptedKey)
 		{
 			var login = ValidateToken(encryptedKey);
@@ -138,7 +152,8 @@ namespace TaskPlus.Server.Security
 			TokenValidationParameters validationParameters = new TokenValidationParameters
 			{
 				ValidateIssuer = true,
-				ValidateLifetime = true,
+				ValidateLifetime = true, 
+				ValidateAudience = false,
 				ValidateIssuerSigningKey = true,
 				ValidIssuer = _cs["Jwt:Issuer"],
 				IssuerSigningKey = _securityKey
@@ -146,7 +161,7 @@ namespace TaskPlus.Server.Security
 			try
 			{
 				var p = new JwtSecurityTokenHandler().ValidateToken(jwtToken, validationParameters, out SecurityToken validatedToken);
-				return p.Identity.Name;
+				return p.Claims.FirstOrDefault(claim=>claim.Type == ClaimTypes.Dns)?.Value ;
 			}
 			catch (Exception ex)
 			{

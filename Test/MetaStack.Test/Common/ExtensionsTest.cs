@@ -2,6 +2,7 @@
 using S031.MetaStack.Common.Logging;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Xunit;
 using pair = System.Collections.Generic.KeyValuePair<System.Type, System.ValueType>;
 
@@ -325,6 +326,22 @@ namespace MetaStack.Test.Common
 			return vbo.IsEmpty(value);
 		}
 
+		[Fact]
+		private void ReflectionExtensionsTest()
+		{
+			using (FileLog l = new FileLog("ReflectionExtensionsTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			{
+				DateTime start = DateTime.Now;
+				Type t = this.GetType();
+				for (int i = 0; i < 1_000_000; i++)
+				{
+					//var a = AppDomain.CurrentDomain.GetAssemblies();
+					Assembly.Load("S031.MetaStack.Core");
+				}
+				DateTime stop = DateTime.Now;
+				l.Debug($"AppDomain.CurrentDomain.GetAssemblies Return for 1,000,000 runs {(stop - start).TotalMilliseconds} ms");
+			}
+		}
 	}
 
 	internal static class TestExt

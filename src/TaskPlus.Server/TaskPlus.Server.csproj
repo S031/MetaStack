@@ -19,11 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DB\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="..\S031.MetaStack.AppServer\DB\SysCat.db" Link="DB\SysCat.db">
+    <None Update="DB\SysCat.db">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

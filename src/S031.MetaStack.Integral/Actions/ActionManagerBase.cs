@@ -28,7 +28,7 @@ namespace S031.MetaStack.Actions
 				1 As WebAuthentication,
 				I.ID As IID,
 				I.InterfaceName As InterfaceID,
-				I.Name,
+				I.Name As InterfaceName,
 				COALESCE(I.Description, '') As Description,
 				I.MultipleRowsParams,
 				I.MultipleRowsResult

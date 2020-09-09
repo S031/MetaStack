@@ -9,6 +9,11 @@ using System.Threading.Tasks;
 
 namespace TaskPlus.Server.Data
 {
+	/// <summary>
+	/// !!! Раздклить контексты с постоянным соединением (SQLite) и создаваемые по звапросу (SQLServer и т.д)
+	/// Контехт с постоянным соединением хранить в экзепляре сервиса
+	/// Для пересоздаваемого контекста в переменной сервиса хранить MdbContextFactory
+	/// </summary>
 	public class MdbContextFactory : IMdbContextFactory
 	{
 		private readonly IServiceProvider _services;
@@ -20,7 +25,6 @@ namespace TaskPlus.Server.Data
 			_services = services;
 			_config = services.GetRequiredService<IConfiguration>();
 			_logger = services.GetRequiredService<ILogger>();
-
 		}
 
 		/// <summary>

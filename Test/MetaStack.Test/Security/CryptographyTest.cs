@@ -80,7 +80,7 @@ namespace MetaStack.Test.Security
 
 				var clientAes = Aes.Create()
 					.ImportBin(loginInfo.CryptoKey);
-				string token = loginFactory.Logon(userName, loginInfo.SessionID.ToString(),
+				string token = (loginFactory as BasicLoginProvider).Logon(userName, loginInfo.SessionID.ToString(),
 					clientAes
 					.EncryptBin(Encoding.UTF8.GetBytes(secret))
 					.ToBASE64String());
@@ -92,7 +92,7 @@ namespace MetaStack.Test.Security
 				int i;
 				for (i = 0; i < 10000; i++)
 				{
-					token = loginFactory.Logon(userName, loginInfo.SessionID.ToString(),
+					token = (loginFactory as BasicLoginProvider).Logon(userName, loginInfo.SessionID.ToString(),
 						clientAes.EncryptBin(ticket
 							.ToByteArray()
 							.Concat(BitConverter.GetBytes(DateTime.Now.Millisecond)).ToArray())
@@ -107,6 +107,17 @@ namespace MetaStack.Test.Security
 			var rsa = RSA.Create();
 			rsa.Import(publicKeyBase64String);
 			return rsa;
+		}
+
+		[Fact]
+		private void HashAlgorithmTest()
+		{
+			const string password_str = "@test";
+			using (FileLogger l = new FileLogger("CryptographyTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			{
+				l.Debug($"Password (@test) sha256 hash: {CryptoHelper.ComputeSha256Hash(password_str)}");
+				l.Debug($"Password (@test) md5 hash: {CryptoHelper.ComputeMD5Hash(password_str)}");
+			}
 		}
 	}
 }

@@ -10,20 +10,9 @@ namespace TaskPlus.Server.Actions
 	internal class SysLoginRequest : IAppEvaluator
 	{
 		public DataPackage Invoke(ActionInfo ai, DataPackage dp)
-		{
-			ActionContext ctx = ai.GetContext();
-			string userName = (string)dp["UserName"];
-			string password = (string)dp["Password"];
-			var key = ctx
-				.Services
-				.GetService<ILoginProvider>()
-				.LoginRequest(userName, password);
-
-			return ai.GetOutputParamTable()
-				.AddNew()
-				.SetValue("LoginInfo", key)
-				.Update();
-		}
+			=> InvokeAsync(ai, dp)
+			.GetAwaiter()
+			.GetResult();
 
 		public async Task<DataPackage> InvokeAsync(ActionInfo ai, DataPackage dp)
 		{
@@ -37,7 +26,7 @@ namespace TaskPlus.Server.Actions
 
 			return  ai.GetOutputParamTable()
 				.AddNew()
-				.SetValue("LoginInfo", key)
+				.SetValue("JwtToken", key)
 				.Update();
 		}
 	}

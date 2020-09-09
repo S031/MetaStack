@@ -10,28 +10,76 @@ using System.Threading.Tasks;
 
 namespace S031.MetaStack.Data
 {
-	public sealed partial class DataPackage : IDataReader
+	public sealed partial class DataPackage : JsonSerializible, IDataReader
 	{
-		public override string ToString() => ToString(TsExportFormat.JSON);
-
-		public string ToString(TsExportFormat fmt)
+		public DataPackage(JsonValue source) : base(source) 
 		{
-			if (fmt == TsExportFormat.JSON)
-				return SaveJSON();
-			else
-				throw new NotImplementedException();
-		}
+			var j = source as JsonObject;
+			int headerSpaceSize = (int)j["HeaderSize"];
+			JsonArray columns = (j["Columns"] as JsonArray);
+			JsonArray rows = (j["Rows"] as JsonArray);
 
-		private string SaveJSON()
+			_b = new BinaryDataBuffer(headerSpaceSize * 2);
+			_bw = new BinaryDataWriter(_b);
+			_br = new BinaryDataReader(_b);
+
+			_colCount = columns.Count;
+			bool hasValues = rows != null;
+
+			//headers
+			_headerSpaceSize = headerSpaceSize;
+			_headers = new MapTable<string, object>(StringComparer.Ordinal);
+			JsonObject headers = (JsonObject)j["Headers"];
+			foreach (var pair in headers)
+				_headers.Add(pair.Key, pair.Value?.GetValue());
+
+			//Create col info
+			_indexes = new string[_colCount];
+			_colInfo = new ColumnInfo[_colCount];
+			for (int i = 0; i < _colCount; i++)
+			{
+				var c = columns[i];
+				_indexes[i] = (string)c["Name"];
+				_colInfo[i] = new ColumnInfo()
+				{
+					DataType = MdbTypeMap.GetType((string)c["Type"], typeof(string)), 
+					ColumnSize = (int)c["Size"], 
+					AllowDBNull = (bool)c["AllowNull"]
+				};
+			}
+			WritePackageHeader();
+
+			//values
+			foreach (JsonObject r in rows)
+			{
+				AddNew();
+				foreach (var o in r)
+					SetValue(o.Key, o.Value?.GetValue());
+				Update();
+			}
+			GoDataTop();
+		}
+		/// <summary>
+		/// serialize package to json format
+		/// </summary>
+		/// <param name="exportFormat">reqaired TsExportFormat.JSON</param>
+		/// <returns>json formatted text</returns>
+		public string ToString(TsExportFormat exportFormat)
+			=> ToString();
+		/// <summary>
+		/// serialize current row to json format
+		/// </summary>
+		/// <returns>json formatted test</returns>
+		public string GetStringRow()
 		{
 			JsonWriter writer = new JsonWriter(MetaStack.Json.Formatting.None);
-			ToStringRaw(writer);
+			WriteRowJson(writer);
 			return writer.ToString();
 		}
-
-		private void ToStringRaw(JsonWriter writer)
+		public string GetRowJSON()
+			=> GetStringRow();
+		protected override void ToJsonRaw(JsonWriter writer)
 		{
-			writer.WriteStartObject();
 			writer.WriteProperty("HeaderSize", _headerSpaceSize);
 
 			#region Heders
@@ -70,10 +118,7 @@ namespace S031.MetaStack.Data
 				WriteRowJson(writer);
 			writer.WriteEndArray();
 			#endregion Data
-
-			writer.WriteEndObject();
 		}
-
 		private void WriteRowJson(JsonWriter writer)
 		{
 			writer.WriteStartObject();
@@ -85,57 +130,17 @@ namespace S031.MetaStack.Data
 			writer.WriteEndObject();
 		}
 
-		public string GetRowJSON()
-		{
-			JsonWriter writer = new JsonWriter(MetaStack.Json.Formatting.None);
-			WriteRowJson(writer);
-			return writer.ToString();
-		}
-
 		public static DataPackage Parse(int headerSpaceSize, string jsonString)
 		{
 			JsonObject j = (JsonObject)new JsonReader(jsonString).Read();
 			DataPackage ts = new DataPackage(headerSpaceSize,
 				j.Select(kvp => kvp.Key).ToArray<string>(),
 				j.Select(kvp => kvp.Value?.GetValue()).ToArray<object>());
-			//ts.Update();
 			ts.GoDataTop();
 			return ts;
 		}
-
 		public static DataPackage Parse(string jsonString)
-		{
-			JsonObject j = (JsonObject)new JsonReader(jsonString).Read();
-			int headerSpaceSize = (int)j["HeaderSize"];
-
-			JsonArray columns = (j["Columns"] as JsonArray);
-			JsonArray rows = (j["Rows"] as JsonArray);
-			string[] cis = columns.Select(
-				c => $"{(string)c["Name"]}.{(string)c["Type"]}.{(int)c["Size"]}.{(bool)c["AllowNull"]}")
-				.ToArray();
-			
-			DataPackage ts = new DataPackage(headerSpaceSize, cis, null);
-			JsonObject headers = (JsonObject)j["Headers"];
-			foreach (var pair in headers)
-			{
-				ts.Headers.Add(pair.Key, pair.Value?.GetValue());
-			}
-			ts.UpdateHeaders();
-			foreach (JsonObject r in rows)
-			{
-				ts.AddNew();
-				int i = 0;
-				foreach (var jo in r)
-				{
-					ts[i] = jo.Value?
-						.GetValue()
-						.CastOf(ts.GetFieldType(i));
-					i++;
-				}
-				ts.Update();
-			}
-			ts.GoDataTop();
-			return ts;
-		}
+			=> new DataPackage(new JsonReader(jsonString).Read());
+		public override void FromJson(JsonValue source) { }
 	}
 }

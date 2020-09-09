@@ -6,7 +6,10 @@ using S031.MetaStack.Common;
 using S031.MetaStack.Data;
 using S031.MetaStack.Security;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.Loader;
 using System.Threading.Tasks;
 using TaskPlus.Server.Api.Properties;
 using TaskPlus.Server.Data;
@@ -60,10 +63,11 @@ namespace TaskPlus.Server.Actions
 		
 		private async Task<DataPackage> ExecuteInternalAsync(ActionInfo ai, DataPackage inParamStor)
 		{
-			var se = CreateEvaluator(ai, inParamStor);
 			//!!! AuthorizationRequired remove from sys action list and add test authentication in procedure
 			if (ai.AuthorizationRequired)
 				await AuthorizationAsync(ai, inParamStor);
+			
+			var se = CreateEvaluator(ai, inParamStor);
 			return await se.InvokeAsync(ai, inParamStor);
 		}
 
@@ -83,6 +87,7 @@ namespace TaskPlus.Server.Actions
 				throw new UnauthorizedAccessException(ai.GetAuthorizationExceptionsMessage(objectName));
 		}
 
+		private static readonly MapTable<string, Type> _loadedTypesCache = new MapTable<string, Type>();
 		private static IAppEvaluator CreateEvaluator(ActionInfo ai, DataPackage inParamStor)
 		{
 			var inParams = ai.InterfaceParameters.Where(kvp => kvp.Value.Dirrect == ParamDirrect.Input && kvp.Value.Required).Select(kvp => kvp.Value);
@@ -111,10 +116,18 @@ namespace TaskPlus.Server.Actions
 				}
 				inParamStor.GoDataTop();
 			}
-			IAppEvaluator se = ImplementsList.GetTypes(typeof(IAppEvaluator))
-				.FirstOrDefault(t => t.FullName.Equals(ai.ClassName, StringComparison.Ordinal))?
-				.CreateInstance<IAppEvaluator>();
-			return se;
+
+			if (!_loadedTypesCache.TryGetValue(ai.ClassName, out Type type))
+			{
+				LoadAssembly(ai.AssemblyID);
+				type = ImplementsList.GetTypes(typeof(IAppEvaluator))
+					.FirstOrDefault(t => t.FullName.Equals(ai.ClassName, StringComparison.Ordinal));
+				_loadedTypesCache.TryAdd(ai.ClassName, type);
+			}
+			return type.CreateInstance<IAppEvaluator>();
 		}
+
+		private static Assembly LoadAssembly(string assemblyID) => AssemblyLoadContext.Default.LoadFromAssemblyPath(
+				System.IO.Path.Combine(System.AppContext.BaseDirectory, $"{assemblyID}.dll"));
 	}
 }

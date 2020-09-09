@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using S031.MetaStack.Common;
+using S031.MetaStack.Integral.Security;
 using S031.MetaStack.Security;
 
 namespace S031.MetaStack.Core.Security
@@ -212,6 +213,16 @@ namespace S031.MetaStack.Core.Security
 
 			foreach (var data in expiredInfo)
 				RemoveSession(data.Item1, data.Item2);
+		}
+
+		Task<UserInfo> ILoginProvider.LogonAsync(string userName, string sessionID, string encryptedKey)
+		{
+			throw new NotImplementedException();
+		}
+
+		UserInfo ILoginProvider.Logon(string userName, string sessionID, string encryptedKey)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

@@ -15,7 +15,7 @@ namespace S031.MetaStack.Data
 		JSON,
 		BINARY
 	}
-	public sealed partial class DataPackage : IDataReader
+	public sealed partial class DataPackage : JsonSerializible, IDataReader
 	{
 
 		private struct ColumnInfo
@@ -83,7 +83,7 @@ namespace S031.MetaStack.Data
 		/// using when deserialise <see cref="DataPackage"/> from array created with <see cref="DataPackage.ToArray()"/> methos
 		/// </summary>
 		/// <param name="data"><see cref="byte"/> array created with <see cref="DataPackage.ToArray()"/> methos</param>
-		public DataPackage(byte[] source)
+		public DataPackage(byte[] source):base(null)
 		{
 			_b = (BinaryDataBuffer)source;
 			_br = new BinaryDataReader(_b);
@@ -134,7 +134,7 @@ namespace S031.MetaStack.Data
 		/// <param name="headerSpaceSize">Header size (default 512 bytes)</param>
 		/// <param name="allowDublicate"><see cref="bool"/></param>
 		/// <returns></returns>
-		public DataPackage(IDataReader dr, int headerSpaceSize, bool allowDublicate)
+		public DataPackage(IDataReader dr, int headerSpaceSize, bool allowDublicate):base(null)
 		{
 			_b = new BinaryDataBuffer(headerSpaceSize * 2);
 			_bw = new BinaryDataWriter(_b);
@@ -269,7 +269,7 @@ namespace S031.MetaStack.Data
 		/// <param name="headerSpaceSize">Header size (default 512 bytes)</param>
 		/// <param name="columns">list of columns definitions strings  in format ColimnName[.ColumnType][.ColumnWidth]</param>
 		/// <param name="values">list of values</param>
-		public DataPackage(int headerSpaceSize, string[] columns, object[] values)
+		public DataPackage(int headerSpaceSize, string[] columns, object[] values):base(null)
 		{
 			_b = new BinaryDataBuffer(headerSpaceSize * 2);
 			_bw = new BinaryDataWriter(_b);
