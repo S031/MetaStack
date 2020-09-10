@@ -19,19 +19,19 @@ namespace TaskPlus.Server.Security
 	public class UserManager : UserManagerBase
 	{
 		private readonly IServiceProvider _services;
-		private readonly IConfiguration _config;
-		private readonly ILogger _logger;
-		private readonly IAuthorizationProvider _authorizationProvider;
+		//private readonly IConfiguration _config;
+		//private readonly ILogger _logger;
+		//private readonly IAuthorizationProvider _authorizationProvider;
 
 		private static readonly MapTable<string, UserInfo> _uiCache = new MapTable<string, UserInfo>();
 
 		public UserManager(IServiceProvider services)
 		{
 			_services = services;
-			_config = services.GetRequiredService<IConfiguration>();
-			_logger = services.GetRequiredService<ILogger>();
-			_authorizationProvider = services.GetRequiredService<IAuthorizationProvider>();
-			mdb = services
+			//_config = _services.GetRequiredService<IConfiguration>();
+			//_logger = services.GetRequiredService<ILogger>();
+			//_authorizationProvider = services.GetRequiredService<IAuthorizationProvider>();
+			mdb = _services
 				.GetRequiredService<IMdbContextFactory>()
 				.GetContext(Strings.SysCatConnection);
 		}
@@ -59,12 +59,14 @@ namespace TaskPlus.Server.Security
 			objClaim.AddClaim(new Claim(ClaimTypes.Name, name));
 			objClaim.AddClaim(new Claim(ClaimTypes.Email, $"{userName}@{domainName}.{zone}"));
 
-			UserInfo currentPrincipal = new UserInfo(objClaim);
-			currentPrincipal.AccessLevelID = 1;
-			currentPrincipal.DomainName = domainName;
-			currentPrincipal.Name = name;
-			currentPrincipal.PersonID = 0;
-			currentPrincipal.StructuralUnitID = 1;
+			UserInfo currentPrincipal = new UserInfo(objClaim)
+			{
+				AccessLevelID = 1,
+				DomainName = domainName,
+				Name = name,
+				PersonID = 0,
+				StructuralUnitID = 1
+			};
 			currentPrincipal.Roles.Add("Everyone");
 			return currentPrincipal;
 		}

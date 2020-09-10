@@ -7,7 +7,8 @@ namespace S031.MetaStack.Common
 {
 	public static class ImplementsList
 	{
-		static readonly MapTable<Type, List<Type>> _iList = new MapTable<Type, List<Type>>();
+		private static object obj4Lock = new object();
+		private static readonly MapTable<Type, List<Type>> _iList = new MapTable<Type, List<Type>>();
 
 		public static IEnumerable<Type> GetTypes(Type type)
 		{
@@ -21,16 +22,18 @@ namespace S031.MetaStack.Common
 
 		public static IEnumerable<Type> Add(Type type, Assembly a = null)
 		{
+			var implements = GetImplements(type, a);
 			if (_iList.ContainsKey(type))
 			{
 				var l = _iList[type];
-				l.AddRange(GetImplements(type, a).Where(t => !l.Contains(t)));
+				lock(obj4Lock)
+					l.AddRange(implements.Where(t => !l.Contains(t)));
 				return l;
 			}
 			else
 			{
-				var l = GetImplements(type, a).ToList();
-				_iList.Add(type, l);
+				var l = implements.ToList();
+				_iList.TryAdd(type, l);
 				return l;
 			}
 		}

@@ -8,9 +8,6 @@ using System.Text;
 
 namespace S031.MetaStack.Integral.Security
 {
-	/// <summary>
-	/// !!! not completed (add json serialization)
-	/// </summary>
 	public class UserInfo : ClaimsPrincipal, IJsonSerializible
 	{
 		public UserInfo(IIdentity identity) : base(identity)
@@ -112,12 +109,7 @@ namespace S031.MetaStack.Integral.Security
 			writer.WriteProperty("ValueType",  ClaimsTypes.GetTypeKey(claim.ValueType));
 		}
 		
-		/// <summary>
-		/// Deserialize content only <see cref="UserInfo"/> from json string
-		/// !!! not completed
-		/// </summary>
-		/// <returns>json string</returns>
-		public static UserInfo ReadFrom(string serializedJsonString)
+		public static UserInfo Parse(string serializedJsonString)
 			=>new UserInfo(new JsonReader(serializedJsonString).Read());
 		public UserInfo(JsonValue source)
 			: this(CreateIdentityFromJson((JsonObject)source))

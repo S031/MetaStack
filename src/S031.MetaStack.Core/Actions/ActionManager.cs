@@ -47,7 +47,7 @@ namespace S031.MetaStack.Core.Actions
 							1 As WebAuthentication,
 							I.ID As IID,
 							I.InterfaceName As InterfaceID,
-							I.Name,
+							I.Name As InterfaceName,
 							COALESCE(I.Description, '') As Description,
 							I.MultipleRowsParams,
 							I.MultipleRowsResult
@@ -129,7 +129,6 @@ namespace S031.MetaStack.Core.Actions
 		private static async Task<DataPackage> ExecuteInternalAsync(ActionInfo ai, DataPackage inParamStor)
 		{
 			var se = CreateEvaluator(ai, inParamStor);
-			//!!! AuthorizationRequired remove from sys action list and add test authentication in procedure
 			if (ai.AuthorizationRequired)
 				await AuthorizationAsync(ai, inParamStor);
 			return await se.InvokeAsync(ai, inParamStor);

@@ -27,7 +27,7 @@ namespace MetaStack.Test.Security
 			{
 				string s = u.ToString(S031.MetaStack.Json.Formatting.None);
 				_logger.Debug(s);
-				u = UserInfo.ReadFrom(s);
+				u = UserInfo.Parse(s);
 				s = u.ToString(S031.MetaStack.Json.Formatting.Indented);
 				_logger.Debug(s);
 			}
@@ -61,7 +61,7 @@ namespace MetaStack.Test.Security
 				_logger.Debug(s);
 				_logger.Debug("Start UserInfoDeSerializationSpeedTest");
 				for (int i = 0; i < 100_000; i++)
-					u = UserInfo.ReadFrom(s);
+					u = UserInfo.Parse(s);
 
 				s = u.ToString(S031.MetaStack.Json.Formatting.Indented);
 				_logger.Debug(s);

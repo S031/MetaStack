@@ -50,14 +50,17 @@ namespace S031.MetaStack.Data
 			WritePackageHeader();
 
 			//values
-			foreach (JsonObject r in rows)
+			if (hasValues)
 			{
-				AddNew();
-				foreach (var o in r)
-					SetValue(o.Key, o.Value?.GetValue());
-				Update();
+				foreach (JsonObject r in rows)
+				{
+					AddNew();
+					foreach (var o in r)
+						SetValue(o.Key, o.Value?.GetValue());
+					Update();
+				}
+				GoDataTop();
 			}
-			GoDataTop();
 		}
 		/// <summary>
 		/// serialize package to json format
@@ -65,7 +68,11 @@ namespace S031.MetaStack.Data
 		/// <param name="exportFormat">reqaired TsExportFormat.JSON</param>
 		/// <returns>json formatted text</returns>
 		public string ToString(TsExportFormat exportFormat)
-			=> ToString();
+		{
+			if (exportFormat == TsExportFormat.JSON)
+				return ToString();
+			throw new NotImplementedException();
+		}
 		/// <summary>
 		/// serialize current row to json format
 		/// </summary>

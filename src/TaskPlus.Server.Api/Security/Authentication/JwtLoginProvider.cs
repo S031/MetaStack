@@ -27,8 +27,8 @@ namespace TaskPlus.Server.Security
 	{
 		private readonly IServiceProvider _services;
 		private readonly IConfiguration _config;
-		private readonly IUserManager _um;
-		private readonly ILogger _logger;
+		private readonly IUserManager _userManager;
+		//private readonly ILogger _logger;
 
 		private readonly IConfigurationSection _cs;
 		private readonly SymmetricSecurityKey _securityKey;
@@ -38,9 +38,9 @@ namespace TaskPlus.Server.Security
 		public JwtLoginProvider(IServiceProvider services)
 		{
 			_services = services;
-			_config = services.GetRequiredService<IConfiguration>();
-			_logger = services.GetRequiredService<ILogger>();
-			_um = services.GetRequiredService<IUserManager>();
+			_config = _services.GetRequiredService<IConfiguration>();
+			//_logger = _services.GetRequiredService<ILogger>();
+			_userManager = _services.GetRequiredService<IUserManager>();
 
 			_cs = _config.GetSection("Authentication");
 			_securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_cs["jwt:Key"]));
@@ -93,7 +93,7 @@ namespace TaskPlus.Server.Security
 		public async Task<UserInfo> LogonAsync(string userName, string sessionID, string encryptedKey)
 		{
 			var login = ValidateToken(encryptedKey);
-			return await _um.GetUserInfoAsync(login);
+			return await _userManager.GetUserInfoAsync(login);
 		}
 
 		public void Logout(string userName, string sessionID, string encryptedKey)
@@ -114,7 +114,7 @@ namespace TaskPlus.Server.Security
 		private async Task<UserInfo> AuthenticateUserAsync(string userName, string password)
 		{
 			// Find in catalog (not found error)
-			var ui = await _um.GetUserInfoAsync(userName);
+			var ui = await _userManager.GetUserInfoAsync(userName);
 			if (ui == null)
 				throw new AuthenticationException($"Login for name '{userName}' not registered in system catalog");
 			
@@ -168,102 +168,5 @@ namespace TaskPlus.Server.Security
 				throw new AuthenticationException(ex.Message, ex);
 			}
 		}
-	}
-
-	public class JwtLoginProvider2
-	{
-		private readonly HttpContext _context;
-
-		public JwtLoginProvider2(HttpContext context)
-		{
-			_context = context;
-		}
-
-		public ActionResult<JsonObject> Login()
-		{
-			var response = ActionResult<JsonObject>.Unauthorized();
-			var user = AuthenticateUser("F2345@gmail.com", "fackePassword");
-
-			if (user != null)
-			{
-				var tokenString = GenerateJSONWebToken(user);
-				response = ActionResult<JsonObject>.OK(new JsonObject() { ["token"] = tokenString });
-			}
-
-			return response;
-		}
-		public ActionResult<JsonObject> Logon()
-		{
-			string token = string.Empty;
-			if (_context.Request.Headers.TryGetValue("Authorization", out var values))
-			{
-				string value = values[0];
-				if (value.StartsWith("Bearer "))
-					token = value.Substring(7);
-			}
-			if (string.IsNullOrEmpty(token))
-				return ActionResult<JsonObject>.Unauthorized();
-
-			_context.User = ValidateToken(token);
-			if (_context.User != null)
-				return ActionResult<JsonObject>.OK(null);
-			return ActionResult<JsonObject>.Unauthorized();
-		}
-
-
-		private static UserModel AuthenticateUser(string login, string password)
-			=> new UserModel() { ID = 1, EMail = login, Password = password, Name = "Jonh Smith" };
-
-		private string GenerateJSONWebToken(UserModel user)
-		{
-			var config = _context.RequestServices.GetService<IConfiguration>()
-				.GetSection("Authentication");
-			var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["jwt:Key"]));
-			var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-			var claims = new[] {
-				new Claim(JwtRegisteredClaimNames.Sub, user.Name),
-				new Claim(JwtRegisteredClaimNames.Email, user.EMail),
-				new Claim("DateOfJoing", user.RegisterDate.ToString("yyyy-MM-dd")),
-				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-			};
-			var token = new JwtSecurityToken(config["Jwt:Issuer"],
-				config["Jwt:Audience"],				
-				claims,
-				expires: DateTime.Now.AddMinutes(120),
-				signingCredentials: credentials);
-
-			return new JwtSecurityTokenHandler().WriteToken(token);
-		}
-
-		private ClaimsPrincipal ValidateToken(string jwtToken)
-		{
-			var config = _context.RequestServices
-				.GetService<IConfiguration>()
-				.GetSection("Authentication");
-			IdentityModelEventSource.ShowPII = true;
-
-			TokenValidationParameters validationParameters = new TokenValidationParameters
-			{
-				ValidateIssuer = true,
-				ValidateAudience = true,
-				ValidateLifetime = true,
-				ValidateIssuerSigningKey = true,
-				ValidAudience = config["Jwt:Audience"],
-				ValidIssuer = config["Jwt:Issuer"],
-				IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]))
-			};
-
-			ClaimsPrincipal principal = new JwtSecurityTokenHandler().ValidateToken(jwtToken, validationParameters, out SecurityToken validatedToken);
-			return principal;
-		}
-	}
-	internal class UserModel
-	{
-		public int ID { get; set; }
-		public string EMail { get; set; }
-		public string Password { get; set; }
-		public string Name { get; set; }
-		public DateTime RegisterDate { get; set; } = DateTime.Now;
 	}
 }

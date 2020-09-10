@@ -19,7 +19,6 @@ namespace TaskPlus.Server.Actions
 	public sealed class ActionManager : ActionManagerBase
 	{
 		private readonly IServiceProvider _services;
-		private readonly IConfiguration _config;
 		private readonly ILogger _logger;
 		private readonly IAuthorizationProvider _authorizationProvider;
 
@@ -31,10 +30,9 @@ namespace TaskPlus.Server.Actions
 		public ActionManager(IServiceProvider services) 
 		{
 			_services = services;
-			_config = services.GetRequiredService<IConfiguration>();
-			_logger = services.GetRequiredService<ILogger>();
-			_authorizationProvider = services.GetRequiredService<IAuthorizationProvider>();
-			this.SysCatDbContext = services
+			_logger = _services.GetRequiredService<ILogger>();
+			_authorizationProvider = _services.GetRequiredService<IAuthorizationProvider>();
+			this.SysCatDbContext = _services
 				.GetRequiredService<IMdbContextFactory>()
 				.GetContext(Strings.SysCatConnection);
 		}
@@ -63,7 +61,6 @@ namespace TaskPlus.Server.Actions
 		
 		private async Task<DataPackage> ExecuteInternalAsync(ActionInfo ai, DataPackage inParamStor)
 		{
-			//!!! AuthorizationRequired remove from sys action list and add test authentication in procedure
 			if (ai.AuthorizationRequired)
 				await AuthorizationAsync(ai, inParamStor);
 			
@@ -119,7 +116,8 @@ namespace TaskPlus.Server.Actions
 
 			if (!_loadedTypesCache.TryGetValue(ai.ClassName, out Type type))
 			{
-				LoadAssembly(ai.AssemblyID);
+				var a = LoadAssembly(ai.AssemblyID);
+				ImplementsList.Add(typeof(IAppEvaluator), a);
 				type = ImplementsList.GetTypes(typeof(IAppEvaluator))
 					.FirstOrDefault(t => t.FullName.Equals(ai.ClassName, StringComparison.Ordinal));
 				_loadedTypesCache.TryAdd(ai.ClassName, type);

@@ -10,9 +10,6 @@ using System.Threading.Tasks;
 
 namespace S031.MetaStack.Buffers
 {
-	/// <summary>
-	/// !!!Make it disposable
-	/// </summary>
 	public class BinaryDataBuffer: IDisposable
 	{
 #if NETCOREAPP

@@ -30,8 +30,8 @@ namespace TaskPlus.Server.Security
 		public const string security_admin_role = "Sys.SecurityAdmin";
 
 		private readonly IServiceProvider _services;
-		private readonly IConfiguration _config;
-		private readonly ILogger _logger;
+		//private readonly IConfiguration _config;
+		//private readonly ILogger _logger;
 		private readonly MdbContext _mdb;
 
 		/// <summary>
@@ -43,9 +43,9 @@ namespace TaskPlus.Server.Security
 		public UserAuthorizationProvider(IServiceProvider services)
 		{
 			_services = services;
-			_config = services.GetRequiredService<IConfiguration>();
-			_logger = services.GetRequiredService<ILogger>();
-			_mdb = services
+			//_config = _services.GetRequiredService<IConfiguration>();
+			//_logger = _services.GetRequiredService<ILogger>();
+			_mdb = _services
 				.GetRequiredService<IMdbContextFactory>()
 				.GetContext(Strings.SysCatConnection);
 		}
@@ -58,7 +58,7 @@ namespace TaskPlus.Server.Security
 		{
 			if (await IsAdminAsync(actionInfo.GetContext().Principal))
 				return true;
-			/*!!!
+			/*!!! Remove from IsAdminAsync async mode
              * select * from users u
              * inner join User2Roles r on u.id = r.UserID
              * inner join permissions p on p.RoleID = r.roleId
@@ -87,15 +87,16 @@ namespace TaskPlus.Server.Security
 			.GetResult();
 
 		public async Task<bool> UserInRoreAsync(UserInfo user, string roleName)
-		{
-			string key = user.UserName.ToUpper();
-			string role = roleName.ToUpper();
+			=> await Task.Run(() => user.Roles.Any(r => r.Equals(roleName, StringComparison.OrdinalIgnoreCase)));
+		//{
+			//string key = user.UserName.ToUpper();
+			//string role = roleName.ToUpper();
 
-			if (!_user2RolesCache.ContainsKey(key))
-				await SetUser2RolesCache(key);
-			return _user2RolesCache[key]
-				.Any(r => r.Equals(role, StringComparison.Ordinal));
-		}
+			//if (!_user2RolesCache.ContainsKey(key))
+			//	await SetUser2RolesCache(key);
+			//return _user2RolesCache[key]
+			//	.Any(r => r.Equals(role, StringComparison.Ordinal));
+		//}
 
 		private async Task SetUser2RolesCache(string key)
 		{

@@ -18,18 +18,16 @@ namespace TaskPlus.Server.Data
 	{
 		private readonly IServiceProvider _services;
 		private readonly IConfiguration _config;
-		private readonly ILogger _logger;
 
 		public MdbContextFactory(IServiceProvider services)
 		{
 			_services = services;
-			_config = services.GetRequiredService<IConfiguration>();
-			_logger = services.GetRequiredService<ILogger>();
+			_config = _services.GetRequiredService<IConfiguration>();
 		}
 
 		/// <summary>
 		/// Return <see cref="MdbContext" with <see cref="ConnectInfo"/> getted from configuration />
-		/// !!!Need for test
+		/// Need for test
 		/// </summary>
 		/// <param name="connectionName">appSettings:{connectionName}? if not exists then connectionStrings:{connectionName}</param>
 		/// <returns></returns>

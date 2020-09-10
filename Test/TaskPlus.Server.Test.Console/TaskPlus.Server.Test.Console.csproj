@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <StartupObject>TaskPlus.Server.Test.Console.Program</StartupObject>
+    <RootNamespace>TaskPlus.Server.Test.Console</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\S031.MetaStack.Common\S031.MetaStack.Common.csproj" />
+    <ProjectReference Include="..\..\src\S031.MetaStack.Json\S031.MetaStack.Json.csproj" />
+  </ItemGroup>
+
+</Project>

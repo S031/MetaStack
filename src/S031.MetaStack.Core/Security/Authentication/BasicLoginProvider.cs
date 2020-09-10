@@ -31,6 +31,9 @@ namespace S031.MetaStack.Core.Security
 		{
 		}
 
+		~BasicLoginProvider()
+			=> _timer.Dispose();
+
 		/// <summary>
 		/// Set timeout in milliseconds for expire client message timestamp (0-disable check)
 		/// </summary>

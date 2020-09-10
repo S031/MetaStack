@@ -21,11 +21,11 @@ namespace TaskPlus.Server.Middleware
 {
 	internal class PipeLineController
 	{
-		private readonly ILogger _logger;
 		private readonly PipeLineRouteValues _routeValues;
 		private readonly HttpContext _context;
-		private readonly IConfiguration _config;
-		private readonly IUserManager _userManager;
+		//private readonly ILogger _logger;
+		//private readonly IConfiguration _config;
+		//private readonly IUserManager _userManager;
 		private readonly IActionManager _actionManager;
 		private readonly ILoginProvider _loginProvider;
 
@@ -36,10 +36,10 @@ namespace TaskPlus.Server.Middleware
 		{
 			_context = context;
 			var services = _context.RequestServices;
-			_config = services.GetRequiredService<IConfiguration>();
-			_logger = services.GetRequiredService<ILogger>();
+			//_config = services.GetRequiredService<IConfiguration>();
+			//_userManager = services.GetRequiredService<IUserManager>();
+			//_logger = services.GetRequiredService<ILogger>();
 			_actionManager = services.GetRequiredService<IActionManager>();
-			_userManager = services.GetRequiredService<IUserManager>();
 			_loginProvider = services.GetRequiredService<ILoginProvider>();
 			_routeValues = _context
 				.AddItem<PipeLineRouteValues>(new PipeLineRouteValues(_context))
@@ -48,7 +48,7 @@ namespace TaskPlus.Server.Middleware
 		public async Task ProcessMessage()
 		{
 			HttpStatusCode resultCode = HttpStatusCode.OK;
-			DataPackage response = null;
+			DataPackage response;
 			bool multipleRowsResult = false;
 
 			try
@@ -56,12 +56,6 @@ namespace TaskPlus.Server.Middleware
 				ActionInfo ai = await BuildContext();
 				response = await _actionManager.ExecuteAsync(ai,
 					DataPackage.Parse(0, await new StreamReader(_context.Request.Body).ReadToEndAsync()));
-				//string data = await new StreamReader(_context.Request.Body).ReadToEndAsync();
-				//for (int i = 0; i < 100_000; i++)
-				//{
-				//	response = await _actionManager.ExecuteAsync(ai,
-				//		DataPackage.Parse(0, data));
-				//}
 				multipleRowsResult = ai.MultipleRowsResult;
 			}
 			catch (Exception ex)
@@ -140,41 +134,5 @@ namespace TaskPlus.Server.Middleware
 				return code;
 			return HttpStatusCode.InternalServerError;
 		}
-
-		private void LoggingSpeedTest()
-		{
-			List<Task> ts = new List<Task>(10);
-
-			for (int j = 0; j < 10; j++)
-			{
-				ts.Add(Task.Factory.StartNew(() =>
-				{
-					int id = System.Threading.Thread.CurrentThread.ManagedThreadId;
-					for (int i = 1; i <= 100000; i++)
-						_logger.LogDebug(new CallerInfo($"Сообщение № {i} в потоке {id}"));
-				}));
-			}
-			Task.WaitAll(ts.ToArray());
-		}
-
-		private async Task ActionManagerCreationSpeedTest()
-			=> await Task.Run(() =>
-				{
-					List<Task> ts = new List<Task>(10);
-
-					for (int j = 0; j < 10; j++)
-					{
-						ts.Add(Task.Factory.StartNew(() =>
-						{
-							int id = System.Threading.Thread.CurrentThread.ManagedThreadId;
-							IActionManager am;
-							for (int i = 1; i <= 100000; i++)
-								am = _context.RequestServices.GetRequiredService<IActionManager>(); //new ActionManager(_context.RequestServices);
-						}));
-					}
-					Task.WaitAll(ts.ToArray());
-				});
-
-
 	}
 }
