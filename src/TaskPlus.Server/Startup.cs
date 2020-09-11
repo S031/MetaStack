@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using S031.MetaStack.Actions;
+using S031.MetaStack.Caching;
 using S031.MetaStack.Common;
 using S031.MetaStack.Integral.Security;
 using S031.MetaStack.Security;
@@ -20,7 +21,6 @@ namespace TaskPlus.Server
 	public class Startup
 	{
 		private ILoggerProvider _loggerProvider;
-		//private ILogger _logger;
 
 		public void ConfigureServices(IServiceCollection services)
 		{
@@ -31,6 +31,7 @@ namespace TaskPlus.Server
 			services.AddSingleton<ILoginProvider, JwtLoginProvider>();
 			services.AddSingleton<IAuthorizationProvider, UserAuthorizationProvider>();
 			services.AddSingleton<IUserManager, UserManager>();
+			services.AddSingleton<ICacheManager, CacheManager>();
 		}
 
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerProvider loggerProvider)

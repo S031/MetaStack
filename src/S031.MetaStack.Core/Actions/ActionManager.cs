@@ -9,6 +9,7 @@ using S031.MetaStack.Core.Security;
 using S031.MetaStack.Data;
 using S031.MetaStack.Actions;
 using S031.MetaStack.Security;
+using S031.MetaStack.Caching;
 
 namespace S031.MetaStack.Core.Actions
 {
@@ -28,7 +29,7 @@ namespace S031.MetaStack.Core.Actions
 	/// </summary>
 	public class ActionManager : ManagerObjectBase, IDisposable, IActionManager
 	{
-		private static readonly MapTable<string, ActionInfo> _actions = ActionsList.CreateActionsList();
+		private static readonly ActionInfoCache _actions = ActionInfoCache.Instance;
 
 		const string _sql_actions = @"
 						Select 

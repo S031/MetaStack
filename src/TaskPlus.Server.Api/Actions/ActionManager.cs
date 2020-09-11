@@ -23,10 +23,7 @@ namespace TaskPlus.Server.Actions
 		private readonly IAuthorizationProvider _authorizationProvider;
 
 		static ActionManager()
-		{
-			new Action(async () => await AddToCache(ActionsListInternal.CreateActionsList()))();
-		}
-
+			=> Task.Run(() => ActionsListInternal.CreateActionsList());
 		public ActionManager(IServiceProvider services) 
 		{
 			_services = services;
@@ -36,12 +33,10 @@ namespace TaskPlus.Server.Actions
 				.GetRequiredService<IMdbContextFactory>()
 				.GetContext(Strings.SysCatConnection);
 		}
-
 		public override DataPackage Execute(ActionInfo ai, DataPackage inParamStor)
 		{
 			throw new NotImplementedException();
 		}
-
 		public override async Task<DataPackage> ExecuteAsync(ActionInfo ai, DataPackage inParamStor)
 		{
 			try
@@ -58,17 +53,30 @@ namespace TaskPlus.Server.Actions
 				throw;
 			}
 		}
-		
 		private async Task<DataPackage> ExecuteInternalAsync(ActionInfo ai, DataPackage inParamStor)
 		{
 			if (ai.AuthorizationRequired)
-				await AuthorizationAsync(ai, inParamStor);
+				//!!!Веонуть при полной реализации _authorizationProvider.HasPermissionAsync
+				//await AuthorizationAsync(ai, inParamStor);
+				Authorize(ai, inParamStor);
 			
 			var se = CreateEvaluator(ai, inParamStor);
 			return await se.InvokeAsync(ai, inParamStor);
 		}
-
-		private async Task AuthorizationAsync(ActionInfo ai, DataPackage inParamStor)
+		private void Authorize(ActionInfo ai, DataPackage inParamStor)
+		{
+			string objectName = GetObjectNameFromInputParameters(ai, inParamStor);
+			if (!_authorizationProvider.HasPermission(ai, objectName))
+				throw new UnauthorizedAccessException(ai.GetAuthorizationExceptionsMessage(objectName));
+		}
+		private async Task AuthorizeAsync(ActionInfo ai, DataPackage inParamStor)
+		{
+			string objectName = GetObjectNameFromInputParameters(ai, inParamStor);
+			if (!await _authorizationProvider.HasPermissionAsync(ai, objectName))
+				//!!! GetSchema for objectName && put name of object to message
+				throw new UnauthorizedAccessException(ai.GetAuthorizationExceptionsMessage(objectName));
+		}
+		private static string GetObjectNameFromInputParameters(ActionInfo ai, DataPackage inParamStor)
 		{
 			ParamInfo objectNameParamInfo = ai.InterfaceParameters.GetObjectNameParamInfo();
 			string objectName = ActionInfo.ObjectNameForStaticActions;
@@ -79,11 +87,8 @@ namespace TaskPlus.Server.Actions
 					objectName = (string)inParamStor[objectNameParamInfo.AttribName];
 				inParamStor.GoDataTop();
 			}
-			if (!await _authorizationProvider.HasPermissionAsync(ai, objectName))
-				//!!! GetSchema for objectName && put name of object to message
-				throw new UnauthorizedAccessException(ai.GetAuthorizationExceptionsMessage(objectName));
+			return objectName;
 		}
-
 		private static readonly MapTable<string, Type> _loadedTypesCache = new MapTable<string, Type>();
 		private static IAppEvaluator CreateEvaluator(ActionInfo ai, DataPackage inParamStor)
 		{
@@ -124,7 +129,6 @@ namespace TaskPlus.Server.Actions
 			}
 			return type.CreateInstance<IAppEvaluator>();
 		}
-
 		private static Assembly LoadAssembly(string assemblyID) => AssemblyLoadContext.Default.LoadFromAssemblyPath(
 				System.IO.Path.Combine(System.AppContext.BaseDirectory, $"{assemblyID}.dll"));
 	}

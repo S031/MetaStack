@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Metib.Factoring.Clients\Metib.Factoring.Clients.csproj" />
     <ProjectReference Include="..\S031.MetaStack.Buffers\S031.MetaStack.Buffers.csproj" />
     <ProjectReference Include="..\S031.MetaStack.Common\S031.MetaStack.Common.csproj" />
     <ProjectReference Include="..\S031.MetaStack.Data\S031.MetaStack.Data.csproj" />

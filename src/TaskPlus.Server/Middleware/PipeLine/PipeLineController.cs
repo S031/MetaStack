@@ -1,20 +1,16 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using S031.MetaStack.Actions;
 using S031.MetaStack.Common;
 using S031.MetaStack.Data;
 using S031.MetaStack.Integral.Security;
 using S031.MetaStack.Security;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Runtime.Serialization;
 using System.Security.Authentication;
 using System.Threading.Tasks;
-using TaskPlus.Server.Logging;
 using TaskPlus.Server.Security;
 
 namespace TaskPlus.Server.Middleware
@@ -106,15 +102,6 @@ namespace TaskPlus.Server.Middleware
 			return token;
 		}
 
-		/*
-			ArgumentException or SerializationException or FormatException is returned as a 400 BadRequest
-			NotImplementedException or NotSupportedException is returned as a 405 MethodNotAllowed
-			FileNotFoundException is return as 404 NotFound
-			AuthenticationException is returned as 401 Unauthorized
-			UnauthorizedAccessException is returned as 403 Forbidden
-			OptimisticConcurrencyException is returned as 409 Conflict
-			All Other normal C# Exceptions are returned as 500 InternalServerError
-		 */
 		private static readonly ReadOnlyCache<Type, HttpStatusCode> _actionCodes =
 			new ReadOnlyCache<Type, HttpStatusCode>
 			(
@@ -128,6 +115,7 @@ namespace TaskPlus.Server.Middleware
 				(typeof(UnauthorizedAccessException), HttpStatusCode.Forbidden),
 				(typeof(Exception), HttpStatusCode.InternalServerError)
 			);
+
 		private static HttpStatusCode GetCodeFromException(Exception exception)
 		{
 			if (_actionCodes.TryGetValue(exception.GetType(), out HttpStatusCode code))

@@ -34,12 +34,6 @@ namespace TaskPlus.Server.Security
 		//private readonly ILogger _logger;
 		private readonly MdbContext _mdb;
 
-		/// <summary>
-		/// !!! Create global cache with update or clear possibilities
-		/// </summary>
-		private static readonly MapTable<string, List<string>> _user2RolesCache
-			= new MapTable<string, List<string>>(StringComparer.Ordinal);
-
 		public UserAuthorizationProvider(IServiceProvider services)
 		{
 			_services = services;
@@ -50,9 +44,10 @@ namespace TaskPlus.Server.Security
 				.GetContext(Strings.SysCatConnection);
 		}
 		public bool HasPermission(ActionInfo actionInfo, string objectName)
-			=> HasPermissionAsync(actionInfo, objectName)
-			.GetAwaiter()
-			.GetResult();
+		{
+			// !!! See  HasPermissionAsync
+			return IsAdmin(actionInfo.GetContext().Principal);
+		}
 
 		public async Task<bool> HasPermissionAsync(ActionInfo actionInfo, string objectName)
 		{
@@ -82,41 +77,9 @@ namespace TaskPlus.Server.Security
 			=> await UserInRoreAsync(user, security_admin_role);
 
 		public bool UserInRore(UserInfo user, string roleName)
-			=> UserInRoreAsync(user, roleName)
-			.GetAwaiter()
-			.GetResult();
+			=> user.Roles.Any(r => r.Equals(roleName, StringComparison.OrdinalIgnoreCase));
 
 		public async Task<bool> UserInRoreAsync(UserInfo user, string roleName)
 			=> await Task.Run(() => user.Roles.Any(r => r.Equals(roleName, StringComparison.OrdinalIgnoreCase)));
-		//{
-			//string key = user.UserName.ToUpper();
-			//string role = roleName.ToUpper();
-
-			//if (!_user2RolesCache.ContainsKey(key))
-			//	await SetUser2RolesCache(key);
-			//return _user2RolesCache[key]
-			//	.Any(r => r.Equals(role, StringComparison.Ordinal));
-		//}
-
-		private async Task SetUser2RolesCache(string key)
-		{
-			string sql = $@"
-				select Upper(r.RoleName) as RoleName
-				from Users u
-				inner join Users2Roles ur on u.ID = ur.UserID
-				inner join Roles r on r.ID = ur.RoleID
-				where u.UserName LIKE '{key}'";
-
-			using (var dr = await _mdb.GetReaderAsync(sql))
-			{
-				if (!_user2RolesCache.ContainsKey(key))
-				{
-					List<string> roles = new List<string>();
-					for (; dr.Read();)
-						roles.Add((string)dr["RoleName"]);
-					_user2RolesCache.TryAdd(key, roles);
-				}
-			}
-		}
 	}
 }

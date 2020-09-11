@@ -24,16 +24,16 @@ namespace TaskPlus.Server.Test.Console
 		
 		private static string RequesSpeedTest()
 		{
-			List<Task> ts = new List<Task>(10);
+			List<Task> ts = new List<Task>(100);
 			string result = string.Empty;
 
-			for (int j = 0; j < 100; j++)
+			for (int j = 0; j < 1; j++)
 			{
 				ts.Add(Task.Run(async ()=>
 				{
-					for (int i = 1; i <= 1000; i++)
+					for (int i = 1; i <= 1; i++)
 						result = await RunAsync("cks_test", 
-							new JsonObject(){["@ObjectName"] = "Test", ["@IDs"] = "1, 2, 3"}
+							new JsonObject(){["@ObjectName"] = "Test", ["@IDs"] = "0"}
 							.ToString());
 				}));
 			}

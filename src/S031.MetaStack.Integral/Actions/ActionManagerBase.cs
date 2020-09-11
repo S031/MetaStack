@@ -1,4 +1,5 @@
-﻿using S031.MetaStack.Common;
+﻿using S031.MetaStack.Caching;
+using S031.MetaStack.Common;
 using S031.MetaStack.Data;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ namespace S031.MetaStack.Actions
 {
 	public abstract class ActionManagerBase : IActionManager
 	{
-		private static readonly MapTable<string, ActionInfo> _actionsCache = new MapTable<string, ActionInfo>(StringComparer.OrdinalIgnoreCase);
+		private static readonly ActionInfoCache _actionsCache = ActionInfoCache.Instance;
 
 		const string _sql_actions = @"
 			Select 
@@ -174,13 +175,5 @@ namespace S031.MetaStack.Actions
 				FieldName = (string)dr["FieldName"],
 				IsObjectName = dr["IsObjectName"].CastOf<bool>()
 			};
-
-		public static async Task AddToCache(IEnumerable<KeyValuePair<string, ActionInfo>> listOfActions)
-			=> await Task.Run(() =>
-			   {
-				   _actionsCache.Clear();
-				   foreach (var ai in listOfActions)
-					   _actionsCache.Add(ai.Key, ai.Value);
-			   });
 	}
 }

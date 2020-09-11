@@ -4,6 +4,7 @@ using S031.MetaStack.Actions;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using S031.MetaStack.Caching;
 
 namespace TaskPlus.Server.Actions
 {
@@ -11,7 +12,7 @@ namespace TaskPlus.Server.Actions
 	{
 		public static IDictionary<string, ActionInfo> CreateActionsList()
 		{
-			MapTable<string, ActionInfo> actions = new MapTable<string, ActionInfo>();
+			ActionInfoCache actions = ActionInfoCache.Instance;
 
             #region Sys.LoginRequest
             ActionInfo ai = new ActionInfo()

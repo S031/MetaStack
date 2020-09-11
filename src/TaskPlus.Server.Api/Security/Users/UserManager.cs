@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using S031.MetaStack.Actions;
+using S031.MetaStack.Caching;
 using S031.MetaStack.Common;
 using S031.MetaStack.Data;
 using S031.MetaStack.Integral.Security;
@@ -23,7 +24,7 @@ namespace TaskPlus.Server.Security
 		//private readonly ILogger _logger;
 		//private readonly IAuthorizationProvider _authorizationProvider;
 
-		private static readonly MapTable<string, UserInfo> _uiCache = new MapTable<string, UserInfo>();
+		private static readonly UserInfoCache _uiCache = UserInfoCache.Instance;
 
 		public UserManager(IServiceProvider services)
 		{
@@ -70,6 +71,5 @@ namespace TaskPlus.Server.Security
 			currentPrincipal.Roles.Add("Everyone");
 			return currentPrincipal;
 		}
-
 	}
 }
