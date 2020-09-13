@@ -61,7 +61,7 @@ namespace TaskPlus.Server.Api.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to defaultConnection.
+        ///   Looks up a localized string similar to DefaultConnection.
         /// </summary>
         internal static string DefaultConnection {
             get {

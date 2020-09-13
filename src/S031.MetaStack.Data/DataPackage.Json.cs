@@ -139,10 +139,29 @@ namespace S031.MetaStack.Data
 
 		public static DataPackage Parse(int headerSpaceSize, string jsonString)
 		{
-			JsonObject j = (JsonObject)new JsonReader(jsonString).Read();
-			DataPackage ts = new DataPackage(headerSpaceSize,
-				j.Select(kvp => kvp.Key).ToArray<string>(),
-				j.Select(kvp => kvp.Value?.GetValue()).ToArray<object>());
+			JsonValue jv = new JsonReader(jsonString).Read();
+			DataPackage ts;
+			if (jv is JsonObject j)
+				ts = new DataPackage(headerSpaceSize,
+					j.Select(kvp => kvp.Key).ToArray<string>(),
+					j.Select(kvp => kvp.Value?.GetValue()).ToArray<object>());
+			else // JsonArray
+			{
+				var a = (jv as JsonArray);
+				if (a.Count == 0)
+					throw new ArgumentException("Parameter array cannot be empty");
+				j = (JsonObject)a[0];
+				ts = new DataPackage(headerSpaceSize,
+					j.Select(kvp => kvp.Key).ToArray<string>(), null);
+				foreach (JsonObject r in a)
+				{
+					ts.AddNew();
+					foreach (var o in r)
+						ts.SetValue(o.Key, o.Value?.GetValue());
+					ts.Update();
+				}
+
+			}
 			ts.GoDataTop();
 			return ts;
 		}

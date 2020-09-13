@@ -8,8 +8,4 @@ namespace S031.MetaStack.Caching
 	{
 		IEnumerable<IDataCache<TKey, TValue>> GetCache<TKey, TValue>();
 	}
-
-	public interface IDataCache<TKey, TValue> : IDictionary<TKey, TValue>
-	{
-	}
 }

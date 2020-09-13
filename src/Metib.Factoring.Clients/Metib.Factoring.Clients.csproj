@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\S031.MetaStack.Integral\S031.MetaStack.Integral.csproj" />
+    <ProjectReference Include="..\TaskPlus.Server.Api\TaskPlus.Server.Api.csproj" />
   </ItemGroup>
 
 </Project>

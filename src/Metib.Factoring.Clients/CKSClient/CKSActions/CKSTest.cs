@@ -11,36 +11,10 @@ namespace Metib.Factoring.Clients.CKS
 {
 	public class CKSTest : IAppEvaluator
 	{
-		public DataPackage Invoke(ActionInfo ai, DataPackage dp)
-		{
-			throw new NotImplementedException();
-		}
+		public DataPackage Invoke(ActionInfo ai, DataPackage dp) => InvokeInternalAsync(ai, dp).GetAwaiter().GetResult();
 
 		public async Task<DataPackage> InvokeAsync(ActionInfo ai, DataPackage dp)
-			=> await Task.Run(() => InvokeInternal(ai, dp));
-			//=> await InvokeInternalAsync(ai, dp);
-
-		private DataPackage InvokeInternal(ActionInfo ai, DataPackage dp)
-		{
-			const string _un = "svc_factoring2";
-			const string _pwd = "";
-			
-			StringBuilder b = new StringBuilder();
-			//string inn = (string)dp["@IDs"];
-			using (var rpcClient = new RpcClient())
-			{
-				var loginInfo = rpcClient.Login(_un, _pwd);
-				//var response = rpcClient.Call(message);
-
-				b.AppendLine(loginInfo.ToString());
-				var list = rpcClient.Read("inn", "7714606819");
-				b.Append(list[0].ToString());
-			}
-			return ai.GetOutputParamTable()
-				.AddNew()
-				.SetValue("@Result", b.ToString())
-				.Update();
-		}
+			=> await InvokeInternalAsync(ai, dp);
 
 		public async Task<DataPackage> InvokeInternalAsync(ActionInfo ai, DataPackage dp)
 		{

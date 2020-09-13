@@ -10,8 +10,10 @@ using S031.MetaStack.Actions;
 using S031.MetaStack.Caching;
 using S031.MetaStack.Common;
 using S031.MetaStack.Integral.Security;
+using S031.MetaStack.Integral.Settings;
 using S031.MetaStack.Security;
 using TaskPlus.Server.Actions;
+using TaskPlus.Server.Api.Settings;
 using TaskPlus.Server.Data;
 using TaskPlus.Server.Middleware;
 using TaskPlus.Server.Security;
@@ -25,13 +27,14 @@ namespace TaskPlus.Server
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddRouting();
-			services.AddSingleton<ILogger>((svc) => _loggerProvider.CreateLogger(Assembly.GetEntryAssembly().GetWorkName()));
+			services.AddSingleton((svc) => _loggerProvider.CreateLogger(Assembly.GetEntryAssembly().GetWorkName()));
 			services.AddSingleton<IMdbContextFactory, MdbContextFactory>();
 			services.AddSingleton<IActionManager, ActionManager>();
 			services.AddSingleton<ILoginProvider, JwtLoginProvider>();
 			services.AddSingleton<IAuthorizationProvider, UserAuthorizationProvider>();
 			services.AddSingleton<IUserManager, UserManager>();
 			services.AddSingleton<ICacheManager, CacheManager>();
+			services.AddTransient<ISettingsProvider<VocabularySettingsProvider>, VocabularySettingsProvider>();
 		}
 
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerProvider loggerProvider)
