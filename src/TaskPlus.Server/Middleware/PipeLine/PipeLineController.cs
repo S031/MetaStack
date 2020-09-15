@@ -10,6 +10,7 @@ using System.IO;
 using System.Net;
 using System.Runtime.Serialization;
 using System.Security.Authentication;
+using System.Text;
 using System.Threading.Tasks;
 using TaskPlus.Server.Security;
 
@@ -60,12 +61,13 @@ namespace TaskPlus.Server.Middleware
 				resultCode = GetCodeFromException(ex);
 			}
 			_context.Response.StatusCode = (int)resultCode;
-			if (multipleRowsResult)
-				await _context.Response.WriteAsync(response.ToString());
+			
+			if (multipleRowsResult && resultCode == HttpStatusCode.OK)
+				await _context.Response.WriteAsync(response.ToString(), Encoding.UTF8);
 			else
 			{
 				response.GoDataTop();
-				await _context.Response.WriteAsync(response.GetRowJSON());
+				await _context.Response.WriteAsync(response.GetRowJSON(), Encoding.UTF8);
 			}
 		}
 

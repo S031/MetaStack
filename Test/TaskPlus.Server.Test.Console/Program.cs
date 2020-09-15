@@ -16,12 +16,26 @@ namespace TaskPlus.Server.Test.Console
 			System.Console.WriteLine("Start tests");
 			_token = Login("svostrikov", "@test").GetAwaiter().GetResult();
 			DateTime start = DateTime.Now;
-			string result = RequesSpeedTest();
+			//string result = RequesSpeedTest();
+			string result = RequestPerformClientSearch();
 			System.Console.WriteLine($"Finsh tests with {(DateTime.Now - start).TotalSeconds} ms");
 			System.Console.WriteLine($"Result: {result}");
 			System.Console.ReadLine();
 		}
 		
+		private static readonly HttpClient _client = new HttpClient();
+		private static string _token;
+
+		private static async Task<string> Login(string login, string password)
+		{
+			JsonObject j = new JsonObject() { ["UserName"] = login, ["Password"] = password };
+			var tokenJson = await RunAsync("login", j.ToString());
+
+			j = (JsonObject)new JsonReader(tokenJson).Read();
+			var token = (string)j["JwtToken"];
+			_client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+			return token;
+		}
 		private static string RequesSpeedTest()
 		{
 			List<Task> ts = new List<Task>(100);
@@ -40,24 +54,18 @@ namespace TaskPlus.Server.Test.Console
 			Task.WaitAll(ts.ToArray());
 			return result;
 		}
-
-		private static readonly HttpClient _client = new HttpClient();
-		private static string _token;
-
-		private static async Task<string> Login(string login, string password)
+		private static string RequestPerformClientSearch()
 		{
-			JsonObject j = new JsonObject() { ["UserName"] = login, ["Password"] = password };
-			var tokenJson = await RunAsync("login", j.ToString());
-
-			j = (JsonObject)new JsonReader(tokenJson).Read();
-			var token = (string)j["JwtToken"];
-			_client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-			return _token;
+			JsonArray a = new JsonArray();
+			a.Add(new JsonObject() { ["@Key"] = "inn", ["@Value"] = "7714606819" });
+			return RunAsync("cks_perform_client_search", a.ToString())
+				.GetAwaiter()
+				.GetResult();
 		}
 		private static async Task<string> RunAsync(string method, string json)
 		{
 			// Update port # in the following line.
-			var url = new Uri($"http://localhost:5000/api/v.1/{method}");
+			var url = new Uri($"http://localhost:5000/api/v1/{method}");
 			var data = new StringContent(json, Encoding.UTF8, "application/json");
 
 			var response = await _client.PostAsync(url, data);

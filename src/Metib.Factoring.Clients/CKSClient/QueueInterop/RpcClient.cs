@@ -5,41 +5,71 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Xml.Linq;
 using System.Collections.Generic;
+using S031.MetaStack.Json;
+using Microsoft.Extensions.Logging;
 
 namespace Metib.Factoring.Clients.CKS
 {
+	public enum RpcClientStatusCodes
+	{
+		None,
+		OK,
+		Error
+	}
 	public class RpcClient : IDisposable
 	{
-		private readonly IConnection _connection;
-		private readonly IModel _channel;
-		private readonly string _replyQueueName;
-		private readonly EventingBasicConsumer _consumer;
-		private readonly BlockingCollection<string> _respQueue = new BlockingCollection<string>();
-		private readonly IBasicProperties _props;
-		private readonly Encoding _encoding = Encoding.Default;
-		private string _uuid = string.Empty;
-
-		private const string _un = "rabbit_service";
-		private const string _pwd = "";
 		private const string _exchange = "cks.general.exchange";
 		private const string _loginQueue = "cks.login";
 		private const string _operationQueue = "cks.operations";
 		private const string _uploadQueue = "cks.upload";
 
-		public RpcClient()
+		private IConnection _connection;
+		private IModel _channel;
+		private string _replyQueueName;
+		private EventingBasicConsumer _consumer;
+		private readonly BlockingCollection<string> _respQueue = new BlockingCollection<string>();
+		private IBasicProperties _props;
+		private readonly Encoding _encoding = Encoding.Default;
+		private string _uuid = string.Empty;
+
+		private readonly JsonObject _rabbitConnectorOptions;
+		private readonly ILogger _logger;
+
+
+		public RpcClientStatusCodes Status { get; private set; } = RpcClientStatusCodes.None;
+
+		public RpcClient(JsonObject parameters, ILogger logger)
+		{
+			_rabbitConnectorOptions = parameters;
+			_logger = logger;
+			try
+			{
+				Initialize();
+			}
+			catch (Exception ex)
+			{
+				logger.LogError(ex.Message);
+				Status = RpcClientStatusCodes.Error;
+			}
+		}
+
+		private void Initialize()
 		{
 			var factory = new ConnectionFactory()
 			{
-				HostName = "192.168.247.72",
-				VirtualHost = "test",
-				Port = 5672,
-				UserName = _un,
-				Password = _pwd,
+				HostName = _rabbitConnectorOptions["HostName"],
+				VirtualHost = _rabbitConnectorOptions["VirtualHost"],
+				Port = (int)_rabbitConnectorOptions["Port"],
+				UserName = _rabbitConnectorOptions["QueueServiceLogin"],
+				Password = _rabbitConnectorOptions["QueueServicePassword"],
 			};
 
 			_connection = factory.CreateConnection();
 			_channel = _connection.CreateModel();
-			_channel.ExchangeDeclare(exchange: _exchange, type: ExchangeType.Direct, durable: true);
+			_channel.ExchangeDeclare(
+				exchange: _rabbitConnectorOptions["Exchange"], 
+				type: ExchangeType.Direct, 
+				durable: true);
 			_replyQueueName = _channel.QueueDeclare().QueueName;
 			_consumer = new EventingBasicConsumer(_channel);
 
@@ -66,9 +96,10 @@ namespace Metib.Factoring.Clients.CKS
 					<username>{userName}</username>
 					<password>{password}</password>
 				</rabbitMsg>";
-			var response = CallInternal(_loginQueue, message);
+			var response = CallInternal(_rabbitConnectorOptions["LoginQueue"], message);
 			var info = new CKSLogin(response);
 			_uuid = info.UUID;
+			Status = RpcClientStatusCodes.OK;
 			return info;
 		}
 
@@ -98,20 +129,20 @@ namespace Metib.Factoring.Clients.CKS
 			root.Add(new XElement("xml", xcks.ToString()));
 			msg.Add(root);
 
-			string response = CallInternal(_operationQueue, msg.ToString());
+			string response = CallInternal(_rabbitConnectorOptions["OperationQueue"], msg.ToString());
 			return CKSSubject
 				.Load(CKSBase.Parse(response))
 				.ToArray();
 		}
 
 		public string Call(string message)
-			=> CallInternal(_operationQueue, message);
+			=> CallInternal(_rabbitConnectorOptions["OperationQueue"], message);
 
 		private string CallInternal(string routingKey, string message)
 		{
 			var messageBytes = _encoding.GetBytes(message);
 			_channel.BasicPublish
-				(exchange: _exchange,
+				(exchange: _rabbitConnectorOptions["Exchange"],
 				routingKey: routingKey,
 				basicProperties: _props,
 				body: messageBytes);

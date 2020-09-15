@@ -166,7 +166,6 @@ namespace S031.MetaStack.Common
 			new __typeInfo( '\0', NumericTypesScope.Integral ),
 			new __typeInfo( (sbyte)0, NumericTypesScope.Integral ),
 			new __typeInfo( (byte)0, NumericTypesScope.Integral ),
-			new __typeInfo( (sbyte)0, NumericTypesScope.Integral ),
 			new __typeInfo( (short)0, NumericTypesScope.Integral ),
 			new __typeInfo( (ushort)0, NumericTypesScope.Integral ),
 			new __typeInfo( 0, NumericTypesScope.Integral ),

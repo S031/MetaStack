@@ -8,6 +8,6 @@ namespace S031.MetaStack.Integral.Settings
 {
 	public interface ISettingsProvider<T> where T : class, ISettingsProvider<T>
 	{
-		Task<JsonValue> GetSettings(string path);
+		Task<string> GetSettings(string path);
 	}
 }

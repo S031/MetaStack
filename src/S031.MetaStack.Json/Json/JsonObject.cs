@@ -138,5 +138,9 @@ namespace S031.MetaStack.Json
 
 		public JsonPair GetPair()
 			=> _map.FirstOrDefault();
+
+		//public static implicit operator JsonObject(string value) => (JsonObject)new JsonReader(value).Read();
+		
+		//public static implicit operator string(JsonObject value) => value.ToString();
 	}
 }

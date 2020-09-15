@@ -191,7 +191,7 @@ namespace S031.MetaStack.Buffers
 		public static implicit operator byte[](BinaryDataBuffer b) 
 			=> b.Source;
 
-		public static explicit operator BinaryDataBuffer(byte[] b) 
+		public static implicit operator BinaryDataBuffer(byte[] b) 
 			=> new BinaryDataBuffer(b, false);
 	}
 }

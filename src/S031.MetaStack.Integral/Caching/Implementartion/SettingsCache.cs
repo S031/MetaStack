@@ -7,7 +7,7 @@ using System.Text;
 
 namespace S031.MetaStack.Caching
 {
-	public class SettingsCache : MapTable<string, JsonValue>, IDataCache<string, JsonValue>
+	public class SettingsCache : MapTable<string, string>, IDataCache<string, string>
 	{
 		public static SettingsCache  Instance = new SettingsCache();
 		private SettingsCache() { }
