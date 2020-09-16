@@ -1,4 +1,5 @@
-﻿using System;
+﻿using S031.MetaStack.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,27 +8,21 @@ using System.Xml.Linq;
 
 namespace Metib.Factoring.Clients.CKS
 {
-	public class CKSSubject: CKSBase
+	public class CKSSubject
 	{
 		private readonly XElement _xsubj;
-		public CKSSubject(string cksResponse) : base(cksResponse)
+
+		protected internal CKSSubject(XElement xsource)
 		{
+			_xsubj = xsource;
 		}
 
-		CKSSubject(XDocument source) : base(source)
-		{
-			_xsubj = Source.Element("client");
-		}
+		protected internal XElement Source
+			=> _xsubj;
 
-		public int ID => int.Parse(this["id"]);
+		public int ID => _xsubj.Element("id").Value.ToIntOrDefault();
 
-		public static List<CKSSubject> Load(XDocument source)
-		{
-			var result = new List<CKS.CKSSubject>();
-			var xclients = source.Root.Element("clients");
-			foreach (var xclient in xclients.Elements())
-				result.Add(new CKSSubject(new XDocument(xclient)));
-			return result;
-		}
+		public override string ToString()
+			=> _xsubj.ToString();
 	}
 }

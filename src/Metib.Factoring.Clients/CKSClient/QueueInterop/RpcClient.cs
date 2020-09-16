@@ -18,10 +18,10 @@ namespace Metib.Factoring.Clients.CKS
 	}
 	public class RpcClient : IDisposable
 	{
-		private const string _exchange = "cks.general.exchange";
-		private const string _loginQueue = "cks.login";
-		private const string _operationQueue = "cks.operations";
-		private const string _uploadQueue = "cks.upload";
+		//private const string _exchange = "cks.general.exchange";
+		//private const string _loginQueue = "cks.login";
+		//private const string _operationQueue = "cks.operations";
+		//private const string _uploadQueue = "cks.upload";
 
 		private IConnection _connection;
 		private IModel _channel;
@@ -98,15 +98,23 @@ namespace Metib.Factoring.Clients.CKS
 				</rabbitMsg>";
 			var response = CallInternal(_rabbitConnectorOptions["LoginQueue"], message);
 			var info = new CKSLogin(response);
-			_uuid = info.UUID;
-			Status = RpcClientStatusCodes.OK;
+			if (info.Status == CKSOperationStatus.error)
+			{
+				_uuid = string.Empty;
+				Status = RpcClientStatusCodes.Error;
+			}
+			else
+			{
+				_uuid = info.UUID;
+				Status = RpcClientStatusCodes.OK;
+			}
 			return info;
 		}
 
 		public bool Connected
 			=> !string.IsNullOrEmpty(_uuid);
 
-		public CKSSubject[] Read(params object[] searchParameters)
+		public CKSSubjects PerformClientSearch(params object[] searchParameters)
 		{
 			XDocument msg = new XDocument();
 			XElement root = new XElement("rabbitMsg");
@@ -130,9 +138,7 @@ namespace Metib.Factoring.Clients.CKS
 			msg.Add(root);
 
 			string response = CallInternal(_rabbitConnectorOptions["OperationQueue"], msg.ToString());
-			return CKSSubject
-				.Load(CKSBase.Parse(response))
-				.ToArray();
+			return new CKSSubjects(response);
 		}
 
 		public string Call(string message)

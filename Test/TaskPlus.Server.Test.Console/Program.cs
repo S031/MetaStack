@@ -2,6 +2,7 @@
 using S031.MetaStack.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -14,18 +15,27 @@ namespace TaskPlus.Server.Test.Console
 		static void Main()
 		{
 			System.Console.WriteLine("Start tests");
-			_token = Login("svostrikov", "@test").GetAwaiter().GetResult();
+			Login("svostrikov", "@test").GetAwaiter().GetResult();
 			DateTime start = DateTime.Now;
-			//string result = RequesSpeedTest();
-			string result = RequestPerformClientSearch();
-			System.Console.WriteLine($"Finsh tests with {(DateTime.Now - start).TotalSeconds} ms");
-			System.Console.WriteLine($"Result: {result}");
+
+			string result = RequesSpeedTest();
+			System.Console.WriteLine($"Finsh RequesSpeedTest (100 calls from 100 clients) with {(DateTime.Now - start).TotalSeconds} ms\nResult: {result}\n\n");
+			
+			result = Test("GetSettingsSpeedTest", 100000);
+			System.Console.WriteLine($"Finsh GetSettingsSpeedTest tests with Result:\n{result}\n\n");
+
+			result = Test("RecursiveCallExecuteAsync", 100000);
+			System.Console.WriteLine($"Finsh RecursiveCallExecuteAsync tests with Result:\n{result}\n\n");
+
+			start = DateTime.Now;
+			result = PerformClientSearchTest();
+			System.Console.WriteLine($"Finsh PerformClientSearchTest with {(DateTime.Now - start).TotalSeconds} ms\nResult: {result}\n\n");
 			System.Console.ReadLine();
+
 		}
 		
 		private static readonly HttpClient _client = new HttpClient();
-		private static string _token;
-
+		
 		private static async Task<string> Login(string login, string password)
 		{
 			JsonObject j = new JsonObject() { ["UserName"] = login, ["Password"] = password };
@@ -36,16 +46,17 @@ namespace TaskPlus.Server.Test.Console
 			_client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 			return token;
 		}
+		
 		private static string RequesSpeedTest()
 		{
 			List<Task> ts = new List<Task>(100);
 			string result = string.Empty;
 
-			for (int j = 0; j < 1; j++)
+			for (int j = 0; j < 100; j++)
 			{
 				ts.Add(Task.Run(async ()=>
 				{
-					for (int i = 1; i <= 1; i++)
+					for (int i = 1; i <= 100; i++)
 						result = await RunAsync("cks_test", 
 							new JsonObject(){["@ObjectName"] = "Test", ["@IDs"] = "0"}
 							.ToString());
@@ -54,14 +65,25 @@ namespace TaskPlus.Server.Test.Console
 			Task.WaitAll(ts.ToArray());
 			return result;
 		}
-		private static string RequestPerformClientSearch()
+		
+		private static string PerformClientSearchTest()
 		{
-			JsonArray a = new JsonArray();
-			a.Add(new JsonObject() { ["@Key"] = "inn", ["@Value"] = "7714606819" });
+			JsonArray a = new JsonArray
+			{
+				new JsonObject() { ["@Key"] = "inn", ["@Value"] = "7714606819" }
+			};
 			return RunAsync("cks_perform_client_search", a.ToString())
 				.GetAwaiter()
 				.GetResult();
 		}
+
+		private static string Test(string testID, int loopCount)
+		{
+			return RunAsync("cks_test", new JsonObject() { ["@ObjectName"] = testID, ["@IDs"] = $"{loopCount}" }.ToString())
+				.GetAwaiter()
+				.GetResult();
+		}
+
 		private static async Task<string> RunAsync(string method, string json)
 		{
 			// Update port # in the following line.

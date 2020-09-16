@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using JsonPair = System.Collections.Generic.KeyValuePair<string, S031.MetaStack.Json.JsonValue>;
 using JsonPairEnumerable = System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, S031.MetaStack.Json.JsonValue>>;
 
@@ -139,8 +140,31 @@ namespace S031.MetaStack.Json
 		public JsonPair GetPair()
 			=> _map.FirstOrDefault();
 
-		//public static implicit operator JsonObject(string value) => (JsonObject)new JsonReader(value).Read();
-		
-		//public static implicit operator string(JsonObject value) => value.ToString();
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static JsonObject Parse(string source)
+			=> (JsonObject)new JsonReader(source).Read();
+
+		public static bool TryParse(string source, out JsonObject json)
+		{
+			try
+			{
+				json = (JsonObject)new JsonReader(source).Read();
+				return true;
+			}
+			catch
+			{
+				json = null;
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Fast test string on json format first and last characters are '{' and '}'
+		/// </summary>
+		/// <param name="stringForTest"></param>
+		/// <returns></returns>
+		public static new bool Test(string stringForTest)
+			=> TestStringOnJsonFormat(stringForTest, new char[] { '{' }, new char[] { '}' });
+
 	}
 }

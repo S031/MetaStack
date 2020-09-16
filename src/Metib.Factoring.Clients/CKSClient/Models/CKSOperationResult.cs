@@ -34,17 +34,27 @@ namespace Metib.Factoring.Clients.CKS
 		}
 
 	}
-	public abstract class CKSBase
+	public class CKSOperationResult
 	{
-		protected CKSBase(XDocument source)
+		public CKSOperationResult(string cksResponse)
 		{
-			Source = source;
+			Source = 
+				XDocument.Parse(
+					XDocument.Parse(cksResponse)
+						.Element("cksOperationPOSTModel")
+						.Element("xml").Value)
+				.Element("cks");
+			var elem = Source.Element("return");
+			Status = (CKSOperationStatus)Enum.Parse(typeof(CKSOperationStatus), elem.Attribute("Status").Value);
+			if (Status == CKSOperationStatus.error)
+			{
+				XElement xerr = elem.Element("error");
+				Error = new CKS.CKSOperationError(
+					(CKSOperationErrorStatus)Enum.Parse(typeof(CKSOperationErrorStatus), xerr.Attribute("Status").Value),
+					xerr.Value);
+			}
 		}
-
-		protected CKSBase(string cksResponse) : this(Parse(cksResponse))
-		{
-		}
-		public XDocument Source { get; }
+		protected internal XElement Source { get; }
 
 		public CKSOperationStatus Status { get; protected set; }
 
@@ -52,12 +62,6 @@ namespace Metib.Factoring.Clients.CKS
 
 		public override string ToString()
 			=> Source.ToString();
-
-		public static XDocument Parse(string cksResponse)
-			=> XDocument.Parse(
-				XDocument.Parse(cksResponse)
-					.Element("cksOperationPOSTModel")
-					.Element("xml").Value);
 
 		public string this[string path]
 			=>Source.Element(path).Value;

@@ -27,13 +27,13 @@ namespace TaskPlus.Server.Api.Settings
 			FROM [BU_Earth].[dbo].[Vocabulary_SettingsFactoring]
 			where [Identifier] = @identifier";
 
-		private ILogger _logger;
-		private IMdbContextFactory _mdbFactory;
+		//private readonly ILogger _logger;
+		private readonly IMdbContextFactory _mdbFactory;
 		private static readonly SettingsCache _cache = SettingsCache.Instance;
 
 		public VocabularySettingsProvider(IServiceProvider services)
 		{
-			_logger =  services.GetRequiredService<ILogger>();
+			//_logger =  services.GetRequiredService<ILogger>();
 			_mdbFactory = services.GetRequiredService<IMdbContextFactory>();
 		}
 
@@ -43,7 +43,10 @@ namespace TaskPlus.Server.Api.Settings
 				throw new ArgumentException("Invalid argument for get settings", nameof(path));
 			
 			string[] items = path.Split('.', StringSplitOptions.RemoveEmptyEntries);
+			bool needJson = items.Length > 1;
+
 			JsonWriter w = new JsonWriter(Formatting.None);
+			JsonValue settings = null;
 			
 			if (!_cache.TryGetValue(items[0], out string s))
 			{
@@ -53,15 +56,19 @@ namespace TaskPlus.Server.Api.Settings
 				{
 					if (!dr.Read())
 						throw new KeyNotFoundException($"No found setting with Identifier = '{items[0]}'");
+					
 					w.WriteStartObject();
 					for (int i = 0; i < dr.FieldCount; i++)
 					{
 						string name = dr.GetName(i);
 						if (name == "ValueString")
 						{
+							string source = (string)dr.GetValue(i);
+							if (needJson && !JsonValue.TryParse(source, out settings))
+								throw new KeyNotFoundException($"No found setting with path = '{path}' Or ValueString is not json format");
+
 							w.WritePropertyName("Settings");
-							string source = ((string)dr.GetValue(i)).Trim();
-							if (source.StartsWith('{'))
+							if (needJson || JsonValue.Test(source))
 								w.WriteRaw(source);
 							else
 								w.WriteValue(source);
@@ -74,17 +81,18 @@ namespace TaskPlus.Server.Api.Settings
 					_cache.TryAdd(items[0], s);
 				}
 			}
-			if (items.Length == 1)
-				return s;
-			_logger.LogDebug(s);
-			JsonValue result = new JsonReader(s).Read()["Settings"];
-			if (result == null)
-				throw new KeyNotFoundException($"No found setting for path '{path}'");
+			else if (needJson)
+				settings = new JsonReader(s).Read()["Settings"];
 
-			for (int n = 1; n < items.Length; n++)
-				/// !!! add exception raise
-				result = result[items[n]];
-			return result;
+			if (!needJson)
+				return s;
+			else if (settings == null)
+				throw new InvalidCastException($"ValueString has not valid json format");
+
+			var result = settings[items[1]];
+			for (int i = 2; i < items.Length; i++)
+				result = result[items[i]];
+			return result.ToString();
 		}
 	}
 }

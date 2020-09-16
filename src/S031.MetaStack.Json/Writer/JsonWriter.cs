@@ -267,7 +267,10 @@ namespace S031.MetaStack.Json
 
 		public JsonWriter WriteRaw(string json)
 		{
+			if (_commaExpected)
+				WriteComma();
 			_sb.Append(json);
+			_commaExpected = true;
 			return this;
 		}
 

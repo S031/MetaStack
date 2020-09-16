@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace S031.MetaStack.Json
 {
@@ -121,5 +122,32 @@ namespace S031.MetaStack.Json
 		public IEnumerator<JsonValue> GetEnumerator() => _list.GetEnumerator();
 
 		IEnumerator IEnumerable.GetEnumerator() => _list.GetEnumerator();
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static JsonArray Parse(string source)
+			=> (JsonArray)new JsonReader(source).Read();
+
+		public static bool TryParse(string source, out JsonArray array)
+		{
+			try
+			{
+				array = (JsonArray)new JsonReader(source).Read();
+				return true;
+			}
+			catch
+			{
+				array = null;
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Fast simpale test string on json format, first and last characters are '[' and ']'
+		/// </summary>
+		/// <param name="stringForTest"></param>
+		/// <returns></returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static new bool Test(string stringForTest)
+			=> TestStringOnJsonFormat(stringForTest, new char[] {'['}, new char[] { ']' });
 	}
 }

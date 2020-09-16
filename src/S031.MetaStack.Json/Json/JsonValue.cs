@@ -1,5 +1,7 @@
 ﻿using S031.MetaStack.Common;
 using System;
+using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace S031.MetaStack.Json
 {
@@ -7,26 +9,26 @@ namespace S031.MetaStack.Json
 	{
 		private static readonly ReadOnlyCache<Type, JsonType> _typesCache = new ReadOnlyCache<Type, JsonType>
 		(
-			(typeof(bool), JsonType.Boolean ),
-			(typeof(byte), JsonType.Integer ),
-			(typeof(char), JsonType.String ),
-			(typeof(sbyte), JsonType.Integer ),
-			(typeof(short), JsonType.Integer ),
-			(typeof(ushort), JsonType.Integer ),
-			(typeof(int), JsonType.Integer ),
-			(typeof(uint), JsonType.Integer ),
-			(typeof(long), JsonType.Integer ),
-			(typeof(ulong), JsonType.Integer ),
-			(typeof(float), JsonType.Float ),
-			(typeof(double), JsonType.Float ),
-			(typeof(decimal), JsonType.Float ),
-			(typeof(DateTime), JsonType.Date ),
-			(typeof(string), JsonType.String ),
-			(typeof(Uri), JsonType.Uri ),
-			(typeof(Guid), JsonType.Guid ),
-			(typeof(byte[]), JsonType.Bytes ),
-			(typeof(DateTimeOffset), JsonType.String ),
-			(typeof(TimeSpan), JsonType.String )
+			(typeof(bool), JsonType.Boolean),
+			(typeof(byte), JsonType.Integer),
+			(typeof(char), JsonType.String),
+			(typeof(sbyte), JsonType.Integer),
+			(typeof(short), JsonType.Integer),
+			(typeof(ushort), JsonType.Integer),
+			(typeof(int), JsonType.Integer),
+			(typeof(uint), JsonType.Integer),
+			(typeof(long), JsonType.Integer),
+			(typeof(ulong), JsonType.Integer),
+			(typeof(float), JsonType.Float),
+			(typeof(double), JsonType.Float),
+			(typeof(decimal), JsonType.Float),
+			(typeof(DateTime), JsonType.Date),
+			(typeof(string), JsonType.String),
+			(typeof(Uri), JsonType.Uri),
+			(typeof(Guid), JsonType.Guid),
+			(typeof(byte[]), JsonType.Bytes),
+			(typeof(DateTimeOffset), JsonType.String),
+			(typeof(TimeSpan), JsonType.String)
 		);
 
 		private readonly object _value;
@@ -283,5 +285,70 @@ namespace S031.MetaStack.Json
 			=> new JsonWriter(Formatting.None)
 			.WriteValue(this)
 			.ToString();
+
+		public static bool TryParse(string source, out JsonValue value)
+		{
+			try
+			{
+				value = new JsonReader(source).Read();
+				return true;
+			}
+			catch
+			{
+				value = null;
+				return false;
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool Test(string stringForTest)
+			=> TestStringOnJsonFormat(stringForTest,
+				new char[] { '{', '[' },
+				new char[] { '}', ']' });
+
+		internal static bool TestStringOnJsonFormat(string stringForTest, char[] first, char[] last)
+		{
+			int len = stringForTest.Length;
+			int start = -1;
+			for (int i = 0; i < len; i++)
+			{
+				char peekChar = stringForTest[i];
+				switch (peekChar)
+				{
+					case ' ':
+					case '\t':
+					case '\r':
+					case '\n':
+						continue;
+					default:
+						if (first.Contains(peekChar))
+						{
+							start = i;
+							break;
+						}
+						else
+							return false;
+				}
+			}
+
+			for (int i = len - 1; i > start; i--)
+			{
+				char peekChar = stringForTest[i];
+				switch (peekChar)
+				{
+					case ' ':
+					case '\t':
+					case '\r':
+					case '\n':
+						continue;
+					default:
+						if (last.Contains(peekChar))
+							return true;
+						else
+							return false;
+				}
+			}
+			return false;
+		}
 	}
 }

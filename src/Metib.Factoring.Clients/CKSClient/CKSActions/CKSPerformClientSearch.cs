@@ -29,7 +29,7 @@ namespace Metib.Factoring.Clients.CKS
 			ISettingsProvider<VocabularySettingsProvider> settings
 				= services.GetRequiredService<ISettingsProvider<VocabularySettingsProvider>>();
 
-			var rabbitConnectorOptions = (JsonObject)(await settings.GetSettings("CKSServiceSettings.RabbitConnectorOptions"));
+			var rabbitConnectorOptions = JsonObject.Parse(await settings.GetSettings("CKSServiceSettings.RabbitConnectorOptions"));
 
 			dp.GoDataTop();
 			List<object> p = new List<object>();
@@ -44,17 +44,18 @@ namespace Metib.Factoring.Clients.CKS
 				_rpcClient = new RpcClient(rabbitConnectorOptions, logger);
 
 			if (_rpcClient.Status == RpcClientStatusCodes.None)
-				_rpcClient.Login(
-					(string)rabbitConnectorOptions["UserLogin"],
-					(string)rabbitConnectorOptions["UserPassword"]);
+			{
+				string login = (string)rabbitConnectorOptions["UserLogin"];
+				string password = (string)rabbitConnectorOptions["UserPassword"];
+				var loginResult = _rpcClient.Login(login, password);
+				if (loginResult.Status == CKSOperationStatus.error)
+					throw new InvalidOperationException($"Error login on RabbitMQ service for login '{login}' with Status={loginResult.Error.Status}, Message={loginResult.Error.ErrorMessage}");
+			}
 
 			if (_rpcClient.Status == RpcClientStatusCodes.OK)
 			{
-				var list = _rpcClient.Read(p.ToArray());
-				b.AppendLine("<clients>");
-				for (int i = 0; i < list.Length; i++)
-					b.Append(list[i].ToString());
-				b.AppendLine("</clients>");
+				var list = _rpcClient.PerformClientSearch(p.ToArray());
+				b.Append(list.ToString());
 			}
 			else //!!! Replace with normal exception
 				throw new InvalidOperationException("Error access to RabbitMQ service");
