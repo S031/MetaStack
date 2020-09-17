@@ -16,7 +16,7 @@ using TaskPlus.Server.Data;
 
 namespace Metib.Factoring.Clients.CKS
 {
-	public class CKSPerformClientSearch : IAppEvaluator
+	public class CKSGetClientInfo : IAppEvaluator
 	{
 		public DataPackage Invoke(ActionInfo ai, DataPackage dp)
 			=> throw new NotImplementedException();
@@ -29,21 +29,16 @@ namespace Metib.Factoring.Clients.CKS
 				= services.GetRequiredService<ISettingsProvider<VocabularySettingsProvider>>();
 
 			var rabbitConnectorOptions = await settings.GetSettings("CKSServiceSettings.RabbitConnectorOptions");
+			if ((string)dp[0] != "id")
+				throw new IndexOutOfRangeException("Required parameter name = 'id'");
 
-			dp.GoDataTop();
-			List<object> p = new List<object>();
-			for (; dp.Read();)
-			{
-				p.Add(dp[0]);
-				p.Add(dp[1]);
-			}
+			long id = dp[1].CastOf<long>();
 
 			StringBuilder b = new StringBuilder();
 			using (var _rpcClient = new RpcClient(rabbitConnectorOptions))
 			{
-
 				var loginResult = await _rpcClient.Login();
-				var list = await _rpcClient.PerformClientSearch(p.ToArray());
+				var list = await _rpcClient.GetClientInfo(id);
 				b.Append(list.ToString());
 			}
 

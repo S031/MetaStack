@@ -34,6 +34,7 @@ namespace Metib.Factoring.Clients.CKS
 		}
 
 	}
+
 	public class CKSOperationResult
 	{
 		public CKSOperationResult(string cksResponse)

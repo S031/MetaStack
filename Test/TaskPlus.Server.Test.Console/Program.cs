@@ -18,18 +18,23 @@ namespace TaskPlus.Server.Test.Console
 			Login("svostrikov", "@test").GetAwaiter().GetResult();
 			DateTime start = DateTime.Now;
 
-			string result = RequesSpeedTest();
-			System.Console.WriteLine($"Finsh RequesSpeedTest (100 calls from 100 clients) with {(DateTime.Now - start).TotalSeconds} ms\nResult: {result}\n\n");
+			//string result = RequesSpeedTest();
+			//System.Console.WriteLine($"Finsh RequesSpeedTest (100 calls from 100 clients) with {(DateTime.Now - start).TotalSeconds} ms\nResult: {result}\n\n");
 			
-			result = Test("GetSettingsSpeedTest", 100000);
-			System.Console.WriteLine($"Finsh GetSettingsSpeedTest tests with Result:\n{result}\n\n");
+			//result = Test("GetSettingsSpeedTest", 100000);
+			//System.Console.WriteLine($"Finsh GetSettingsSpeedTest tests with Result:\n{result}\n\n");
 
-			result = Test("RecursiveCallExecuteAsync", 100000);
-			System.Console.WriteLine($"Finsh RecursiveCallExecuteAsync tests with Result:\n{result}\n\n");
+			//result = Test("RecursiveCallExecuteAsync", 100000);
+			//System.Console.WriteLine($"Finsh RecursiveCallExecuteAsync tests with Result:\n{result}\n\n");
 
-			start = DateTime.Now;
-			result = PerformClientSearchTest();
-			System.Console.WriteLine($"Finsh PerformClientSearchTest with {(DateTime.Now - start).TotalSeconds} ms\nResult: {result}\n\n");
+			//start = DateTime.Now;
+			//result = PerformClientSearchTest();
+			//System.Console.WriteLine($"Finsh PerformClientSearchTest with {(DateTime.Now - start).TotalSeconds} ms\nResult: {result}\n\n");
+			//System.Console.ReadLine();
+			
+			//start = DateTime.Now;
+			string result = GetClientInfo();
+			System.Console.WriteLine($"Finsh GetClientInfo with {(DateTime.Now - start).TotalSeconds} ms\nResult: {result}\n\n");
 			System.Console.ReadLine();
 
 		}
@@ -73,6 +78,17 @@ namespace TaskPlus.Server.Test.Console
 				new JsonObject() { ["@Key"] = "inn", ["@Value"] = "7714606819" }
 			};
 			return RunAsync("cks_perform_client_search", a.ToString())
+				.GetAwaiter()
+				.GetResult();
+		}
+
+		private static string GetClientInfo()
+		{
+			JsonArray a = new JsonArray
+			{
+				new JsonObject() { ["@Key"] = "id", ["@Value"] = 1872024L }
+			};
+			return RunAsync("cks_get_client_info", a.ToString())
 				.GetAwaiter()
 				.GetResult();
 		}

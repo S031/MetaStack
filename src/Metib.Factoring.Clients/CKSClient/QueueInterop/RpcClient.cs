@@ -7,114 +7,39 @@ using System.Xml.Linq;
 using System.Collections.Generic;
 using S031.MetaStack.Json;
 using Microsoft.Extensions.Logging;
+using System.Xml;
+using System.Threading.Tasks;
 
 namespace Metib.Factoring.Clients.CKS
 {
-	public enum RpcClientStatusCodes
-	{
-		None,
-		OK,
-		Error
-	}
 	public class RpcClient : IDisposable
 	{
-		//private const string _exchange = "cks.general.exchange";
-		//private const string _loginQueue = "cks.login";
-		//private const string _operationQueue = "cks.operations";
-		//private const string _uploadQueue = "cks.upload";
-
-		private IConnection _connection;
-		private IModel _channel;
-		private string _replyQueueName;
-		private EventingBasicConsumer _consumer;
-		private readonly BlockingCollection<string> _respQueue = new BlockingCollection<string>();
-		private IBasicProperties _props;
-		private readonly Encoding _encoding = Encoding.Default;
+		private readonly RpcChannel _cahannel;
 		private string _uuid = string.Empty;
 
-		private readonly JsonObject _rabbitConnectorOptions;
-		private readonly ILogger _logger;
-
-
-		public RpcClientStatusCodes Status { get; private set; } = RpcClientStatusCodes.None;
-
-		public RpcClient(JsonObject parameters, ILogger logger)
+		public RpcClient(string parameters)
 		{
-			_rabbitConnectorOptions = parameters;
-			_logger = logger;
-			try
-			{
-				Initialize();
-			}
-			catch (Exception ex)
-			{
-				logger.LogError(ex.Message);
-				Status = RpcClientStatusCodes.Error;
-			}
+			_cahannel = RpcChannelPool.Rent(parameters);
 		}
 
-		private void Initialize()
-		{
-			var factory = new ConnectionFactory()
-			{
-				HostName = _rabbitConnectorOptions["HostName"],
-				VirtualHost = _rabbitConnectorOptions["VirtualHost"],
-				Port = (int)_rabbitConnectorOptions["Port"],
-				UserName = _rabbitConnectorOptions["QueueServiceLogin"],
-				Password = _rabbitConnectorOptions["QueueServicePassword"],
-			};
-
-			_connection = factory.CreateConnection();
-			_channel = _connection.CreateModel();
-			_channel.ExchangeDeclare(
-				exchange: _rabbitConnectorOptions["Exchange"], 
-				type: ExchangeType.Direct, 
-				durable: true);
-			_replyQueueName = _channel.QueueDeclare().QueueName;
-			_consumer = new EventingBasicConsumer(_channel);
-
-			_props = _channel.CreateBasicProperties();
-			var correlationId = Guid.NewGuid().ToString();
-			_props.CorrelationId = correlationId;
-			_props.ReplyTo = _replyQueueName;
-
-			_consumer.Received += (model, ea) =>
-			{
-				var body = ea.Body.ToArray();
-				var response = Encoding.UTF8.GetString(body);
-				if (ea.BasicProperties.CorrelationId == correlationId)
-				{
-					_respQueue.Add(response);
-				}
-			};
-		}
-
-		public CKSLogin Login(string userName, string password)
+		public async Task<CKSLogin> Login()
 		{
 			string message = $@"
 				<rabbitMsg>
-					<username>{userName}</username>
-					<password>{password}</password>
+					<username>{(string)_cahannel["UserLogin"]}</username>
+					<password>{(string)_cahannel["UserPassword"]}</password>
 				</rabbitMsg>";
-			var response = CallInternal(_rabbitConnectorOptions["LoginQueue"], message);
+
+			var response = await Task.Run(() => _cahannel.Call("LoginQueue", message));
 			var info = new CKSLogin(response);
 			if (info.Status == CKSOperationStatus.error)
-			{
-				_uuid = string.Empty;
-				Status = RpcClientStatusCodes.Error;
-			}
-			else
-			{
-				_uuid = info.UUID;
-				Status = RpcClientStatusCodes.OK;
-			}
+				throw new CKSOperationException(info.Error.Status, info.Error.ErrorMessage);
+
+			_uuid = info.UUID;
 			return info;
 		}
 
-		public bool Connected
-			=> !string.IsNullOrEmpty(_uuid);
-
-		public CKSSubjects PerformClientSearch(params object[] searchParameters)
+		public async Task<CKSSubjects> PerformClientSearch(params object[] searchParameters)
 		{
 			XDocument msg = new XDocument();
 			XElement root = new XElement("rabbitMsg");
@@ -137,41 +62,39 @@ namespace Metib.Factoring.Clients.CKS
 			root.Add(new XElement("xml", xcks.ToString()));
 			msg.Add(root);
 
-			string response = CallInternal(_rabbitConnectorOptions["OperationQueue"], msg.ToString());
-			return new CKSSubjects(response);
+			string response = await Task.Run(() => _cahannel.Call(msg.ToString()));
+			var info = new CKSSubjects(response);
+			if (info.Status == CKSOperationStatus.error)
+				throw new CKSOperationException(info.Error.Status, info.Error.ErrorMessage);
+			return info;
 		}
 
-		public string Call(string message)
-			=> CallInternal(_rabbitConnectorOptions["OperationQueue"], message);
-
-		private string CallInternal(string routingKey, string message)
+		public async Task<CKSSubjects> GetClientInfo(long id)
 		{
-			var messageBytes = _encoding.GetBytes(message);
-			_channel.BasicPublish
-				(exchange: _rabbitConnectorOptions["Exchange"],
-				routingKey: routingKey,
-				basicProperties: _props,
-				body: messageBytes);
-
-			_channel.BasicConsume(
-				consumer: _consumer,
-				queue: _replyQueueName,
-				autoAck: true);
-
-			return _respQueue.Take();
+			XDocument msg = new XDocument(
+				new XElement("rabbitMsg",
+					new XElement("operation", "Get_Client_Info"),
+					new XElement("UUID", _uuid),
+					new XElement("xml", 
+						new XElement("cks", 
+							new XElement("search",
+								new XElement("clients",
+									new XElement("client",
+										new XAttribute("id", id)
+									)
+								)
+							)
+						).ToString()
+					)
+				)
+			);
+			string response = await Task.Run(() => _cahannel.Call(msg.ToString()));
+			var info = new CKSSubjects(response);
+			if (info.Status == CKSOperationStatus.error)
+				throw new CKSOperationException(info.Error.Status, info.Error.ErrorMessage);
+			return info;
 		}
 
-		public void Close()
-		{
-			if (_connection.IsOpen)
-				_connection.Close();
-		}
-
-		public void Dispose()
-		{
-			Close();
-			_channel.Dispose();
-			_connection.Dispose();
-		}
+		public void Dispose() => RpcChannelPool.Return(_cahannel);
 	}
 }
