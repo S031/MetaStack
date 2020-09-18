@@ -257,7 +257,7 @@ namespace S031.MetaStack.Core.Actions
 			ai.LogOnError = (bool)dr["LogOnError"];
 			ai.EMailOnError = (bool)dr["EMailOnError"];
 			ai.EMailGroup = (string)dr["EMailGroup"];
-			ai.IID = dr["IID"].CastOf<int>();
+			ai.IID = dr["IID"].CastAs<int>();
 			ai.InterfaceID = (string)dr["InterfaceID"];
 			ai.InterfaceName = (string)dr["Name"];
 			ai.Description = (string)dr["Description"];
@@ -276,11 +276,11 @@ namespace S031.MetaStack.Core.Actions
 			{
 				ParameterID = (string)dr["ParameterID"],
 				Dirrect = (ParamDirrect)(int)dr["Dirrect"],
-				Position = dr["Position"].CastOf<int>(),
+				Position = dr["Position"].CastAs<int>(),
 				Name = (string)dr["Name"],
 				DataType = (string)dr["DataType"],
-				Width = dr["Width"].CastOf<int>(),
-				DisplayWidth = dr["DisplayWidth"].CastOf<int>(),
+				Width = dr["Width"].CastAs<int>(),
+				DisplayWidth = dr["DisplayWidth"].CastAs<int>(),
 				PresentationType = (string)dr["PresentationType"],
 				Mask = (string)dr["Mask"],
 				Format = (string)dr["Format"],
@@ -296,7 +296,7 @@ namespace S031.MetaStack.Core.Actions
 				DefaultValue = (string)dr["DefaultValue"],
 				ConstName = (string)dr["ConstantName"],
 				FieldName = (string)dr["FieldName"],
-				IsObjectName = dr["IsObjectName"].CastOf<bool>()
+				IsObjectName = dr["IsObjectName"].CastAs<bool>()
 			});
 		}
 	}

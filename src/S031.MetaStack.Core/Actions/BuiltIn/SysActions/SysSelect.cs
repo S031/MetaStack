@@ -125,7 +125,7 @@ namespace S031.MetaStack.Core.Actions
 				{
 					object value = _parameters[idx + 1];
 					Type type = p.DataType.Type();
-					mdbParams.Add(new MdbParameter(p.ParamName, value.CastOf(type)) { NullIfEmpty = p.NullIfEmpty });
+					mdbParams.Add(new MdbParameter(p.ParamName, value.CastAs(type)) { NullIfEmpty = p.NullIfEmpty });
 				}
 			}
 			return mdbParams.ToArray();

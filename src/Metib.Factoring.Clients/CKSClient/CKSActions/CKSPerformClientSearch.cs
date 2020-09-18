@@ -42,7 +42,7 @@ namespace Metib.Factoring.Clients.CKS
 			using (var _rpcClient = new RpcClient(rabbitConnectorOptions))
 			{
 
-				var loginResult = await _rpcClient.Login();
+				await _rpcClient.Login();
 				var list = await _rpcClient.PerformClientSearch(p.ToArray());
 				b.Append(list.ToString());
 			}

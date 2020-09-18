@@ -631,13 +631,13 @@ namespace S031.MetaStack.Common
 		public static T GetValue<T>(this IDictionary<string, object> d, string key, T defaultValue = default)
 		{
 			if (d != null && d.TryGetValue(key, out object result))
-				return result.CastOf<T>();
+				return result.CastAs<T>();
 			return defaultValue;
 		}
 		public static T GetValue<T>(this MapTable<string, object> d, string key, T defaultValue = default)
 		{
 			if (d != null && d.TryGetValue(key, out object result))
-				return result.CastOf<T>();
+				return result.CastAs<T>();
 			return defaultValue;
 		}
 	}
@@ -650,7 +650,7 @@ namespace S031.MetaStack.Common
 
 	public static class ObjectExtensions
 	{
-		public static object CastOf(this object source, Type type)
+		public static object CastAs(this object source, Type type)
 		{
 			if (source == null || Convert.IsDBNull(source))
 				return type.GetDefaultValue();
@@ -666,7 +666,7 @@ namespace S031.MetaStack.Common
 				return source.ToString().ToObjectOf(type);
 		}
 
-		public static T CastOf<T>(this object source) => (T)CastOf(source, typeof(T));
+		public static T CastAs<T>(this object source) => (T)CastAs(source, typeof(T));
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void NullTest(this object value, string valueName) =>

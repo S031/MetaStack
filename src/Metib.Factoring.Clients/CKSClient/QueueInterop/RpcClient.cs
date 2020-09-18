@@ -9,6 +9,7 @@ using S031.MetaStack.Json;
 using Microsoft.Extensions.Logging;
 using System.Xml;
 using System.Threading.Tasks;
+using S031.MetaStack.Common;
 
 namespace Metib.Factoring.Clients.CKS
 {
@@ -19,24 +20,26 @@ namespace Metib.Factoring.Clients.CKS
 
 		public RpcClient(string parameters)
 		{
-			_cahannel = RpcChannelPool.Rent(parameters);
+			//_cahannel = RpcChannelPool.Rent(parameters);
+			_cahannel = new RpcChannel(parameters, 0);
 		}
 
-		public async Task<CKSLogin> Login()
+		public async Task Login()
 		{
-			string message = $@"
+			if (_uuid.IsEmpty())
+			{
+				string message = $@"
 				<rabbitMsg>
 					<username>{(string)_cahannel["UserLogin"]}</username>
 					<password>{(string)_cahannel["UserPassword"]}</password>
 				</rabbitMsg>";
 
-			var response = await Task.Run(() => _cahannel.Call("LoginQueue", message));
-			var info = new CKSLogin(response);
-			if (info.Status == CKSOperationStatus.error)
-				throw new CKSOperationException(info.Error.Status, info.Error.ErrorMessage);
-
-			_uuid = info.UUID;
-			return info;
+				var response = await Task.Run(() => _cahannel.Call("LoginQueue", message));
+				var info = new CKSLogin(response);
+				if (info.Status == CKSOperationStatus.error)
+					throw new CKSOperationException(info.Error.Status, info.Error.ErrorMessage);
+				_uuid = info.UUID;
+			}
 		}
 
 		public async Task<CKSSubjects> PerformClientSearch(params object[] searchParameters)
@@ -95,6 +98,6 @@ namespace Metib.Factoring.Clients.CKS
 			return info;
 		}
 
-		public void Dispose() => RpcChannelPool.Return(_cahannel);
+		public void Dispose() => _cahannel.Dispose(); //RpcChannelPool.Return(_cahannel);
 	}
 }

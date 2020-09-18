@@ -8,7 +8,7 @@ namespace Metib.Factoring.Clients.CKS
 {
 	internal static class RpcChannelPool
 	{
-		private const int _connection_pool_size = 10;
+		private const int _connection_pool_size = 100;
 
 		private static readonly RpcChannel[] _rpcChannels = new RpcChannel[_connection_pool_size];
 		private static readonly int[] _rented = new int[_connection_pool_size];
@@ -36,6 +36,7 @@ namespace Metib.Factoring.Clients.CKS
 					throw new InvalidOperationException("Internal error: rabbit connection pool is locked");
 				i = pos.Value;
 				_blocked[i] = true;
+				_rented[i]++;
 			}
 			
 			var channel = _rpcChannels[i];
@@ -47,10 +48,7 @@ namespace Metib.Factoring.Clients.CKS
 			}
 
 			lock (obj4Lock)
-			{
-				_rented[i]++;
 				_blocked[i] = false;
-			}
 			return i;
 		}
 	}

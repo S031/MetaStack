@@ -12,4 +12,10 @@
     <ProjectReference Include="..\..\src\S031.MetaStack.Json\S031.MetaStack.Json.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Test.App.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

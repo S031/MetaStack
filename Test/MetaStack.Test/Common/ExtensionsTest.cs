@@ -202,7 +202,7 @@ namespace MetaStack.Test.Common
 					//var b = decimal.TryParse(value.ToString(), out decimal a) && a == 0;
 					//var b = value.ToString().Equals("0");
 					//value.Equals(0);
-					var a = val.CastOf(typeof(int));
+					var a = val.CastAs(typeof(int));
 					//var a = vbo.IsEmpty(val);
 				}
 				object value = 0D;

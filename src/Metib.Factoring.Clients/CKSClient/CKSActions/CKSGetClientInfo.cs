@@ -32,12 +32,12 @@ namespace Metib.Factoring.Clients.CKS
 			if ((string)dp[0] != "id")
 				throw new IndexOutOfRangeException("Required parameter name = 'id'");
 
-			long id = dp[1].CastOf<long>();
+			long id = dp[1].CastAs<long>();
 
 			StringBuilder b = new StringBuilder();
 			using (var _rpcClient = new RpcClient(rabbitConnectorOptions))
 			{
-				var loginResult = await _rpcClient.Login();
+				await _rpcClient.Login();
 				var list = await _rpcClient.GetClientInfo(id);
 				b.Append(list.ToString());
 			}

@@ -177,7 +177,7 @@ namespace S031.MetaStack.Data
 		{
 			using (DbCommand command = GetCommandInternal(sql, parameters))
 			{
-				return command.ExecuteScalar().CastOf<T>();
+				return command.ExecuteScalar().CastAs<T>();
 			}
 		}
 		DbCommand GetCommandInternal(string sql, params MdbParameter[] parameters)

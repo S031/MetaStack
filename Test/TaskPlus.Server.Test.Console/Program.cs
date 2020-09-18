@@ -3,6 +3,7 @@ using S031.MetaStack.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -12,9 +13,14 @@ namespace TaskPlus.Server.Test.Console
 {
 	class Program
 	{
+		private static JsonObject _appSettings;
+		private static string _baseUrl;
 		static void Main()
 		{
-			System.Console.WriteLine("Start tests");
+			_appSettings = (JsonObject)new JsonReader(File.ReadAllText("Test.App.json")).Read()?["AppSettings"];
+			_baseUrl = (string)_appSettings?["BaseUrl"] ?? "http://localhost:5000";
+
+			System.Console.WriteLine($"Start tests on {_baseUrl}");
 			Login("svostrikov", "@test").GetAwaiter().GetResult();
 			DateTime start = DateTime.Now;
 
@@ -103,7 +109,7 @@ namespace TaskPlus.Server.Test.Console
 		private static async Task<string> RunAsync(string method, string json)
 		{
 			// Update port # in the following line.
-			var url = new Uri($"http://localhost:5000/api/v1/{method}");
+			var url = new Uri($"{_baseUrl}/api/v1/{method}");
 			var data = new StringContent(json, Encoding.UTF8, "application/json");
 
 			var response = await _client.PostAsync(url, data);
