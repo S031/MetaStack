@@ -25,6 +25,7 @@ namespace S031.MetaStack.Integral.Security
 		public string PasswordHash { get; set; }
 		public List<string> Roles { get; private set; } = new List<string>();
 		public List<UserLogin> UserLogins { get; private set; } = new List<UserLogin>();
+		public List<Permission> UserPermissions { get; private set; } = new List<Permission>();
 
 		/// <summary>
 		/// Serialize <see cref="ActionInfo"/> to json string
@@ -79,6 +80,12 @@ namespace S031.MetaStack.Integral.Security
 			writer.WriteStartArray();
 			foreach (var login in UserLogins)
 				login.ToJson(writer);
+			writer.WriteEndArray();
+
+			writer.WritePropertyName("UserPermissions");
+			writer.WriteStartArray();
+			foreach (var permission in UserPermissions)
+				permission.ToJson(writer);
 			writer.WriteEndArray();
 		}
 		private static void WriteIdentityRaw(JsonWriter writer, ClaimsIdentity idn)
@@ -151,6 +158,10 @@ namespace S031.MetaStack.Integral.Security
 			if (j.TryGetValue("Roles", out a))
 				foreach (string role in a)
 					Roles.Add(role);
+			
+			if (j.TryGetValue("UserPermissions", out a))
+				foreach (JsonObject obj in a)
+					UserPermissions.Add(new Permission (obj));
 		}
 	}
 }

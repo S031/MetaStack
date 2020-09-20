@@ -28,6 +28,18 @@ namespace S031.MetaStack.Integral.Security
 			from Users u
 			inner join Users2Roles ur on u.ID = ur.UserID
 			inner join Roles r on r.ID = ur.RoleID
+			where u.UserName LIKE '{0}';
+			select 
+				a.ActionName as ActionID
+				,COALESCE(s.SchemaName, '') as SchemaName
+				,COALESCE(s.ObjectName, '') as ObjectName
+			    ,p.IsGranted
+			from Users u
+			inner join Users2Roles ur on u.ID = ur.UserID
+			inner join Roles r on r.ID = ur.RoleID
+			inner join Permissions p on p.RoleID = r.ID
+			inner join Actions a on a.ID = p.ActionID
+			left join V_SysSchemas s on s.ID = p.SchemaID
 			where u.UserName LIKE '{0}'";
 
 		protected MdbContext mdb;
@@ -48,6 +60,14 @@ namespace S031.MetaStack.Integral.Security
 				{
 					ui.Roles.Add((string)dr[1]["RoleName"]);
 				}
+				for (; dr[2].Read();)
+					ui.UserPermissions.Add(new Permission()
+					{
+						ActionID = (string)dr[2]["ActionID"],
+						SchemaName = (string)dr[2]["SchemaName"],
+						ObjectName = (string)dr[2]["ObjectName"], 
+						IsGranted = (bool)dr[2]["IsGranted"]
+					});
 			}
 			dr[0].Dispose();
 			dr[1].Dispose();

@@ -56,13 +56,13 @@ namespace S031.MetaStack.Json
 			throw new NotImplementedException();
 		}
 
-		public static string SerializeObject(object value)
+		public static string SerializeObject(object value, Formatting formatting = Formatting.None)
 		{
 			if (value is IJsonSerializible js)
-				return js.ToString(Formatting.None);
+				return js.ToString(formatting);
 			else if (JsonWellKnownTypes.TryGetValue(value.GetType(), out var f))
 			{
-				JsonWriter writer = new JsonWriter(Formatting.None);
+				JsonWriter writer = new JsonWriter(formatting);
 				f.WriteDelegate(writer, value);
 				return writer.ToString();
 			}
