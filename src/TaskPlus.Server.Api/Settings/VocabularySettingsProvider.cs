@@ -50,7 +50,7 @@ namespace TaskPlus.Server.Api.Settings
 			
 			if (!_cache.TryGetValue(items[0], out string s))
 			{
-				using (MdbContext mdb = _mdbFactory.GetContext("DefaultConnection"))
+				using (MdbContext mdb = _mdbFactory.GetContext(Properties.Strings.DefaultConnection))
 				using (var dr = await mdb.GetReaderAsync(_sql_get_settings,
 					new MdbParameter("@identifier", items[0])))
 				{

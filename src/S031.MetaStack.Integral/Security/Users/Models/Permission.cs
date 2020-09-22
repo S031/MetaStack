@@ -7,9 +7,12 @@ namespace S031.MetaStack.Integral.Security
 {
 	public class Permission : JsonSerializible
 	{
-		public string SchemaName { get; set; }
+		/// <summary>
+		/// Name of schema object in format [SchemaName].[ObjectName] (as dbo.Accounts)
+		/// </summary>
 		public string ObjectName { get; set; }
 		public string ActionID { get; set; }
+		public string RoleID { get; set; }
 		public bool IsGranted { get; set; }
 
 		public Permission() : base(null) { }
@@ -17,16 +20,16 @@ namespace S031.MetaStack.Integral.Security
 		public override void FromJson(JsonValue source)
 		{
 			JsonObject j = (source as JsonObject);
-			SchemaName = j.GetStringOrDefault("SchemaName");
 			ObjectName = j.GetStringOrDefault("ObjectName");
 			ActionID = j.GetStringOrDefault("ActionID");
+			RoleID = j.GetStringOrDefault("RoleID");
 			IsGranted = j.GetBoolOrDefault("IsGranted");
 		}
 		protected override void ToJsonRaw(JsonWriter writer)
 		{
-			writer.WriteProperty("SchemaName", SchemaName);
 			writer.WriteProperty("ObjectName", ObjectName);
 			writer.WriteProperty("ActionID", ActionID);
+			writer.WriteProperty("RoleID", RoleID);
 			writer.WriteProperty("IsGranted", IsGranted);
 		}
 	}

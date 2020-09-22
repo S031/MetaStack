@@ -43,26 +43,22 @@ namespace TaskPlus.Server.Security
 				.GetRequiredService<IMdbContextFactory>()
 				.GetContext(Strings.SysCatConnection);
 		}
+		
+		/// <summary>
+		/// Name of object in format [SchemaName].[ObjectName] (as dbo.Accounts)
+		/// </summary>
 		public bool HasPermission(ActionInfo actionInfo, string objectName)
 		{
-			// !!! See  HasPermissionAsync
-			return IsAdmin(actionInfo.GetContext().Principal);
+			var user = actionInfo.GetContext().Principal;
+			return IsAdmin(user)
+				? true
+				: user.UserPermissions.Any(p=>p.ActionID.Equals(actionInfo.ActionID, StringComparison.OrdinalIgnoreCase)
+					&& (actionInfo.IsStatic 
+						|| objectName.Equals(p.ObjectName, StringComparison.OrdinalIgnoreCase)));
 		}
 
 		public async Task<bool> HasPermissionAsync(ActionInfo actionInfo, string objectName)
-		{
-			if (await IsAdminAsync(actionInfo.GetContext().Principal))
-				return true;
-			/*!!! Remove from IsAdminAsync async mode
-             * select * from users u
-             * inner join User2Roles r on u.id = r.UserID
-             * inner join permissions p on p.RoleID = r.roleId
-             * inner join actions a on a.id = p.ActionId
-             * where u.UserName = '{UserName}' and objectName = {if static action any else objectName}
-             * and a.actionname = actionInfo.actionId
-             */
-			return false;
-		}
+			=> await Task.Run(() => HasPermission(actionInfo, objectName));
 
 		public bool IsAdmin(UserInfo user) 
 			=> UserInRore(user, admin_role);

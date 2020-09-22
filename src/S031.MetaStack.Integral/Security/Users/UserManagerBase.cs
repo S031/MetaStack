@@ -31,16 +31,16 @@ namespace S031.MetaStack.Integral.Security
 			where u.UserName LIKE '{0}';
 			select 
 				a.ActionName as ActionID
-				,COALESCE(s.SchemaName, '') as SchemaName
-				,COALESCE(s.ObjectName, '') as ObjectName
+				,COALESCE(s.SchemaName + '.' + s.ObjectName, '') as ObjectName
+				,r.RoleName as RoleID
 			    ,p.IsGranted
-			from Users u
-			inner join Users2Roles ur on u.ID = ur.UserID
-			inner join Roles r on r.ID = ur.RoleID
-			inner join Permissions p on p.RoleID = r.ID
-			inner join Actions a on a.ID = p.ActionID
+			from Actions a
+			inner join Permissions p on a.ID = p.ActionID
+			inner join Roles r on r.ID = p.RoleID
+			left join Users2Roles ur on r.ID = ur.RoleID
+			left join Users u on u.ID = ur.UserID 
 			left join V_SysSchemas s on s.ID = p.SchemaID
-			where u.UserName LIKE '{0}'";
+			where u.UserName LIKE '{0}' or r.RoleName like 'Sys.Everyone'";
 
 		protected MdbContext mdb;
 
@@ -56,21 +56,24 @@ namespace S031.MetaStack.Integral.Security
 			if (dr[0].Read()) 
 			{
 				ui = JsonSerializer.DeserializeObject<UserInfo>((string)dr[0]["JData"]);
+				ui.Roles.Clear();
+				ui.UserPermissions.Clear();
+
 				if (dr[1].Read())
-				{
 					ui.Roles.Add((string)dr[1]["RoleName"]);
-				}
+
 				for (; dr[2].Read();)
 					ui.UserPermissions.Add(new Permission()
 					{
 						ActionID = (string)dr[2]["ActionID"],
-						SchemaName = (string)dr[2]["SchemaName"],
 						ObjectName = (string)dr[2]["ObjectName"], 
+						RoleID = (string)dr[2]["RoleID"], 
 						IsGranted = (bool)dr[2]["IsGranted"]
 					});
 			}
 			dr[0].Dispose();
 			dr[1].Dispose();
+			dr[2].Dispose();
 			return ui;
 		}
 		public virtual UserInfo GetUserInfo(string login)

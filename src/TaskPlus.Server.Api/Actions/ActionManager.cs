@@ -56,8 +56,6 @@ namespace TaskPlus.Server.Actions
 		private async Task<DataPackage> ExecuteInternalAsync(ActionInfo ai, DataPackage inParamStor)
 		{
 			if (ai.AuthorizationRequired)
-				//!!!Вернуть при полной реализации _authorizationProvider.HasPermissionAsync
-				//await AuthorizationAsync(ai, inParamStor);
 				Authorize(ai, inParamStor);
 			
 			var se = CreateEvaluator(ai, inParamStor);
@@ -67,6 +65,7 @@ namespace TaskPlus.Server.Actions
 		{
 			string objectName = GetObjectNameFromInputParameters(ai, inParamStor);
 			if (!_authorizationProvider.HasPermission(ai, objectName))
+				//!!! GetSchema for objectName && put name of object to message
 				throw new UnauthorizedAccessException(ai.GetAuthorizationExceptionsMessage(objectName));
 		}
 		private async Task AuthorizeAsync(ActionInfo ai, DataPackage inParamStor)
