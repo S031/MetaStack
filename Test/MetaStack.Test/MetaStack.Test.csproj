@@ -81,6 +81,7 @@
     <ProjectReference Include="..\..\src\S031.MetaStack.Data\S031.MetaStack.Data.csproj" />
     <ProjectReference Include="..\..\src\S031.MetaStack.Integral\S031.MetaStack.Integral.csproj" />
     <ProjectReference Include="..\..\src\S031.MetaStack.Interop\S031.MetaStack.Interop.csproj" />
+    <ProjectReference Include="..\..\src\TaskPlus.Server.Api\TaskPlus.Server.Api.csproj" />
   </ItemGroup>
 
   <ItemGroup>

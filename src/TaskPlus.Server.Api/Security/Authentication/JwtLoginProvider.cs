@@ -161,7 +161,7 @@ namespace TaskPlus.Server.Security
 			try
 			{
 				var p = new JwtSecurityTokenHandler().ValidateToken(jwtToken, validationParameters, out SecurityToken validatedToken);
-				return p.Claims.FirstOrDefault(claim=>claim.Type == ClaimTypes.Dns)?.Value ;
+				return p.Claims.FirstOrDefault(claim=>claim.Type == ClaimTypes.Email)?.Value ;
 			}
 			catch (Exception ex)
 			{

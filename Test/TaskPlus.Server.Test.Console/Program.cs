@@ -21,12 +21,13 @@ namespace TaskPlus.Server.Test.Console
 			_baseUrl = (string)_appSettings?["BaseUrl"] ?? "http://localhost:5000";
 
 			System.Console.WriteLine($"Start tests on {_baseUrl}");
-			Login("svostrikov", "@test").GetAwaiter().GetResult();
+			Login("svostrikov@metib.ru", "@test").GetAwaiter().GetResult();
 			DateTime start = DateTime.Now;
 
-			//string result = RequesSpeedTest();
+			string result;
+			//result	= RequesSpeedTest();
 			//System.Console.WriteLine($"Finsh RequesSpeedTest (100 calls from 100 clients) with {(DateTime.Now - start).TotalSeconds} ms\nResult: {result}\n\n");
-			
+
 			//result = Test("GetSettingsSpeedTest", 100000);
 			//System.Console.WriteLine($"Finsh GetSettingsSpeedTest tests with Result:\n{result}\n\n");
 
@@ -37,9 +38,9 @@ namespace TaskPlus.Server.Test.Console
 			//result = PerformClientSearchTest();
 			//System.Console.WriteLine($"Finsh PerformClientSearchTest with {(DateTime.Now - start).TotalSeconds} ms\nResult: {result}\n\n");
 			//System.Console.ReadLine();
-			
-			//start = DateTime.Now;
-			string result = GetClientInfo();
+
+			start = DateTime.Now;
+			result = GetClientInfo();
 			System.Console.WriteLine($"Finsh GetClientInfo with {(DateTime.Now - start).TotalSeconds} ms\nResult: {result}\n\n");
 			System.Console.ReadLine();
 

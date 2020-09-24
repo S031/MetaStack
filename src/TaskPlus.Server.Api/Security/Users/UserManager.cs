@@ -11,6 +11,7 @@ using System;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using TaskPlus.Server.Api.Properties;
 using TaskPlus.Server.Data;
@@ -46,19 +47,29 @@ namespace TaskPlus.Server.Security
 			}
 			return ui;
 		}
+
 		public static UserInfo GetCurrentPrincipal()
 		{
+			string mailServerName; 
 			string userName = Environment.UserName;
-			string domainName = Environment.UserDomainName.ToLower();
-			string name = $@"{domainName}\{userName}";
-			string region = new RegionInfo(CultureInfo.CurrentCulture.LCID).TwoLetterISORegionName.ToLower();
-			string zone = region == "en" ? "com" : region;
+			string domainName = System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties().DomainName.ToLower();
+			if (domainName.Length < 2)
+			{
+				string region = new RegionInfo(CultureInfo.CurrentCulture.LCID).TwoLetterISORegionName.ToLower();
+				string zone = region == "en" ? "com" : region;
+				domainName = Environment.UserDomainName.ToLower();
+				mailServerName = $"{domainName}.{zone}";
+			}
+			else
+				mailServerName = GetMailServerName(domainName);
 
-			ClaimsIdentity objClaim = new ClaimsIdentity("Basic", ClaimTypes.Dns, ClaimTypes.Role);
+			string name = $@"{domainName}\{userName}";
+
+			ClaimsIdentity objClaim = new ClaimsIdentity("Basic", ClaimTypes.Email, ClaimTypes.Role);
 			objClaim.AddClaim(new Claim(ClaimTypes.Dns, userName));
 			objClaim.AddClaim(new Claim(ClaimTypes.AuthenticationMethod, "Basic"));
 			objClaim.AddClaim(new Claim(ClaimTypes.Name, name));
-			objClaim.AddClaim(new Claim(ClaimTypes.Email, $"{userName}@{domainName}.{zone}"));
+			objClaim.AddClaim(new Claim(ClaimTypes.Email, $"{userName}@{mailServerName}"));
 
 			UserInfo currentPrincipal = new UserInfo(objClaim)
 			{
@@ -70,6 +81,16 @@ namespace TaskPlus.Server.Security
 			};
 			currentPrincipal.Roles.Add("Everyone");
 			return currentPrincipal;
+		}
+
+		private static string GetMailServerName(string fqdn)
+		{
+			string[] tokens = fqdn.Split('.');
+			int len = tokens.Length;
+			if (len <= 2)
+				return fqdn;
+			return $"{tokens[len - 2]}.{tokens[len - 1]}";
+
 		}
 	}
 }

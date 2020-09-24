@@ -56,6 +56,11 @@ namespace S031.MetaStack.Integral.Security
 			if (dr[0].Read()) 
 			{
 				ui = JsonSerializer.DeserializeObject<UserInfo>((string)dr[0]["JData"]);
+				ui.StructuralUnitID = (int)dr[0]["StructuralUnitID"];
+				ui.AccessLevelID = (int)dr[0]["AccessLevelID"];
+				ui.PersonID = dr[0]["PersonID"].CastAs<int>();
+				ui.DomainName = (string)dr[0]["DomainName"];
+				ui.Name = (string)dr[0]["Name"];
 				ui.Roles.Clear();
 				ui.UserPermissions.Clear();
 

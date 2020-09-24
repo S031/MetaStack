@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
+using TaskPlus.Server.Security;
 using Xunit;
 
 namespace MetaStack.Test.Security
@@ -22,7 +23,7 @@ namespace MetaStack.Test.Security
 		[Fact]
 		private void GetUserInfoTest()
 		{
-			var u = GetCustomPrincipal();
+			var u = UserManager.GetCurrentPrincipal();
 			using (FileLog _logger = new FileLog("MetaStackSecurity.GetUserInfoTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
 				string s = u.ToString(S031.MetaStack.Json.Formatting.None);
@@ -76,7 +77,7 @@ namespace MetaStack.Test.Security
 			string region = new RegionInfo(CultureInfo.CurrentCulture.LCID).TwoLetterISORegionName.ToLower();
 			string zone = region == "en" ? "com" : region;
 
-			ClaimsIdentity objClaim = new ClaimsIdentity("Basic", ClaimTypes.Dns, ClaimTypes.Role);
+			ClaimsIdentity objClaim = new ClaimsIdentity("Basic", ClaimTypes.Email, ClaimTypes.Role);
 			objClaim.AddClaim(new Claim(ClaimTypes.Dns, userName));
 			objClaim.AddClaim(new Claim(ClaimTypes.AuthenticationMethod, "Basic"));
 			objClaim.AddClaim(new Claim(ClaimTypes.Name, name));
