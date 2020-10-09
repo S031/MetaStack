@@ -7,18 +7,16 @@ namespace S031.MetaStack.Common.Logging
     {
 		private LogLevels _logLevel = LogLevels.Information;
 
-		private static readonly FileLogSettings _default = new FileLogSettings(
+		public static FileLogSettings Default { get; } = new FileLogSettings(
 			basePath: Path.Combine(System.AppContext.BaseDirectory, "Log"),
 			cacheSize: 100,
 			dateFolderMask: "yyyy-MM",
 			filter: null, //(s, l) => l >= LogLevels.Information,
 			levelToFlush: LogLevels.Critical,
 			formater: (l, s, d) =>
-			   $"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff")}\t[{l.ToString()}]\t{s}\t{d}{Environment.NewLine}"
+			   $"{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}\t[{l.ToString()}]\t{s}\t{d}{Environment.NewLine}"
 		)
 		{ LogLevel = LogLevels.Information };
-
-		public static FileLogSettings Default => _default;
 
 		private FileLogSettings(string basePath, int cacheSize, string dateFolderMask,
 			Func<string, LogLevels, bool> filter, LogLevels levelToFlush,
@@ -34,12 +32,12 @@ namespace S031.MetaStack.Common.Logging
 
 		public FileLogSettings()
 		{
-			BasePath = _default.BasePath;
-			CacheSize = _default.CacheSize;
-			DateFolderMask = _default.DateFolderMask;
-			Filter = _default.Filter;
-			LevelToFlush = _default.LevelToFlush;
-			Formater = _default.Formater;
+			BasePath = Default.BasePath;
+			CacheSize = Default.CacheSize;
+			DateFolderMask = Default.DateFolderMask;
+			Filter = Default.Filter;
+			LevelToFlush = Default.LevelToFlush;
+			Formater = Default.Formater;
 		}
 
 		/// <summary>

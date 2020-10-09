@@ -65,30 +65,30 @@ namespace S031.MetaStack.Actions
 		public override void FromJson(JsonValue source)
 		{
 			var o = source as JsonObject;
-			if (o.ContainsKey("AttribName")) AttribName = o["AttribName"];
-			if (o.ContainsKey("AttribPath")) AttribPath = o["AttribPath"];
-			if (o.ContainsKey("Name")) Name = o["AttribPath"];
-			if (o.ContainsKey("DataType")) DataType = o["DataType"];
-			if (o.ContainsKey("Mask")) Mask = o["Mask"];
-			if (o.ContainsKey("Format")) Format = o["Format"];
-			if (o.ContainsKey("Position")) Position = o["Position"];
-			if (o.ContainsKey("Width")) Width = o["Width"];
-			if (o.ContainsKey("DisplayWidth")) DisplayWidth = o["DisplayWidth"];
-			if (o.ContainsKey("SuperForm")) SuperForm = o["SuperForm"];
-			if (o.ContainsKey("SuperObject")) SuperObject = o["SuperObject"];
-			if (o.ContainsKey("SuperMethod")) SuperMethod = o["SuperMethod"];
-			if (o.ContainsKey("SuperFilter")) SuperFilter = o["SuperFilter"];
-			if (o.ContainsKey("ListItems")) ListItems = o["ListItems"];
-			if (o.ContainsKey("ListData")) ListData = o["ListData"];
-			if (o.ContainsKey("FieldName")) FieldName = o["FieldName"];
-			if (o.ContainsKey("ConstName")) ConstName = o["ConstName"];
-			if (o.ContainsKey("Agregate")) Agregate = o["Agregate"];
-			if (o.ContainsKey("IsPK")) IsPK = o["IsPK"];
-			if (o.ContainsKey("Locate")) Locate = o["Locate"];
-			if (o.ContainsKey("Visible")) Visible = o["Visible"];
-			if (o.ContainsKey("ReadOnly")) ReadOnly = o["ReadOnly"];
-			if (o.ContainsKey("Enabled")) Enabled = o["Enabled"];
-			if (o.ContainsKey("Sorted")) Sorted = o["Sorted"];
+			AttribName = o.GetStringOrDefault("AttribName");
+			AttribPath = o.GetStringOrDefault("AttribPath");
+			Name = o.GetStringOrDefault("AttribPath");
+			DataType = o.GetStringOrDefault("DataType");
+			Mask = o.GetStringOrDefault("Mask");
+			Format = o.GetStringOrDefault("Format");
+			Position = o.GetIntOrDefault("Position");
+			Width = o.GetIntOrDefault("Width");
+			DisplayWidth = o.GetIntOrDefault("DisplayWidth");
+			SuperForm = o.GetStringOrDefault("SuperForm");
+			SuperObject = o.GetStringOrDefault("SuperObject");
+			SuperMethod = o.GetStringOrDefault("SuperMethod");
+			SuperFilter = o.GetStringOrDefault("SuperFilter");
+			ListItems = o.GetStringOrDefault("ListItems");
+			ListData = o.GetStringOrDefault("ListData");
+			FieldName = o.GetStringOrDefault("FieldName");
+			ConstName = o.GetStringOrDefault("ConstName");
+			Agregate = o.GetStringOrDefault("Agregate");
+			IsPK = o.GetBoolOrDefault("IsPK");
+			Locate = o.GetBoolOrDefault("Locate");
+			Visible = o.GetBoolOrDefault("Visible");
+			ReadOnly = o.GetBoolOrDefault("ReadOnly");
+			Enabled = o.GetBoolOrDefault("Enabled");
+			Sorted = o.GetBoolOrDefault("Sorted");
 		}
 	}
 }
