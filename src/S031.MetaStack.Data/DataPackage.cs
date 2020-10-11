@@ -15,6 +15,14 @@ namespace S031.MetaStack.Data
 		JSON,
 		BINARY
 	}
+
+	public enum TsJsonFormat
+	{
+		Full,
+		Array,
+		Simple
+	}
+
 	public sealed partial class DataPackage : JsonSerializible, IDataReader
 	{
 

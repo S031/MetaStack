@@ -12,7 +12,11 @@ namespace S031.MetaStack.Data
 {
 	public sealed partial class DataPackage : JsonSerializible, IDataReader
 	{
-		public DataPackage(JsonValue source) : base(source) 
+		/// <summary>
+		/// Create <see cref="DataPackage"/> from full json format
+		/// </summary>
+		/// <param name="source">json string whit Headers, Columns and Data rows </param>
+		internal DataPackage(JsonValue source, TsJsonFormat jsonFormat = TsJsonFormat.Full) : base(source) 
 		{
 			var j = source as JsonObject;
 			int headerSpaceSize = (int)j["HeaderSize"];
@@ -52,12 +56,25 @@ namespace S031.MetaStack.Data
 			//values
 			if (hasValues)
 			{
-				foreach (JsonObject r in rows)
+				if (jsonFormat == TsJsonFormat.Full)
+					foreach (JsonObject r in rows)
+					{
+						AddNew();
+						foreach (var o in r)
+							SetValue(o.Key, o.Value?.GetValue());
+						Update();
+					}
+				else
 				{
-					AddNew();
-					foreach (var o in r)
-						SetValue(o.Key, o.Value?.GetValue());
-					Update();
+					//!!! Not tested
+					foreach (JsonArray a in rows)
+					{
+						AddNew();
+						foreach (var o in a)
+							for (int i = 0; i < _colCount; i++)
+								SetValue(_indexes[i], o?.GetValue());
+						Update();
+					}
 				}
 				GoDataTop();
 			}
@@ -137,36 +154,41 @@ namespace S031.MetaStack.Data
 			writer.WriteEndObject();
 		}
 
-		public static DataPackage Parse(int headerSpaceSize, string jsonString)
+		public static DataPackage Parse(int headerSpaceSize, string jsonString, TsJsonFormat jsonFormat = TsJsonFormat.Simple)
 		{
-			JsonValue jv = new JsonReader(jsonString).Read();
-			DataPackage ts;
-			if (jv is JsonObject j)
-				ts = new DataPackage(headerSpaceSize,
-					j.Select(kvp => kvp.Key).ToArray<string>(),
-					j.Select(kvp => kvp.Value?.GetValue()).ToArray<object>());
-			else // JsonArray
+			if (jsonFormat == TsJsonFormat.Simple)
 			{
-				var a = (jv as JsonArray);
-				if (a.Count == 0)
-					throw new ArgumentException("Parameter array cannot be empty");
-				j = (JsonObject)a[0];
-				ts = new DataPackage(headerSpaceSize,
-					j.Select(kvp => kvp.Key).ToArray<string>(), null);
-				foreach (JsonObject r in a)
+				JsonValue jv = new JsonReader(jsonString).Read();
+				DataPackage ts;
+				if (jv is JsonObject j)
+					ts = new DataPackage(headerSpaceSize,
+						j.Select(kvp => kvp.Key).ToArray<string>(),
+						j.Select(kvp => kvp.Value?.GetValue()).ToArray<object>());
+				else // JsonArray
 				{
-					ts.AddNew();
-					foreach (var o in r)
-						ts.SetValue(o.Key, o.Value?.GetValue());
-					ts.Update();
-				}
+					var a = (jv as JsonArray);
+					if (a.Count == 0)
+						throw new ArgumentException("Parameter array cannot be empty");
+					j = (JsonObject)a[0];
+					ts = new DataPackage(headerSpaceSize,
+						j.Select(kvp => kvp.Key).ToArray<string>(), null);
+					foreach (JsonObject r in a)
+					{
+						ts.AddNew();
+						foreach (var o in r)
+							ts.SetValue(o.Key, o.Value?.GetValue());
+						ts.Update();
+					}
 
+				}
+				ts.GoDataTop();
+				return ts;
 			}
-			ts.GoDataTop();
-			return ts;
+			else
+				return new DataPackage(new JsonReader(jsonString).Read(), jsonFormat) { ["HeaderSpaceSize"] = headerSpaceSize };
 		}
-		public static DataPackage Parse(string jsonString)
-			=> new DataPackage(new JsonReader(jsonString).Read());
+		public static DataPackage Parse(string jsonString, TsJsonFormat jsonFormat = TsJsonFormat.Full)
+			=> new DataPackage(new JsonReader(jsonString).Read(), jsonFormat);
 		public override void FromJson(JsonValue source) { }
 	}
 }
