@@ -52,7 +52,7 @@ namespace TaskPlus.Server.Middleware
 			{
 				ActionInfo ai = await BuildContext();
 				response = await _actionManager.ExecuteAsync(ai,
-					DataPackage.Parse(0, await new StreamReader(_context.Request.Body).ReadToEndAsync()));
+					DataPackage.Parse(await new StreamReader(_context.Request.Body).ReadToEndAsync(), TsJsonFormat.Simple, 8));
 				multipleRowsResult = ai.MultipleRowsResult;
 			}
 			catch (Exception ex)

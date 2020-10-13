@@ -18,7 +18,7 @@ namespace MetaStack.Test.Json
 		private static readonly string _sourceJsonString = Encoding.UTF8.GetString(Resources.TestData.TestJson);
 		private static readonly byte[] _sourceJsonArrayData = Resources.TestData.TestJsonData;
 		private static readonly byte[] _sourceJsonData = Resources.TestData.TestJson;
-		private static readonly string _sourceUtf8JsonString = Encoding.UTF8.GetString(_sourceJsonData);
+		private static readonly string _sourceUtf8JsonString = Encoding.UTF8.GetString(_sourceJsonArrayData);
 
 		public MetaStackJsonTest()
 		{

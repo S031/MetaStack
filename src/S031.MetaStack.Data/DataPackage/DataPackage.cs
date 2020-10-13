@@ -72,7 +72,7 @@ namespace S031.MetaStack.Data
 		private const int header_pos = 10; // (sizeof(byte) + sizeof(int)) *2
 		private const int header_space_size_default = 512;
 
-		private readonly int _headerSpaceSize;
+		private int _headerSpaceSize;
 		private readonly int _colCount;
 		private int _dataPos;
 		private int _rowPos;
@@ -144,7 +144,8 @@ namespace S031.MetaStack.Data
 		/// <returns></returns>
 		public DataPackage(IDataReader dr, int headerSpaceSize, bool allowDublicate):base(null)
 		{
-			_b = new BinaryDataBuffer(headerSpaceSize * 2);
+			_headerSpaceSize = headerSpaceSize <= 0 ? header_space_size_default : headerSpaceSize;
+			_b = new BinaryDataBuffer(_headerSpaceSize * 2);
 			_bw = new BinaryDataWriter(_b);
 			_br = new BinaryDataReader(_b);
 			_headers = new MapTable<string, object>(StringComparer.Ordinal);
@@ -195,15 +196,32 @@ namespace S031.MetaStack.Data
 			}
 		}
 
-		private void WritePackageHeader()
+		private void WritePackageHeader(byte[] headersAsByteArray = null)
 		{
 			//Write sizes
+			_bw.Position = 0;
 			_bw.Write(_headerSpaceSize);
 			_bw.Write(_colCount);
 
 			//Write Headers
-			_bw.Write(_headers);
+			if (headersAsByteArray == null)
+				_bw.Write(_headers);
+			else
+				_bw.WriteBlock(headersAsByteArray);
+
 			int len = header_pos + _headerSpaceSize - _bw.Position;
+
+			if (len < 0)
+			{
+				int p = _bw.Position;
+				//if _headerSpaceSize less then sizeof _headers
+				_headerSpaceSize = p;
+				len = header_pos + _headerSpaceSize - p;
+				//write new _headerSpaceSize
+				_bw.Position = 0;
+				_bw.Write(_headerSpaceSize);
+				_bw.Position = p;
+			}
 			_bw.WriteSpace(len);
 
 			//Write ColInfo
@@ -279,14 +297,14 @@ namespace S031.MetaStack.Data
 		/// <param name="values">list of values</param>
 		public DataPackage(int headerSpaceSize, string[] columns, object[] values):base(null)
 		{
-			_b = new BinaryDataBuffer(headerSpaceSize * 2);
+			_headerSpaceSize = headerSpaceSize <= 0 ? header_space_size_default : headerSpaceSize;
+			_b = new BinaryDataBuffer(_headerSpaceSize * 2);
 			_bw = new BinaryDataWriter(_b);
 			_br = new BinaryDataReader(_b);
 
 			_colCount = columns.Length;
 			bool hasValues = values != null && values.Length == _colCount;
 			
-			_headerSpaceSize = headerSpaceSize;
 			_headers = new MapTable<string, object>(StringComparer.Ordinal);
 
 			//Create col info
@@ -434,9 +452,21 @@ namespace S031.MetaStack.Data
 			_bw.Position = header_pos;
 			int limit = header_pos + _headerSpaceSize;
 
-			_bw.Write(_headers);
-			if (_bw.Position > limit)
-				throw new OverflowException("Header size is larger than the buffer size specified in HeaderSpaceSize");
+			BinaryDataBuffer b = new BinaryDataBuffer(_headerSpaceSize);
+			BinaryDataWriter bw = new BinaryDataWriter(b);
+			bw.Write(_headers);
+			if (bw.Length <= _headerSpaceSize)
+				_bw.WriteBlock(b);
+			else if (_dataPos >= _b.Length)
+				// No data rewrite package header only
+				WritePackageHeader(b);
+			else
+			{
+				// rewrite package header and shift data 
+				byte[] data = _b.Slice(_dataPos, _b.Length - _dataPos).GetBytes();
+				WritePackageHeader(b);
+				_bw.WriteBlock(data);
+			}
 			return this;
 		}
 

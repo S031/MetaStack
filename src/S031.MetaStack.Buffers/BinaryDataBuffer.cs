@@ -131,7 +131,27 @@ namespace S031.MetaStack.Buffers
 #endif
 			}
 		}
+		public unsafe void ShiftBuffer(int start, int shiftCount)
+		{
+			if (_isReadOnly)
+				throw new InvalidOperationException($"{nameof(BinaryDataBuffer)} is read only");
 
+			int countToMove = _dataSize - start;
+			_dataSize = _dataSize + shiftCount;
+			byte[] buffer = _buffer;
+			if(_dataSize > _buffer.Length)
+			{
+				//allocate new
+				int growBy = shiftCount * 2;
+				int newSize = checked(_buffer.Length + growBy);
+				buffer = new byte[newSize];
+			}
+			fixed (byte* source = &_buffer[_dataSize - shiftCount])
+			fixed (byte* dest = &buffer[_dataSize])
+				for (int i = countToMove; i >= 0; i--) 
+					dest[i] = source[i];
+
+		}
 		public int Position
 		{
 			get { return _index; }

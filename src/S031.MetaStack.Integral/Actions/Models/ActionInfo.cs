@@ -101,33 +101,31 @@ namespace S031.MetaStack.Actions
 		public override void FromJson(JsonValue source)
 		{
 			JsonObject j = (source as JsonObject);
-			ActionInfo a = new ActionInfo
-			{
-				ActionID = j.GetStringOrDefault("ActionID"),
-				AssemblyID = j.GetStringOrDefault("AssemblyID"),
-				ClassName = j.GetStringOrDefault("ClassName"),
-				Name = j.GetStringOrDefault("Name"),
-				LogOnError = j.GetBoolOrDefault("LogOnError"),
-				EMailOnError = j.GetBoolOrDefault("EMailOnError"),
-				EMailGroup = j.GetStringOrDefault("EMailGroup"),
+			ActionID = j.GetStringOrDefault("ActionID");
+			AssemblyID = j.GetStringOrDefault("AssemblyID");
+			ClassName = j.GetStringOrDefault("ClassName");
+			Name = j.GetStringOrDefault("Name");
+			LogOnError = j.GetBoolOrDefault("LogOnError");
+			EMailOnError = j.GetBoolOrDefault("EMailOnError");
+			EMailGroup = j.GetStringOrDefault("EMailGroup");
 #if NETCOREAPP
-				TransactionSupport = Enum.Parse<TransactionActionSupport>(j.GetStringOrDefault("TransactionSupport")),
-				WebAuthentication = Enum.Parse<ActionWebAuthenticationType>(j.GetStringOrDefault("WebAuthentication")),
+			TransactionSupport = Enum.Parse<TransactionActionSupport>(j.GetStringOrDefault("TransactionSupport"));
+			WebAuthentication = Enum.Parse<ActionWebAuthenticationType>(j.GetStringOrDefault("WebAuthentication"));
 #else
-				TransactionSupport = (TransactionActionSupport)Enum.Parse(typeof(TransactionActionSupport), j.GetStringOrDefault("TransactionSupport")),
-				WebAuthentication =(ActionWebAuthenticationType) Enum.Parse(typeof(ActionWebAuthenticationType), j.GetStringOrDefault("WebAuthentication")),
+			TransactionSupport = (TransactionActionSupport)Enum.Parse(typeof(TransactionActionSupport), j.GetStringOrDefault("TransactionSupport"));
+			WebAuthentication =(ActionWebAuthenticationType) Enum.Parse(typeof(ActionWebAuthenticationType), j.GetStringOrDefault("WebAuthentication"));
 #endif
-				AuthenticationRequired = j.GetBoolOrDefault("AuthenticationRequired"),
-				AuthorizationRequired = j.GetBoolOrDefault("AuthorizationRequired"),
-				AsyncMode = j.GetBoolOrDefault("AsyncMode"),
-				IID = j.GetIntOrDefault("IID"),
-				InterfaceID = j.GetStringOrDefault("InterfaceID"),
-				InterfaceName = j.GetStringOrDefault("InterfaceName"),
-				Description = j.GetStringOrDefault("Description"),
-				MultipleRowsParams = j.GetBoolOrDefault("MultipleRowsParams"),
-				MultipleRowsResult = j.GetBoolOrDefault("MultipleRowsResult"),
-				IsStatic = j.GetBoolOrDefault("IsStatic")
-			};
+			AuthenticationRequired = j.GetBoolOrDefault("AuthenticationRequired");
+			AuthorizationRequired = j.GetBoolOrDefault("AuthorizationRequired");
+			AsyncMode = j.GetBoolOrDefault("AsyncMode");
+			IID = j.GetIntOrDefault("IID");
+			InterfaceID = j.GetStringOrDefault("InterfaceID");
+			InterfaceName = j.GetStringOrDefault("InterfaceName");
+			Description = j.GetStringOrDefault("Description");
+			MultipleRowsParams = j.GetBoolOrDefault("MultipleRowsParams");
+			MultipleRowsResult = j.GetBoolOrDefault("MultipleRowsResult");
+			IsStatic = j.GetBoolOrDefault("IsStatic");
+			
 			if (j.ContainsKey("InterfaceParameters"))
 			{
 				JsonArray ps = (JsonArray)j["InterfaceParameters"];
@@ -171,7 +169,7 @@ namespace S031.MetaStack.Actions
 						ConstName = o.GetStringOrDefault("ConstName"),
 						Agregate = o.GetStringOrDefault("Agregate")
 					};
-					a.InterfaceParameters.Add(p);
+					InterfaceParameters.Add(p);
 				}
 			}
 		}

@@ -321,6 +321,18 @@ namespace S031.MetaStack.Buffers
 			}
 			return this;
 		}
+		public unsafe BinaryDataWriter WriteBlock(byte[] value)
+		{
+			int size = value.Length;
+			CheckAndResizeBuffer(size);
+			if (size > 0)
+			{
+				fixed (byte* source = value)
+					Buffer.MemoryCopy(source, _buffer.Ref, size, size);
+				_buffer.Skip(size);
+			}
+			return this;
+		}
 
 		public unsafe BinaryDataWriter Write(Guid value)
 		{

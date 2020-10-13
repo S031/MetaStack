@@ -93,13 +93,7 @@ namespace MetaStack.Test.Data
 		private static readonly DateTime _dateTest = DateTime.Now.Date;
 		private static DataPackage GetTestData(int rowsCount = 5, bool withHeader = false, bool withObjectData = false)
 		{
-			DataPackage p = new DataPackage(new string[] { "Col1.int", "Col2.string.255", "Col3.datetime.10", "Col4.Guid.34", "Col5.object.10.true" });
-			if (withHeader)
-				p.SetHeader("Username", "Сергей")
-				.SetHeader("Password", "1234567T")
-				.SetHeader("Sign", UnicodeEncoding.UTF8.GetBytes("Сергей"))
-				.UpdateHeaders();
-
+			DataPackage p = new DataPackage(16, new string[] { "Col1.int", "Col2.string.255", "Col3.datetime.10", "Col4.Guid.34", "Col5.object.10.true" }, null);
 			for (int i = 0; i < rowsCount; i++)
 			{
 				p.AddNew()
@@ -114,6 +108,13 @@ namespace MetaStack.Test.Data
 					p[4] = new TestClass() { ID = i, Name = (string)p[1] };
 				p.Update();
 			}
+			//Specialy update headers after input data for test speed shifting 1000 loop for shift 1000 rows ~ 2.5c
+			//update headers before input data ~ 1.7c
+			if (withHeader)
+				p.SetHeader("Username", "Сергей")
+				.SetHeader("Password", "1234567T")
+				.SetHeader("Sign", UnicodeEncoding.UTF8.GetBytes("Сергей"))
+				.UpdateHeaders();
 			return p;
 		}
 
@@ -144,13 +145,13 @@ namespace MetaStack.Test.Data
 				l.Debug($"parseTest source {i} rows added");
 				l.Debug(p.ToString(TsExportFormat.JSON));
 				int hash = p.ToString(TsExportFormat.JSON).GetHashCode();
-				p = DataPackage.Parse(p.ToString(TsExportFormat.JSON));
+				p = DataPackage.Parse(p.ToString(TsExportFormat.JSON), TsJsonFormat.Full);
 				l.Debug("parseTest after conversion");
 				l.Debug(p.ToString(TsExportFormat.JSON));
 				Assert.True(hash == p.ToString(TsExportFormat.JSON).GetHashCode());
 
 				string source = "{\"string1\":\"value\",\"integer2\":99,\"datetime3\":\"2017-05-23T00:00:00\",\"time4\":\"22:00:00\"}";
-				p = DataPackage.Parse(512, source);
+				p = DataPackage.Parse(source, TsJsonFormat.Simple, 8);
 				l.Debug(p.ToString(TsExportFormat.JSON));
 			}
 		}

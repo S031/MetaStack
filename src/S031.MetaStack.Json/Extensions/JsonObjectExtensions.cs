@@ -117,5 +117,11 @@ namespace S031.MetaStack.Json
 			=> json.TryGetValue(key, out JsonValue value)
 				&& value.JsonType == JsonType.String
 				&& Enum.TryParse<T>(value, out T result) ? result : defaultValue;
+		
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static JsonArray GetArray(this JsonObject json, string key)
+			=> json.TryGetValue(key, out JsonValue value)
+				&& value.JsonType == JsonType.Array? (value as JsonArray) : null;
+
 	}
 }

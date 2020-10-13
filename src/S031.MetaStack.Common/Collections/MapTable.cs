@@ -116,10 +116,14 @@ namespace S031.MetaStack.Common
 		}
 
 		public ICollection<TKey> Keys
-			=> _entries.Select(e => e.key)
+			=> _entries
+			.Where(e=>e.key != null)
+			.Select(e => e.key)
 			.ToArray();
 		public ICollection<TValue> Values
-			=> _entries.Select(e => e.value)
+			=> _entries
+			.Where(e=>e.key != null)
+			.Select(e => e.value)
 			.ToArray();
 
 		public void Clear()
