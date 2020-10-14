@@ -1,10 +1,23 @@
 ﻿using S031.MetaStack.Common;
 using System;
+#if NETCOREAPP
+using System.Text.Encodings.Web;
+using System.Text.Json;
+#endif
 
 namespace S031.MetaStack.Json
 {
 	public static partial class JsonSerializer
 	{
+#if NETCOREAPP
+		private static JsonSerializerOptions _serializerOptions = new JsonSerializerOptions() //net core 5 use JsonSerializerDefaults.Web
+		{
+			//IncludeFields = true, // NEW: globally include fields for (de)serialization
+			//Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic)
+			WriteIndented = false,
+			Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+		};
+#endif
 		public static object DeserializeObject(Type t, string value)
 		{
 			if (typeof(JsonSerializible).IsAssignableFrom(t))
@@ -27,7 +40,12 @@ namespace S031.MetaStack.Json
 				return instance;
 
 			}
+#if NETCOREAPP
+			else
+				return System.Text.Json.JsonSerializer.Deserialize(value, t, _serializerOptions);
+#else
 			throw new NotImplementedException();
+#endif
 		}
 
 		public static T DeserializeObject<T>(string value)
@@ -53,7 +71,12 @@ namespace S031.MetaStack.Json
 				return (T)instance;
 
 			}
+#if NETCOREAPP
+			else
+				return System.Text.Json.JsonSerializer.Deserialize<T>(value, _serializerOptions);
+#else
 			throw new NotImplementedException();
+#endif				
 		}
 
 		public static string SerializeObject(object value, Formatting formatting = Formatting.None)
@@ -66,7 +89,12 @@ namespace S031.MetaStack.Json
 				f.WriteDelegate(writer, value);
 				return writer.ToString();
 			}
+#if NETCOREAPP
+			else
+				return System.Text.Json.JsonSerializer.Serialize(value, _serializerOptions);
+#else
 			throw new NotImplementedException();
+#endif
 		}
 	}
 }

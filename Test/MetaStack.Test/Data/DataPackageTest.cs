@@ -250,13 +250,16 @@ namespace MetaStack.Test.Data
 				//l.Debug("SpeedTest JSOSerializer Finish");
 
 				l.Debug("SpeedTest JSONSerializer Start");
+				string data = "";
 				for (int i = 0; i < 1_000_000; i++)
 				{
 					TestClass test = new TestClass() { ID = i, Name = $"Item {i}" };
 					test.ItemList.Add($"Item {i}", i);
-					var data = JsonSerializer.SerializeObject(test);
-					test = JsonSerializer.DeserializeObject<TestClass>(data);
+					test.ItemList.Add($"Item", "Просто");
+					data = JsonSerializer.SerializeObject(test);
+					_ = JsonSerializer.DeserializeObject<TestClass>(data);
 				}
+				l.Debug(data);
 				l.Debug("SpeedTest JSOSerializer Finish");
 			}
 		}
@@ -265,10 +268,10 @@ namespace MetaStack.Test.Data
 		{
 			static TestClass()
 			{
-				JsonWellKnownTypes.Register(
-					new JsonAction(typeof(TestClass),
-					(w, o) => (o as TestClass).WriteRaw(w),
-					(r, o) => (o as TestClass).ReadRaw(r)));
+				//JsonWellKnownTypes.Register(
+				//	new JsonAction(typeof(TestClass),
+				//	(w, o) => (o as TestClass).WriteRaw(w),
+				//	(r, o) => (o as TestClass).ReadRaw(r)));
 			}
 
 			public TestClass()

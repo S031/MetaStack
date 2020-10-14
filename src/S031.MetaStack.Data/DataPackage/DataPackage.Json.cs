@@ -81,7 +81,6 @@ namespace S031.MetaStack.Data
 							Update();
 						}
 					}
-					GoDataTop();
 				}
 			}
 			else //simple
@@ -89,59 +88,60 @@ namespace S031.MetaStack.Data
 				if (headerSpaceSize == 0)
 					headerSpaceSize = header_space_size_default;
 
-				_b = new BinaryDataBuffer(_headerSpaceSize * 2);
+				_b = new BinaryDataBuffer(headerSpaceSize * 2);
 				_bw = new BinaryDataWriter(_b);
 				_br = new BinaryDataReader(_b);
 
-				JsonValue jv = new JsonReader(source).Read();
-				JsonObject firstRow;
-				if (jv is JsonObject j)
+				JsonObject dataRow;
+				bool isArray = false;
+				if (source is JsonObject j)
 				{
-					firstRow = j;
+					dataRow = j;
 				}
-				else if (jv is JsonArray a)
+				else if (source is JsonArray a)
 				{
 					if (a.Count == 0)
 						throw new ArgumentException("Parameter array cannot be empty");
-					firstRow = (JsonObject)a[0];
+					dataRow = (JsonObject)a[0];
+					isArray = true;
 				}
 				else
 					throw new ArgumentException("The constructor of DataPackage requires JsonObject or JsonArray parameter type.");
-
-				_colCount = firstRow.Count;
+				
+				_headerSpaceSize = headerSpaceSize;
 				_headers = new MapTable<string, object>(StringComparer.Ordinal);
+				_colCount = dataRow.Count;
 				_indexes = new string[_colCount];
 				_colInfo = new ColumnInfo[_colCount];
 
-				/*
-				 * 
-								DataPackage ts;
-								if (jv is JsonObject j)
-									ts = new DataPackage(headerSpaceSize,
-										j.Select(kvp => kvp.Key).ToArray<string>(),
-										j.Select(kvp => kvp.Value?.GetValue()).ToArray<object>());
-								else // JsonArray
-								{
-									var a = (jv as JsonArray);
-									if (a.Count == 0)
-										throw new ArgumentException("Parameter array cannot be empty");
-									j = (JsonObject)a[0];
-									ts = new DataPackage(headerSpaceSize,
-										j.Select(kvp => kvp.Key).ToArray<string>(), null);
-									foreach (JsonObject r in a)
-									{
-										ts.AddNew();
-										foreach (var o in r)
-											ts.SetValue(o.Key, o.Value?.GetValue());
-										ts.Update();
-									}
+				int i = 0;
+				foreach (var kvp in dataRow)
+				{
+					_indexes[i] = kvp.Key;
+					_colInfo[i] = ColumnInfo.FromValue(kvp.Value?.GetValue());
+					i++;
+				}
+				WritePackageHeader();
 
-								}
-								ts.GoDataTop();
-								return ts;
-
-				 */
+				if (isArray)
+				{
+					foreach (var r in (source as JsonArray))
+					{
+						AddNew();
+						foreach (var o in (JsonObject)r)
+							SetValue(o.Key, o.Value?.GetValue());
+						Update();
+					}
+				}
+				else
+				{
+					AddNew();
+					foreach (var o in dataRow)
+						SetValue(o.Key, o.Value?.GetValue());
+					Update();
+				}
 			}
+			GoDataTop();
 		}
 
 		/// <summary>
