@@ -10,7 +10,7 @@ namespace S031.MetaStack.Json
 	public static partial class JsonSerializer
 	{
 #if NETCOREAPP
-		private static JsonSerializerOptions _serializerOptions = new JsonSerializerOptions() //net core 5 use JsonSerializerDefaults.Web
+		private static readonly JsonSerializerOptions _serializerOptions = new JsonSerializerOptions() //net core 5 use JsonSerializerDefaults.Web
 		{
 			//IncludeFields = true, // NEW: globally include fields for (de)serialization
 			//Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Cyrillic)
