@@ -10,11 +10,12 @@ namespace S031.MetaStack.Security
 	{
 
 		[DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-		public static extern bool LogonUser(String lpszUsername, String lpszDomain, String lpszPassword,
+		private static extern bool LogonUser(String lpszUsername, String lpszDomain, String lpszPassword,
 			int dwLogonType, int dwLogonProvider, out SafeAccessTokenHandle phToken);
 
 		public static T Execute<T>(string userName, string password, Func<T> userAction)
 		{
+#if !NETCOREAPP
 			string domainName;
 			int pos = userName.IndexOf('\\');
 			if (pos > -1)
@@ -35,15 +36,18 @@ namespace S031.MetaStack.Security
 			if (!returnValue)
 			{
 				int ret = Marshal.GetLastWin32Error();
-				Console.WriteLine("LogonUser failed with error code : {0}", ret);
+				//Console.WriteLine("LogonUser failed with error code : {0}", ret);
 				throw new System.ComponentModel.Win32Exception(ret);
 			}
 
 			// Note: if you want to run as unimpersonated, pass
 			//       'SafeAccessTokenHandle.InvalidHandle' instead of variable 'safeAccessTokenHandle'
-			return WindowsIdentity.RunImpersonated<T>(
+			return WindowsIdentity.RunImpersonated(
 				safeAccessTokenHandle,
 				userAction);
+#else
+			throw new NotImplementedException();
+#endif
 		}
 	}
 }

@@ -95,12 +95,9 @@ namespace TaskPlus.Server.Logging
 				 return string.Join('\t',
 					info.TimeStampUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss.fff"),
 					$"[{info.Level}]",
-					info.EventId != null
-						? $"EventId={info.EventId}"
-						: "",
+					$"EventId={info.EventId}",
 					s,
 					info.Text);
-
 			 };
 
 
