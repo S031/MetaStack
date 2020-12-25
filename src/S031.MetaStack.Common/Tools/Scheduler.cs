@@ -105,15 +105,22 @@ namespace S031.MetaStack.Common
         private DateTime increment(DateTime dStart)
         {
             DateTime nextStartTime;
-            if (_unitOfQt == UnitOfQt.Year)
-                nextStartTime = dStart.AddYears(_qt);
-            else if (_unitOfQt == UnitOfQt.Month)
-                nextStartTime = dStart.AddMonths(_qt);
-            else if (_unitOfQt == UnitOfQt.Day)
-                nextStartTime = dStart.AddDays(_qt);
-            else
-                nextStartTime = dStart.AddSeconds(_qt * (int)_unitOfQt);
-            return nextStartTime;
+			switch (_unitOfQt)
+			{
+				case UnitOfQt.Year:
+					nextStartTime = dStart.AddYears(_qt);
+					break;
+				case UnitOfQt.Month:
+					nextStartTime = dStart.AddMonths(_qt);
+					break;
+				case UnitOfQt.Day:
+					nextStartTime = dStart.AddDays(_qt);
+					break;
+				default:
+					nextStartTime = dStart.AddSeconds(_qt * (int)_unitOfQt);
+					break;
+			}
+			return nextStartTime;
         }
 
         private bool inDay()
