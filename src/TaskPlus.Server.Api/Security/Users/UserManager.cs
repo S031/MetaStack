@@ -55,7 +55,7 @@ namespace TaskPlus.Server.Security
 			string domainName = System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties().DomainName.ToLower();
 			if (domainName.Length < 2)
 			{
-				string region = new RegionInfo(CultureInfo.CurrentCulture.LCID).TwoLetterISORegionName.ToLower();
+				string region = new RegionInfo(CultureInfo.CurrentCulture.Name).TwoLetterISORegionName.ToLower();
 				string zone = region == "en" ? "com" : region;
 				domainName = Environment.UserDomainName.ToLower();
 				mailServerName = $"{domainName}.{zone}";

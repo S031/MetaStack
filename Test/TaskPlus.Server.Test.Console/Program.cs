@@ -25,8 +25,8 @@ namespace TaskPlus.Server.Test.Console
 			DateTime start = DateTime.Now;
 
 			string result;
-			//result	= RequesSpeedTest();
-			//System.Console.WriteLine($"Finsh RequesSpeedTest (100 calls from 100 clients) with {(DateTime.Now - start).TotalSeconds} ms\nResult: {result}\n\n");
+			result = RequesSpeedTest();
+			System.Console.WriteLine($"Finsh RequesSpeedTest (100 calls from 100 clients) with {(DateTime.Now - start).TotalSeconds} ms\nResult: {result}\n\n");
 
 			//result = Test("GetSettingsSpeedTest", 100000);
 			//System.Console.WriteLine($"Finsh GetSettingsSpeedTest tests with Result:\n{result}\n\n");
@@ -39,9 +39,9 @@ namespace TaskPlus.Server.Test.Console
 			//System.Console.WriteLine($"Finsh PerformClientSearchTest with {(DateTime.Now - start).TotalSeconds} ms\nResult: {result}\n\n");
 			//System.Console.ReadLine();
 
-			start = DateTime.Now;
-			result = GetClientInfo();
-			System.Console.WriteLine($"Finsh GetClientInfo with {(DateTime.Now - start).TotalSeconds} ms\nResult: {result}\n\n");
+			//start = DateTime.Now;
+			//result = GetClientInfo();
+			//System.Console.WriteLine($"Finsh GetClientInfo with {(DateTime.Now - start).TotalSeconds} ms\nResult: {result}\n\n");
 			System.Console.ReadLine();
 
 		}
