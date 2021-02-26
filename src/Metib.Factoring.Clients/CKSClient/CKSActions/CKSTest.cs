@@ -21,7 +21,7 @@ namespace Metib.Factoring.Clients.CKS
 
 		public async Task<DataPackage> InvokeInternalAsync(ActionInfo ai, DataPackage dp)
 		{
-			var ctx = ai.GetContext();
+			//var ctx = ai.GetContext();
 			string totals = string.Empty;
 
 			string testName = (string)dp["@ObjectName"];

@@ -17,9 +17,9 @@ namespace S031.MetaStack.WinForms
 				PresentationType = typeof(TextBox),
 				ControlTrigger = (i, c) =>
 				{
-					c.FindForm().Text = $"Вход в систему пользователя {userName}";
+					//c.FindForm().Text = $"Вход в систему пользователя {userName}";
 					TextBox tb = (c as TextBox);
-					c.Width = 100;
+					tb.Width = 100;
 					tb.PasswordChar = '*';
 				}
 			})[0];

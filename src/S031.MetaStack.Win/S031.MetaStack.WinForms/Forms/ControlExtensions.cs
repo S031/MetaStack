@@ -44,13 +44,13 @@ namespace S031.MetaStack.WinForms
 			if (!winFormItem.Caption.IsEmpty())
 			{
 				Label l;
-				if (winFormItem.CellAddress != null)
+				if (winFormItem.CellAddress == default)
 				{
 					l = parent.Add<Label>(new WinFormItem("Label_" + winFormItem.Name)
 					{
-						CellAddress = new Pair<int>(winFormItem.CellAddress.x, winFormItem.CellAddress.y)
+						CellAddress = new Pair<int>(winFormItem.CellAddress.X, winFormItem.CellAddress.Y)
 					});
-					winFormItem.CellAddress.x++;
+					winFormItem.CellAddress = new Pair<int>(winFormItem.CellAddress.X + 1, winFormItem.CellAddress.Y);
 				}
 				else
 					l = parent.Add<Label>(new WinFormItem("Label_" + winFormItem.Name));
@@ -228,13 +228,13 @@ namespace S031.MetaStack.WinForms
 				tp.AutoSize = true;
 				if (winFormItem.CellsSize != null)
 				{
-					for (int i = 0; i < winFormItem.CellsSize.x; i++)
+					for (int i = 0; i < winFormItem.CellsSize.X; i++)
 					{
 						tp.ColumnCount++;
 						tp.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
 
 					}
-					for (int i = 0; i < winFormItem.CellsSize.y; i++)
+					for (int i = 0; i < winFormItem.CellsSize.Y; i++)
 					{
 						tp.RowCount++;
 						tp.RowStyles.Add(new RowStyle(SizeType.AutoSize, WinForm.CellsRowHieght));
@@ -245,7 +245,7 @@ namespace S031.MetaStack.WinForms
 			if (cellAddress == null)
 				parent.Controls.Add(instance);
 			else
-				(parent as TableLayoutPanel)?.Controls.Add(instance, cellAddress.x, cellAddress.y);
+				(parent as TableLayoutPanel)?.Controls.Add(instance, cellAddress.X, cellAddress.Y);
 			winFormItem.ControlTrigger?.Invoke(winFormItem, instance);
 			foreach (WinFormItem item in winFormItem)
 			{

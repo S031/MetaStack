@@ -408,7 +408,7 @@ namespace S031.MetaStack.WinForms
 											_totals[j].totalString = value.ToString();
 									else if (_totals[j].Type == MacroType.date)
 									{
-										DateTime d = value.CastOf<DateTime>();
+										DateTime d = value.CastAs<DateTime>();
 										if (d > _totals[j].totalDate)
 											lock (_obj4lock)
 												_totals[j].totalDate = d;
@@ -423,7 +423,7 @@ namespace S031.MetaStack.WinForms
 											_totals[j].totalString = value.ToString();
 									else if (_totals[j].Type == MacroType.date)
 									{
-										DateTime d = value.CastOf<DateTime>();
+										DateTime d = value.CastAs<DateTime>();
 										if (d < _totals[j].totalDate)
 											lock (_obj4lock)
 												_totals[j].totalDate = d;

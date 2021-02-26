@@ -93,10 +93,10 @@
     ]
   },
   "Dependencies": [
-    {
+    /*{
       "AssemblyName": "AdoNetCore.AseClient",
       "AssemblyPath": "AdoNetCore.AseClient"
-    },
+    },*/
     {
       "AssemblyName": "S031.MetaStack.Core.ORM.SQLite",
       "AssemblyPath": "S031.MetaStack.Core.ORM.SQLite"

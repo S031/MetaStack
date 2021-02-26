@@ -51,7 +51,7 @@ namespace S031.MetaStack.WinForms.Actions
 						{
 							Caption = text[i],
 							DataType = item.DataType,
-							Value = data[i].CastOf(item.DataType)
+							Value = data[i].CastAs(item.DataType)
 						});
 					item.Mask = "lock";
 				}
