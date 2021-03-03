@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace S031.MetaStack.Common
 {
-	public struct Pair<T>
+	public readonly struct Pair<T>
 	{
 		public Pair(T xValue, T yValue)
 		{
 			X = xValue;
 			Y = yValue;
 		}
-		public T X;
-		public T Y;
+		public readonly T X;
+		public readonly T Y;
 
 		public override int GetHashCode()
 			=> (X, Y).GetHashCode();

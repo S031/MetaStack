@@ -44,7 +44,7 @@ namespace S031.MetaStack.WinForms
 			if (!winFormItem.Caption.IsEmpty())
 			{
 				Label l;
-				if (winFormItem.CellAddress == default)
+				if (winFormItem.CellAddress == WinFormItem.CellAddressDefault)
 				{
 					l = parent.Add<Label>(new WinFormItem("Label_" + winFormItem.Name)
 					{
@@ -242,7 +242,7 @@ namespace S031.MetaStack.WinForms
 				}
 			}
 
-			if (cellAddress == null)
+			if (cellAddress == WinFormItem.CellAddressDefault)
 				parent.Controls.Add(instance);
 			else
 				(parent as TableLayoutPanel)?.Controls.Add(instance, cellAddress.X, cellAddress.Y);

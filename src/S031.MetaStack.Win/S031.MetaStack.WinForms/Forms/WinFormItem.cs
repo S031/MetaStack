@@ -65,7 +65,7 @@ namespace S031.MetaStack.WinForms
 		public string SuperFilter { get; set; }
 		public string ConstName { get; set; }
 		public List<string> DisabledSTDActions { get; protected internal set; }
-		public Pair<int> CellAddress { get; set; }
+		public Pair<int> CellAddress { get; set; } = CellAddressDefault;
 		public Pair<int> CellsSize { get; set; }
 		public Action<WinFormItem, Control> ControlTrigger { get; set; }
 		public WinForm Parent { get; protected internal set; }
@@ -160,5 +160,8 @@ namespace S031.MetaStack.WinForms
 		{
 			return (T)this.LinkedControl;
 		}
+
+		public static Pair<int> CellAddressDefault
+			=> new Pair<int>(-1, -1);
 	}
 }

@@ -82,6 +82,9 @@ namespace S031.MetaStack.Core.Actions
 
 		private readonly string _schemaName = string.Empty;
 
+		static ActionManager()
+			=> Task.Run(() => S031.MetaStack.Core.Actions.ActionsList.CreateActionsList());
+
 		public ActionManager(MdbContext mdbContext) : base(mdbContext)
 		{
 			if (mdbContext.ConnectInfo.SchemaSupport)

@@ -218,14 +218,16 @@ namespace S031.MetaStack.Core.Security
 				RemoveSession(data.Item1, data.Item2);
 		}
 
-		Task<UserInfo> ILoginProvider.LogonAsync(string userName, string sessionID, string encryptedKey)
+		async Task<UserInfo> ILoginProvider.LogonAsync(string userName, string sessionID, string encryptedKey)
 		{
-			throw new NotImplementedException();
+			_ = await this.LogonAsync(userName, sessionID, encryptedKey);
+			return null;
 		}
 
 		UserInfo ILoginProvider.Logon(string userName, string sessionID, string encryptedKey)
 		{
-			throw new NotImplementedException();
+			_ = this.Logon(userName, sessionID, encryptedKey);
+			return null;
 		}
 	}
 }

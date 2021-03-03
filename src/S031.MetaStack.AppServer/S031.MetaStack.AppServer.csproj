@@ -43,7 +43,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\TaskPlus.Server\DB\SysCat.db" Link="DB\SysCat.db" />
+    <None Include="..\TaskPlus.Server\DB\SysCat.db" Link="DB\SysCat.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

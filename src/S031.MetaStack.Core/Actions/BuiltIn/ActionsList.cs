@@ -4,6 +4,7 @@ using S031.MetaStack.Actions;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using S031.MetaStack.Caching;
 
 namespace S031.MetaStack.Core.Actions
 {
@@ -11,7 +12,7 @@ namespace S031.MetaStack.Core.Actions
 	{
 		public static MapTable<string, ActionInfo> CreateActionsList()
 		{
-			MapTable<string, ActionInfo> actions = new MapTable<string, ActionInfo>();
+			MapTable<string, ActionInfo> actions = ActionInfoCache.Instance;
             #region Sys.LoginRequest
             ActionInfo ai = new ActionInfo()
             {
