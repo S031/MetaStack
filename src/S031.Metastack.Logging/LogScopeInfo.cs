@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace TaskPlus.Server.Logging
+namespace S031.MetaStack.Logging
 {
     public class LogScopeInfo
     {

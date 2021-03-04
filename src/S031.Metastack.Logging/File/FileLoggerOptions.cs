@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace TaskPlus.Server.Logging.File
+namespace S031.MetaStack.Logging.File
 {
     public class FileLoggerOptions
     {

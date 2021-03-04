@@ -19,6 +19,7 @@
     <ProjectReference Include="..\S031.MetaStack.Data\S031.MetaStack.Data.csproj" />
     <ProjectReference Include="..\S031.MetaStack.Integral\S031.MetaStack.Integral.csproj" />
     <ProjectReference Include="..\S031.MetaStack.Json\S031.MetaStack.Json.csproj" />
+    <ProjectReference Include="..\S031.Metastack.Logging\S031.MetaStack.Logging.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -5,8 +5,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S031.MetaStack.Common.Logging;
-using TaskPlus.Server.Logging;
-using TaskPlus.Server.Logging.File;
+using S031.MetaStack.Logging;
+using S031.MetaStack.Logging.File;
 
 namespace TaskPlus.Server
 {

@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TaskPlus.Server.Logging.File
+namespace S031.MetaStack.Logging.File
 {
 	[Microsoft.Extensions.Logging.ProviderAlias("File")]
 	public class FileLoggerProvider : LoggerProvider
@@ -76,8 +76,14 @@ namespace TaskPlus.Server.Logging.File
 							bufferSize: 4096, useAsync: false))
 						{
 							StringBuilder sb = new StringBuilder(1024);
+#if NETCOREAPP
 							for (; _queue.TryDequeue(out LogEntry message);)
 							{
+#else
+							for (; _queue.Count > 0;)
+							{
+								var message = _queue.Dequeue();
+#endif
 								sb.AppendLine(Formatter(message));
 							}
 							byte[] encodedText = Encoding.UTF8.GetBytes(sb.ToString());

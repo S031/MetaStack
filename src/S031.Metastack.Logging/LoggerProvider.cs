@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace TaskPlus.Server.Logging
+namespace S031.MetaStack.Logging
 {
 	public abstract class LoggerProvider : IDisposable, ILoggerProvider, ISupportExternalScope
 	{
@@ -92,12 +92,21 @@ namespace TaskPlus.Server.Logging
 							Newtonsoft.Json.JsonConvert.SerializeObject(Info.StateProperties);
 				 }                
 				 */
+#if NETCOREAPP
 				 return string.Join('\t',
 					info.TimeStampUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss.fff"),
 					$"[{info.Level}]",
 					$"EventId={info.EventId}",
 					s,
 					info.Text);
+#else
+				 return string.Join("\t",
+					info.TimeStampUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss.fff"),
+					$"[{info.Level}]",
+					$"EventId={info.EventId}",
+					s,
+					info.Text);
+#endif
 			 };
 
 

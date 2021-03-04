@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using S031.MetaStack.Core.App;
 using System;
 using System.Threading.Tasks;
@@ -13,23 +14,44 @@ namespace S031.MetaStack.AppServer
 		/// </summary>
 		/// <param name="args"></param>
 		/// <returns></returns>
-		public static async Task Main()
-		{
-			IConfiguration configuration = new ConfigurationBuilder()
-				.AddJsonFile("config.json", optional: false, reloadOnChange: true)
-				.Build();
+		//public static async Task Main()
+		//{
+		//	IConfiguration configuration = new ConfigurationBuilder()
+		//		.AddJsonFile("config.json", optional: false, reloadOnChange: true)
+		//		.Build();
 
-			using (IHost host = new HostBuilder()
+		//	using (IHost host = new HostBuilder()
+		//		.UseConsoleLifetime()
+		//		.UseApplicationContext(configuration)
+		//		.Build())
+		//	{
+		//		//await host.RunAsync(ApplicationContext.CancellationToken);
+		//		//TestConnection();
+		//		Console.WriteLine("Server started. Press Ctrl+C to exit...");
+		//		await host.RunAsync();
+		//	}
+		//}
+		public static async Task Main(string[] args)
+			=> await CreateHostBuilder(args).Build().RunAsync();
+
+
+		private static IHostBuilder CreateHostBuilder(string[] args)
+			=> Host.CreateDefaultBuilder(args)
+				.ConfigureAppConfiguration(config =>
+				{
+					config.AddJsonFile("config.json", optional: false, reloadOnChange: true);
+				})
+				.ConfigureLogging(logging =>
+				{
+					logging.ClearProviders();
+					logging.AddConsole();
+					logging.AddFile();
+				})
 				.UseConsoleLifetime()
-				.UseApplicationContext(configuration)
-				.Build())
-			{
-				//await host.RunAsync(ApplicationContext.CancellationToken);
-				//TestConnection();
-				Console.WriteLine("Server started. Press Ctrl+C to exit...");
-				await host.RunAsync();
-			}
-		}
+				.UseStartup<Startup>()
+				//.UseApplicationContext(configuration)
+			;
+
 		//private static void TestConnection()
 		//{
 		//	var sp = ApplicationContext.GetServices();

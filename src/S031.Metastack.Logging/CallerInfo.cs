@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-namespace TaskPlus.Server.Logging
+namespace S031.MetaStack.Logging
 {
 	public struct CallerInfo
 	{

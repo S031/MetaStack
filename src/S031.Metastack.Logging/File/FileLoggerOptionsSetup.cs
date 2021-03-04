@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging.Configuration;
 using Microsoft.Extensions.Options;
 using System.Linq;
 
-namespace TaskPlus.Server.Logging.File
+namespace S031.MetaStack.Logging.File
 {
 	internal class FileLoggerOptionsSetup : ConfigureFromConfigurationOptions<FileLoggerOptions>,
 		IConfigureOptions<LoggerFilterOptions>
