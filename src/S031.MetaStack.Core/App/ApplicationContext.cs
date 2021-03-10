@@ -17,10 +17,6 @@ using S031.MetaStack.Security;
 
 namespace S031.MetaStack.Core.App
 {
-	public class Startup
-	{
-	}
-
 	public static class ApplicationContext
     {
 		static IServiceProvider _lastBuildServiceProvider = null;

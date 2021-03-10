@@ -14,23 +14,6 @@ namespace S031.MetaStack.AppServer
 		/// </summary>
 		/// <param name="args"></param>
 		/// <returns></returns>
-		//public static async Task Main()
-		//{
-		//	IConfiguration configuration = new ConfigurationBuilder()
-		//		.AddJsonFile("config.json", optional: false, reloadOnChange: true)
-		//		.Build();
-
-		//	using (IHost host = new HostBuilder()
-		//		.UseConsoleLifetime()
-		//		.UseApplicationContext(configuration)
-		//		.Build())
-		//	{
-		//		//await host.RunAsync(ApplicationContext.CancellationToken);
-		//		//TestConnection();
-		//		Console.WriteLine("Server started. Press Ctrl+C to exit...");
-		//		await host.RunAsync();
-		//	}
-		//}
 		public static async Task Main(string[] args)
 			=> await CreateHostBuilder(args).Build().RunAsync();
 
@@ -47,8 +30,8 @@ namespace S031.MetaStack.AppServer
 					logging.AddConsole();
 					logging.AddFile();
 				})
-				.UseConsoleLifetime()
 				.UseStartup<Startup>()
+				.UseConsoleLifetime()
 				//.UseApplicationContext(configuration)
 			;
 
