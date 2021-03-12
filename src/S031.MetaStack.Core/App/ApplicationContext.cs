@@ -22,7 +22,7 @@ namespace S031.MetaStack.Core.App
 		static IServiceProvider _lastBuildServiceProvider = null;
 		static int _lastBuildHash = 0;
 
-		static readonly object obj4Lock = new object();
+		static readonly object obj4Lock = new();
 		static readonly CancellationTokenSource _cts = new CancellationTokenSource();
 		static IServiceCollection _services;
 		static IConfiguration _configuration;

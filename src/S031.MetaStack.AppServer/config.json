@@ -5,6 +5,26 @@
     "defaultConnection": "bankLocal",
     "SysCatConnection": "SQliteDb"
   },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information",
+      "TaskPlus.Server": "Debug"
+    },
+    "File": {
+      "CacheSize": 100,
+      "DateFolderMask": "yyyy-MM",
+      "LevelToFlush": "Critical",
+      "LogLevel": {
+        "Default": "Warning",
+        "Microsoft": "Warning",
+        "Microsoft.Hosting.Lifetime": "Information",
+        "TaskPlus.Server": "Debug"
+      },
+      "MaxFileSizeInMB": 20
+    }
+  },
   "ApplicationLogSettings": {
     /* Cache size before flushing to disk */
     "CacheSize": 100,

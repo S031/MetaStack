@@ -1,8 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using S031.MetaStack.Common;
 using S031.MetaStack.Core.App;
 using System;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace S031.MetaStack.AppServer
@@ -26,9 +29,9 @@ namespace S031.MetaStack.AppServer
 				})
 				.ConfigureLogging(logging =>
 				{
-					logging.ClearProviders();
-					logging.AddConsole();
-					logging.AddFile();
+					logging.ClearProviders()
+						.AddConsole()
+						.AddFile();
 				})
 				.UseStartup<Startup>()
 				.UseConsoleLifetime()
