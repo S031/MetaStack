@@ -12,7 +12,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using TaskPlus.Server.Api.Settings;
-using TaskPlus.Server.Data;
 
 namespace Metib.Factoring.Clients.CKS
 {

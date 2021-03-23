@@ -1,6 +1,4 @@
-﻿using S031.MetaStack.Data;
-
-namespace TaskPlus.Server.Data
+﻿namespace S031.MetaStack.Data
 {
 	public interface IMdbContextFactory
 	{

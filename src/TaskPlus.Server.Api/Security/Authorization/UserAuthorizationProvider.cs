@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TaskPlus.Server.Api.Properties;
-using TaskPlus.Server.Data;
 
 namespace TaskPlus.Server.Security
 {

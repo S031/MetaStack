@@ -12,7 +12,6 @@ using System.Reflection;
 using System.Runtime.Loader;
 using System.Threading.Tasks;
 using TaskPlus.Server.Api.Properties;
-using TaskPlus.Server.Data;
 
 namespace TaskPlus.Server.Actions
 {

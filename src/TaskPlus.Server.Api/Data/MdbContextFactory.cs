@@ -1,13 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using S031.MetaStack.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace TaskPlus.Server.Data
+namespace S031.MetaStack.Data
 {
 	/// <summary>
 	/// !!! Раздклить контексты с постоянным соединением (SQLite) и создаваемые по звапросу (SQLServer и т.д)
