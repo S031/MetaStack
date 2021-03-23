@@ -89,21 +89,27 @@ namespace S031.MetaStack.Services
 		{
 			_listener.Close();
 			_log.Debug($"{_nameof} successfully stoped");
-			(_log as FileLogger)?.Dispose();
+			(_log as IDisposable)?.Dispose();
 			await base.StopAsync(cancellationToken);
 		}
 
-		public TCPServerService(HostedServiceOptions options)
+		public TCPServerService(IServiceProvider services, HostedServiceOptions options)
 		{
-			var serviceBuilder = ApplicationContext.GetServices(new ServiceProviderOptions() { ValidateScopes = true });
-			using (var scope = serviceBuilder.CreateScope())
-			{
-				var serviceProvider = scope.ServiceProvider;
-				if (!options.LogName.IsEmpty())
-					_log = new FileLogger(_nameof, options.LogSettings);
-				else
-					_log = serviceProvider.GetRequiredService<ILogger>();
-			}
+			//var serviceBuilder = ApplicationContext.GetServices(new ServiceProviderOptions() { ValidateScopes = true });
+			//using (var scope = serviceBuilder.CreateScope())
+			//{
+			//	var serviceProvider = scope.ServiceProvider;
+			//	if (!options.LogName.IsEmpty())
+			//		_log = new FileLogger(_nameof, options.LogSettings);
+			//	else
+			//		_log = serviceProvider.GetRequiredService<ILogger>();
+			//}
+
+			if (options.LogName.IsEmpty())
+				_log = services.GetRequiredService<ILogger>();
+			else
+				_log = services.GetRequiredService<ILoggerProvider>()
+					.CreateLogger(options.LogName);
 			_options = options;
 		}
 
