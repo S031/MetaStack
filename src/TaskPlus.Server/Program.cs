@@ -1,12 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using S031.MetaStack.Common.Logging;
-using S031.MetaStack.Logging;
-using S031.MetaStack.Logging.File;
 
 namespace TaskPlus.Server
 {

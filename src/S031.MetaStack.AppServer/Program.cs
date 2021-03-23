@@ -6,19 +6,23 @@ using S031.MetaStack.Common;
 using S031.MetaStack.Core.App;
 using System;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace S031.MetaStack.AppServer
 {
 	internal class Program
 	{
+		private static readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 		/// <summary>
 		////Костыль!!! Исключить из ссылок рантайм dll (aka \ORM\*.dll
 		/// </summary>
 		/// <param name="args"></param>
 		/// <returns></returns>
 		public static async Task Main(string[] args)
-			=> await CreateHostBuilder(args).Build().RunAsync();
+			=> await CreateHostBuilder(args)
+			.Build()
+			.RunAsync(_cancellationTokenSource.Token);
 
 
 		private static IHostBuilder CreateHostBuilder(string[] args)
@@ -34,9 +38,8 @@ namespace S031.MetaStack.AppServer
 						.AddFile();
 				})
 				.UseStartup<Startup>()
-				.UseConsoleLifetime()
-				//.UseApplicationContext(configuration)
-			;
+				.UseConsoleLifetime();
+
 
 		//private static void TestConnection()
 		//{

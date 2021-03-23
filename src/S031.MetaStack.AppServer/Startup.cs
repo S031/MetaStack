@@ -2,7 +2,9 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using S031.MetaStack.Common;
+using S031.MetaStack.Data;
 using System.Reflection;
+using System.Threading;
 
 namespace S031.MetaStack.AppServer
 {
@@ -17,6 +19,7 @@ namespace S031.MetaStack.AppServer
 		{
 			services.AddSingleton(p => p.GetRequiredService<ILoggerProvider>()
 				.CreateLogger(Assembly.GetEntryAssembly().GetWorkName()));
+			services.AddSingleton<IMdbContextFactory, MdbContextFactory>();
 		}
 	}
 }
