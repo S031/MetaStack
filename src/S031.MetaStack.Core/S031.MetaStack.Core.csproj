@@ -17,14 +17,17 @@
 
   <ItemGroup>
     <Compile Remove="Configuration\**" />
+    <Compile Remove="Logging\File\**" />
     <Compile Remove="ORM\JMXFactory\DB\**" />
     <Compile Remove="ORM\SchemaProviders\**" />
     <Compile Remove="SysCat\**" />
     <EmbeddedResource Remove="Configuration\**" />
+    <EmbeddedResource Remove="Logging\File\**" />
     <EmbeddedResource Remove="ORM\JMXFactory\DB\**" />
     <EmbeddedResource Remove="ORM\SchemaProviders\**" />
     <EmbeddedResource Remove="SysCat\**" />
     <None Remove="Configuration\**" />
+    <None Remove="Logging\File\**" />
     <None Remove="ORM\JMXFactory\DB\**" />
     <None Remove="ORM\SchemaProviders\**" />
     <None Remove="SysCat\**" />

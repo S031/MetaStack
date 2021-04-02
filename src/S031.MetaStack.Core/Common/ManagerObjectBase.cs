@@ -10,6 +10,9 @@ namespace S031.MetaStack.Core
 		SysCat,
 		Work
 	}
+	/// <summary>
+	/// !!! remove this class
+	/// </summary>
 	public abstract class ManagerObjectBase: IDisposable
 	{
 		private ILogger _logger;
@@ -55,8 +58,9 @@ namespace S031.MetaStack.Core
 			{
 				if (_logger == null)
 				{
-					_logger = new Logging.FileLogger(this.GetType().FullName);
-					_isLocalLog = true;
+					throw new InvalidOperationException($"The Logger has not been assigned this instance of the {this.GetType().FullName} class");
+					//_logger = new Logging.FileLogger(this.GetType().FullName);
+					//_isLocalLog = true;
 				}
 				return _logger;
 			}

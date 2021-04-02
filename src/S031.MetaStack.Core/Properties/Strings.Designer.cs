@@ -61,6 +61,33 @@ namespace S031.MetaStack.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to DefaultConnection.
+        /// </summary>
+        internal static string DefaultConnection {
+            get {
+                return ResourceManager.GetString("DefaultConnection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Required interface parameter &apos;{0}. {1}&apos;, not found in the parameter list of operation &apos;{2}&apos;.
+        /// </summary>
+        internal static string S031_MetaStack_Core_Actions_CreateEvaluator_1 {
+            get {
+                return ResourceManager.GetString("S031.MetaStack.Core.Actions.CreateEvaluator.1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Number of operation parameters &apos;{0}&apos;, does not match interface &apos;{1}&apos;.
+        /// </summary>
+        internal static string S031_MetaStack_Core_Actions_CreateEvaluator_2 {
+            get {
+                return ResourceManager.GetString("S031.MetaStack.Core.Actions.CreateEvaluator.2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The config.json configuration file was not found.
         /// </summary>
         internal static string S031_MetaStack_Core_App_AppHost_1 {
@@ -255,6 +282,15 @@ namespace S031.MetaStack.Core.Properties {
         internal static string S031_MetaStack_Services_TCPServerService_Accept_1 {
             get {
                 return ResourceManager.GetString("S031.MetaStack.Services.TCPServerService.Accept.1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to SysCatConnection.
+        /// </summary>
+        internal static string SysCatConnection {
+            get {
+                return ResourceManager.GetString("SysCatConnection", resourceCulture);
             }
         }
     }

@@ -20,9 +20,6 @@ namespace TaskPlus.Server.Middleware
 	{
 		private readonly PipeLineRouteValues _routeValues;
 		private readonly HttpContext _context;
-		//private readonly ILogger _logger;
-		//private readonly IConfiguration _config;
-		//private readonly IUserManager _userManager;
 		private readonly IActionManager _actionManager;
 		private readonly ILoginProvider _loginProvider;
 

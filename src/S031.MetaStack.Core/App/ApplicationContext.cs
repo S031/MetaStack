@@ -5,7 +5,6 @@ using System;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using S031.MetaStack.Core.Security;
-using S031.MetaStack.Core.Logging;
 using S031.MetaStack.Common.Logging;
 using System.Reflection;
 using System.Runtime.Loader;
@@ -58,7 +57,6 @@ namespace S031.MetaStack.Core.App
 			_services
 				.AddSingleton<CancellationTokenSource>(_cts)
 				.AddSingleton<IConfiguration>(_configuration);
-			ConfigureLogging();
 			ConfigureLoginProvider();
 			ConfigureServicesFromConfigFile();
 			ConfigureProvidersFromConfigFile();
@@ -67,15 +65,6 @@ namespace S031.MetaStack.Core.App
 			return _services;
 		}
 
-		private static IServiceCollection ConfigureLogging()
-		{
-			var logSettings = _configuration.GetSection("ApplicationLogSettings")?.Get<Common.Logging.FileLogSettings>();
-			if (logSettings == null)
-				logSettings = FileLogSettings.Default;
-			_logger = new FileLogger($"AppServer.{Environment.MachineName}", logSettings);
-			_services.AddSingleton<ILogger>(_logger);
-			return _services;
-		}
 		private static IServiceCollection ConfigureLoginProvider()
 		{
 			//костыль!!!

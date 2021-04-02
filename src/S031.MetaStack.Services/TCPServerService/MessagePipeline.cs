@@ -5,14 +5,33 @@ using S031.MetaStack.Data;
 using S031.MetaStack.Actions;
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using S031.MetaStack.Security;
+using System.Threading;
 
 namespace S031.MetaStack.Services
 {
 	internal class MessagePipeline : IDisposable
 	{
-		readonly DataPackage _message = null;
-		DataPackage _result = null;
-		public MessagePipeline(DataPackage message)
+		private readonly IServiceProvider _services;
+		private readonly IActionManager _actionManager;
+		private readonly ILoginProvider _loginProvider;
+		CancellationToken _token;
+
+		public MessagePipeline(IServiceProvider services)
+		{
+			_services = services;
+			_actionManager = services.GetRequiredService<IActionManager>();
+			_loginProvider = services.GetRequiredService<ILoginProvider>();
+		}
+
+
+		public void Dispose()
+		{
+		}
+		
+		public async Task<DataPackage> ProcessMessageAsync(DataPackage message, CancellationToken token)
 		{
 			message.NullTest(nameof(message));
 			if (!message.Headers.TryGetValue("ActionID", out object actionID) ||
@@ -21,44 +40,52 @@ namespace S031.MetaStack.Services
 			else if (!message.Headers.TryGetValue("UserName", out object UserID) ||
 				UserID.ToString().IsEmpty())
 				throw new MessagePipelineException("The title of the message does not contain user name");
-			_message = message;
-		}
-
-		public DataPackage InputMessage => _message;
-		public DataPackage ResultMessage => _result;
-
-		public void Dispose()
-		{
-		}
-		public async Task ProcessMessageAsync()
-		{
-			var config = ApplicationContext.GetConfiguration();
-			if (!_message.Headers.TryGetValue("ConnectionName", out object connectionName))
-				connectionName = config["appSettings:defaultConnection"]; ;
-			ActionContext actionContext = new ActionContext() { ConnectionName = (string)connectionName };
-
-			using (ActionManager am = ApplicationContext.GetActionManager())
+			
+			
+			_token = token;
+			try
 			{
-				string actionID = (string)_message.Headers["ActionID"];
-				ActionInfo ai = am.GetActionInfo(actionID);
-				if (ai.AuthenticationRequired)
-				{
-					actionContext.UserName = (string)_message.Headers["UserName"];
-					actionContext.SessionID = (string)_message.Headers["SessionID"];
-					ApplicationContext
-						.GetLoginProvider()
-						.Logon(
-						(string)_message.Headers["UserName"],
-						(string)_message.Headers["SessionID"],
-						(string)_message.Headers["EncryptedKey"]);
-					//set thread principal
-				}
-				ai.SetContext(actionContext);
+				ActionInfo ai = await BuildContext(message);
 				if (ai.AsyncMode)
-					_result = await am.ExecuteAsync(ai, _message);
+					return await _actionManager.ExecuteAsync(ai, message);
 				else
-					_result = am.Execute(ai, _message);
+					return await Task.Run(() => _actionManager.Execute(ai, message));
 			}
+			catch (Exception ex)
+			{
+				return DataPackage.CreateErrorPackage(ex);
+			}
+		}
+
+		private async Task<ActionInfo> BuildContext(DataPackage message)
+		{
+			var config = _services.GetRequiredService<IConfiguration>();
+			string actionID = (string)message.Headers["ActionID"];
+			string userName = (string)message.Headers["UserName"];
+			string sessionID = (string)message.Headers["SessionID"];
+			string encryptedKey = (string)message.Headers["EncryptedKey"];
+			if (!message.Headers.TryGetValue("ConnectionName", out object connectionName))
+				connectionName = config["appSettings:defaultConnection"]; ;
+
+			ActionInfo ai = await _actionManager.GetActionInfoAsync(actionID);
+			ActionContext ctx = new ActionContext(_services)
+			{
+				CancellationToken = _token,
+				UserName = userName,
+				SessionID = sessionID,
+				ConnectionName = (string)connectionName
+			};
+
+			if (ai.AuthenticationRequired)
+			{
+				var ui = await _loginProvider.LogonAsync(userName, sessionID, encryptedKey);
+				ctx.Principal = ui;
+			}
+			else
+				ctx.Principal = _guest;
+
+			ai.SetContext(ctx);
+			return ai;
 		}
 	}
 

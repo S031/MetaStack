@@ -213,8 +213,6 @@ namespace S031.MetaStack.Common
 		{
 			if (string.IsNullOrEmpty(str) || string.IsNullOrEmpty(template))
 				return false;
-			if (template.Contains(str))
-				return true;
 			return System.Text.RegularExpressions.Regex.IsMatch(str, template);
 		}
 

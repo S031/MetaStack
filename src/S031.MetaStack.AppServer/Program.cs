@@ -1,11 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using S031.MetaStack.Common;
-using S031.MetaStack.Core.App;
-using System;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,16 +8,23 @@ namespace S031.MetaStack.AppServer
 {
 	internal class Program
 	{
-		private static readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+
 		/// <summary>
 		////Костыль!!! Исключить из ссылок рантайм dll (aka \ORM\*.dll
 		/// </summary>
 		/// <param name="args"></param>
 		/// <returns></returns>
 		public static async Task Main(string[] args)
-			=> await CreateHostBuilder(args)
-			.Build()
-			.RunAsync(_cancellationTokenSource.Token);
+		{
+			using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
+			{
+				await CreateHostBuilder(args)
+					.Build()
+					// этот токен приходит в BackgroundService.ExecuteAsync
+					// не нужно отдельый service
+					.RunAsync(cancellationTokenSource.Token);
+			}
+		}
 
 
 		private static IHostBuilder CreateHostBuilder(string[] args)
@@ -39,88 +41,5 @@ namespace S031.MetaStack.AppServer
 				})
 				.UseStartup<Startup>()
 				.UseConsoleLifetime();
-
-
-		//private static void TestConnection()
-		//{
-		//	var sp = ApplicationContext.GetServices();
-		//	var config = sp.GetService<IConfiguration>();
-		//	var connectionName = config["appSettings:defaultConnection"];
-		//	var cn = config.GetSection($"connectionStrings:{connectionName}").Get<ConnectInfo>();
-
-		//	using (MdbContext mdb = new MdbContext(cn))
-		//	using (var dr = mdb.GetReader("select * from mib_msfo_DealValues_Select where Date = @Date",
-		//		"@Date", "2018-09-30".ToDateOrDefault()))
-		//	//,
-		//	//"@DealType", "КредЮЛ_КК"))
-		//	{
-		//		for (; dr.Read();)
-		//		{
-		//			Console.WriteLine($"{dr[0]}\t{dr[1]}");
-		//			//Console.WriteLine($"{dr[0]}\t{dr[1]}\t{dr[2]}\t{dr[3]}");
-		//		}
-		//	}
-
-		//	//	DbProviderFactory dbFactory = AseClientFactory.Instance;
-		//	//	using (DbConnection c = dbFactory.CreateConnection())
-		//	//	using (DbCommand comm = dbFactory.CreateCommand())
-		//	//	{
-		//	//		c.ConnectionString = cn.ConnectionString;
-		//	//		comm.Connection = c;
-		//	//		//comm.CommandText = "dbo.fct_select_deal_values";
-		//	//		//comm.CommandType = CommandType.StoredProcedure;
-		//	//		comm.CommandText = "exec dbo.fct_select_deal_values '2018-09-30', 'КредЮЛ_КК'";
-		//	//		comm.CommandType = CommandType.Text;
-		//	//		//var p = comm.CreateParameter();
-		//	//		//p.ParameterName = "@Date";
-		//	//		//p.Value = "2018-09-30".ToDateOrDefault();
-		//	//		//comm.Parameters.Add(p);
-		//	//		//p = comm.CreateParameter();
-		//	//		//p.ParameterName = "@DealType";
-		//	//		//p.Value = "КредЮЛ_КК";
-		//	//		//comm.Parameters.Add(p);
-
-		//	//		c.Open();
-		//	//		for (int i = 0; i < 1; i++)
-		//	//		{
-		//	//			using (IDataReader dr = comm.ExecuteReader())
-		//	//			{
-		//	//				for (; dr.Read();)
-		//	//				{
-		//	//					Console.WriteLine($"{dr[0]}\t{dr[1]}");
-		//	//				}
-		//	//			}
-		//	//		}
-		//	//	}
-		//	//using (var connection = new AseConnection(cn.ConnectionString))
-		//	//{
-		//	//	connection.Open();
-		//	//	using (var command = connection.CreateCommand())
-		//	//	{
-		//	//		command.CommandText = "select * from mib_msfo_DealValues_Select where Date = @Date";
-		//	//		command.CommandType = CommandType.Text;
-		//	//		command.Parameters.AddWithValue("@Date", "2018-04-10".ToDateOrDefault());
-		//	//		command.Parameters.AddWithValue("@DealType", "");
-		//	//		//var p = command.CreateParameter();
-		//	//		//p.ParameterName = "@Date";
-		//	//		//p.AseDbType = AseDbType.SmallDateTime;
-		//	//		//p.Value = "2018-09-30".ToDateOrDefault();
-		//	//		//command.Parameters.Add(p);
-		//	//		//p = command.CreateParameter();
-		//	//		//p.AseDbType = AseDbType.VarChar;
-		//	//		//p.ParameterName = "@DealType";
-		//	//		//p.Value = "КредЮЛ_КК";
-		//	//		//command.Parameters.Add(p);
-		//	//		using (var reader = command.ExecuteReader())
-		//	//		{
-		//	//			Console.WriteLine($"{reader.FieldCount}");
-		//	//			while (reader.Read())
-		//	//			{
-		//	//				Console.WriteLine($"{reader[0]}\t{reader[1]}");
-		//	//			}
-		//	//		}
-		//	//	}
-		//	//}
-		//}
 	}
 }

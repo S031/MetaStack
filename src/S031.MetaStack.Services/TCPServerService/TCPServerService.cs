@@ -3,10 +3,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using S031.MetaStack.Core.App;
 using S031.MetaStack.Common;
 using Microsoft.Extensions.Logging;
-using S031.MetaStack.Core.Logging;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using S031.MetaStack.Core.Services;
@@ -19,6 +17,7 @@ namespace S031.MetaStack.Services
 		private Socket _listener;
 		private CancellationToken _token;
 		private readonly ILogger _log;
+		private readonly IServiceProvider _services;
 		private long _maxReceivedMessageSize = 1048576;
 		private readonly HostedServiceOptions _options;
 		private static readonly string _nameof = typeof(TCPServerService).FullName;
@@ -33,6 +32,7 @@ namespace S031.MetaStack.Services
 				.ConfigureAwait(false);
 			}
 		}
+
 		async Task Accept(Task<Socket> task)
 		{
 			using (var client = await task)
@@ -69,12 +69,11 @@ namespace S031.MetaStack.Services
 			}
 		}
 
-		static async Task<DataPackage> ProcessMessageAsync(DataPackage inputMessage)
+		private async Task<DataPackage> ProcessMessageAsync(DataPackage inputMessage)
 		{
-			using (var messagePipeline = new MessagePipeline(inputMessage))
+			using (var messagePipeline = new MessagePipeline(_services))
 			{
-				await messagePipeline.ProcessMessageAsync();
-				return messagePipeline.ResultMessage;
+				return await messagePipeline.ProcessMessageAsync(inputMessage, _token);
 			}
 		}
 
@@ -88,23 +87,14 @@ namespace S031.MetaStack.Services
 		public override  async Task StopAsync(CancellationToken cancellationToken)
 		{
 			_listener.Close();
-			_log.Debug($"{_nameof} successfully stoped");
+			_log.LogDebug($"{_nameof} successfully stoped");
 			(_log as IDisposable)?.Dispose();
 			await base.StopAsync(cancellationToken);
 		}
 
 		public TCPServerService(IServiceProvider services, HostedServiceOptions options)
 		{
-			//var serviceBuilder = ApplicationContext.GetServices(new ServiceProviderOptions() { ValidateScopes = true });
-			//using (var scope = serviceBuilder.CreateScope())
-			//{
-			//	var serviceProvider = scope.ServiceProvider;
-			//	if (!options.LogName.IsEmpty())
-			//		_log = new FileLogger(_nameof, options.LogSettings);
-			//	else
-			//		_log = serviceProvider.GetRequiredService<ILogger>();
-			//}
-
+			_services = services;
 			if (options.LogName.IsEmpty())
 				_log = services.GetRequiredService<ILogger>();
 			else
@@ -120,7 +110,7 @@ namespace S031.MetaStack.Services
 			_maxReceivedMessageSize = _options.Parameters.GetValue<int>("MaxReceivedMessageSize", 1048576);
 			_listener.Bind(new IPEndPoint(IPAddress.Loopback, _options.Parameters.GetValue<int>("Port", 8001)));
 			_listener.Listen(120);
-			_log.Debug($"{_nameof} successfully started");
+			_log.LogDebug($"{_nameof} successfully started");
 			await Listen();
 		}
 	}

@@ -7,6 +7,7 @@ using S031.MetaStack.Core.ORM;
 using S031.MetaStack.Data;
 using S031.MetaStack.ORM;
 using S031.MetaStack.Actions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace S031.MetaStack.Core.Actions
 {
@@ -21,33 +22,35 @@ namespace S031.MetaStack.Core.Actions
 		public DataPackage Invoke(ActionInfo ai, DataPackage dp)
 		{
 			GetParameters(ai, dp);
-			using (JMXFactory f = ApplicationContext.CreateJMXFactory((string)_connectionName))
+			var ctx = ai.GetContext();
+
+			using (JMXFactory f = ctx.CreateJMXFactory((string)_connectionName))
 			using (JMXRepo repo = (f.CreateJMXRepo() as JMXRepo))
 			using (SQLStatementWriter writer = f.CreateSQLStatementWriter())
 			{
 				JMXSchema schema = repo.GetSchema(_viewName);
-				string _body = writer.WriteSelectStatement(
+				string body = writer.WriteSelectStatement(
 					schema,
 					_conditions.ToArray())
 					.ToString();
 
 				if (schema.DbObjectType == DbObjectTypes.Action)
-					using (ActionManager am = new ActionManager(f.GetMdbContext(ContextTypes.SysCat))
-					{
-						Logger = ApplicationContext.GetLogger()
-					})
-						return am.Execute(am.GetActionInfo(_body), dp);
+				{
+					ActionManager am = ctx.Services.GetRequiredService<ActionManager>();
+					return am.Execute(am.GetActionInfo(body), dp);
+				}
 				else
-					return f
-						.GetMdbContext(ContextTypes.Work)
-						.GetReader(_body, CreateParameters(schema));
+					return f.GetMdbContext(ContextTypes.Work)
+						.GetReader(body, CreateParameters(schema));
 			}
 		}
 
 		public async Task<DataPackage> InvokeAsync(ActionInfo ai, DataPackage dp)
 		{
 			GetParameters(ai, dp);
-			using (JMXFactory f = ApplicationContext.CreateJMXFactory((string)_connectionName))
+			var ctx = ai.GetContext();
+
+			using (JMXFactory f = ctx.CreateJMXFactory((string)_connectionName))
 			using (JMXRepo repo = (f.CreateJMXRepo() as JMXRepo))
 			using (SQLStatementWriter writer = f.CreateSQLStatementWriter())
 			{
@@ -58,11 +61,10 @@ namespace S031.MetaStack.Core.Actions
 					.ToString();
 
 				if (schema.DbObjectType == DbObjectTypes.Action)
-					using (ActionManager am = new ActionManager(f.GetMdbContext(ContextTypes.SysCat))
-					{
-						Logger = ApplicationContext.GetLogger()
-					})
-						return await am.ExecuteAsync(am.GetActionInfo(body), dp);
+				{
+					ActionManager am = ctx.Services.GetRequiredService<ActionManager>();
+					return await am.ExecuteAsync(am.GetActionInfo(body), dp);
+				}
 				else
 					return await f
 						.GetMdbContext(ContextTypes.Work)

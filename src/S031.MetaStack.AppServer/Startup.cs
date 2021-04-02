@@ -2,8 +2,12 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using S031.MetaStack.Actions;
 using S031.MetaStack.Common;
+using S031.MetaStack.Core.Actions;
+using S031.MetaStack.Core.Security;
 using S031.MetaStack.Data;
+using S031.MetaStack.Security;
 using System.Reflection;
 using System.Threading;
 
@@ -23,6 +27,8 @@ namespace S031.MetaStack.AppServer
 			services.AddSingleton(p => p.GetRequiredService<ILoggerProvider>()
 				.CreateLogger(Assembly.GetEntryAssembly().GetWorkName()));
 			services.AddSingleton<IMdbContextFactory, MdbContextFactory>();
+			services.AddTransient<IActionManager, ActionManager>();
+			services.AddSingleton<ILoginProvider, BasicLoginProvider>();
 			ConfigureServicesFromConfigFile(services);
 		}
 		
@@ -32,7 +38,7 @@ namespace S031.MetaStack.AppServer
 			foreach (var section in serviceList)
 			{
 				var options = section.Get<Core.Services.HostedServiceOptions>();
-				services.AddTransient<Core.Services.HostedServiceOptions>(s => options);
+				services.AddScoped(s => options);
 				services.Add<IHostedService>(options.TypeName, options.AssemblyName, options.ServiceLifetime);
 			}
 		}

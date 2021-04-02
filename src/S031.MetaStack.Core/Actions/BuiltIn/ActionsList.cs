@@ -8,7 +8,7 @@ using S031.MetaStack.Caching;
 
 namespace S031.MetaStack.Core.Actions
 {
-	internal static class ActionsList
+	internal static class ActionsListInternal
 	{
 		public static MapTable<string, ActionInfo> CreateActionsList()
 		{
@@ -17,7 +17,7 @@ namespace S031.MetaStack.Core.Actions
             ActionInfo ai = new ActionInfo()
             {
                 ActionID = "Sys.LoginRequest",
-                AssemblyID = typeof(ActionsList).Assembly.GetWorkName(),
+                AssemblyID = typeof(ActionsListInternal).Assembly.GetWorkName(),
                 AsyncMode = false,
                 AuthenticationRequired = false,
                 AuthorizationRequired = false,
@@ -87,7 +87,7 @@ namespace S031.MetaStack.Core.Actions
 			ai = new ActionInfo()
 			{
 				ActionID = "Sys.Logon",
-				AssemblyID = typeof(ActionsList).Assembly.GetWorkName(),
+				AssemblyID = typeof(ActionsListInternal).Assembly.GetWorkName(),
 				AsyncMode = false,
 				AuthenticationRequired = false,
 				AuthorizationRequired = false,
@@ -173,7 +173,7 @@ namespace S031.MetaStack.Core.Actions
 			ai = new ActionInfo()
 			{
 				ActionID = "Sys.Select",
-				AssemblyID = typeof(ActionsList).Assembly.GetWorkName(),
+				AssemblyID = typeof(ActionsListInternal).Assembly.GetWorkName(),
 				AsyncMode = true,
 				AuthenticationRequired = true,
 				AuthorizationRequired = true,
@@ -227,7 +227,7 @@ namespace S031.MetaStack.Core.Actions
 			ai = new ActionInfo()
 			{
 				ActionID = "Sys.GetSchema",
-				AssemblyID = typeof(ActionsList).Assembly.GetWorkName(),
+				AssemblyID = typeof(ActionsListInternal).Assembly.GetWorkName(),
 				AsyncMode = true,
 				AuthenticationRequired = true,
 				AuthorizationRequired = false,
@@ -282,7 +282,7 @@ namespace S031.MetaStack.Core.Actions
 			ai = new ActionInfo()
 			{
 				ActionID = "Sys.Logout",
-				AssemblyID = typeof(ActionsList).Assembly.GetWorkName(),
+				AssemblyID = typeof(ActionsListInternal).Assembly.GetWorkName(),
 				AsyncMode = false,
 				AuthenticationRequired = false,
 				AuthorizationRequired = false,
@@ -304,7 +304,7 @@ namespace S031.MetaStack.Core.Actions
 			ai = new ActionInfo()
 			{
 				ActionID = "Sys.SaveSchema",
-				AssemblyID = typeof(ActionsList).Assembly.GetWorkName(),
+				AssemblyID = typeof(ActionsListInternal).Assembly.GetWorkName(),
 				AsyncMode = true,
 				AuthenticationRequired = true,
 				AuthorizationRequired = true,
@@ -358,7 +358,7 @@ namespace S031.MetaStack.Core.Actions
 			ai = new ActionInfo()
 			{
 				ActionID = "Sys.GetActionInfo",
-				AssemblyID = typeof(ActionsList).Assembly.GetWorkName(),
+				AssemblyID = typeof(ActionsListInternal).Assembly.GetWorkName(),
 				AsyncMode = true,
 				AuthenticationRequired = true,
 				AuthorizationRequired = true,
@@ -412,7 +412,7 @@ namespace S031.MetaStack.Core.Actions
 			ai = new ActionInfo()
 			{
 				ActionID = "Sys.PipeRead",
-				AssemblyID = typeof(ActionsList).Assembly.GetWorkName(),
+				AssemblyID = typeof(ActionsListInternal).Assembly.GetWorkName(),
 				AsyncMode = false,
 				AuthenticationRequired = true,
 				AuthorizationRequired = true,

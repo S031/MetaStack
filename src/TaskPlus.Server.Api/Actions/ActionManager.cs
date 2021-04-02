@@ -34,7 +34,19 @@ namespace TaskPlus.Server.Actions
 		}
 		public override DataPackage Execute(ActionInfo ai, DataPackage inParamStor)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				return ExecuteInternal(ai, inParamStor);
+			}
+			catch (Exception ex)
+			{
+				if (ai == null || ai.LogOnError)
+					_logger.LogError($"{ex.Message}\n{ex.StackTrace}");
+				//Костыль!!!
+				//if (ai != null && ai.EMailOnError)
+				//	Comm.SendEMail(ai.EMailGroup, "Ошибка выполнения операции '{0}'".ToFormat(ai.ActionID), ex.Detail.FullReport);
+				throw;
+			}
 		}
 		public override async Task<DataPackage> ExecuteAsync(ActionInfo ai, DataPackage inParamStor)
 		{
@@ -52,10 +64,19 @@ namespace TaskPlus.Server.Actions
 				throw;
 			}
 		}
-		private async Task<DataPackage> ExecuteInternalAsync(ActionInfo ai, DataPackage inParamStor)
+		private DataPackage ExecuteInternal(ActionInfo ai, DataPackage inParamStor)
 		{
 			if (ai.AuthorizationRequired)
 				Authorize(ai, inParamStor);
+			
+			var se = CreateEvaluator(ai, inParamStor);
+			return se.Invoke(ai, inParamStor);
+		}
+
+		private async Task<DataPackage> ExecuteInternalAsync(ActionInfo ai, DataPackage inParamStor)
+		{
+			if (ai.AuthorizationRequired)
+				await AuthorizeAsync(ai, inParamStor);
 			
 			var se = CreateEvaluator(ai, inParamStor);
 			return await se.InvokeAsync(ai, inParamStor);
@@ -96,7 +117,7 @@ namespace TaskPlus.Server.Actions
 			if (pCount > 0 && (inParamStor == null || inParamStor.FieldCount < pCount || !inParamStor.Read()))
 			{
 				throw new InvalidOperationException(
-					"Количество параметров операции '{0}', не соответствует интерфейсу '{1}'"
+					Strings.TaskPlus_Server_Actions_CreateEvaluator_2
 					.ToFormat(ai.ActionID, ai.InterfaceID));
 			}
 			else if (pCount > 0)

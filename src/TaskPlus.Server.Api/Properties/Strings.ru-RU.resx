@@ -120,6 +120,9 @@
   <data name="TaskPlus.Server.Actions.CreateEvaluator_1" xml:space="preserve">
     <value>Обязательный параметер интерфейса '{0}.{1}', не найден в списке параметров  операции '{2}'</value>
   </data>
+  <data name="TaskPlus.Server.Actions.CreateEvaluator_2" xml:space="preserve">
+    <value>Количество параметров операции '{0}', не соответствует интерфейсу '{1}'</value>
+  </data>
   <data name="TaskPlus.Server.SecurityAuthorizationExceptions.GetMessage.1" xml:space="preserve">
     <value>Полномочий пользователя {0} недостаточно для выполнения метода '{1}' объекта '{2}'</value>
   </data>

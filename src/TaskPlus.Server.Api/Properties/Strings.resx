@@ -126,6 +126,9 @@
   <data name="TaskPlus.Server.Actions.CreateEvaluator_1" xml:space="preserve">
     <value>Required interface parameter '{0}. {1}', not found in the parameter list of operation '{2}'</value>
   </data>
+  <data name="TaskPlus.Server.Actions.CreateEvaluator_2" xml:space="preserve">
+    <value>Number of operation parameters '{0}', does not match interface '{1}'</value>
+  </data>
   <data name="TaskPlus.Server.SecurityAuthorizationExceptions.GetMessage.1" xml:space="preserve">
     <value>Permission denied for user {0} to execute '{1}' of object '{2}'</value>
   </data>

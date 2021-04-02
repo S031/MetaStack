@@ -27,7 +27,7 @@ namespace S031.MetaStack.Core.Security
 		static readonly Random _random = new Random(Guid.NewGuid().GetHashCode());
 		static readonly MapTable<string, MapTable<Guid, LoginInfo>> _users = new MapTable<string, MapTable<Guid, LoginInfo>>();
 
-		public BasicLoginProvider()
+		public BasicLoginProvider(IServiceProvider services)
 		{
 		}
 

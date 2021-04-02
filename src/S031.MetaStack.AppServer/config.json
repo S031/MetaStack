@@ -10,44 +10,20 @@
       "Default": "Information",
       "Microsoft": "Warning",
       "Microsoft.Hosting.Lifetime": "Information",
-      "TaskPlus.Server": "Debug"
+      "S031.MetaStack": "Debug"
     },
     "File": {
       "CacheSize": 100,
-      "DateFolderMask": "yyyy-MM",
+      "DateFolderMask": "yyyy-MM-dd",
       "LevelToFlush": "Critical",
       "LogLevel": {
-        "Default": "Warning",
+        "Default": "Debug",
         "Microsoft": "Warning",
         "Microsoft.Hosting.Lifetime": "Information",
-        "TaskPlus.Server": "Debug"
+        "S031.MetaStack": "Debug"
       },
       "MaxFileSizeInMB": 20
     }
-  },
-  "ApplicationLogSettings": {
-    /* Cache size before flushing to disk */
-    "CacheSize": 100,
-    /* Set the mask for grouping by date
-      For example:
-      yyyy-MM-dd - every day a new folder
-      yyyy-MM - every month 
-    */
-    "DateFolderMask": "yyyy-MM-dd",
-    /* Min log level for output may be:
-		  Trace = 0,
-		  Debug = 1,
-		  Information = 2,
-		  Warning = 3,
-		  Error = 4,
-		  Critical = 5,
-		  None = 6
-      default value is LogLevels.Information
-      use LogLevels.Debug for development and testing cycles
-    */
-    "LogLevel": "Debug",
-    /* Log level for forced flush */
-    "LevelToFlush": "Critical"
   },
   "connectionStrings": {
     "bankLocal": {
