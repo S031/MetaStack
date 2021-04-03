@@ -81,7 +81,7 @@ namespace S031.MetaStack.Core.App
 			}
 			else
 			{
-				_loginProvider = new BasicLoginProvider() { CheckTicketTimeout = 0 };
+				_loginProvider = new BasicLoginProvider(GetServices()) { CheckTicketTimeout = 0 };
 				_services.AddSingleton<ILoginProvider>(_loginProvider);
 			}
 			return _services;
@@ -161,8 +161,6 @@ namespace S031.MetaStack.Core.App
 			f.IsLocalContext = true;
 			return f;
 		}
-
-		public static ActionManager GetActionManager() => new ActionManager(SchemaDb) { Logger = GetLogger() };
 
 		private static MdbContext SchemaDb
 		{

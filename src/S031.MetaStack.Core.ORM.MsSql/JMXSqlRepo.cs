@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using S031.MetaStack.Common;
-using S031.MetaStack.Core.Logging;
 using S031.MetaStack.Data;
 using S031.MetaStack.ORM;
 
@@ -120,8 +119,8 @@ namespace S031.MetaStack.Core.ORM.MsSql
 
 				foreach (string statement in scripts)
 					await mdb.ExecuteAsync(statement);
-				Logger.Debug($"Schema SysCat was created in database {mdb.DbName}");
-				Logger.Debug("Schema tables SysCat.SysAreas and SysCat.SysSchemas was created in SysCat Schema");
+				Logger.LogDebug($"Schema SysCat was created in database {mdb.DbName}");
+				Logger.LogDebug("Schema tables SysCat.SysAreas and SysCat.SysSchemas was created in SysCat Schema");
 				string owner = await GetDefaultDbSchemaAsync();
 				int id = await mdb.ExecuteAsync<int>(SqlServer.AddSysAreas,
 					new MdbParameter("@SchemaName", owner),
@@ -214,7 +213,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 				{
 					foreach (var sql in sqlList)
 					{
-						logger.Debug(sql);
+						logger.LogDebug(sql);
 						await mdb.ExecuteAsync(sql);
 					}
 					await mdb.ExecuteAsync(SqlServer.DelSysSchemas,
@@ -280,7 +279,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 				try
 				{
 					await mdb.ExecuteAsync(SqlServer.DropSchema);
-					log.Debug($"Schema SysCat was deleted from database {mdb.DbName}");
+					log.LogDebug($"Schema SysCat was deleted from database {mdb.DbName}");
 				}
 				catch (Exception e)
 				{
@@ -289,7 +288,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 				}
 			}
 			else
-				log.Debug($"Schema SysCat not exists in database  {mdb.DbName}");
+				log.LogDebug($"Schema SysCat not exists in database  {mdb.DbName}");
 		}
 		#endregion Clear Catalog
 
@@ -556,7 +555,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 			{
 				foreach (var sql in sqlList)
 				{
-					log.Debug(sql);
+					log.LogDebug(sql);
 					await mdb.ExecuteAsync(sql);
 				}
 				//if (!createNew)

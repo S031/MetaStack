@@ -1,19 +1,22 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using S031.MetaStack.Actions;
 using S031.MetaStack.Common;
 using S031.MetaStack.Data;
 using S031.MetaStack.Security;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Threading.Tasks;
-using TaskPlus.Server.Api.Properties;
 
+#if METASTACK_CORE
+using S031.MetaStack.Core.Properties;
+namespace S031.MetaStack.Core.Actions
+#else
+using TaskPlus.Server.Api.Properties;
 namespace TaskPlus.Server.Actions
+#endif
 {
 	public sealed class ActionManager : ActionManagerBase
 	{
@@ -117,7 +120,12 @@ namespace TaskPlus.Server.Actions
 			if (pCount > 0 && (inParamStor == null || inParamStor.FieldCount < pCount || !inParamStor.Read()))
 			{
 				throw new InvalidOperationException(
+#if METASTACK_CORE
+					Strings.S031_MetaStack_Core_Actions_CreateEvaluator_2
+#else
 					Strings.TaskPlus_Server_Actions_CreateEvaluator_2
+#endif
+
 					.ToFormat(ai.ActionID, ai.InterfaceID));
 			}
 			else if (pCount > 0)
@@ -131,7 +139,11 @@ namespace TaskPlus.Server.Actions
 					catch
 					{
 						throw new InvalidOperationException(
+#if METASTACK_CORE
+							Strings.S031_MetaStack_Core_Actions_CreateEvaluator_1
+#else
 							Strings.TaskPlus_Server_Actions_CreateEvaluator_1
+#endif
 							.ToFormat(ai.InterfaceID, pi.ParameterID, ai.ActionID));
 					}
 				}

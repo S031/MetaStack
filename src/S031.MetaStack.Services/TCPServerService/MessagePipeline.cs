@@ -1,6 +1,4 @@
 ﻿using S031.MetaStack.Common;
-using S031.MetaStack.Core.Actions;
-using S031.MetaStack.Core.App;
 using S031.MetaStack.Data;
 using S031.MetaStack.Actions;
 using System;
@@ -9,6 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using S031.MetaStack.Security;
 using System.Threading;
+using S031.MetaStack.Integral.Security;
+using S031.MetaStack.Core.Security;
 
 namespace S031.MetaStack.Services
 {
@@ -18,6 +18,8 @@ namespace S031.MetaStack.Services
 		private readonly IActionManager _actionManager;
 		private readonly ILoginProvider _loginProvider;
 		CancellationToken _token;
+		
+		private static readonly UserInfo _guest = UserManager.GetCurrentPrincipal();
 
 		public MessagePipeline(IServiceProvider services)
 		{

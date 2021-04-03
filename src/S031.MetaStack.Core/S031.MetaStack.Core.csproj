@@ -7,12 +7,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile></DocumentationFile>
     <LangVersion>latest</LangVersion>
-    <DefineConstants>TRACE;DEBUG;NETCOREAPP;SERIALIZEBINARY</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NETCOREAPP;METASTACK_CORE</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <LangVersion>latest</LangVersion>
-    <DefineConstants>TRACE;NETCOREAPP;SERIALIZEBINARY</DefineConstants>
+    <DefineConstants>TRACE;NETCOREAPP;METASTACK_CORE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -40,7 +40,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\TaskPlus.Server.Api\Actions\ActionManager.cs" Link="Actions\ActionManager.cs" />
     <Compile Include="..\TaskPlus.Server.Api\Data\MdbContextFactory.cs" Link="Data\MdbContextFactory.cs" />
+    <Compile Include="..\TaskPlus.Server.Api\Security\Users\UserManager.cs" Link="Security\Users\UserManager.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -77,6 +79,7 @@
 
   <ItemGroup>
     <Folder Include="Data\" />
+    <Folder Include="Security\Users\" />
   </ItemGroup>
 
 </Project>

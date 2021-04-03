@@ -13,9 +13,13 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+#if METASTACK_CORE
+using S031.MetaStack.Core.Properties;
+namespace S031.MetaStack.Core.Security
+#else
 using TaskPlus.Server.Api.Properties;
-
 namespace TaskPlus.Server.Security
+#endif
 {
 	public class UserManager : UserManagerBase
 	{
@@ -36,6 +40,7 @@ namespace TaskPlus.Server.Security
 				.GetRequiredService<IMdbContextFactory>()
 				.GetContext(Strings.SysCatConnection);
 		}
+
 		public async override Task<UserInfo> GetUserInfoAsync(string login)
 		{
 			if (!_uiCache.TryGetValue(login, out UserInfo ui))

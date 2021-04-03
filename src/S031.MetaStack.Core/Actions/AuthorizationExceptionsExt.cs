@@ -2,7 +2,7 @@
 using System;
 using S031.MetaStack.Actions;
 
-namespace S031.MetaStack.Core.App
+namespace S031.MetaStack.Core.Actions
 {
 	public static class AuthorizationExceptionsExtension
 	{

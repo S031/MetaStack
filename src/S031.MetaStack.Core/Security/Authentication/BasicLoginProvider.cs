@@ -47,7 +47,7 @@ namespace S031.MetaStack.Core.Security
 		/// <returns></returns>
 		public async Task<string> LoginRequestAsync(string userName, string clientPublicKey)
 		{
-			return await Task.Factory.StartNew(
+			return await Task.Run(
 				()=> LoginRequest(userName, clientPublicKey)).ConfigureAwait(false);
 		}
 

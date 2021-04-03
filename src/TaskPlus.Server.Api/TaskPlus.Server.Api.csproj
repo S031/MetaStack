@@ -6,6 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Security\Claims\**" />
+    <Content Remove="Security\Claims\**" />
+    <EmbeddedResource Remove="Security\Claims\**" />
+    <None Remove="Security\Claims\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="SimpleValue.cs" />
   </ItemGroup>
 
