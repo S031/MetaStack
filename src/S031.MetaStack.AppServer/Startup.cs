@@ -29,6 +29,7 @@ namespace S031.MetaStack.AppServer
 			services.AddSingleton<IMdbContextFactory, MdbContextFactory>();
 			services.AddTransient<IActionManager, ActionManager>();
 			services.AddSingleton<ILoginProvider, BasicLoginProvider>();
+			services.AddSingleton<PipeQueue, PipeQueue>();
 			ConfigureServicesFromConfigFile(services);
 		}
 		

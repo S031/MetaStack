@@ -9,14 +9,15 @@ namespace S031.MetaStack.Core.Actions
 {
 	internal class SysGetSchema : IAppEvaluator
 	{
-		ConnectInfo _connectInfo;
+		string _connectionName;
 		string _objectName;
 
 		public DataPackage Invoke(ActionInfo ai, DataPackage dp)
 		{
-			GetParameters(dp);
-			using (MdbContext mdb = new MdbContext(_connectInfo))
-			using (JMXFactory f = JMXFactory.Create(mdb, ApplicationContext.GetLogger()))
+			GetParameters(ai, dp);
+			var ctx = ai.GetContext();
+
+			using (JMXFactory f = ctx.CreateJMXFactory(_connectionName))
 			{
 				return ai.GetOutputParamTable()
 					.AddNew()
@@ -27,10 +28,10 @@ namespace S031.MetaStack.Core.Actions
 
 		public async Task<DataPackage> InvokeAsync(ActionInfo ai, DataPackage dp)
 		{
-			GetParameters(dp);
-			//using (MdbContext mdb = await MdbContext.CreateMdbContextAsync(_connectInfo))
-			using (MdbContext mdb = new MdbContext(_connectInfo))
-			using (JMXFactory f = JMXFactory.Create(mdb, ApplicationContext.GetLogger()))
+			GetParameters(ai, dp);
+			var ctx = ai.GetContext();
+
+			using (JMXFactory f = ctx.CreateJMXFactory(_connectionName))
 			{
 				return ai.GetOutputParamTable()
 					.AddNew()
@@ -39,12 +40,9 @@ namespace S031.MetaStack.Core.Actions
 			}
 		}
 
-		private void GetParameters(DataPackage dp)
+		private void GetParameters(ActionInfo ai, DataPackage dp)
 		{
-			var configuration = ApplicationContext.GetConfiguration();
-			if (!dp.Headers.TryGetValue("ConnectionName", out object connectionName))
-				connectionName = configuration["appSettings:SysCatConnection"];
-			_connectInfo = configuration.GetSection($"connectionStrings:{connectionName}").Get<ConnectInfo>();
+			_connectionName = ai.GetContext().ConnectionName;
 
 			if (dp.Read())
 				_objectName = (string)dp["ObjectName"];

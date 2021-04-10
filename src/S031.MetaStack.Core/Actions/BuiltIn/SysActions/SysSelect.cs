@@ -13,7 +13,7 @@ namespace S031.MetaStack.Core.Actions
 {
 	internal class SysSelect : IAppEvaluator
 	{
-		object _connectionName;
+		string _connectionName;
 		string _viewName;
 		readonly List<object> _parameters = new List<object>();
 		List<JMXCondition> _conditions;
@@ -24,7 +24,7 @@ namespace S031.MetaStack.Core.Actions
 			GetParameters(ai, dp);
 			var ctx = ai.GetContext();
 
-			using (JMXFactory f = ctx.CreateJMXFactory((string)_connectionName))
+			using (JMXFactory f = ctx.CreateJMXFactory(_connectionName))
 			using (JMXRepo repo = (f.CreateJMXRepo() as JMXRepo))
 			using (SQLStatementWriter writer = f.CreateSQLStatementWriter())
 			{
@@ -50,7 +50,7 @@ namespace S031.MetaStack.Core.Actions
 			GetParameters(ai, dp);
 			var ctx = ai.GetContext();
 
-			using (JMXFactory f = ctx.CreateJMXFactory((string)_connectionName))
+			using (JMXFactory f = ctx.CreateJMXFactory(_connectionName))
 			using (JMXRepo repo = (f.CreateJMXRepo() as JMXRepo))
 			using (SQLStatementWriter writer = f.CreateSQLStatementWriter())
 			{

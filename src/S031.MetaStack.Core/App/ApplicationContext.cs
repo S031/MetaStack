@@ -13,6 +13,7 @@ using S031.MetaStack.Core.ORM;
 using S031.MetaStack.Core.Actions;
 using S031.MetaStack.Data;
 using S031.MetaStack.Security;
+using S031.MetaStack.Actions;
 
 namespace S031.MetaStack.Core.App
 {
@@ -29,7 +30,7 @@ namespace S031.MetaStack.Core.App
 		static ILoginProvider _loginProvider;
 		static IBasicAuthorizationProvider _authorizationProvider;
 		static MdbContext _schemaDb = null;
-		static readonly PipeService _pipeChannel = new PipeService();
+		static readonly PipeQueue _pipeChannel = new PipeQueue();
 
 		public static IConfiguration GetConfiguration() => _configuration;
 		public static ILogger GetLogger() => _logger;
@@ -179,6 +180,6 @@ namespace S031.MetaStack.Core.App
 
 		}
 
-		public static PipeService GetPipe() => _pipeChannel;
+		public static PipeQueue GetPipe() => _pipeChannel;
     }
 }

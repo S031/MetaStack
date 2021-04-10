@@ -19,7 +19,7 @@ namespace MetaStack.Test.ORM
 		private static readonly string _sourceJsonString = Encoding.UTF8.GetString(Test.Resources.TestData.TestJson);
 		public ORMSchemaTest()
 		{
-			Program.ConfigureTests();
+			Program.GetServices();
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
 		}
 

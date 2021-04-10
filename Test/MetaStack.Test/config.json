@@ -10,6 +10,20 @@
       "Port": 8001
     }
   },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Debug",
+    },
+    "File": {
+      "CacheSize": 100,
+      "DateFolderMask": "yyyy-MM-dd",
+      "LevelToFlush": "Critical",
+      "LogLevel": {
+        "Default": "Debug",
+      },
+      "MaxFileSizeInMB": 20
+    }
+  },
   "connectionStrings": {
     "bankLocal": {
       "Description": "Local SQL Express 2014 server",

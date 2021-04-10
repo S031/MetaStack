@@ -79,6 +79,7 @@
 
   <ItemGroup>
     <Folder Include="Data\" />
+    <Folder Include="Logging\Pipe\" />
     <Folder Include="Security\Users\" />
   </ItemGroup>
 

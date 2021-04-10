@@ -1,6 +1,8 @@
-﻿using S031.MetaStack.Common.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using S031.MetaStack.Actions;
+using S031.MetaStack.Common.Logging;
 using S031.MetaStack.Core.Actions;
-using S031.MetaStack.Core.Logging;
 using S031.MetaStack.Core.ORM;
 using S031.MetaStack.Data;
 using S031.MetaStack.ORM;
@@ -15,15 +17,19 @@ namespace MetaStack.Test.ORM
 	{
 		private const string _cn = @"Data Source=D:\Source\Repos\Data\SQLite\MetaStack\SysCat.db; Mode=Memory; Cache=Shared";
 		private readonly ConnectInfo _ci;
+		private readonly ILogger _logger;
 
 		/// <summary>
 		/// Required MetaStack database in sql server
 		/// </summary>
 		public ORMSQLiteTest()
 		{
-			Program.ConfigureTests();
+			_logger = Program
+				.GetServices()
+				.GetRequiredService<ILoggerProvider>()
+				.CreateLogger("ORMSQLiteTest");
+
 			_ci = new ConnectInfo("System.Data.Sqlite", _cn);
-			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
 		}
 
 		/// <summary>
@@ -32,7 +38,6 @@ namespace MetaStack.Test.ORM
 		[Fact]
 		private void Test1()
 		{
-			using (FileLogger _logger = new FileLogger("ORMSQLiteTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			using (MdbContext mdb = new MdbContext(_ci))
 			using (JMXFactory f = JMXFactory.Create(mdb, _logger))
 			{
@@ -49,7 +54,6 @@ namespace MetaStack.Test.ORM
 
 		private async Task SaveSchemaTestAsyncNew()
 		{
-			using (FileLogger _logger = new FileLogger("ORMSQLiteTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			using (MdbContext mdb = new MdbContext(_ci))
 			using (JMXFactory f = JMXFactory.Create(mdb, _logger))
 			{
@@ -72,7 +76,6 @@ namespace MetaStack.Test.ORM
 
 		private async Task SyncSchemaTestAsyncNew()
 		{
-			using (FileLogger _logger = new FileLogger("ORMSQLiteTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			using (MdbContext mdb = new MdbContext(_cn))
 			using (JMXFactory f = JMXFactory.Create(mdb, _logger))
 			{
@@ -114,7 +117,6 @@ namespace MetaStack.Test.ORM
 
 		private async Task DropSchemaTestAsyncNew()
 		{
-			using (FileLogger _logger = new FileLogger("ORMSQLiteTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			using (MdbContext mdb = new MdbContext(_ci))
 			using (JMXFactory f = JMXFactory.Create(mdb, _logger))
 			{
@@ -137,7 +139,6 @@ namespace MetaStack.Test.ORM
 
 		private async Task DropDBSchemaTestAsyncNew()
 		{
-			using (FileLogger _logger = new FileLogger("ORMSQLiteTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			using (MdbContext mdb = new MdbContext(_ci))
 			using (JMXFactory f = JMXFactory.Create(mdb, _logger))
 			{
@@ -148,59 +149,52 @@ namespace MetaStack.Test.ORM
 		[Fact]
 		private void SpeedGetHashCodeTest()
 		{
-			using (FileLogger _logger = new FileLogger("ORMSQLiteTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			using (MdbContext mdb = new MdbContext(_ci))
 			{
-				using (MdbContext mdb = new MdbContext(_ci))
+				//string s1 = mdb.Execute<string>("SysCat.Get_TableSchema_xml",
+				//	new MdbParameter("@table_name", "dbo.OrderDetails"));
+				//_logger.Debug(s1);
+				//_logger.Debug(JMXSchema.ParseXml(s1).ToString());
+				//s1 = mdb.Execute<string>("SysCat.Get_TableSchema",
+				//	new MdbParameter("@table_name", "dbo.Orders"));
+				//_logger.Debug(s1);
+
+				//_logger.Debug("Start speed test for SysCat.Get_TableSchema_xml");
+				//for (int i = 0; i < 100; i++)
+				//{
+				//	s1 = mdb.Execute<string>("SysCat.Get_TableSchema_xml",
+				//		new MdbParameter("@table_name", "dbo.OrderDetails"));
+				//	var schema = JMXSchema.ParseXml(s1);
+				//}
+				//_logger.Debug("End speed test for SysCat.Get_TableSchema_xml");
+				_logger.LogDebug("Start speed test for SysCat.Get_TableSchema");
+				for (int i = 0; i < 100; i++)
 				{
-					//string s1 = mdb.Execute<string>("SysCat.Get_TableSchema_xml",
-					//	new MdbParameter("@table_name", "dbo.OrderDetails"));
-					//_logger.Debug(s1);
-					//_logger.Debug(JMXSchema.ParseXml(s1).ToString());
-					//s1 = mdb.Execute<string>("SysCat.Get_TableSchema",
-					//	new MdbParameter("@table_name", "dbo.Orders"));
-					//_logger.Debug(s1);
-
-					//_logger.Debug("Start speed test for SysCat.Get_TableSchema_xml");
-					//for (int i = 0; i < 100; i++)
-					//{
-					//	s1 = mdb.Execute<string>("SysCat.Get_TableSchema_xml",
-					//		new MdbParameter("@table_name", "dbo.OrderDetails"));
-					//	var schema = JMXSchema.ParseXml(s1);
-					//}
-					//_logger.Debug("End speed test for SysCat.Get_TableSchema_xml");
-					_logger.Debug("Start speed test for SysCat.Get_TableSchema");
-					for (int i = 0; i < 100; i++)
-					{
-						var s1 = mdb.Execute<string>("SysCat.Get_TableSchema",
-							new MdbParameter("@table_name", "dbo.OrderDetails"));
-						var schema = JMXSchema.Parse(s1);
-					}
-					_logger.Debug("End speed test for SysCat.Get_TableSchema");
+					var s1 = mdb.Execute<string>("SysCat.Get_TableSchema",
+						new MdbParameter("@table_name", "dbo.OrderDetails"));
+					var schema = JMXSchema.Parse(s1);
 				}
-
+				_logger.LogDebug("End speed test for SysCat.Get_TableSchema");
 			}
 		}
+
 		[Fact]
 		private void ActionSelectTest()
 		{
-			using (FileLogger _logger = new FileLogger("ORMSQLiteTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
-			using (MdbContext mdb = new MdbContext(_ci))
-			using (ActionManager m = new ActionManager(mdb) { Logger = _logger })
-			{
-				var ai = m.GetActionInfo("Sys.Select");
-				var dr = m.Execute(ai, ai
-					.GetInputParamTable()
-					.AddNew()
-					.SetValue("ParamName", "_viewName")
-					.SetValue("ParamValue", "SysCat.SysSchema")
-					.Update()
-					.AddNew()
-					.SetValue("ParamName", "_filter")
-					.SetValue("ParamValue", "ObjectName = 'SysSchema'")
-					.Update()
-					);
-				_logger.Debug(dr.ToString());
-			}
+			var m = Program.GetServices().GetRequiredService<IActionManager>();
+			var ai = m.GetActionInfo("Sys.Select");
+			var dr = m.Execute(ai, ai
+				.GetInputParamTable()
+				.AddNew()
+				.SetValue("ParamName", "_viewName")
+				.SetValue("ParamValue", "SysCat.SysSchema")
+				.Update()
+				.AddNew()
+				.SetValue("ParamName", "_filter")
+				.SetValue("ParamValue", "ObjectName = 'SysSchema'")
+				.Update()
+				);
+			_logger.LogDebug(dr.ToString());
 		}
 
 		[Fact]
@@ -213,15 +207,11 @@ namespace MetaStack.Test.ORM
 			//	string s = File.ReadAllText(f.FullName);
 			//	File.WriteAllText(f.FullName, s, Encoding.UTF8);
 			//}
-			using (FileLogger _logger = new FileLogger("ORMSQLiteTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
-			{
-				var s = CreateTestSchema();
-				_logger.Debug(s.ToString());
-				var s1 = JMXSchema.Parse(s.ToString());
-				Assert.Equal(s.ToString(), s1.ToString());
-				_logger.Debug(s1.ToString());
-			}
-
+			var s = CreateTestSchema();
+			_logger.LogDebug(s.ToString());
+			var s1 = JMXSchema.Parse(s.ToString());
+			Assert.Equal(s.ToString(), s1.ToString());
+			_logger.LogDebug(s1.ToString());
 		}
 
 		private JMXSchema CreateTestSchema()

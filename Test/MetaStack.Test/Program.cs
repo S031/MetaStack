@@ -1,24 +1,43 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using S031.MetaStack.Common;
 using S031.MetaStack.Core.App;
+using S031.MetaStack.Data;
+using System;
+using System.Reflection;
 
 namespace MetaStack.Test
 {
-	public static class Program
+	internal static class Program
 	{
 		private static IHost _host;
 
-		public static void ConfigureTests()
+		public static IServiceProvider GetServices()
 		{
-			IConfiguration configuration = new ConfigurationBuilder()
-				.AddJsonFile("config.json", optional: false, reloadOnChange: true)
-				.Build();
-
-			_host = new HostBuilder()
+			if (_host == null)
+			{
+				_host = Host.CreateDefaultBuilder()
+				.ConfigureAppConfiguration(config =>
+				{
+					config.AddJsonFile("config.json", optional: false, reloadOnChange: false);
+				})
+				.ConfigureLogging(logging =>
+				{
+					logging
+						.ClearProviders()
+						.AddFile();
+				})
+				.ConfigureServices(s=>
+					s.AddSingleton(p => p.GetRequiredService<ILoggerProvider>()
+						.CreateLogger(Assembly.GetEntryAssembly().GetWorkName()))
+					.AddSingleton<IMdbContextFactory, MdbContextFactory>()
+				)
 				.UseConsoleLifetime()
-				.UseApplicationContext(configuration)
 				.Build();
+			}
+			return _host.Services;
 		}
-
 	}
 }

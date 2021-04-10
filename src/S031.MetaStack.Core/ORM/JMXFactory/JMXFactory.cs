@@ -17,13 +17,13 @@ namespace S031.MetaStack.Core.ORM
 		{
 		}
 
-		public virtual IJMXFactory SchemaFactory => throw new NotImplementedException();
+		public abstract IJMXFactory SchemaFactory { get; }
 
-		public virtual IJMXRepo CreateJMXRepo() => throw new NotImplementedException();
+		public abstract IJMXRepo CreateJMXRepo();
 
-		public virtual IJMXProvider CreateJMXProvider() => throw new NotImplementedException();
+		public abstract IJMXProvider CreateJMXProvider();
 
-		public virtual JMXObject CreateObject(string objectName) => throw new NotImplementedException();
+		public abstract JMXObject CreateObject(string objectName);
 
 		public static JMXFactory Create(MdbContext mdb, ILogger logger) => Create(mdb, mdb, logger);
 

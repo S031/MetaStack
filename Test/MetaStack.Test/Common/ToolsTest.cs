@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using S031.MetaStack.Common;
 using S031.MetaStack.Common.Logging;
-using S031.MetaStack.Core.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -124,33 +124,32 @@ namespace MetaStack.Test.Common
 		[Fact]
 		private void fileLoggerFactoryTest()
 		{
-			using (ILoggerFactory factory = new LoggerFactory())
-			{
-				factory.AddFileLog(new FileLogSettings() { DateFolderMask = "yyyy-MM-dd", CacheSize = 1000 });
-				//ILogger loger = factory.CreateLogger<ToolsTest>();
-				ILogger loger = factory.CreateLogger("ToolsTest");
-				loger.LogInformation("Старт");
-				List<Task> ts = new List<Task>(10);
+			ILogger loger = Program
+				.GetServices()
+				.GetRequiredService<ILoggerProvider>()
+				.CreateLogger("ToolsTest");
 
-				for (int j = 0; j < 10; j++)
+			loger.LogInformation("Старт");
+			List<Task> ts = new List<Task>(10);
+
+			for (int j = 0; j < 10; j++)
+			{
+				ts.Add(Task.Factory.StartNew(() =>
 				{
-					ts.Add(Task.Factory.StartNew(() =>
+					for (int i = 1; i <= 100000; i++)
 					{
-						for (int i = 1; i <= 100000; i++)
-						{
-							string data = $"Сообщение № {i} в потоке {System.Threading.Thread.CurrentThread.ManagedThreadId}";
-							loger.LogInformation(new EventId(1001, "fileLoggerFactoryTest"), data);
+						string data = $"Сообщение № {i} в потоке {System.Threading.Thread.CurrentThread.ManagedThreadId}";
+						loger.LogInformation(new EventId(1001, "fileLoggerFactoryTest"), data);
 							//loger.LogDebug(new EventId(1001, "fileLoggerFactoryTest"), "Test debug with eventID");
 							////очень медленно будет
 							//loger.LogDebug("Test debug without eventID");
 							////
 							//loger.Log<string>(LogLevel.Information, new EventId(0, "fileLoggerFactoryTest"), data, null, null);
 						}
-					}));
-				}
-				Task.WaitAll(ts.ToArray());
-				loger.LogInformation("Финиш");
+				}));
 			}
+			Task.WaitAll(ts.ToArray());
+			loger.LogInformation("Финиш");
 		}
 
 		[Fact]

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using S031.MetaStack.Core.App;
 using S031.MetaStack.Data;
 using S031.MetaStack.Actions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace S031.MetaStack.Core.Actions
 {
@@ -10,9 +11,13 @@ namespace S031.MetaStack.Core.Actions
 	{
 		public DataPackage Invoke(ActionInfo ai, DataPackage dp)
 		{
+			var ctx = ai.GetContext();
 			return ai.GetOutputParamTable()
 				.AddNew()
-				.SetValue("Result", ApplicationContext.GetPipe().Read(ai.GetContext()))
+				.SetValue("Result", ctx
+					.Services
+					.GetRequiredService<PipeQueue>()
+					.Read(ctx))
 				.Update();
 		}
 

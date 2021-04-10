@@ -1,8 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using S031.MetaStack.Common;
-using System;
-using System.Reflection;
 
 namespace Microsoft.Extensions.Hosting
 {

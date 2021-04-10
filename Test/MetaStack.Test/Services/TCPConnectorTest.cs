@@ -1,20 +1,25 @@
 ﻿using S031.MetaStack.Common.Logging;
 using S031.MetaStack.Core.Actions;
 using S031.MetaStack.Interop.Connectors;
-using S031.MetaStack.Core.Logging;
 using S031.MetaStack.Data;
 using S031.MetaStack.Actions;
 using Xunit;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MetaStack.Test.Services
 {
 	public class TCPConnectorTest
 	{
 		private readonly string _cn;
+		private readonly ILogger _logger;
 
 		public TCPConnectorTest()
 		{
-			Program.ConfigureTests();
+			_logger = Program
+				.GetServices()
+				.GetRequiredService<ILoggerProvider>()
+				.CreateLogger("TCPConnectorTest");
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
 			var mdbTest = new MetaStack.Test.Data.MdbContextTest();
 			_cn = mdbTest.connectionString;
@@ -23,7 +28,7 @@ namespace MetaStack.Test.Services
 		[Fact]
 		private void TCPConnectorConnectTest()
 		{
-			using (FileLogger l = new FileLogger("TCPConnectorConnectTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			using (FileLog l = new FileLog("TCPConnectorConnectTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			using (TCPConnector connector = TCPConnector.Create())
 			{
 				connector.Connect("Test", "@TestPassword");
@@ -42,18 +47,14 @@ namespace MetaStack.Test.Services
 		[Fact]
 		private void ActionManagerTest()
 		{
-			using (FileLogger _logger = new FileLogger("ActionManagerTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
-			using (MdbContext mdb = new MdbContext(_cn))
-			using (ActionManager am = new ActionManager(mdb) { Logger = _logger })
-			{
-				ActionInfo ai = am.GetActionInfo("Sys.LoginRequest");
-				_logger.Debug(ai.GetInputParamTable().ToString());
-				_logger.Debug(ai.GetOutputParamTable().ToString());
-				var dt = ai.GetOutputParamTable();
-				dt.AddNew();
-				dt["PublicKey"] = "123456789";
-				dt.Update();
-			}
+			var am = Program.GetServices().GetRequiredService<IActionManager>();
+			ActionInfo ai = am.GetActionInfo("Sys.LoginRequest");
+			_logger.LogDebug(ai.GetInputParamTable().ToString());
+			_logger.LogDebug(ai.GetOutputParamTable().ToString());
+			var dt = ai.GetOutputParamTable();
+			dt.AddNew();
+			dt["PublicKey"] = "123456789";
+			dt.Update();
 		}
 	}
 }

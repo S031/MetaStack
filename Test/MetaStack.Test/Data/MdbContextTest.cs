@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using S031.MetaStack.Common;
 using S031.MetaStack.Common.Logging;
 using S031.MetaStack.Core.App;
-using S031.MetaStack.Core.Logging;
 using S031.MetaStack.Data;
 using System;
 using System.Linq;
@@ -25,11 +24,12 @@ namespace MetaStack.Test.Data
 
 		internal string providerName => _providerName;
 		internal string connectionString => _cn;
+
 		public MdbContextTest()
 		{
-			MetaStack.Test.Program.ConfigureTests();
+			var services = MetaStack.Test.Program.GetServices();
 
-			_configuration = ApplicationContext.GetServices().GetService<IConfiguration>();
+			_configuration = services.GetService<IConfiguration>();
 			var cs = _configuration.GetSection($"connectionStrings:{connection_name}").Get<ConnectInfo>();
 			_providerName = cs.ProviderName;
 			_cn = new ConnectInfo(_providerName, cs.ConnectionString).ToString();
@@ -39,11 +39,12 @@ namespace MetaStack.Test.Data
 			_syscatProviderName = cs.ProviderName;
 			_syscat = new ConnectInfo(_syscatProviderName, cs.ConnectionString).ToString();
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
+
 		}
 		[Fact]
 		private void createContextTest()
 		{
-			using (FileLogger l = new FileLogger("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			using (FileLog l = new FileLog("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
 				Type t = null;
 				l.Debug("SpeedTest 1 Start ");
@@ -60,7 +61,7 @@ namespace MetaStack.Test.Data
 		[Fact]
 		public void GetReaderSpeedTest()
 		{
-			using (FileLogger l = new FileLogger("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			using (FileLog l = new FileLog("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
 				DateTime t = DateTime.MinValue;
 				//Caching pool
@@ -100,7 +101,7 @@ namespace MetaStack.Test.Data
 		[Fact]
 		public void GetReaderTest()
 		{
-			using (FileLogger l = new FileLogger("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			using (FileLog l = new FileLog("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
 				MdbContextOptions.GetOptions().CommandTimeout = 120;
 				using (var ctx = new MdbContext(_cn))
@@ -186,7 +187,7 @@ namespace MetaStack.Test.Data
 		[Fact]
 		public void GetReadersTest()
 		{
-			using (FileLogger l = new FileLogger("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			using (FileLog l = new FileLog("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
 				MdbContextOptions.GetOptions().CommandTimeout = 120;
 				using (var ctx = new MdbContext(_cn))
@@ -217,7 +218,7 @@ namespace MetaStack.Test.Data
 		[Fact]
 		public void GetSysCatReadersTest()
 		{
-			using (FileLogger l = new FileLogger("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			using (FileLog l = new FileLog("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
 				MdbContextOptions.GetOptions().CommandTimeout = 120;
 				using (var ctx = new MdbContext(_syscat))
@@ -259,7 +260,7 @@ namespace MetaStack.Test.Data
 		[Fact]
 		public void ExecuteTest()
 		{
-			using (FileLogger l = new FileLogger("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			using (FileLog l = new FileLog("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
 				MdbContextOptions.GetOptions().CommandTimeout = 120;
 				using (var ctx = new MdbContext(_cn))
@@ -319,7 +320,7 @@ namespace MetaStack.Test.Data
 
 		private void TransactionTest(bool withCommit)
 		{
-			using (FileLogger l = new FileLogger("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			using (FileLog l = new FileLog("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
 				using (var ctx = new MdbContext(_cn))
 				{
@@ -341,7 +342,7 @@ namespace MetaStack.Test.Data
 			}
 		}
 
-		private static void CreateTestTable(MdbContext ctx, FileLogger l)
+		private static void CreateTestTable(MdbContext ctx, FileLog l)
 		{
 			l.Debug("Create Test Table Start");
 			int i = 0;
@@ -356,7 +357,7 @@ namespace MetaStack.Test.Data
 			ctx.Commit();
 		}
 
-		private static void InsertTestTable(MdbContext ctx, FileLogger l)
+		private static void InsertTestTable(MdbContext ctx, FileLog l)
 		{
 			l.Debug("Insert Test Table Start");
 			string sql = @"Insert Into TestTable (ID, Name, DateOper, Handle)
@@ -375,7 +376,7 @@ namespace MetaStack.Test.Data
 			l.Debug($"Insert Test Table Finish rows result {i}");
 		}
 
-		private static void SelectTestTable(MdbContext ctx, FileLogger l)
+		private static void SelectTestTable(MdbContext ctx, FileLog l)
 		{
 			l.Debug("Select Test Table Start");
 			int i = 0;
@@ -389,7 +390,7 @@ namespace MetaStack.Test.Data
 			l.Debug($"Select Test Table Finish rows result {i}");
 		}
 
-		private static void DropTestTable(MdbContext ctx, FileLogger l)
+		private static void DropTestTable(MdbContext ctx, FileLog l)
 		{
 			l.Debug("Drop Test Table Start");
 			int i = 0;
@@ -404,7 +405,7 @@ namespace MetaStack.Test.Data
 		//}
 		//async Task _createContextTestAsync()
 		//{
-		//	using (FileLogger l = new FileLogger("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+		//	using (FileLog l = new FileLog("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 		//	{
 		//		Type t = null;
 		//		l.Debug("SpeedTest 1 Start ");
@@ -427,7 +428,7 @@ namespace MetaStack.Test.Data
 
 		private async Task _getReaderSpeedTestAsync()
 		{
-			using (FileLogger l = new FileLogger("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			using (FileLog l = new FileLog("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
 				DateTime t = DateTime.MinValue;
 				//Caching pool
@@ -472,7 +473,7 @@ namespace MetaStack.Test.Data
 
 		private async Task _getReadersTestAsync()
 		{
-			using (FileLogger l = new FileLogger("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			using (FileLog l = new FileLog("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
 				MdbContextOptions.GetOptions().CommandTimeout = 120;
 				using (var ctx = new MdbContext(_cn))
@@ -508,7 +509,7 @@ namespace MetaStack.Test.Data
 
 		private async Task executeTestAsync()
 		{
-			using (FileLogger l = new FileLogger("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			using (FileLog l = new FileLog("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
 				MdbContextOptions.GetOptions().CommandTimeout = 120;
 				using (var ctx = new MdbContext(_cn))
@@ -568,7 +569,7 @@ namespace MetaStack.Test.Data
 
 		private async Task _TransactionTestAsync(bool withCommit)
 		{
-			using (FileLogger l = new FileLogger("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			using (FileLog l = new FileLog("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
 				using (var ctx = new MdbContext(_cn))
 				{
@@ -590,7 +591,7 @@ namespace MetaStack.Test.Data
 			}
 		}
 
-		private static async Task CreateTestTableAsync(MdbContext ctx, FileLogger l)
+		private static async Task CreateTestTableAsync(MdbContext ctx, FileLog l)
 		{
 			l.Debug("Create Test Table Start");
 			int i = 0;
@@ -605,7 +606,7 @@ namespace MetaStack.Test.Data
 			await ctx.CommitAsync();
 		}
 
-		private static async Task InsertTestTableAsync(MdbContext ctx, FileLogger l)
+		private static async Task InsertTestTableAsync(MdbContext ctx, FileLog l)
 		{
 			l.Debug("Insert Test Table Start");
 			string sql = @"Insert Into TestTable (ID, Name, DateOper, Handle)
@@ -624,7 +625,7 @@ namespace MetaStack.Test.Data
 			l.Debug($"Insert Test Table Finish rows result {i}");
 		}
 
-		private static async Task SelectTestTableAsync(MdbContext ctx, FileLogger l)
+		private static async Task SelectTestTableAsync(MdbContext ctx, FileLog l)
 		{
 			l.Debug("Select Test Table Start");
 			int i = 0;
@@ -638,7 +639,7 @@ namespace MetaStack.Test.Data
 			l.Debug($"Select Test Table Finish rows result {i}");
 		}
 
-		private static async Task DropTestTableAsync(MdbContext ctx, FileLogger l)
+		private static async Task DropTestTableAsync(MdbContext ctx, FileLog l)
 		{
 			l.Debug("Drop Test Table Start");
 			int i = 0;
@@ -646,7 +647,7 @@ namespace MetaStack.Test.Data
 			i = await ctx.ExecuteAsync(sql);
 			l.Debug($"Drop Test Table Finish rows result {i}");
 		}
-		private static void DisplayData(System.Data.DataTable table, FileLogger l)
+		private static void DisplayData(System.Data.DataTable table, FileLog l)
 		{
 			StringBuilder sb = new StringBuilder();
 			foreach (System.Data.DataRow row in table.Rows)

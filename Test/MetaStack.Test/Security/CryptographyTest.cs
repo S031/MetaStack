@@ -2,7 +2,6 @@
 using S031.MetaStack.Common;
 using S031.MetaStack.Common.Logging;
 using S031.MetaStack.Core.App;
-using S031.MetaStack.Core.Logging;
 using S031.MetaStack.Core.Security;
 using S031.MetaStack.Security;
 using System;
@@ -18,7 +17,7 @@ namespace MetaStack.Test.Security
 		private static readonly RSAEncryptionPadding _padding = RSAEncryptionPadding.OaepSHA256;
 		public CryptographyTest()
 		{
-			MetaStack.Test.Program.ConfigureTests();
+			MetaStack.Test.Program.GetServices();
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
 		}
 		[Fact]
@@ -63,7 +62,7 @@ namespace MetaStack.Test.Security
 		[Fact]
 		private void LogonTest()
 		{
-			using (FileLogger l = new FileLogger("CryptographyTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			using (FileLog l = new FileLog("CryptographyTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
 				var userName = "Test";
 				var secret = "@TestPassword";
@@ -113,7 +112,7 @@ namespace MetaStack.Test.Security
 		private void HashAlgorithmTest()
 		{
 			const string password_str = "@test";
-			using (FileLogger l = new FileLogger("CryptographyTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
+			using (FileLog l = new FileLog("CryptographyTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
 				l.Debug($"Password (@test) sha256 hash: {CryptoHelper.ComputeSha256Hash(password_str)}");
 				l.Debug($"Password (@test) md5 hash: {CryptoHelper.ComputeMD5Hash(password_str)}");

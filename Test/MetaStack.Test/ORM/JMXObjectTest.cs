@@ -13,7 +13,7 @@ namespace MetaStack.Test.ORM
 		private readonly string _connectionName;
 		public ORMObjectTest()
 		{
-			Program.ConfigureTests();
+			Program.GetServices();
 			_connectionName = ApplicationContext
 				.GetConfiguration()["appSettings:defaultConnection"];
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;

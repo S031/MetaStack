@@ -14,7 +14,7 @@ namespace MetaStack.Test.Data
 	{
 		public DBProviderFactoryTest()
 		{
-			MetaStack.Test.Program.ConfigureTests();
+			MetaStack.Test.Program.GetServices();
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
 		}
 		[Fact]

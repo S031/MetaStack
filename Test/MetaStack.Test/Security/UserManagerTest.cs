@@ -1,13 +1,10 @@
 ﻿using S031.MetaStack.Common.Logging;
+using S031.MetaStack.Core.Security;
 using S031.MetaStack.Integral.Security;
 using S031.MetaStack.Json;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Security.Claims;
-using System.Security.Principal;
-using System.Text;
-using TaskPlus.Server.Security;
 using Xunit;
 
 namespace MetaStack.Test.Security
@@ -16,7 +13,7 @@ namespace MetaStack.Test.Security
 	{
 		public UserManagerTest()
 		{
-			MetaStack.Test.Program.ConfigureTests();
+			MetaStack.Test.Program.GetServices();
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
 		}
 

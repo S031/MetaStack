@@ -1,15 +1,11 @@
 ﻿using S031.MetaStack.Common;
-using S031.MetaStack.Core.Actions;
 using S031.MetaStack.Actions;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Text;
 
-namespace S031.MetaStack.Core
+namespace S031.MetaStack.Actions
 {
-	
-	public class PipeService
+	public class PipeQueue
 	{
 		readonly MapTable<ActionContext, ConcurrentQueue<string>> _messages = 
 			new MapTable<ActionContext, ConcurrentQueue<string>>(); 

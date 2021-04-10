@@ -157,34 +157,6 @@ namespace MetaStack.Test.Buffers
 			return t;
 		}
 
-		readonly struct SimpleValue2
-		{
-			private readonly long _long;
-			private readonly double _double;
-			private readonly object _value;
-			private readonly ExportedDataTypes _type;
-
-			public SimpleValue2(int value)
-			{
-				_long = value;
-				_double = -1;
-				_value = null;
-				_type = ExportedDataTypes.@int;
-			}
-
-			public SimpleValue2(string value)
-			{
-				_long = -1;
-				_double = -1;
-				_value = value;
-				_type = ExportedDataTypes.@string;
-			}
-			public static implicit operator string(SimpleValue2 value)
-				=> value._type == ExportedDataTypes.@string
-				? (string)value._value
-				: throw new InvalidCastException();
-		}
-
 		unsafe struct SimpleValue
 		{
 			private unsafe Byte* _buffer;
