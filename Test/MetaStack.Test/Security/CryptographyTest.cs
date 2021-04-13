@@ -66,7 +66,7 @@ namespace MetaStack.Test.Security
 			{
 				var userName = "Test";
 				var secret = "@TestPassword";
-				var svcProv = ApplicationContext.GetServices();
+				var svcProv = Program.GetServices();
 
 				var clientRSA = RSA.Create();
 				var clientPK = clientRSA.Export();

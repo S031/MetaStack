@@ -340,7 +340,7 @@ namespace S031.MetaStack.Data
 		/// <summary>
 		/// Async version of <see cref="MdbContext.GetReader(string)"/>
 		/// </summary>
-		public async Task<DataPackage> GetReaderAsync(string sql) => await GetReaderAsync(sql, new MdbParameter[] { }).ConfigureAwait(false);
+		public async Task<DataPackage> GetReaderAsync(string sql) => await GetReaderAsync(sql, Array.Empty<MdbParameter>()).ConfigureAwait(false);
 		/// <summary>
 		/// Async version of <see cref="MdbContext.GetReader(string, MdbParameter[])"/>
 		/// </summary>

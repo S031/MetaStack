@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Metib.Business.Msfo
 {
@@ -28,11 +29,12 @@ namespace Metib.Business.Msfo
 				.ToArray();
 
 			var ctx = ai.GetContext();
-			var cs = ApplicationContext
-				.GetConfiguration()
+			var cs = ctx.Services
+				.GetRequiredService<IConfiguration>()
 				.GetSection($"connectionStrings:{ctx.ConnectionName}").Get<ConnectInfo>();
 
-			var pipe = ApplicationContext.GetPipe();
+			var pipe = ctx.Services
+				.GetRequiredService<PipeQueue>();
 			StringBuilder sb = new StringBuilder();
 			foreach (long i in ids)
 			{

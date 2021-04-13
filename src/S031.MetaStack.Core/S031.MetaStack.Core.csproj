@@ -17,17 +17,14 @@
 
   <ItemGroup>
     <Compile Remove="Configuration\**" />
-    <Compile Remove="Logging\File\**" />
     <Compile Remove="ORM\JMXFactory\DB\**" />
     <Compile Remove="ORM\SchemaProviders\**" />
     <Compile Remove="SysCat\**" />
     <EmbeddedResource Remove="Configuration\**" />
-    <EmbeddedResource Remove="Logging\File\**" />
     <EmbeddedResource Remove="ORM\JMXFactory\DB\**" />
     <EmbeddedResource Remove="ORM\SchemaProviders\**" />
     <EmbeddedResource Remove="SysCat\**" />
     <None Remove="Configuration\**" />
-    <None Remove="Logging\File\**" />
     <None Remove="ORM\JMXFactory\DB\**" />
     <None Remove="ORM\SchemaProviders\**" />
     <None Remove="SysCat\**" />
@@ -36,6 +33,7 @@
   <ItemGroup>
     <Compile Remove="App\AppHost.cs" />
     <Compile Remove="App\AppHostExtensions.cs" />
+    <Compile Remove="App\ObjectFactories.cs" />
     <Compile Remove="ORM\JMXSchemaProviderFactory.cs" />
   </ItemGroup>
 
@@ -79,7 +77,6 @@
 
   <ItemGroup>
     <Folder Include="Data\" />
-    <Folder Include="Logging\Pipe\" />
     <Folder Include="Security\Users\" />
   </ItemGroup>
 

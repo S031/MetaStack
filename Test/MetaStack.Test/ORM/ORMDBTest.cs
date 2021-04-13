@@ -189,7 +189,7 @@ namespace MetaStack.Test.ORM
 		[Fact]
 		private void CreateFactorySpeedGTest()
 		{
-			var _configuration = ApplicationContext.GetConfiguration();
+			var _configuration = Program.GetServices().GetRequiredService<IConfiguration>();
 			var _schemaConnectInfo = _configuration.GetSection($"connectionStrings:{_configuration["appSettings:SysCatConnection"]}").Get<ConnectInfo>();
 			var workConnectInfo = _configuration.GetSection($"connectionStrings:Test").Get<ConnectInfo>();
 			MdbContext schemaDb = new MdbContext(_schemaConnectInfo);
@@ -197,12 +197,8 @@ namespace MetaStack.Test.ORM
 
 			for (int i = 0; i < 10000; i++)
 			{
-				//using (MdbContext workDb = new MdbContext(workConnectInfo))
-				//using (JMXFactory f = JMXFactory.Create(schemaDb, workDb, _logger))
-				//{
-
-				//}
-				using (JMXFactory f = ApplicationContext.CreateJMXFactory("Test"))
+				using (MdbContext workDb = new MdbContext(workConnectInfo))
+				using (JMXFactory f = JMXFactory.Create(schemaDb, workDb, _logger))
 				{
 
 				}

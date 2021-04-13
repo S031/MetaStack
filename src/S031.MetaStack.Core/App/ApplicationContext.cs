@@ -3,133 +3,52 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Threading;
-using Microsoft.Extensions.Logging;
 using S031.MetaStack.Core.Security;
-using S031.MetaStack.Common.Logging;
 using System.Reflection;
 using System.Runtime.Loader;
 using S031.MetaStack.Common;
-using S031.MetaStack.Core.ORM;
-using S031.MetaStack.Core.Actions;
 using S031.MetaStack.Data;
 using S031.MetaStack.Security;
-using S031.MetaStack.Actions;
 
 namespace S031.MetaStack.Core.App
 {
 	public static class ApplicationContext
     {
-		static IServiceProvider _lastBuildServiceProvider = null;
-		static int _lastBuildHash = 0;
+		private static IServiceProvider _lastBuildServiceProvider = null;
+		private static IServiceCollection _services;
+		private static int _lastBuildHash = 0;
+		private static readonly object obj4Lock = new();
 
-		static readonly object obj4Lock = new();
-		static readonly CancellationTokenSource _cts = new();
-		static IServiceCollection _services;
-		static IConfiguration _configuration;
-		static ILogger _logger;
-		static ILoginProvider _loginProvider;
-		static IBasicAuthorizationProvider _authorizationProvider;
-		static MdbContext _schemaDb = null;
-		static readonly PipeQueue _pipeChannel = new PipeQueue();
+		private static MdbContext _schemaDb = null;
+		private static CancellationToken _token;
 
-		public static IConfiguration GetConfiguration() => _configuration;
-		public static ILogger GetLogger() => _logger;
-		public static ILoginProvider GetLoginProvider() => _loginProvider;
-		public static IBasicAuthorizationProvider GetAuthorizationProvider()
-			=> _authorizationProvider;
-
-		public static IHostBuilder UseApplicationContext(this IHostBuilder host, IConfiguration configuration)
+		/// <summary>
+		/// Implementation of Host.Build method whith 
+		/// </summary>
+		/// <param name="hostBuilder"><see cref="IHostBuilder"/></param>
+		/// <param name="token"><see cref="System.Threading.CancellationToken"/></param>
+		/// <returns><see cref="IHost"/></returns>
+		public static IHost Build(this IHostBuilder hostBuilder, CancellationToken token)
 		{
-			_configuration = configuration;
-			host.ConfigureServices(services => Configure(services));
-			AppDomain.CurrentDomain.ProcessExit += DisposeMe;
-			return host;
+			_token = token;
+			hostBuilder.ConfigureServices(services => Configure(services));
+			var h =  hostBuilder.Build();
+			_lastBuildServiceProvider = h.Services;
+			return h;
 		}
 
-		private static void DisposeMe(object sender, EventArgs e)
-		{
-			(_loginProvider as IDisposable)?.Dispose();
-			(_logger as IDisposable)?.Dispose();
-		}
-
+		/// <summary>
+		/// !!!
+		/// Возможно это лучее место для включения сервисов используемых в данной библиотеке
+		/// типа LoginProvider, AuthorizationProvider, MdbFactory и т.д., кт сейчас объявлены в startup
+		/// </summary>
+		/// <param name="services"></param>
+		/// <returns></returns>
 		private static IServiceCollection Configure(IServiceCollection services)
 		{
 			_services = services;
-			_services
-				.AddSingleton<CancellationTokenSource>(_cts)
-				.AddSingleton<IConfiguration>(_configuration);
-			ConfigureLoginProvider();
-			ConfigureServicesFromConfigFile();
-			ConfigureProvidersFromConfigFile();
-			ConfigureDefaultsFromConfigFile();
-			ConfigureAuthorizationProvider();
 			return _services;
 		}
-
-		private static IServiceCollection ConfigureLoginProvider()
-		{
-			//костыль!!!
-			//return settings from configuration
-			var options = _configuration
-				.GetSection("LoginProvider")
-				.Get<Core.Services.HostedServiceOptions>();
-
-			if (options != null)
-			{
-				_services.AddTransient<Core.Services.HostedServiceOptions>(s => options);
-				_services.Add<ILoginProvider>(options.TypeName, options.AssemblyName, options.ServiceLifetime);
-				_loginProvider = GetServices().GetService<ILoginProvider>();
-			}
-			else
-			{
-				_loginProvider = new BasicLoginProvider(GetServices()) { CheckTicketTimeout = 0 };
-				_services.AddSingleton<ILoginProvider>(_loginProvider);
-			}
-			return _services;
-		}
-		private static IServiceCollection ConfigureAuthorizationProvider()
-		{
-			//костыль!!!
-			//return settings from configuration
-			_authorizationProvider = new BasicAuthorizationProvider(SchemaDb);
-			_services.AddSingleton<IBasicAuthorizationProvider>(_authorizationProvider);
-			return _services;
-		}
-
-		private static void ConfigureServicesFromConfigFile()
-		{
-			var serviceList = _configuration.GetSection("IAppServiceConfiguration:ImplementationList").GetChildren();
-			foreach (var section in serviceList)
-			{
-				var options = section.Get<Core.Services.HostedServiceOptions>();
-				_services.AddTransient<Core.Services.HostedServiceOptions>(s => options);
-				_services.Add<IHostedService>(options.TypeName, options.AssemblyName, options.ServiceLifetime);
-			}
-		}
-		private static void ConfigureProvidersFromConfigFile()
-		{
-			//костыль!!!
-			//Remove from project references all plugins and configure publish plugins to project 
-			//output folder
-			//Load to publish folder all plugins with depencies (after publish plugin progect)
-			var serviceList = _configuration.GetSection("Dependencies").GetChildren();
-			foreach (var section in serviceList)
-			{
-				if (section["AssemblyPath"].IsEmpty())
-					Assembly.Load(section["AssemblyName"]);
-				else
-					LoadAssembly(section["AssemblyPath"]);
-			}
-		}
-		private static void ConfigureDefaultsFromConfigFile()
-		{
-			//костыль!!!
-			//return settings from configuration
-		}
-		private static Assembly LoadAssembly(string assemblyID)=> AssemblyLoadContext.Default.LoadFromAssemblyPath(
-				System.IO.Path.Combine(System.AppContext.BaseDirectory, $"{assemblyID}.dll"));
-
-		public static IServiceCollection Services => _services;
 
 		public static IServiceProvider GetServices(ServiceProviderOptions options = default)
 		{
@@ -147,21 +66,7 @@ namespace S031.MetaStack.Core.App
 			return _lastBuildServiceProvider;
 		}
 
-		public static CancellationToken CancellationToken => _cts.Token;
-
-		/// <summary>
-		/// Recomended for sqlite sys cat
-		/// </summary>
-		/// <param name="workConnectionName"></param>
-		/// <returns></returns>
-		public static JMXFactory CreateJMXFactory(string workConnectionName)
-		{
-			var workConnectInfo = _configuration.GetSection($"connectionStrings:{workConnectionName}").Get<ConnectInfo>();
-			MdbContext workDb = new MdbContext(workConnectInfo);
-			var f = JMXFactory.Create(SchemaDb, workDb, _logger);
-			f.IsLocalContext = true;
-			return f;
-		}
+		public static CancellationToken CancellationToken => _token;
 
 		private static MdbContext SchemaDb
 		{
@@ -171,15 +76,15 @@ namespace S031.MetaStack.Core.App
 				{
 					lock (obj4Lock)
 					{
-						var schemaConnectInfo = _configuration.GetSection($"connectionStrings:{_configuration["appSettings:SysCatConnection"]}").Get<ConnectInfo>();
-						_schemaDb = new MdbContext(schemaConnectInfo);
+						var s = _lastBuildServiceProvider;
+						var c = s.GetRequiredService<IConfiguration>();
+						_schemaDb = s.GetRequiredService<MdbContextFactory>()
+							.GetContext(c["appSettings:SysCatConnection"]);
 					}
 				}
 				return _schemaDb;
 			}
 
 		}
-
-		public static PipeQueue GetPipe() => _pipeChannel;
     }
 }

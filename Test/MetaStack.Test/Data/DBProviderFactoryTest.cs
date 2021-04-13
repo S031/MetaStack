@@ -18,7 +18,7 @@ namespace MetaStack.Test.Data
 			FileLogSettings.Default.Filter = (s, i) => i >= LogLevels.Debug;
 		}
 		[Fact]
-		private void GetFactoryTest()
+		public void GetFactoryTest()
 		{
 			using (FileLog l = new FileLog("DBProviderFactoryTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
@@ -42,11 +42,11 @@ namespace MetaStack.Test.Data
 
 				//ApplicationContext.Services.AddFromAssembly<DbProviderFactory>(ServiceLifetime.Singleton,
 				//	(s, t) => t.CreateInstance2<DbProviderFactory>());
-				l.Debug("GetFactoryProviderNames:");
-				foreach (string s in ObjectFactories.GetFactoryNames<DbProviderFactory>())
-				{
-					l.Debug(s);
-				}
+				//l.Debug("GetFactoryProviderNames:");
+				//foreach (string s in ObjectFactories.GetFactoryNames<DbProviderFactory>())
+				//{
+				//	l.Debug(s);
+				//}
 				//Retrieve the installed providers and factories.
 				DataTable table = System.Data.Common.DbProviderFactories.GetFactoryClasses();
 

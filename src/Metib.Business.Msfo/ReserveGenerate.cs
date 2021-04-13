@@ -7,6 +7,7 @@ using S031.MetaStack.Actions;
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Metib.Business.Msfo
 {
@@ -26,14 +27,15 @@ namespace Metib.Business.Msfo
 			string batch = (string)dp["@Batch"];
 
 			var ctx = ai.GetContext();
-			var cs = ApplicationContext
-				.GetConfiguration()
+			var cs = ctx.Services
+				.GetRequiredService<IConfiguration>()
 				.GetSection($"connectionStrings:{ctx.ConnectionName}").Get<ConnectInfo>();
 
 			string[] filials = DealValuesCalculate.GetParamListData(ai, "@BranchID", branchID, "0");
 			string[] dealTypes = DealValuesCalculate.GetParamListData(ai, "@DealType", dealType, "Все");
 
-			var pipe = ApplicationContext.GetPipe();
+			var pipe = ctx.Services
+				.GetRequiredService<PipeQueue>();
 			StringBuilder sb = new StringBuilder();
 			foreach (var filial in filials)
 			{

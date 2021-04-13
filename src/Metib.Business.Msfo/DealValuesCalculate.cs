@@ -8,6 +8,7 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Metib.Business.Msfo
 {
@@ -26,14 +27,15 @@ namespace Metib.Business.Msfo
 			int reCalc = (int)dp["@ReCalc"];
 
 			var ctx = ai.GetContext();
-			var cs = ApplicationContext
-				.GetConfiguration()
+			var cs = ctx.Services
+				.GetRequiredService<IConfiguration>()
 				.GetSection($"connectionStrings:{ctx.ConnectionName}").Get<ConnectInfo>();
 
 			string[] filials = GetParamListData(ai, "@BranchID", branchID, "0");
 			string[] dealTypes = GetParamListData(ai, "@DealType", dealType, "Все");
 
-			var pipe = ApplicationContext.GetPipe();
+			var pipe = ctx.Services
+				.GetRequiredService<PipeQueue>();
 			StringBuilder sb = new StringBuilder();
 			foreach (var filial in filials)
 			{
@@ -45,7 +47,7 @@ namespace Metib.Business.Msfo
 						{
 							await mdb.ExecuteAsync($@"
 							exec workdb..mib_msfo_dv_calc 
-								@Date = '{date.ToString("yyyyMMdd")}'
+								@Date = '{date:yyyyMMdd}'
 								,@BranchID = {filial}
 								,@DealType = '{dtype}'
 								,@ReCalc   = {reCalc}");

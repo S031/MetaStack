@@ -9,6 +9,7 @@ using S031.MetaStack.Core.Security;
 using S031.MetaStack.Data;
 using S031.MetaStack.Security;
 using System.Reflection;
+using System.Runtime.Loader;
 using System.Threading;
 
 namespace S031.MetaStack.AppServer
@@ -31,6 +32,8 @@ namespace S031.MetaStack.AppServer
 			services.AddSingleton<ILoginProvider, BasicLoginProvider>();
 			services.AddSingleton<PipeQueue, PipeQueue>();
 			ConfigureServicesFromConfigFile(services);
+			ConfigureProvidersFromConfigFile();
+			ConfigureDefaultsFromConfigFile();
 		}
 		
 		private void ConfigureServicesFromConfigFile(IServiceCollection services)
@@ -43,5 +46,27 @@ namespace S031.MetaStack.AppServer
 				services.Add<IHostedService>(options.TypeName, options.AssemblyName, options.ServiceLifetime);
 			}
 		}
+		private void ConfigureProvidersFromConfigFile()
+		{
+			//костыль!!!
+			//Remove from project references all plugins and configure publish plugins to project 
+			//output folder
+			//Load to publish folder all plugins with depencies (after publish plugin progect)
+			var serviceList = _configuration.GetSection("Dependencies").GetChildren();
+			foreach (var section in serviceList)
+			{
+				if (section["AssemblyPath"].IsEmpty())
+					Assembly.Load(section["AssemblyName"]);
+				else
+					LoadAssembly(section["AssemblyPath"]);
+			}
+		}
+		private static void ConfigureDefaultsFromConfigFile()
+		{
+			//костыль!!!
+			//return settings from configuration
+		}
+		private static Assembly LoadAssembly(string assemblyID) => AssemblyLoadContext.Default.LoadFromAssemblyPath(
+				System.IO.Path.Combine(System.AppContext.BaseDirectory, $"{assemblyID}.dll"));
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using S031.MetaStack.Core.App;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,11 +19,12 @@ namespace S031.MetaStack.AppServer
 		{
 			using (CancellationTokenSource cancellationTokenSource = new CancellationTokenSource())
 			{
+				var t = cancellationTokenSource.Token;
 				await CreateHostBuilder(args)
-					.Build()
+					.Build(t)
 					// этот токен приходит в BackgroundService.ExecuteAsync
-					// не нужно отдельый service
-					.RunAsync(cancellationTokenSource.Token);
+					// не нужно отдельный service
+					.RunAsync(t);
 			}
 		}
 
