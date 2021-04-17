@@ -31,7 +31,7 @@ namespace S031.MetaStack.AppServer
 				.CreateLogger(Assembly.GetEntryAssembly().GetWorkName()));
 			services.AddSingleton<IMdbContextFactory, MdbContextFactory>();
 			services.AddTransient<IActionManager, ActionManager>();
-			services.AddSingleton<ILoginProvider, Security.BasicLoginProvider>();
+			services.AddSingleton<ILoginProvider, BasicLoginProvider>();
 			services.AddSingleton<PipeQueue, PipeQueue>();
 			services.AddSingleton<IAuthorizationProvider, Security.BasicAuthorizationProvider>();
 			services.AddSingleton<IUserManager, UserManager>();

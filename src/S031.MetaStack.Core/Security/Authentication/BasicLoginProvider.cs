@@ -10,7 +10,7 @@ using S031.MetaStack.Common;
 using S031.MetaStack.Integral.Security;
 using S031.MetaStack.Security;
 
-namespace S031.MetaStack.AppServer.Security
+namespace S031.MetaStack.Core.Security
 {
 	public class BasicLoginProvider : ILoginProvider
 	{

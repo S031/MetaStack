@@ -70,8 +70,8 @@ namespace MetaStack.Test.Security
 
 				var clientRSA = RSA.Create();
 				var clientPK = clientRSA.Export();
-				var loginFactory = svcProv.GetService<ILoginProvider>();
-				var secretData = loginFactory.LoginRequest(userName, clientPK)
+				var loginProvider = svcProv.GetService<ILoginProvider>();
+				var secretData = loginProvider.LoginRequest(userName, clientPK)
 					.ToByteArray();
 
 				LoginInfo loginInfo = new LoginInfo();
@@ -79,7 +79,7 @@ namespace MetaStack.Test.Security
 
 				var clientAes = Aes.Create()
 					.ImportBin(loginInfo.CryptoKey);
-				string token = (loginFactory as BasicLoginProvider).Logon(userName, loginInfo.SessionID.ToString(),
+				string token = (loginProvider as BasicLoginProvider).Logon(userName, loginInfo.SessionID.ToString(),
 					clientAes
 					.EncryptBin(Encoding.UTF8.GetBytes(secret))
 					.ToBASE64String());
@@ -91,7 +91,7 @@ namespace MetaStack.Test.Security
 				int i;
 				for (i = 0; i < 10000; i++)
 				{
-					token = (loginFactory as BasicLoginProvider).Logon(userName, loginInfo.SessionID.ToString(),
+					token = (loginProvider as BasicLoginProvider).Logon(userName, loginInfo.SessionID.ToString(),
 						clientAes.EncryptBin(ticket
 							.ToByteArray()
 							.Concat(BitConverter.GetBytes(DateTime.Now.Millisecond)).ToArray())
