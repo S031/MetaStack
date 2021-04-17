@@ -24,18 +24,14 @@ namespace S031.MetaStack.AppServer
 			//throw new NotImplementedException
 			_configuration = context.Configuration;
 		}
-
+		/// <summary>
+		/// !!! remove core needed services to <see cref="MetaStack.Core.App.ApplicationContext"/>
+		/// </summary>
+		/// <param name="services"></param>
 		void IStartup.ConfigureServices(IServiceCollection services)
 		{
 			services.AddSingleton(p => p.GetRequiredService<ILoggerProvider>()
 				.CreateLogger(Assembly.GetEntryAssembly().GetWorkName()));
-			services.AddSingleton<IMdbContextFactory, MdbContextFactory>();
-			services.AddTransient<IActionManager, ActionManager>();
-			services.AddSingleton<ILoginProvider, BasicLoginProvider>();
-			services.AddSingleton<PipeQueue, PipeQueue>();
-			services.AddSingleton<IAuthorizationProvider, Security.BasicAuthorizationProvider>();
-			services.AddSingleton<IUserManager, UserManager>();
-			services.AddSingleton<ICacheManager, CacheManager>();
 			ConfigureServicesFromConfigFile(services);
 			ConfigureProvidersFromConfigFile();
 			ConfigureDefaultsFromConfigFile();

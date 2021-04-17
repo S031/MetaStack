@@ -1,0 +1,2 @@
+1.	CryptographyTest.Logon testing
+2.	TaskPlas add reference to Core with remove dublicate items

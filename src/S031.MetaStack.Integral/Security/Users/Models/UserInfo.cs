@@ -26,6 +26,7 @@ namespace S031.MetaStack.Integral.Security
 		public List<string> Roles { get; private set; } = new List<string>();
 		public List<UserLogin> UserLogins { get; private set; } = new List<UserLogin>();
 		public List<Permission> UserPermissions { get; private set; } = new List<Permission>();
+		public string SessionToken { get; set; }
 
 		/// <summary>
 		/// Serialize <see cref="ActionInfo"/> to json string
@@ -47,42 +48,33 @@ namespace S031.MetaStack.Integral.Security
 		}
 		public void ToJsonRaw(JsonWriter writer)
 		{
-			writer.WriteProperty("ID", ID);
-			writer.WriteProperty("StructuralUnitID", StructuralUnitID);
-			writer.WriteProperty("DomainName", DomainName);
-			writer.WriteProperty("Name", Name);
-			writer.WriteProperty("PersonID", PersonID);
-			writer.WriteProperty("AccessLevelID", AccessLevelID);
-			writer.WriteProperty("PasswordHash", PasswordHash);
+			writer.WriteProperty(nameof(ID), ID)
+				.WriteProperty(nameof(StructuralUnitID), StructuralUnitID)
+				.WriteProperty(nameof(DomainName), DomainName)
+				.WriteProperty(nameof(Name), Name)
+				.WriteProperty(nameof(PersonID), PersonID)
+				.WriteProperty(nameof(AccessLevelID), AccessLevelID)
+				.WriteProperty(nameof(PasswordHash), PasswordHash)
+				.WriteProperty(nameof(SessionToken), SessionToken);
 			
 			writer.WritePropertyName("Identity");
 			writer.WriteStartObject();
 			WriteIdentityRaw(writer, this.Identity as ClaimsIdentity);
 			writer.WriteEndObject();
 
-			//writer.WritePropertyName("Identities");
-			//writer.WriteStartArray();
-			//foreach (var idn in Identities)
-			//{
-			//	writer.WriteStartObject();
-			//	WriteIdentityRaw(writer, idn);
-			//	writer.WriteEndObject();
-			//}
-			//writer.WriteEndArray();
-
-			writer.WritePropertyName("Roles");
+			writer.WritePropertyName(nameof(Roles));
 			writer.WriteStartArray();
 			foreach (var role in Roles)
 				writer.WriteValue(role);
 			writer.WriteEndArray();
 
-			writer.WritePropertyName("UserLogins");
+			writer.WritePropertyName(nameof(UserLogins));
 			writer.WriteStartArray();
 			foreach (var login in UserLogins)
 				login.ToJson(writer);
 			writer.WriteEndArray();
 
-			writer.WritePropertyName("UserPermissions");
+			writer.WritePropertyName(nameof(UserPermissions));
 			writer.WriteStartArray();
 			foreach (var permission in UserPermissions)
 				permission.ToJson(writer);
@@ -92,12 +84,12 @@ namespace S031.MetaStack.Integral.Security
 		{
 			if (idn != null)
 			{
-				writer.WriteProperty("Name", idn.Name);
-				writer.WriteProperty("AuthenticationType", idn.AuthenticationType);
-				writer.WriteProperty("Label", idn.Label);
-				writer.WriteProperty("RoleClaimType", ClaimsTypes.GetKey(idn.RoleClaimType));
-				writer.WriteProperty("NameClaimType", ClaimsTypes.GetKey(idn.NameClaimType));
-				writer.WritePropertyName("Claims");
+				writer.WriteProperty("Name", idn.Name)
+					.WriteProperty("AuthenticationType", idn.AuthenticationType)
+					.WriteProperty("Label", idn.Label)
+					.WriteProperty("RoleClaimType", ClaimsTypes.GetKey(idn.RoleClaimType))
+					.WriteProperty("NameClaimType", ClaimsTypes.GetKey(idn.NameClaimType))
+					.WritePropertyName("Claims");
 				writer.WriteStartArray();
 				foreach (var claim in idn.Claims)
 				{
@@ -110,10 +102,10 @@ namespace S031.MetaStack.Integral.Security
 		}
 		private static void WriteClaimRaw(JsonWriter writer, Claim claim)
 		{
-			writer.WriteProperty("Issuer", claim.Issuer);
-			writer.WriteProperty("Type",  ClaimsTypes.GetKey(claim.Type));
-			writer.WriteProperty("Value",  claim.Value);
-			writer.WriteProperty("ValueType",  ClaimsTypes.GetTypeKey(claim.ValueType));
+			writer.WriteProperty("Issuer", claim.Issuer)
+				.WriteProperty("Type",  ClaimsTypes.GetKey(claim.Type))
+				.WriteProperty("Value",  claim.Value)
+				.WriteProperty("ValueType",  ClaimsTypes.GetTypeKey(claim.ValueType));
 		}
 		
 		public static UserInfo Parse(string serializedJsonString)
@@ -143,13 +135,14 @@ namespace S031.MetaStack.Integral.Security
 		public void FromJson(JsonValue source)
 		{
 			var j = source as JsonObject;
-			ID = j.GetIntOrDefault("ID");
-			StructuralUnitID = j.GetIntOrDefault("StructuralUnitID");
-			PersonID = j.GetIntOrDefault("PersonID");
-			AccessLevelID = j.GetIntOrDefault("AccessLevelID");
-			DomainName = j.GetStringOrDefault("DomainName");
-			Name = j.GetStringOrDefault("Name");
-			PasswordHash = j.GetStringOrDefault("PasswordHash");
+			ID = j.GetIntOrDefault(nameof(ID));
+			StructuralUnitID = j.GetIntOrDefault(nameof(StructuralUnitID));
+			PersonID = j.GetIntOrDefault(nameof(PersonID));
+			AccessLevelID = j.GetIntOrDefault(nameof(AccessLevelID));
+			DomainName = j.GetStringOrDefault(nameof(DomainName));
+			Name = j.GetStringOrDefault(nameof(Name));
+			PasswordHash = j.GetStringOrDefault(nameof(PasswordHash));
+			SessionToken = j.GetStringOrDefault(nameof(SessionToken));
 
 			if (j.TryGetValue("UserLogins", out JsonArray a))
 				foreach (JsonObject obj in a)

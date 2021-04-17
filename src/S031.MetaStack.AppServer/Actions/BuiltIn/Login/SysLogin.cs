@@ -43,13 +43,24 @@ namespace S031.MetaStack.AppServer.Actions
 
 			return ai.GetOutputParamTable()
 				.AddNew()
-				.SetValue("Ticket", key)
+				.SetValue("Ticket", key.SessionToken)
 				.Update();
 		}
 
-		public Task<DataPackage> InvokeAsync(ActionInfo ai, DataPackage dp)
+		public async Task<DataPackage> InvokeAsync(ActionInfo ai, DataPackage dp)
 		{
-			throw new InvalidOperationException("This action can not be executed in asynchronous mode");
+			string userName = (string)dp["UserName"];
+			string sessionID = (string)dp["SessionID"];
+			string encryptedKey = (string)dp["EncryptedKey"];
+			var key = await ai.GetContext()
+				.Services
+				.GetRequiredService<ILoginProvider>()
+				.LogonAsync(userName, sessionID, encryptedKey);
+
+			return ai.GetOutputParamTable()
+				.AddNew()
+				.SetValue("Ticket", key.SessionToken)
+				.Update();
 		}
 	}
 	internal class SysLogout : IAppEvaluator

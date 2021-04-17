@@ -6,53 +6,59 @@ namespace S031.MetaStack.Json
 {
 	public static class JsonWriterExtensions
 	{
-		public static void WriteProperty(this JsonWriter writer, string propertyName, object value)
+		public static JsonWriter WriteProperty(this JsonWriter writer, string propertyName, object value)
 		{
 			if (value != null)
 			{
-				writer.WritePropertyName(propertyName);
-				writer.WriteValue(JsonHelper.ToJsonValue(value));
+				writer.WritePropertyName(propertyName)
+					.WriteValue(JsonHelper.ToJsonValue(value));
 			}
+			return writer;
 		}
-		public static void WriteProperty(this JsonWriter writer, string propertyName, string value)
+		public static JsonWriter WriteProperty(this JsonWriter writer, string propertyName, string value)
 		{
 			if (!string.IsNullOrEmpty(value))
 			{
-				writer.WritePropertyName(propertyName);
-				writer.WriteValue(value);
+				writer.WritePropertyName(propertyName)
+					.WriteValue(value);
 			}
+			return writer;
 		}
-		public static void WriteProperty(this JsonWriter writer, string propertyName, int value)
+		public static JsonWriter WriteProperty(this JsonWriter writer, string propertyName, int value)
 		{
 			if (value != 0)
 			{
-				writer.WritePropertyName(propertyName);
-				writer.WriteValue(value);
+				writer.WritePropertyName(propertyName)
+					.WriteValue(value);
 			}
+			return writer;
 		}
-		public static void WriteProperty(this JsonWriter writer, string propertyName, double value)
+		public static JsonWriter WriteProperty(this JsonWriter writer, string propertyName, double value)
 		{
 			if (value != 0)
 			{
-				writer.WritePropertyName(propertyName);
-				writer.WriteValue(value);
+				writer.WritePropertyName(propertyName)
+					.WriteValue(value);
 			}
+			return writer;
 		}
-		public static void WriteProperty(this JsonWriter writer, string propertyName, DateTime value)
+		public static JsonWriter WriteProperty(this JsonWriter writer, string propertyName, DateTime value)
 		{
 			if (value != default)
 			{
-				writer.WritePropertyName(propertyName);
-				writer.WriteValue(value);
+				writer.WritePropertyName(propertyName)
+					.WriteValue(value);
 			}
+			return writer;
 		}
-		public static void WriteProperty(this JsonWriter writer, string propertyName, bool value)
+		public static JsonWriter WriteProperty(this JsonWriter writer, string propertyName, bool value)
 		{
 			if (value)
 			{
-				writer.WritePropertyName(propertyName);
-				writer.WriteValue(value);
+				writer.WritePropertyName(propertyName)
+					.WriteValue(value);
 			}
+			return writer;
 		}
 	}
 }

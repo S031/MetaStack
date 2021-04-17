@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using S031.MetaStack.Common;
 using S031.MetaStack.Integral.Security;
 using S031.MetaStack.Security;
@@ -19,6 +20,7 @@ namespace S031.MetaStack.Core.Security
 		const int _expirePeriod4Loged = 7200000;
 		const int _maxUserSessions = 128;
 
+		private readonly IUserManager _userManager;
 		static readonly RSAEncryptionPadding _padding = RSAEncryptionPadding.OaepSHA256;
 		static DateTime _lastCheckLogedTime = DateTime.Now;
 
@@ -29,6 +31,7 @@ namespace S031.MetaStack.Core.Security
 
 		public BasicLoginProvider(IServiceProvider services)
 		{
+			_userManager = services.GetRequiredService<IUserManager>();
 		}
 
 		~BasicLoginProvider()
@@ -74,13 +77,33 @@ namespace S031.MetaStack.Core.Security
 		/// <param name="userName">User name</param>
 		/// <param name="encryptedKey">Base64 string, must be a session ticket with solt or password</param>
 		/// <returns></returns>
-		public async Task<string> LogonAsync(string userName, string sessionID, string encryptedKey)
+		public async Task<UserInfo> LogonAsync(string userName, string sessionID, string encryptedKey)
 		{
-			return await Task.Run(
-				() => Logon(userName, sessionID, encryptedKey)).ConfigureAwait(false);
+			var loginInfo = LogonInternal(userName, sessionID, encryptedKey);
+			var ui = await _userManager.GetUserInfoAsync(userName);
+			ui.SessionToken = Aes.Create()
+				.ImportBin(loginInfo.CryptoKey)
+				.EncryptBin(loginInfo.Ticket.ToByteArray()
+					.Concat(BitConverter.GetBytes(_random.Next()))
+					.ToArray())
+				.ToBASE64String();
+			return ui;
 		}
 
-		public string Logon(string userName, string sessionID, string encryptedKey)
+		public UserInfo Logon(string userName, string sessionID, string encryptedKey)
+		{
+			var loginInfo = LogonInternal(userName, sessionID, encryptedKey);
+			var ui = _userManager.GetUserInfo(userName);
+			 ui.SessionToken = Aes.Create()
+				.ImportBin(loginInfo.CryptoKey)
+				.EncryptBin(loginInfo.Ticket.ToByteArray()
+					.Concat(BitConverter.GetBytes(_random.Next()))
+					.ToArray())
+				.ToBASE64String();
+			return ui;
+		}
+		
+		private LoginInfo LogonInternal(string userName, string sessionID, string encryptedKey)
 		{
 			Guid sessionUID = new Guid(sessionID);
 			if (!_users.ContainsKey(userName) ||
@@ -94,13 +117,7 @@ namespace S031.MetaStack.Core.Security
 			}
 			else if (CheckPassword(userName, loginInfo, encryptedKey.ToByteArray()))
 				loginInfo.EmmitTicket();
-
-			return Aes.Create()
-				.ImportBin(loginInfo.CryptoKey)
-				.EncryptBin(loginInfo.Ticket.ToByteArray()
-					.Concat(BitConverter.GetBytes(_random.Next()))
-					.ToArray())
-				.ToBASE64String();
+			return loginInfo;
 		}
 
 
@@ -216,18 +233,6 @@ namespace S031.MetaStack.Core.Security
 
 			foreach (var data in expiredInfo)
 				RemoveSession(data.Item1, data.Item2);
-		}
-
-		async Task<UserInfo> ILoginProvider.LogonAsync(string userName, string sessionID, string encryptedKey)
-		{
-			_ = await this.LogonAsync(userName, sessionID, encryptedKey);
-			return null;
-		}
-
-		UserInfo ILoginProvider.Logon(string userName, string sessionID, string encryptedKey)
-		{
-			_ = this.Logon(userName, sessionID, encryptedKey);
-			return null;
 		}
 	}
 }

@@ -79,10 +79,10 @@ namespace MetaStack.Test.Security
 
 				var clientAes = Aes.Create()
 					.ImportBin(loginInfo.CryptoKey);
-				string token = (loginProvider as BasicLoginProvider).Logon(userName, loginInfo.SessionID.ToString(),
+				string token = loginProvider.Logon(userName, loginInfo.SessionID.ToString(),
 					clientAes
 					.EncryptBin(Encoding.UTF8.GetBytes(secret))
-					.ToBASE64String());
+					.ToBASE64String()).SessionToken;
 
 				Guid ticket = new Guid(clientAes.DecryptBin(token.ToByteArray()).Take(16).ToArray());
 				Assert.NotEqual(ticket, Guid.Empty);
@@ -91,11 +91,11 @@ namespace MetaStack.Test.Security
 				int i;
 				for (i = 0; i < 10000; i++)
 				{
-					token = (loginProvider as BasicLoginProvider).Logon(userName, loginInfo.SessionID.ToString(),
+					token = loginProvider.Logon(userName, loginInfo.SessionID.ToString(),
 						clientAes.EncryptBin(ticket
 							.ToByteArray()
 							.Concat(BitConverter.GetBytes(DateTime.Now.Millisecond)).ToArray())
-							.ToBASE64String());
+							.ToBASE64String()).SessionToken;
 				}
 				l.Debug($"End performance test for {i} logins");
 			}

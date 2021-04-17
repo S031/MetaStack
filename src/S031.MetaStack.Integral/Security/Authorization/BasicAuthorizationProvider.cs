@@ -19,7 +19,7 @@ namespace S031.MetaStack.Security
 	/// одновременно пользователь не может быть членом ролей Sys.Admin и Sys.SecurityAdmin
 	/// аудит таблиц Пользователи, Роли, Права доступа всегда включен
 	/// </summary>
-	public abstract class BasicAuthorizationProvider : IAuthorizationProvider
+	public class BasicAuthorizationProvider : IAuthorizationProvider
 	{
 		public const string admin_role = "Sys.Admin";
 		public const string security_admin_role = "Sys.SecurityAdmin";

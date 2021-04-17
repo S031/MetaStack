@@ -9,6 +9,10 @@ using System.Runtime.Loader;
 using S031.MetaStack.Common;
 using S031.MetaStack.Data;
 using S031.MetaStack.Security;
+using S031.MetaStack.Actions;
+using S031.MetaStack.Integral.Security;
+using S031.MetaStack.Caching;
+using S031.MetaStack.Core.Actions;
 
 namespace S031.MetaStack.Core.App
 {
@@ -47,6 +51,13 @@ namespace S031.MetaStack.Core.App
 		private static IServiceCollection Configure(IServiceCollection services)
 		{
 			_services = services;
+			services.AddSingleton<IMdbContextFactory, MdbContextFactory>();
+			services.AddTransient<IActionManager, ActionManager>();
+			services.AddSingleton<ILoginProvider, BasicLoginProvider>();
+			services.AddSingleton<PipeQueue, PipeQueue>();
+			services.AddSingleton<IAuthorizationProvider, BasicAuthorizationProvider>();
+			services.AddSingleton<IUserManager, UserManager>();
+			services.AddSingleton<ICacheManager, CacheManager>();
 			return _services;
 		}
 
