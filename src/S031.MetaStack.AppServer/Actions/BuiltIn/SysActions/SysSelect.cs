@@ -1,15 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.DependencyInjection;
+using S031.MetaStack.Actions;
 using S031.MetaStack.Common;
-using S031.MetaStack.Core.App;
+using S031.MetaStack.Core;
+using S031.MetaStack.Core.Actions;
 using S031.MetaStack.Core.ORM;
 using S031.MetaStack.Data;
 using S031.MetaStack.ORM;
-using S031.MetaStack.Actions;
-using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace S031.MetaStack.Core.Actions
+namespace S031.MetaStack.AppServer.Actions
 {
 	internal class SysSelect : IAppEvaluator
 	{

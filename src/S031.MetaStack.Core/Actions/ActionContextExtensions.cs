@@ -7,7 +7,7 @@ using S031.MetaStack.Data;
 
 namespace S031.MetaStack.Core.Actions
 {
-	internal static class ActionContextExtensions
+	public static class ActionContextExtensions
 	{
 		public static JMXFactory CreateJMXFactory(this ActionContext ctx, string workConnectionName)
 		{

@@ -1,12 +1,11 @@
-﻿using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using S031.MetaStack.Core.App;
+﻿using S031.MetaStack.Actions;
+using S031.MetaStack.Core.Actions;
 using S031.MetaStack.Core.ORM;
 using S031.MetaStack.Data;
 using S031.MetaStack.ORM;
-using S031.MetaStack.Actions;
+using System.Threading.Tasks;
 
-namespace S031.MetaStack.Core.Actions
+namespace S031.MetaStack.AppServer.Actions
 {
 	internal class SysSaveSchema : IAppEvaluator
 	{

@@ -1,12 +1,11 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
-using S031.MetaStack.Core.Security;
-using System.Threading.Tasks;
-using S031.MetaStack.Data;
+﻿using Microsoft.Extensions.DependencyInjection;
 using S031.MetaStack.Actions;
+using S031.MetaStack.Data;
 using S031.MetaStack.Security;
+using System;
+using System.Threading.Tasks;
 
-namespace S031.MetaStack.Core.Actions
+namespace S031.MetaStack.AppServer.Actions
 {
 	internal class SysLoginRequest : IAppEvaluator
 	{

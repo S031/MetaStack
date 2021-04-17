@@ -3,10 +3,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using S031.MetaStack.Actions;
+using S031.MetaStack.Caching;
 using S031.MetaStack.Common;
 using S031.MetaStack.Core.Actions;
 using S031.MetaStack.Core.Security;
 using S031.MetaStack.Data;
+using S031.MetaStack.Integral.Security;
 using S031.MetaStack.Security;
 using System.Reflection;
 using System.Runtime.Loader;
@@ -29,11 +31,15 @@ namespace S031.MetaStack.AppServer
 				.CreateLogger(Assembly.GetEntryAssembly().GetWorkName()));
 			services.AddSingleton<IMdbContextFactory, MdbContextFactory>();
 			services.AddTransient<IActionManager, ActionManager>();
-			services.AddSingleton<ILoginProvider, BasicLoginProvider>();
+			services.AddSingleton<ILoginProvider, Security.BasicLoginProvider>();
 			services.AddSingleton<PipeQueue, PipeQueue>();
+			services.AddSingleton<IAuthorizationProvider, Security.BasicAuthorizationProvider>();
+			services.AddSingleton<IUserManager, UserManager>();
+			services.AddSingleton<ICacheManager, CacheManager>();
 			ConfigureServicesFromConfigFile(services);
 			ConfigureProvidersFromConfigFile();
 			ConfigureDefaultsFromConfigFile();
+			ConfigureActions();
 		}
 		
 		private void ConfigureServicesFromConfigFile(IServiceCollection services)
@@ -68,5 +74,8 @@ namespace S031.MetaStack.AppServer
 		}
 		private static Assembly LoadAssembly(string assemblyID) => AssemblyLoadContext.Default.LoadFromAssemblyPath(
 				System.IO.Path.Combine(System.AppContext.BaseDirectory, $"{assemblyID}.dll"));
+
+		private static void ConfigureActions() 
+			=> Actions.ActionsListInternal.CreateActionsList();
 	}
 }

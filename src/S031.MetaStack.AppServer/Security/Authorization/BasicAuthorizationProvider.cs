@@ -7,7 +7,7 @@ using S031.MetaStack.Data;
 using S031.MetaStack.Actions;
 using S031.MetaStack.Security;
 
-namespace S031.MetaStack.Core.Security
+namespace S031.MetaStack.AppServer.Security
 {
 	/// <summary>
 	/// !!!

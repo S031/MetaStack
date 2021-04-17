@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using S031.MetaStack.Core.App;
 using S031.MetaStack.Data;
 using S031.MetaStack.Actions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace S031.MetaStack.Core.Actions
+namespace S031.MetaStack.AppServer.Actions
 {
 	internal class SysPipeRead : IAppEvaluator
 	{

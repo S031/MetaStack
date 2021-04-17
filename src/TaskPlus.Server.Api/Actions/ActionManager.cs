@@ -24,8 +24,10 @@ namespace TaskPlus.Server.Actions
 		private readonly ILogger _logger;
 		private readonly IAuthorizationProvider _authorizationProvider;
 
+#if !METASTACK_CORE
 		static ActionManager()
 			=> Task.Run(() => ActionsListInternal.CreateActionsList());
+#endif
 		public ActionManager(IServiceProvider services) 
 		{
 			_services = services;

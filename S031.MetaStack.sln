@@ -64,8 +64,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AppServer", "AppServer", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiServer", "ApiServer", "{386DEC3F-2568-47A1-B074-C91E9B1D7D23}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S031.MetaStack.AppServerLib", "src\S031.Metastack.AppLib\S031.MetaStack.AppServerLib.csproj", "{D7001169-391B-4D8C-8750-A0607AA9D0A5}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -148,10 +146,6 @@ Global
 		{DEC5DC0A-C18A-4571-9747-55D8A7A15DE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DEC5DC0A-C18A-4571-9747-55D8A7A15DE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DEC5DC0A-C18A-4571-9747-55D8A7A15DE7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D7001169-391B-4D8C-8750-A0607AA9D0A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D7001169-391B-4D8C-8750-A0607AA9D0A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D7001169-391B-4D8C-8750-A0607AA9D0A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D7001169-391B-4D8C-8750-A0607AA9D0A5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -182,7 +176,6 @@ Global
 		{DEC5DC0A-C18A-4571-9747-55D8A7A15DE7} = {6D6245E2-4136-4740-9BFE-D18386186D09}
 		{4D4F0481-1F9E-4CA6-AC8A-5E71AD13A9D5} = {1C7C4780-10A0-439A-AB42-32D923C07BDA}
 		{386DEC3F-2568-47A1-B074-C91E9B1D7D23} = {1C7C4780-10A0-439A-AB42-32D923C07BDA}
-		{D7001169-391B-4D8C-8750-A0607AA9D0A5} = {4D4F0481-1F9E-4CA6-AC8A-5E71AD13A9D5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7ECF74F3-895D-4DD3-95B2-C79542194888}
