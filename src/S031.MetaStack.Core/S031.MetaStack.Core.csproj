@@ -38,12 +38,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\TaskPlus.Server.Api\Actions\ActionManager.cs" Link="Actions\ActionManager.cs" />
-    <Compile Include="..\TaskPlus.Server.Api\Data\MdbContextFactory.cs" Link="Data\MdbContextFactory.cs" />
-    <Compile Include="..\TaskPlus.Server.Api\Security\Users\UserManager.cs" Link="Security\Users\UserManager.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
@@ -73,11 +67,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Data\" />
-    <Folder Include="Security\Users\" />
   </ItemGroup>
 
 </Project>

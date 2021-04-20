@@ -9,14 +9,9 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Threading.Tasks;
-
-#if METASTACK_CORE
 using S031.MetaStack.Core.Properties;
+
 namespace S031.MetaStack.Core.Actions
-#else
-using TaskPlus.Server.Api.Properties;
-namespace TaskPlus.Server.Actions
-#endif
 {
 	public sealed class ActionManager : ActionManagerBase
 	{
@@ -24,10 +19,6 @@ namespace TaskPlus.Server.Actions
 		private readonly ILogger _logger;
 		private readonly IAuthorizationProvider _authorizationProvider;
 
-#if !METASTACK_CORE
-		static ActionManager()
-			=> Task.Run(() => ActionsListInternal.CreateActionsList());
-#endif
 		public ActionManager(IServiceProvider services) 
 		{
 			_services = services;
@@ -122,12 +113,7 @@ namespace TaskPlus.Server.Actions
 			if (pCount > 0 && (inParamStor == null || inParamStor.FieldCount < pCount || !inParamStor.Read()))
 			{
 				throw new InvalidOperationException(
-#if METASTACK_CORE
 					Strings.S031_MetaStack_Core_Actions_CreateEvaluator_2
-#else
-					Strings.TaskPlus_Server_Actions_CreateEvaluator_2
-#endif
-
 					.ToFormat(ai.ActionID, ai.InterfaceID));
 			}
 			else if (pCount > 0)
@@ -141,11 +127,7 @@ namespace TaskPlus.Server.Actions
 					catch
 					{
 						throw new InvalidOperationException(
-#if METASTACK_CORE
 							Strings.S031_MetaStack_Core_Actions_CreateEvaluator_1
-#else
-							Strings.TaskPlus_Server_Actions_CreateEvaluator_1
-#endif
 							.ToFormat(ai.InterfaceID, pi.ParameterID, ai.ActionID));
 					}
 				}

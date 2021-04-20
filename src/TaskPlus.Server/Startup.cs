@@ -9,6 +9,8 @@ using Microsoft.Extensions.Logging;
 using S031.MetaStack.Actions;
 using S031.MetaStack.Caching;
 using S031.MetaStack.Common;
+using S031.MetaStack.Core.Actions;
+using S031.MetaStack.Core.Security;
 using S031.MetaStack.Data;
 using S031.MetaStack.Integral.Security;
 using S031.MetaStack.Integral.Settings;
@@ -67,11 +69,15 @@ namespace TaskPlus.Server
 				router.MapRoute("default", "api/{version=v1}/{controller}/{action}");
 				router.MapRoute("static_action", "api/{version=v1}/{action}");
 			});
+			ConfigureActions();
 		}
 
 		private void CurrentDomain_ProcessExit(object sender, EventArgs e)
 		{
 			(_loggerProvider as IDisposable)?.Dispose();
 		}
+
+		private static void ConfigureActions()
+			=> Actions.ActionsListInternal.CreateActionsList();
 	}
 }

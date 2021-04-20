@@ -1,41 +1,24 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using S031.MetaStack.Actions;
+﻿using Microsoft.Extensions.DependencyInjection;
 using S031.MetaStack.Caching;
-using S031.MetaStack.Common;
 using S031.MetaStack.Data;
 using S031.MetaStack.Integral.Security;
-using S031.MetaStack.Security;
 using System;
 using System.Globalization;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
-#if METASTACK_CORE
 using S031.MetaStack.Core.Properties;
+
 namespace S031.MetaStack.Core.Security
-#else
-using TaskPlus.Server.Api.Properties;
-namespace TaskPlus.Server.Security
-#endif
 {
 	public class UserManager : UserManagerBase
 	{
 		private readonly IServiceProvider _services;
-		//private readonly IConfiguration _config;
-		//private readonly ILogger _logger;
-		//private readonly IAuthorizationProvider _authorizationProvider;
 
 		private static readonly UserInfoCache _uiCache = UserInfoCache.Instance;
 
 		public UserManager(IServiceProvider services)
 		{
 			_services = services;
-			//_config = _services.GetRequiredService<IConfiguration>();
-			//_logger = services.GetRequiredService<ILogger>();
-			//_authorizationProvider = services.GetRequiredService<IAuthorizationProvider>();
 			mdb = _services
 				.GetRequiredService<IMdbContextFactory>()
 				.GetContext(Strings.SysCatConnection);
