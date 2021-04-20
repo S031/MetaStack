@@ -21,7 +21,7 @@ namespace S031.MetaStack.AppServer
 			{
 				var t = cancellationTokenSource.Token;
 				await CreateHostBuilder(args)
-					.Build(t)
+					.Build()
 					// этот токен приходит в BackgroundService.ExecuteAsync
 					// не нужно отдельный service
 					.RunAsync(t);
@@ -41,6 +41,7 @@ namespace S031.MetaStack.AppServer
 						.AddConsole()
 						.AddFile();
 				})
+				.UseApplicationContext()
 				.UseStartup<Startup>()
 				.UseConsoleLifetime();
 	}

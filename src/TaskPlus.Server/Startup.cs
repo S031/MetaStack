@@ -42,16 +42,16 @@ namespace TaskPlus.Server
 		 *		( This converts the transient service into the scoped. )
 		*/
 
+		/// <summary>
+		/// Don't use transient for services that uses SQLite connections
+		/// </summary>
+		/// <param name="services"></param>
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddRouting();
 			services.AddSingleton((svc) => _loggerProvider.CreateLogger(Assembly.GetEntryAssembly().GetWorkName()));
-			services.AddSingleton<IMdbContextFactory, MdbContextFactory>();
-			services.AddSingleton<IActionManager, ActionManager>();
 			services.AddSingleton<ILoginProvider, JwtLoginProvider>();
 			services.AddSingleton<IAuthorizationProvider, UserAuthorizationProvider>();
-			services.AddSingleton<IUserManager, UserManager>();
-			services.AddSingleton<ICacheManager, CacheManager>();
 			services.AddTransient<ISettingsProvider<VocabularySettingsProvider>, VocabularySettingsProvider>();
 		}
 

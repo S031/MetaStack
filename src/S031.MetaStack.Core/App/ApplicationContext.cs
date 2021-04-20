@@ -24,25 +24,18 @@ namespace S031.MetaStack.Core.App
 		private static readonly object obj4Lock = new();
 
 		private static MdbContext _schemaDb = null;
-		private static CancellationToken _token;
 
 		/// <summary>
-		/// Implementation of Host.Build method whith 
+		/// Point to configure Core services
 		/// </summary>
 		/// <param name="hostBuilder"><see cref="IHostBuilder"/></param>
 		/// <param name="token"><see cref="System.Threading.CancellationToken"/></param>
 		/// <returns><see cref="IHost"/></returns>
-		public static IHost Build(this IHostBuilder hostBuilder, CancellationToken token)
-		{
-			_token = token;
-			hostBuilder.ConfigureServices(services => Configure(services));
-			var h =  hostBuilder.Build();
-			_lastBuildServiceProvider = h.Services;
-			return h;
-		}
+		public static IHostBuilder UseApplicationContext(this IHostBuilder hostBuilder)
+			=> hostBuilder.ConfigureServices(services => Configure(services));
 
+		
 		/// <summary>
-		/// !!!
 		/// Возможно это лучее место для включения сервисов используемых в данной библиотеке
 		/// типа LoginProvider, AuthorizationProvider, MdbFactory и т.д., кт сейчас объявлены в startup
 		/// </summary>
@@ -50,12 +43,13 @@ namespace S031.MetaStack.Core.App
 		/// <returns></returns>
 		private static IServiceCollection Configure(IServiceCollection services)
 		{
+			/// Don't use transient for services that uses SQLite connections
 			_services = services;
 			services.AddSingleton<IMdbContextFactory, MdbContextFactory>();
-			services.AddTransient<IActionManager, ActionManager>();
+			services.AddSingleton<IActionManager, ActionManager>();
+			services.AddSingleton<IAuthorizationProvider, BasicAuthorizationProvider>();
 			services.AddSingleton<ILoginProvider, BasicLoginProvider>();
 			services.AddSingleton<PipeQueue, PipeQueue>();
-			services.AddSingleton<IAuthorizationProvider, BasicAuthorizationProvider>();
 			services.AddSingleton<IUserManager, UserManager>();
 			services.AddSingleton<ICacheManager, CacheManager>();
 			return _services;
@@ -76,8 +70,6 @@ namespace S031.MetaStack.Core.App
 			}
 			return _lastBuildServiceProvider;
 		}
-
-		public static CancellationToken CancellationToken => _token;
 
 		private static MdbContext SchemaDb
 		{

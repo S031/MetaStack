@@ -24,8 +24,9 @@ namespace S031.MetaStack.AppServer
 			//throw new NotImplementedException
 			_configuration = context.Configuration;
 		}
+		
 		/// <summary>
-		/// !!! remove core needed services to <see cref="MetaStack.Core.App.ApplicationContext"/>
+		/// Don't use transient for services that uses SQLite connections
 		/// </summary>
 		/// <param name="services"></param>
 		void IStartup.ConfigureServices(IServiceCollection services)

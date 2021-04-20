@@ -89,7 +89,7 @@ namespace MetaStack.Test.Security
 
 				l.Debug("Start performance test for logins");
 				int i;
-				for (i = 0; i < 10000; i++)
+				for (i = 0; i < 100000; i++)
 				{
 					token = loginProvider.Logon(userName, loginInfo.SessionID.ToString(),
 						clientAes.EncryptBin(ticket

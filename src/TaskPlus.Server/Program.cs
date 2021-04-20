@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using S031.MetaStack.Core.App;
+using System.Threading;
 
 namespace TaskPlus.Server
 {
@@ -22,6 +24,7 @@ namespace TaskPlus.Server
 					logging.AddConsole();
 					logging.AddFile();
 				})
+				.UseApplicationContext()
 				.ConfigureWebHostDefaults(webBuilder =>
 				{
 					webBuilder.UseStartup<Startup>();

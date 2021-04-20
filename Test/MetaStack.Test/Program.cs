@@ -40,7 +40,8 @@ namespace MetaStack.Test
 						.CreateLogger(Assembly.GetEntryAssembly().GetWorkName()))
 				)
 				.UseConsoleLifetime()
-				.Build(new System.Threading.CancellationToken());
+				.UseApplicationContext()
+				.Build();
 			}
 			return _host.Services;
 		}
