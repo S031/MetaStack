@@ -79,8 +79,8 @@ namespace S031.MetaStack.Core.Security
 		/// <returns></returns>
 		public async Task<UserInfo> LogonAsync(string userName, string sessionID, string encryptedKey)
 		{
-			var loginInfo = LogonInternal(userName, sessionID, encryptedKey);
 			var ui = await _userManager.GetUserInfoAsync(userName);
+			var loginInfo = LogonInternal(ui, sessionID, encryptedKey);
 			ui.SessionToken = Aes.Create()
 				.ImportBin(loginInfo.CryptoKey)
 				.EncryptBin(loginInfo.Ticket.ToByteArray()
@@ -92,9 +92,9 @@ namespace S031.MetaStack.Core.Security
 
 		public UserInfo Logon(string userName, string sessionID, string encryptedKey)
 		{
-			var loginInfo = LogonInternal(userName, sessionID, encryptedKey);
 			var ui = _userManager.GetUserInfo(userName);
-			 ui.SessionToken = Aes.Create()
+			var loginInfo = LogonInternal(ui, sessionID, encryptedKey);
+			ui.SessionToken = Aes.Create()
 				.ImportBin(loginInfo.CryptoKey)
 				.EncryptBin(loginInfo.Ticket.ToByteArray()
 					.Concat(BitConverter.GetBytes(_random.Next()))
@@ -103,9 +103,10 @@ namespace S031.MetaStack.Core.Security
 			return ui;
 		}
 		
-		private LoginInfo LogonInternal(string userName, string sessionID, string encryptedKey)
+		private LoginInfo LogonInternal(UserInfo ui, string sessionID, string encryptedKey)
 		{
 			Guid sessionUID = new Guid(sessionID);
+			string userName = ui.UserName;
 			if (!_users.ContainsKey(userName) ||
 				!_users[userName].TryGetValue(sessionUID, out LoginInfo loginInfo))
 				throw new AuthenticationException($"Timeout logon for user {userName} expired, or not LoginRequest called before");
@@ -115,12 +116,11 @@ namespace S031.MetaStack.Core.Security
 				if (!CheckTicket(loginInfo, encryptedKey.ToByteArray(), this.CheckTicketTimeout))
 					throw new AuthenticationException($"Invaliod session ticked for user {userName}");
 			}
-			else if (CheckPassword(userName, loginInfo, encryptedKey.ToByteArray()))
+			else if (CheckPassword(ui, loginInfo, encryptedKey.ToByteArray()))
 				loginInfo.EmmitTicket();
 			return loginInfo;
 		}
-
-
+		
 		/// <summary>
 		/// End session
 		/// </summary>
@@ -171,22 +171,32 @@ namespace S031.MetaStack.Core.Security
 			}
 		}
 
-		private static bool CheckPassword(string userName, LoginInfo loginInfo, byte[] encryptedTicketData)
+		private static bool CheckPassword(UserInfo ui, LoginInfo loginInfo, byte[] encryptedTicketData)
 		{
+			string userName = ui.UserName;
+			string password = Encoding.UTF8.GetString(
+				Aes.Create()
+				.ImportBin(loginInfo.CryptoKey)
+				.DecryptBin(encryptedTicketData));
 
-			try
+			string impersonateType = ui.Identity.AuthenticationType;
+			if (impersonateType.Equals("windows", StringComparison.OrdinalIgnoreCase))
 			{
-				string password = Encoding.UTF8.GetString(
-					Aes.Create()
-					.ImportBin(loginInfo.CryptoKey)
-					.DecryptBin(encryptedTicketData));
-				Impersonator.Execute<bool>(userName, password, () => true);
-				return true;
+				try
+				{
+					Impersonator.Execute<bool>(userName, password, () => true);
+				}
+				catch (Exception ex)
+				{
+					throw new AuthenticationException($"Authentication failed for user '{userName}'", ex);
+				}
 			}
-			catch (Exception ex)
+			else //basic
 			{
-				throw new AuthenticationException($"Incorrect password for user {userName} ({ex.Message})");
+				if (!ui.PasswordHash.Equals(CryptoHelper.ComputeSha256Hash(password), StringComparison.Ordinal))
+					throw new AuthenticationException($"Bad password for user '{userName}'");
 			}
+			return true;
 		}
 
 		private static void RemoveSession(string userName, Guid sessionID)

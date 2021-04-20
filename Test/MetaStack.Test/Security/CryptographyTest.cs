@@ -64,8 +64,8 @@ namespace MetaStack.Test.Security
 		{
 			using (FileLog l = new FileLog("CryptographyTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
-				var userName = "Test";
-				var secret = "@TestPassword";
+				var userName = "svostrikov@metib.ru";
+				var secret = "@test";
 				var svcProv = Program.GetServices();
 
 				var clientRSA = RSA.Create();
@@ -94,7 +94,7 @@ namespace MetaStack.Test.Security
 					token = loginProvider.Logon(userName, loginInfo.SessionID.ToString(),
 						clientAes.EncryptBin(ticket
 							.ToByteArray()
-							.Concat(BitConverter.GetBytes(DateTime.Now.Millisecond)).ToArray())
+							.Concat(BitConverter.GetBytes((DateTime.Now - DateTime.Now.Date).TotalMilliseconds)).ToArray())
 							.ToBASE64String()).SessionToken;
 				}
 				l.Debug($"End performance test for {i} logins");
