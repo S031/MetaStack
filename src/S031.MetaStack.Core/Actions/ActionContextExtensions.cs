@@ -12,10 +12,10 @@ namespace S031.MetaStack.Core.Actions
 		public static JMXFactory CreateJMXFactory(this ActionContext ctx, string workConnectionName)
 		{
 			var services = ctx.Services;
-			var mdbFactory = services.GetRequiredService<MdbContextFactory>();
+			var mdbFactory = services.GetRequiredService<IMdbContextFactory>();
 			MdbContext workDb = mdbFactory.GetContext(workConnectionName);
-			MdbContext SchemaDb = mdbFactory.GetContext(Strings.SysCatConnection);
-			var f = JMXFactory.Create(SchemaDb, workDb, services.GetRequiredService<ILogger>());
+			MdbContext schemaDb = mdbFactory.GetContext(Strings.SysCatConnection);
+			var f = JMXFactory.Create(schemaDb, workDb, services.GetRequiredService<ILogger>());
 			f.IsLocalContext = true;
 			return f;
 		}

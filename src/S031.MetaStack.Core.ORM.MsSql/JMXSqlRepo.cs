@@ -202,7 +202,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 
 			string[] sqlList;
 			if (schemaFromDb == null)
-				sqlList = new string[] { };
+				sqlList = Array.Empty<string>();
 			else
 				sqlList = await DropSchemaStatementsAsync(schemaFromDb);
 

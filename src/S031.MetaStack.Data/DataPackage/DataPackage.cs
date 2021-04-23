@@ -196,7 +196,7 @@ namespace S031.MetaStack.Data
 			}
 		}
 
-		private void WritePackageHeader(byte[] headersAsByteArray = null)
+		private void WritePackageHeader(byte[] headersAsByteArray = null, int bytesToWrite = 0)
 		{
 			//Write sizes
 			_bw.Position = 0;
@@ -207,7 +207,7 @@ namespace S031.MetaStack.Data
 			if (headersAsByteArray == null)
 				_bw.Write(_headers);
 			else
-				_bw.WriteBlock(headersAsByteArray);
+				_bw.WriteBlock(headersAsByteArray, bytesToWrite);
 
 			int len = header_pos + _headerSpaceSize - _bw.Position;
 
@@ -456,15 +456,15 @@ namespace S031.MetaStack.Data
 			BinaryDataWriter bw = new BinaryDataWriter(b);
 			bw.Write(_headers);
 			if (bw.Length <= _headerSpaceSize)
-				_bw.WriteBlock(b);
+				_bw.WriteBlock(b, b.Length);
 			else if (_dataPos >= _b.Length)
 				// No data rewrite package header only
-				WritePackageHeader(b);
+				WritePackageHeader(b, b.Length);
 			else
 			{
 				// rewrite package header and shift data 
 				byte[] data = _b.Slice(_dataPos, _b.Length - _dataPos).GetBytes();
-				WritePackageHeader(b);
+				WritePackageHeader(b, b.Length);
 				_bw.WriteBlock(data);
 			}
 			return this;

@@ -133,7 +133,7 @@ namespace S031.MetaStack.Buffers
 				throw new InvalidOperationException($"{nameof(BinaryDataBuffer)} is read only");
 
 			int countToMove = _dataSize - start;
-			_dataSize = _dataSize + shiftCount;
+			_dataSize += shiftCount;
 			byte[] buffer = _buffer;
 			if(_dataSize > _buffer.Length)
 			{

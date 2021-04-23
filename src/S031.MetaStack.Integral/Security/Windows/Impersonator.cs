@@ -46,7 +46,7 @@ namespace S031.MetaStack.Security
 				safeAccessTokenHandle,
 				userAction);
 #else
-			throw new NotImplementedException();
+			return default(T);
 #endif
 		}
 	}

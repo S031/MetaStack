@@ -321,9 +321,13 @@ namespace S031.MetaStack.Buffers
 			}
 			return this;
 		}
+
 		public unsafe BinaryDataWriter WriteBlock(byte[] value)
+			=> WriteBlock(value, value.Length);
+
+		public unsafe BinaryDataWriter WriteBlock(byte[] value, int bytesToWrite)
 		{
-			int size = value.Length;
+			int size = bytesToWrite;
 			CheckAndResizeBuffer(size);
 			if (size > 0)
 			{

@@ -64,8 +64,8 @@ namespace MetaStack.Test.Security
 		{
 			using (FileLog l = new FileLog("CryptographyTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
-				var userName = "svostrikov@metib.ru";
-				var secret = "@test";
+				var userName = $@"{Environment.UserDomainName}\{Environment.UserName}"; ;
+				var secret = "";
 				var svcProv = Program.GetServices();
 
 				var clientRSA = RSA.Create();

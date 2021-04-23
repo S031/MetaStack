@@ -27,7 +27,8 @@ namespace S031.MetaStack.Core.Security
 		static int _tickProcess = 0;
 		static readonly Timer _timer = new Timer(Tick, null, _expirePeriod, _expirePeriod);
 		static readonly Random _random = new Random(Guid.NewGuid().GetHashCode());
-		static readonly MapTable<string, MapTable<Guid, LoginInfo>> _users = new MapTable<string, MapTable<Guid, LoginInfo>>();
+		static readonly MapTable<string, MapTable<Guid, LoginInfo>> _users 
+			= new MapTable<string, MapTable<Guid, LoginInfo>>(StringComparer.OrdinalIgnoreCase);
 
 		public BasicLoginProvider(IServiceProvider services)
 		{

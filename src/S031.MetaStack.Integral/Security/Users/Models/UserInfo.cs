@@ -120,7 +120,11 @@ namespace S031.MetaStack.Integral.Security
 			j.NullTest(nameof(j));
 			if (j.TryGetValue("Identity", out JsonObject o))
 			{
-				ClaimsIdentity idn = new ClaimsIdentity(o.GetStringOrDefault("AuthenticationType"), ClaimTypes.Email, ClaimTypes.Role);
+				string authenticationType = o.GetStringOrDefault("AuthenticationType");
+				string claimTypesForName = authenticationType.Equals("windows", StringComparison.OrdinalIgnoreCase)
+					? ClaimTypes.Name
+					: ClaimTypes.Email;
+				ClaimsIdentity idn = new ClaimsIdentity(authenticationType, claimTypesForName, ClaimTypes.Role);
 				if (o.TryGetValue("Claims", out JsonArray a))
 					foreach (JsonObject obj in a)
 						idn.AddClaim(new Claim(
