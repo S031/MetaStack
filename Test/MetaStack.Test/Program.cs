@@ -2,15 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using S031.MetaStack.Actions;
-using S031.MetaStack.Caching;
 using S031.MetaStack.Common;
-using S031.MetaStack.Core.Actions;
 using S031.MetaStack.Core.App;
-using S031.MetaStack.Core.Security;
-using S031.MetaStack.Data;
-using S031.MetaStack.Integral.Security;
-using S031.MetaStack.Security;
 using System;
 using System.Reflection;
 
