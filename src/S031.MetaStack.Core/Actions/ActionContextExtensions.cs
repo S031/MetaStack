@@ -15,8 +15,7 @@ namespace S031.MetaStack.Core.Actions
 			var mdbFactory = services.GetRequiredService<IMdbContextFactory>();
 			MdbContext workDb = mdbFactory.GetContext(workConnectionName);
 			MdbContext schemaDb = mdbFactory.GetContext(Strings.SysCatConnection);
-			var f = JMXFactory.Create(schemaDb, workDb, services.GetRequiredService<ILogger>());
-			f.IsLocalContext = true;
+			var f = JMXFactory.Create(services, workDb);
 			return f;
 		}
 	}

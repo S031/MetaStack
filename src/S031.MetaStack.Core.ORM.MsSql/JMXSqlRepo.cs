@@ -62,7 +62,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 				schema.SchemaRepo = this;
 				return schema;
 			}
-			schema = await GetSchemaAsync(this.GetMdbContext(ContextTypes.SysCat), name.AreaName, name.ObjectName)
+			schema = await GetSchemaAsync(this.GetMdbContext(), name.AreaName, name.ObjectName)
 				.ConfigureAwait(false);
 			_schemaCache.TryAdd(name, schema);
 			return schema;

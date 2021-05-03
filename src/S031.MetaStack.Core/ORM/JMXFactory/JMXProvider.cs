@@ -6,15 +6,13 @@ using System.Threading.Tasks;
 
 namespace S031.MetaStack.Core.ORM
 {
-	public class JMXProvider : ManagerObjectBase, IJMXProvider, IDisposable
+	public class JMXProvider : IJMXProvider
 	{
 		protected readonly static MapTable<string, string> _statementsCache = new MapTable<string, string>();
 		private readonly JMXFactory _factory;
-		public JMXProvider(JMXFactory factory) : 
-			base(factory.GetMdbContext(ContextTypes.SysCat), factory.GetMdbContext(ContextTypes.Work))
+		public JMXProvider(JMXFactory factory)
 		{
 			_factory = factory;
-			base.Logger = factory.Logger;
 		}
 		protected virtual JMXFactory Factory => _factory;
 

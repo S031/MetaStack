@@ -25,8 +25,8 @@ namespace S031.MetaStack.AppServer.Actions
 			GetParameters(ai, dp);
 			var ctx = ai.GetContext();
 
-			using (JMXFactory f = ctx.CreateJMXFactory(_connectionName))
-			using (JMXRepo repo = (f.CreateJMXRepo() as JMXRepo))
+			JMXFactory f = ctx.CreateJMXFactory(_connectionName);
+			IJMXRepo repo = f.SchemaFactory.CreateJMXRepo();
 			using (SQLStatementWriter writer = f.CreateSQLStatementWriter())
 			{
 				JMXSchema schema = repo.GetSchema(_viewName);
@@ -41,7 +41,7 @@ namespace S031.MetaStack.AppServer.Actions
 					return am.Execute(am.GetActionInfo(body), dp);
 				}
 				else
-					return f.GetMdbContext(ContextTypes.Work)
+					return f.GetMdbContext()
 						.GetReader(body, CreateParameters(schema));
 			}
 		}
@@ -51,8 +51,8 @@ namespace S031.MetaStack.AppServer.Actions
 			GetParameters(ai, dp);
 			var ctx = ai.GetContext();
 
-			using (JMXFactory f = ctx.CreateJMXFactory(_connectionName))
-			using (JMXRepo repo = (f.CreateJMXRepo() as JMXRepo))
+			JMXFactory f = ctx.CreateJMXFactory(_connectionName);
+			IJMXRepo repo = f.SchemaFactory.CreateJMXRepo();
 			using (SQLStatementWriter writer = f.CreateSQLStatementWriter())
 			{
 				JMXSchema schema = await repo.GetSchemaAsync(_viewName);
@@ -68,7 +68,7 @@ namespace S031.MetaStack.AppServer.Actions
 				}
 				else
 					return await f
-						.GetMdbContext(ContextTypes.Work)
+						.GetMdbContext()
 						.GetReaderAsync(body, CreateParameters(schema));
 			}
 		}

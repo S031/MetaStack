@@ -156,6 +156,12 @@
   <data name="S031.MetaStack.Core.Data.writeData.1" xml:space="preserve">
     <value>The length of the data array must be equal to the length of the array of field names</value>
   </data>
+  <data name="S031.MetaStack.Core.ORM.JMXFactory_Create.1" xml:space="preserve">
+    <value>No class inherited from JMXFactory defined</value>
+  </data>
+  <data name="S031.MetaStack.Core.ORM.JMXFactory_Create.2" xml:space="preserve">
+    <value>No class inherited from JMXFactory contained attribute of type DBRefAttribute  defined</value>
+  </data>
   <data name="S031.MetaStack.Core.ORM.JMXProvider.ObjectNotFound" xml:space="preserve">
     <value>Object '{0}' with specified id  '{1}' not found in the database</value>
   </data>

@@ -5,15 +5,15 @@ using System.Threading.Tasks;
 
 namespace S031.MetaStack.Core.ORM
 {
-	public abstract class JMXRepo : ManagerObjectBase, IJMXRepo, IDisposable
+	public abstract class JMXRepo : IJMXRepo
 	{
 		private readonly JMXFactory _factory;
-		public JMXRepo(JMXFactory factory) :
-			base(factory.GetMdbContext(ContextTypes.SysCat), factory.GetMdbContext(ContextTypes.Work))
+		
+		public JMXRepo(JMXFactory factory)
 		{
 			_factory = factory;
-			base.Logger = factory.Logger;
 		}
+		
 		protected virtual JMXFactory Factory => _factory;
 
 		public virtual IEnumerable<string> GetChildObjects(string objectName)
@@ -21,54 +21,25 @@ namespace S031.MetaStack.Core.ORM
 			throw new NotImplementedException();
 		}
 
-		public virtual JMXSchema GetSchema(string objectName)
-		{
-			throw new NotImplementedException();
-		}
+		public abstract JMXSchema GetSchema(string objectName);
 
-		public virtual JMXSchema SaveSchema(JMXSchema schema)
-		{
-			throw new NotImplementedException();
-		}
+		public abstract JMXSchema SaveSchema(JMXSchema schema);
 
-		public virtual void DropSchema(string objectName)
-		{
-			throw new NotImplementedException();
-		}
+		public abstract void DropSchema(string objectName);
 
-		public virtual void ClearCatalog()
-		{
-			throw new NotImplementedException();
-		}
+		public abstract void ClearCatalog();
 
-		public virtual Task<JMXSchema> GetSchemaAsync(string objectName)
-		{
-			throw new NotImplementedException();
-		}
+		public abstract Task<JMXSchema> GetSchemaAsync(string objectName);
 
-		public virtual Task<JMXSchema> SaveSchemaAsync(JMXSchema schema)
-		{
-			throw new NotImplementedException();
-		}
+		public abstract Task<JMXSchema> SaveSchemaAsync(JMXSchema schema);
 
-		public virtual Task<JMXSchema> SyncSchemaAsync(string objectName)
-		{
-			throw new NotImplementedException();
-		}
+		public abstract Task<JMXSchema> SyncSchemaAsync(string objectName);
 
-		public virtual Task DropSchemaAsync(string objectName)
-		{
-			throw new NotImplementedException();
-		}
+		public abstract Task DropSchemaAsync(string objectName);
 
-		public virtual Task ClearCatalogAsync()
-		{
-			throw new NotImplementedException();
-		}
+		public abstract Task ClearCatalogAsync();
 
 		public virtual Task<JMXSchema> GetTableSchemaAsync(string objectName)
-		{
-			throw new NotImplementedException();
-		}
+			=> throw new NotImplementedException();
 	}
 }

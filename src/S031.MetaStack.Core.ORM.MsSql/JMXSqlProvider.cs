@@ -27,7 +27,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 				_statementsCache.TryAdd(objectName, sql);
 			}
 
-			var mdb = Factory.GetMdbContext(ContextTypes.Work);
+			var mdb = Factory.GetMdbContext();
 			var drs = await mdb.GetReadersAsync(sql);
 			for (int i = 0; i < drs.Length; i++)
 			{
@@ -52,7 +52,6 @@ namespace S031.MetaStack.Core.ORM.MsSql
 					.WriteEqualsColumnStatement(schema, id, $"@{id.FieldName}", "");
 				return writer.ToString();
 			}
-
 		}
 	}
 

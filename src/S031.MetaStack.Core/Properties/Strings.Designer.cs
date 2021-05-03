@@ -178,6 +178,24 @@ namespace S031.MetaStack.Core.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No class inherited from JMXFactory defined.
+        /// </summary>
+        internal static string S031_MetaStack_Core_ORM_JMXFactory_Create_1 {
+            get {
+                return ResourceManager.GetString("S031.MetaStack.Core.ORM.JMXFactory_Create.1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No class inherited from JMXFactory contained attribute of type DBRefAttribute  defined.
+        /// </summary>
+        internal static string S031_MetaStack_Core_ORM_JMXFactory_Create_2 {
+            get {
+                return ResourceManager.GetString("S031.MetaStack.Core.ORM.JMXFactory_Create.2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Object &apos;{0}&apos; with specified id  &apos;{1}&apos; not found in the database.
         /// </summary>
         internal static string S031_MetaStack_Core_ORM_JMXProvider_ObjectNotFound {
