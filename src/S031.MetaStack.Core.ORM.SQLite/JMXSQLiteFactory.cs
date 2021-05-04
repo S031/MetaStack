@@ -10,9 +10,8 @@ namespace S031.MetaStack.Core.ORM.SQLite
 	{
 		public const string ProviderInvariantName = "System.Data.Sqlite";
 
-		private readonly JMXSQLiteRepo _repo;
+		private JMXSQLiteRepo _repo;
 		private readonly JMXSQLiteProvider _jmx;
-		private readonly JMXFactory _schemaFactory;
 
 		public JMXSQLiteFactory(IServiceProvider services, MdbContext workMdbContext)
 		{
@@ -20,11 +19,16 @@ namespace S031.MetaStack.Core.ORM.SQLite
 			if (!providerName
 				.Equals(ProviderInvariantName, StringComparison.OrdinalIgnoreCase))
 				throw new ArgumentException($"MdbContext must be created using { ProviderInvariantName} provider.");
-			_repo = new JMXSQLiteRepo(this);
 			_jmx = new JMXSQLiteProvider(this);
 		}
 
-		public override IJMXRepo CreateJMXRepo() => _repo;
+		public override IJMXRepo CreateJMXRepo()
+		{
+			if (_repo == null)
+				_repo = new JMXSQLiteRepo(this);
+			return _repo;
+		}
+
 
 		public override IJMXProvider CreateJMXProvider() => _jmx;
 

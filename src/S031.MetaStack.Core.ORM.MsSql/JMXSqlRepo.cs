@@ -52,6 +52,8 @@ namespace S031.MetaStack.Core.ORM.MsSql
 			TestSysCat();
 		}
 
+		public ILogger Logger => Factory.Logger;
+
 		#region GetSchema
 		public override JMXSchema GetSchema(string objectName)=> GetSchemaAsync(objectName).GetAwaiter().GetResult();
 		public override async Task<JMXSchema> GetSchemaAsync(string objectName)
@@ -62,7 +64,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 				schema.SchemaRepo = this;
 				return schema;
 			}
-			schema = await GetSchemaAsync(this.GetMdbContext(), name.AreaName, name.ObjectName)
+			schema = await GetSchemaAsync(Factory.GetMdbContext(), name.AreaName, name.ObjectName)
 				.ConfigureAwait(false);
 			_schemaCache.TryAdd(name, schema);
 			return schema;
@@ -82,7 +84,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 
 		private async Task TestSysCatAsync()
 		{
-			var mdb = this.GetMdbContext(ContextTypes.SysCat);
+			var mdb = Factory.GetMdbContext();
 			var result = await mdb.ExecuteAsync<string>(SqlServer.TestSchema);
 			if (result.IsEmpty())
 			{
@@ -94,12 +96,12 @@ namespace S031.MetaStack.Core.ORM.MsSql
 		{
 			if (_defaultDbSchema.IsEmpty())
 			{
-				_defaultDbSchema = await this
-					.GetMdbContext(ContextTypes.SysCat)
+				_defaultDbSchema = await Factory
+					.GetMdbContext()
 					.ExecuteAsync<string>(SqlServer.GetDefaultSchema);
 				if (_defaultDbSchema.IsEmpty())
-					_defaultDbSchema = await this
-						.GetMdbContext(ContextTypes.Work)
+					_defaultDbSchema = await Factory
+						.GetMdbContext()
 						.ExecuteAsync<string>("select schema_name() as Name");
 			}
 			return _defaultDbSchema;
@@ -107,7 +109,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 
 		private async Task CreateDbSchemaAsync()
 		{
-			MdbContext mdb = this.GetMdbContext(ContextTypes.SysCat);
+			MdbContext mdb = Factory.GetMdbContext();
 			try
 			{
 				await mdb.BeginTransactionAsync();
@@ -193,12 +195,10 @@ namespace S031.MetaStack.Core.ORM.MsSql
 
 		private async Task DropSchemaAsync(string areaName, string objectName)
 		{
-			MdbContext mdb = this.GetMdbContext(ContextTypes.SysCat);
+			MdbContext mdb = Factory.GetMdbContext();
 			ILogger logger = this.Logger;
 			var schema = await GetSchemaAsync(mdb, areaName, objectName);
-			var schemaFromDb = await GetTableSchemaAsync(
-				this.GetMdbContext(ContextTypes.Work), 
-				schema.DbObjectName.ToString());
+			var schemaFromDb = await GetTableSchemaAsync(schema.DbObjectName.ToString());
 
 			string[] sqlList;
 			if (schemaFromDb == null)
@@ -242,11 +242,10 @@ namespace S031.MetaStack.Core.ORM.MsSql
 
 		private async Task WriteDropStatementsAsync(SQLStatementWriter sb, JMXSchema fromDbSchema)
 		{
-			MdbContext mdb = this.GetMdbContext();
 			foreach (var att in fromDbSchema.Attributes.Where(a => a.FieldName.StartsWith(detail_field_prefix)))
 			{
 				string[] names = att.FieldName.Split('_');
-				var schemaFromDb = await GetTableSchemaAsync(mdb, new JMXObjectName(names[1], names[2]).ToString());
+				var schemaFromDb = await GetTableSchemaAsync(new JMXObjectName(names[1], names[2]).ToString());
 				if (schemaFromDb != null)
 					await WriteDropStatementsAsync(sb, schemaFromDb);
 
@@ -262,7 +261,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 		#region Clear Catalog
 		public override void ClearCatalog()
 		{
-			DropDbSchemaAsync(this.GetMdbContext(), this.Logger)
+			DropDbSchemaAsync(Factory.GetMdbContext(), this.Logger)
 				.ConfigureAwait(false)
 				.GetAwaiter()
 				.GetResult();
@@ -943,14 +942,12 @@ namespace S031.MetaStack.Core.ORM.MsSql
 		#endregion Sync Schema
 
 		#region Utils
-		public override async Task<JMXSchema> GetTableSchemaAsync(string objectName)=>
-			await GetTableSchemaAsync(GetMdbContext(ContextTypes.Work), objectName);
-
-		private static async Task<JMXSchema> GetTableSchemaAsync(MdbContext mdb, string fullTableName)
+		public override async Task<JMXSchema> GetTableSchemaAsync(string objectName)
 		{
+			var mdb = Factory.GetMdbContext();
 			string s = await mdb.ExecuteAsync<string>(
 				(await IsSql17(mdb)) ? SqlServer.GetTableSchema : SqlServer.GetTableSchema_12,
-				new MdbParameter("@table_name", fullTableName));
+				new MdbParameter("@table_name", objectName));
 			if (s != null)
 				return JMXSchema.Parse(s);
 			return null;

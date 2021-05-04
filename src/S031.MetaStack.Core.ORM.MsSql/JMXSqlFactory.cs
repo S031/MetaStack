@@ -10,7 +10,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 	{
 		public const string ProviderInvariantName = "System.Data.SqlClient";
 
-		private readonly JMXSqlRepo _repo;
+		private JMXSqlRepo _repo;
 		private readonly JMXSqlProvider _jmx;
 
 		public JMXSqlFactory(IServiceProvider services, MdbContext workMdbContext)
@@ -19,11 +19,15 @@ namespace S031.MetaStack.Core.ORM.MsSql
 			if (!providerName
 				.Equals(ProviderInvariantName, StringComparison.OrdinalIgnoreCase))
 				throw new ArgumentException($"MdbContext must be created using { ProviderInvariantName} provider.");
-			_repo = new JMXSqlRepo(this);
 			_jmx = new JMXSqlProvider(this);
 		}
 
-		public override IJMXRepo CreateJMXRepo() => _repo;
+		public override IJMXRepo CreateJMXRepo()
+		{
+			if (_repo == null)
+				_repo = new JMXSqlRepo(this);
+			return _repo;
+		}
 
 		public override IJMXProvider CreateJMXProvider() => _jmx;
 

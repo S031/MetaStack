@@ -1,4 +1,5 @@
-﻿using S031.MetaStack.ORM;
+﻿using S031.MetaStack.Data;
+using S031.MetaStack.ORM;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -39,7 +40,6 @@ namespace S031.MetaStack.Core.ORM
 
 		public abstract Task ClearCatalogAsync();
 
-		public virtual Task<JMXSchema> GetTableSchemaAsync(string objectName)
-			=> throw new NotImplementedException();
+		public abstract Task<JMXSchema> GetTableSchemaAsync(string objectName);
 	}
 }

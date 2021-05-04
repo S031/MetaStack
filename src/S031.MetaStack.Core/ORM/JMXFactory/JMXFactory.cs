@@ -12,19 +12,18 @@ namespace S031.MetaStack.Core.ORM
 	public abstract class JMXFactory : IJMXFactory
 	{
 		/// <summary>
-		/// Статическое хранение MdbContext имеет смысл, только в случае локального соединения, типа SQLite
+		/// !!! Статическое хранение MdbContext имеет смысл, только в случае локального соединения, типа SQLite
 		/// или добавить в MdbContext reconnect если соединение разорвано
 		/// </summary>
 		private static JMXFactory _schemaFactory;
-		private static MapTable<string, JMXFactory> _factoryCache = new MapTable<string, JMXFactory>();
 		private ILogger _logger;
 		private MdbContext _mdb;
 
-		protected ILogger Logger => _logger;
+		public ILogger Logger => _logger;
 
 		public IJMXFactory WorkFactory => this;
 
-		public IJMXFactory SchemaFactory => SchemaFactory;
+		public IJMXFactory SchemaFactory => _schemaFactory;
 
 		public abstract IJMXRepo CreateJMXRepo();
 
@@ -43,31 +42,32 @@ namespace S031.MetaStack.Core.ORM
 			return CreateFactoryFromMdbContext(services, workMdbContext);
 		}
 
+		/// <summary>
+		/// !!! Save ctor to cache unlike instance
+		/// </summary>
+		/// <param name="services"></param>
+		/// <param name="mdb"></param>
+		/// <returns></returns>
 		private static JMXFactory CreateFactoryFromMdbContext(IServiceProvider services, MdbContext mdb)
 		{
+			var l = ImplementsList.GetTypes(typeof(JMXFactory));
+			if (l == null)
+				//No class inherited from JMXFactory defined
+				throw new InvalidOperationException(Strings.S031_MetaStack_Core_ORM_JMXFactory_Create_1);
+
 			string dbProviderName = mdb.ProviderName;
-			if (!_factoryCache.TryGetValue(dbProviderName, out JMXFactory factory))
+			JMXFactory factory = null;
+			foreach (var t in l)
 			{
-				var l = ImplementsList.GetTypes(typeof(JMXFactory));
-				if (l == null)
-					//No class inherited from JMXFactory defined
-					throw new InvalidOperationException(Strings.S031_MetaStack_Core_ORM_JMXFactory_Create_1);
-				
-				foreach (var t in l)
-				{
-					if (System.Attribute.GetCustomAttributes(t)?
-						.FirstOrDefault(attr => attr.GetType() == typeof(DBRefAttribute)
-							&& (attr as DBRefAttribute)
-								.DBProviderName
-								.Equals(dbProviderName, StringComparison.OrdinalIgnoreCase)) is DBRefAttribute att)
-					{
-						factory = (JMXFactory)t.CreateInstance(services, mdb);
-						_factoryCache.Add(dbProviderName, factory);
-					}
-					else
-						//No class inherited from JMXFactory contained attribute of type DBRefAttribute  defined
-						throw new InvalidOperationException(Properties.Strings.S031_MetaStack_Core_ORM_JMXFactory_Create_2);
-				}
+				if (System.Attribute.GetCustomAttributes(t)?
+					.FirstOrDefault(attr => attr.GetType() == typeof(DBRefAttribute)
+						&& (attr as DBRefAttribute)
+							.DBProviderName
+							.Equals(dbProviderName, StringComparison.OrdinalIgnoreCase)) is DBRefAttribute att)
+					factory = (JMXFactory)t.CreateInstance(services, mdb);
+				else
+					//No class inherited from JMXFactory contained attribute of type DBRefAttribute  defined
+					throw new InvalidOperationException(Properties.Strings.S031_MetaStack_Core_ORM_JMXFactory_Create_2);
 			}
 			factory._mdb = mdb;
 			factory._logger = services
@@ -79,7 +79,6 @@ namespace S031.MetaStack.Core.ORM
 
 		public virtual IJMXTypeMapping CreateJMXTypeMapping() => new JMXTypeMappingAnsi();
 
-		public virtual MdbContext GetMdbContext()
-			=> _mdb;
+		public virtual MdbContext GetMdbContext() => _mdb;
 	}
 }
