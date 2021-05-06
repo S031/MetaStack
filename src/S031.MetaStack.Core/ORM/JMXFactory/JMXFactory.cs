@@ -11,6 +11,7 @@ namespace S031.MetaStack.Core.ORM
 {
 	public abstract class JMXFactory : IJMXFactory
 	{
+		public const string DETAIL_FIELD_PREFIX = "$1_";
 		/// <summary>
 		/// !!! Статическое хранение MdbContext имеет смысл, только в случае локального соединения, типа SQLite
 		/// или добавить в MdbContext reconnect если соединение разорвано
@@ -19,9 +20,9 @@ namespace S031.MetaStack.Core.ORM
 		private ILogger _logger;
 		private MdbContext _mdb;
 
-		public ILogger Logger => _logger;
+		public virtual ILogger Logger => _logger;
 
-		public IJMXFactory WorkFactory => this;
+		public virtual IJMXFactory WorkFactory => this;
 
 		public IJMXFactory SchemaFactory => _schemaFactory;
 
@@ -30,6 +31,8 @@ namespace S031.MetaStack.Core.ORM
 		public abstract IJMXProvider CreateJMXProvider();
 
 		public abstract JMXObject CreateObject(string objectName);
+
+		public abstract IJMXBalance CreateJMXBalance();
 
 		public static JMXFactory Create(IServiceProvider services, MdbContext workMdbContext)
 		{
@@ -42,12 +45,13 @@ namespace S031.MetaStack.Core.ORM
 			return CreateFactoryFromMdbContext(services, workMdbContext);
 		}
 
-		/// <summary>
-		/// !!! Save ctor to cache unlike instance
-		/// </summary>
-		/// <param name="services"></param>
-		/// <param name="mdb"></param>
-		/// <returns></returns>
+		public static JMXFactory Create(IServiceProvider services)
+		{
+			var mdbFactory = services.GetRequiredService<IMdbContextFactory>();
+			var mdb = mdbFactory.GetContext(Strings.DefaultConnection);
+			return CreateFactoryFromMdbContext(services, mdb);
+		}
+
 		private static JMXFactory CreateFactoryFromMdbContext(IServiceProvider services, MdbContext mdb)
 		{
 			var l = ImplementsList.GetTypes(typeof(JMXFactory));
@@ -75,10 +79,12 @@ namespace S031.MetaStack.Core.ORM
 				.CreateLogger(typeof(JMXFactory).FullName);
 			return factory;
 		}
+
 		public virtual SQLStatementWriter CreateSQLStatementWriter() => new SQLStatementWriter(new JMXTypeMappingAnsi());
 
 		public virtual IJMXTypeMapping CreateJMXTypeMapping() => new JMXTypeMappingAnsi();
 
 		public virtual MdbContext GetMdbContext() => _mdb;
+
 	}
 }

@@ -14,7 +14,7 @@ namespace S031.MetaStack.ORM
 		long Save(JMXObject jmxObject, bool isNew);
 		int SetState(string objectName, long handle, int newState, IDictionary<string, object> paramList);
 		Task<JMXObject> ReadAsync(JMXObjectName objectName, long id);
-		Task<JMXObject> ReadAsync(JMXObjectName objectName, string alternameIndexName, params object[] parameters);
+		Task<JMXObject> ReadAsync(JMXObjectName objectName, string alternateIndexName, params object[] parameters);
 		Task DeleteAsync(JMXObject jmxObject);
 		Task DeleteAsync(JMXObjectName objectName, long id);
 		Task<long> SaveAsync(JMXObject jmxObject, bool isNew);

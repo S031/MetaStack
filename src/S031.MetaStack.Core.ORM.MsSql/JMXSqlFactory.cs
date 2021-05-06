@@ -34,5 +34,8 @@ namespace S031.MetaStack.Core.ORM.MsSql
 		public override JMXObject CreateObject(string objectName) => new JMXObject(objectName, this);
 
 		public override SQLStatementWriter CreateSQLStatementWriter() => new SQLStatementWriter(new JMXSQLTypeMapping());
+
+		public override IJMXBalance CreateJMXBalance()
+			=> new JMXSqlBalance(this);
 	}
 }

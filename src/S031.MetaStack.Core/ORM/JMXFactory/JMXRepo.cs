@@ -15,31 +15,24 @@ namespace S031.MetaStack.Core.ORM
 			_factory = factory;
 		}
 		
-		protected virtual JMXFactory Factory => _factory;
-
-		public virtual IEnumerable<string> GetChildObjects(string objectName)
-		{
-			throw new NotImplementedException();
-		}
-
-		public abstract JMXSchema GetSchema(string objectName);
-
-		public abstract JMXSchema SaveSchema(JMXSchema schema);
-
-		public abstract void DropSchema(string objectName);
+		protected JMXFactory Factory => _factory;
 
 		public abstract void ClearCatalog();
 
-		public abstract Task<JMXSchema> GetSchemaAsync(string objectName);
-
-		public abstract Task<JMXSchema> SaveSchemaAsync(JMXSchema schema);
-
-		public abstract Task<JMXSchema> SyncSchemaAsync(string objectName);
-
-		public abstract Task DropSchemaAsync(string objectName);
-
 		public abstract Task ClearCatalogAsync();
 
-		public abstract Task<JMXSchema> GetTableSchemaAsync(string objectName);
+		public abstract void DeleteSchema(string objectName);
+
+		public abstract Task DeleteSchemaAsync(string objectName);
+
+		public abstract IEnumerable<string> GetChildObjects(string objectName);
+
+		public abstract JMXSchema GetSchema(string objectName);
+
+		public abstract Task<JMXSchema> GetSchemaAsync(string objectName);
+
+		public abstract JMXSchema SaveSchema(JMXSchema schema);
+
+		public abstract Task<JMXSchema> SaveSchemaAsync(JMXSchema schema);
 	}
 }

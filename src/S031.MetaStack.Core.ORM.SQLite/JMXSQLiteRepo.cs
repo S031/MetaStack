@@ -37,7 +37,6 @@ namespace S031.MetaStack.Core.ORM.SQLite
 			alter = 8,
 		}
 		const string schema_version = "0.0.1";
-		const string detail_field_prefix = "$1_";
 
 		private static readonly JMXSQLiteTypeMapping _typeMapping = new JMXSQLiteTypeMapping();
 		private static IReadOnlyDictionary<MdbType, string> TypeMap => _typeMapping.GetTypeMap();
@@ -60,7 +59,7 @@ namespace S031.MetaStack.Core.ORM.SQLite
 				schema.SchemaRepo = this;
 				return schema;
 			}
-			schema = await GetSchemaAsync(this.GetMdbContext(), name.AreaName, name.ObjectName).ConfigureAwait(false);
+			schema = await GetSchemaAsync(Factory.GetMdbContext(), name.AreaName, name.ObjectName).ConfigureAwait(false);
 			lock (objLock)
 			{
 				if (!_schemaCache.ContainsKey(name))
@@ -175,79 +174,22 @@ namespace S031.MetaStack.Core.ORM.SQLite
 			}
 		}
 
-		#region Drop Schema
-		public override void DropSchema(string objectName)
-		{
-			DropSchemaAsync(objectName).GetAwaiter().GetResult();
-		}
+		#region Delete Schema
+		public override void DeleteSchema(string objectName)
+			=> DeleteSchemaAsync(objectName).GetAwaiter().GetResult();
 
-		public override async Task DropSchemaAsync(string objectName)
+		public override async Task DeleteSchemaAsync(string objectName)
 		{
 			JMXObjectName name = objectName;
-			await DropSchemaAsync(name.AreaName, name.ObjectName).ConfigureAwait(false);
-			lock (objLock)
-				_schemaCache.Remove(name.ToString());
+			MdbContext mdb = Factory.GetMdbContext();
+			var schema = await GetSchemaAsync(mdb, name.AreaName, name.ObjectName);
+
+			await mdb.ExecuteAsync(SQLite.DelSysSchemas,
+				new MdbParameter("@ID", schema.ID));
+			_schemaCache.Remove(name.ToString());
 		}
 
-		private async Task DropSchemaAsync(string areaName, string objectName)
-		{
-			MdbContext mdb = this.GetMdbContext();
-			ILogger logger = this.Logger;
-			var schema = await GetSchemaAsync(mdb, areaName, objectName);
-			var schemaFromDb = await GetTableSchema(mdb, schema.DbObjectName.ToString());
-
-			string[] sqlList;
-			if (schemaFromDb == null)
-				sqlList = new string[] { };
-			else
-				sqlList = await DropSchemaStatementsAsync(schemaFromDb);
-
-			await mdb.BeginTransactionAsync();
-			try
-			{
-				foreach (var sql in sqlList)
-				{
-					logger.LogDebug(sql);
-					await mdb.ExecuteAsync(sql);
-				}
-				await mdb.ExecuteAsync(SQLite.DelSysSchemas,
-					new MdbParameter("@ID", schema.ID));
-				await mdb.CommitAsync();
-			}
-			catch
-			{
-				mdb.RollBack();
-				throw;
-			}
-		}
-		private async Task<string[]> DropSchemaStatementsAsync(JMXSchema fromDbSchema)
-		{
-			List<string> sql = new List<string>();
-			using (SQLStatementWriter sb = new SQLStatementWriter(_typeMapping, fromDbSchema))
-			{
-				await WriteDropStatementsAsync(sb, fromDbSchema);
-				sql.Add(sb.ToString());
-			}
-			return sql.ToArray();
-		}
-
-		private async Task WriteDropStatementsAsync(SQLStatementWriter sb, JMXSchema fromDbSchema)
-		{
-			MdbContext mdb = this.GetMdbContext();
-			foreach (var att in fromDbSchema.Attributes.Where(a => a.FieldName.StartsWith(detail_field_prefix)))
-			{
-				string[] names = att.FieldName.Split('_');
-				var schemaFromDb = await GetTableSchema(mdb, new JMXObjectName(names[1], names[2]).ToString());
-				if (schemaFromDb != null)
-					await WriteDropStatementsAsync(sb, schemaFromDb);
-
-			}
-			//string s = (await mdb.ExecuteAsync<string>(SQLite.GetParentRelations,
-			//	new MdbParameter("@table_name", fromDbSchema.DbObjectName.ToString()))) ?? "";
-			sb.WriteDropStatements(fromDbSchema);
-		}
-
-		#endregion Drop Schema
+		#endregion Delete Schema
 
 		#region Clear Catalog
 		public override void ClearCatalog()
@@ -1020,6 +962,11 @@ namespace S031.MetaStack.Core.ORM.SQLite
 		}
 		private static JMXObjectName[] GetDependences(JMXSchema schema) =>
 			schema.ForeignKeys.Select(fk => fk.RefDbObjectName).ToArray();
+
+		public override IEnumerable<string> GetChildObjects(string objectName)
+		{
+			throw new NotImplementedException();
+		}
 		#endregion Utils
 	}
 }

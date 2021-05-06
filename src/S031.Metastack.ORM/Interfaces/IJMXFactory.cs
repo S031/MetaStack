@@ -7,5 +7,6 @@
 		IJMXTypeMapping CreateJMXTypeMapping();
 		JMXObject CreateObject(string objectName);
 		IJMXFactory SchemaFactory { get; }
+		IJMXBalance CreateJMXBalance();
 	}
 }

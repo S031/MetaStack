@@ -29,12 +29,12 @@ namespace S031.MetaStack.Core.ORM.SQLite
 			return _repo;
 		}
 
-
 		public override IJMXProvider CreateJMXProvider() => _jmx;
 
 		public override JMXObject CreateObject(string objectName) => new JMXObject(objectName, this);
 
 		public override SQLStatementWriter CreateSQLStatementWriter() => new SQLStatementWriter(new JMXSQLiteTypeMapping(), false);
 
+		public override IJMXBalance CreateJMXBalance() => new JMXSQLiteBalance();
 	}
 }
