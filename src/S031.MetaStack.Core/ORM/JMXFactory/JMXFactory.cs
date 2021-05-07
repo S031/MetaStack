@@ -68,11 +68,15 @@ namespace S031.MetaStack.Core.ORM
 						&& (attr as DBRefAttribute)
 							.DBProviderName
 							.Equals(dbProviderName, StringComparison.OrdinalIgnoreCase)) is DBRefAttribute att)
+				{
 					factory = (JMXFactory)t.CreateInstance(services, mdb);
-				else
-					//No class inherited from JMXFactory contained attribute of type DBRefAttribute  defined
-					throw new InvalidOperationException(Properties.Strings.S031_MetaStack_Core_ORM_JMXFactory_Create_2);
+					break;
+				}
 			}
+			if (factory == null)
+				//No class inherited from JMXFactory contained attribute of type DBRefAttribute  defined
+				throw new InvalidOperationException(Properties.Strings.S031_MetaStack_Core_ORM_JMXFactory_Create_2);
+
 			factory._mdb = mdb;
 			factory._logger = services
 				.GetRequiredService<ILoggerProvider>()

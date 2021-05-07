@@ -178,12 +178,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 					log.LogDebug(sql);
 					await mdb.ExecuteAsync(sql);
 				}
-				//if (!createNew)
-				//	await schemaUpdate(mdb, schema);
-				await mdb.ExecuteAsync($"update SysCat.SysSchemas set ObjectSchema = @ObjectSchema where id = {schema.ID}",
-					new MdbParameter("@ObjectSchema", schema.ToString()));
-				await mdb.ExecuteAsync(SqlServer.StateSysSchemas,
-					new MdbParameter("@id", schema.ID));
+				schema = await _schemaRepo.SetSchemaStateAsync(schema.ObjectName, 1);
 				await mdb.CommitAsync();
 			}
 			catch

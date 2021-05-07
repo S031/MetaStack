@@ -101,9 +101,11 @@
     <Compile Include="Interfaces\IObjectBase.cs" />
     <Compile Include="Interfaces\IObjectEditor.cs" />
     <Compile Include="Interfaces\IObjectHost.cs" />
+    <Compile Include="ORM\JMXFactory\Client\JMXClientBalance.cs" />
     <Compile Include="ORM\JMXFactory\Client\JMXClientFactory.cs" />
     <Compile Include="ORM\JMXFactory\Client\JMXClientProvider.cs" />
     <Compile Include="ORM\JMXFactory\Client\JMXClientRepo.cs" />
+    <Compile Include="ORM\JMXFactory\JMXBalance.cs" />
     <Compile Include="ORM\JMXFactory\JMXFactory.cs" />
     <Compile Include="ORM\JMXFactory\JMXProvider.cs" />
     <Compile Include="ORM\JMXFactory\JMXRepo.cs" />

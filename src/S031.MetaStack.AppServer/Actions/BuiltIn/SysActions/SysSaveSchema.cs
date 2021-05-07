@@ -19,10 +19,12 @@ namespace S031.MetaStack.AppServer.Actions
 			GetParameters(ai, dp);
 			var ctx = ai.GetContext();
 
-			JMXFactory f = ctx.CreateJMXFactory(_connectionName);
+			var r = ctx.CreateJMXFactory(_connectionName)
+				.SchemaFactory
+				.CreateJMXRepo();
 			return ai.GetOutputParamTable()
 				.AddNew()
-				.SetValue("ObjectSchema", (f.CreateJMXRepo().SaveSchema(_schemaSource)).ToString())
+				.SetValue("ObjectSchema", (r.SaveSchema(_schemaSource)).ToString())
 				.Update();
 		}
 
@@ -31,10 +33,12 @@ namespace S031.MetaStack.AppServer.Actions
 			GetParameters(ai, dp);
 			var ctx = ai.GetContext();
 
-			JMXFactory f = ctx.CreateJMXFactory(_connectionName);
+			var r = ctx.CreateJMXFactory(_connectionName)
+				.SchemaFactory
+				.CreateJMXRepo();
 			return ai.GetOutputParamTable()
 				.AddNew()
-				.SetValue("ObjectSchema", (await f.CreateJMXRepo().SaveSchemaAsync(_schemaSource)).ToString())
+				.SetValue("ObjectSchema", (await r.SaveSchemaAsync(_schemaSource)).ToString())
 				.Update();
 		}
 

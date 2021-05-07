@@ -429,11 +429,24 @@ namespace S031.MetaStack.Core.ORM.MsSql
 
 		#endregion Save Schema
 
+		public async override Task<JMXSchema> SetSchemaStateAsync(string objectName, int stateId)
+		{
+			var mdb = Factory.GetMdbContext();
+			var schema = await GetSchemaAsync(objectName);
+			//!!! ???
+			//await mdb.ExecuteAsync($"update SysCat.SysSchemas set ObjectSchema = @ObjectSchema where id = {schema.ID}",
+			//	new MdbParameter("@ObjectSchema", schema.ToString()));
+			await mdb.ExecuteAsync(SqlServer.StateSysSchemas,
+				new MdbParameter("@id", schema.ID));
+			return schema;
+		}
+
 		#region Utils
 		public override IEnumerable<string> GetChildObjects(string objectName)
 		{
 			throw new NotImplementedException();
 		}
+
 		#endregion Utils
 	}
 }

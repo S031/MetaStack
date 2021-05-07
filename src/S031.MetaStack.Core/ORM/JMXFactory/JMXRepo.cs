@@ -34,5 +34,7 @@ namespace S031.MetaStack.Core.ORM
 		public abstract JMXSchema SaveSchema(JMXSchema schema);
 
 		public abstract Task<JMXSchema> SaveSchemaAsync(JMXSchema schema);
+
+		public abstract Task<JMXSchema> SetSchemaStateAsync(string objectName, int stateId);
 	}
 }

@@ -6,6 +6,7 @@ using S031.MetaStack.Core.Actions;
 using S031.MetaStack.Core.ORM;
 using S031.MetaStack.Data;
 using S031.MetaStack.ORM;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -18,14 +19,15 @@ namespace MetaStack.Test.ORM
 		private const string _cn = @"Data Source=D:\Source\Repos\Data\SQLite\MetaStack\SysCat.db; Mode=Memory; Cache=Shared";
 		private readonly ConnectInfo _ci;
 		private readonly ILogger _logger;
+		private readonly IServiceProvider _services;
 
 		/// <summary>
 		/// Required MetaStack database in sql server
 		/// </summary>
 		public ORMSQLiteTest()
 		{
-			_logger = Program
-				.GetServices()
+			_services = Program.GetServices();
+			_logger = _services
 				.GetRequiredService<ILoggerProvider>()
 				.CreateLogger("ORMSQLiteTest");
 
@@ -39,8 +41,8 @@ namespace MetaStack.Test.ORM
 		private void Test1()
 		{
 			using (MdbContext mdb = new MdbContext(_ci))
-			using (JMXFactory f = JMXFactory.Create(mdb, _logger))
 			{
+				_ = JMXFactory.Create(_services, mdb);
 			}
 		}
 		/// <summary>
@@ -55,8 +57,8 @@ namespace MetaStack.Test.ORM
 		private async Task SaveSchemaTestAsyncNew()
 		{
 			using (MdbContext mdb = new MdbContext(_ci))
-			using (JMXFactory f = JMXFactory.Create(mdb, _logger))
 			{
+				JMXFactory f = JMXFactory.Create(_services, mdb);
 				var stor = f.CreateJMXRepo();
 				foreach (var s in GetTestSchemas())
 				{
@@ -77,12 +79,12 @@ namespace MetaStack.Test.ORM
 		private async Task SyncSchemaTestAsyncNew()
 		{
 			using (MdbContext mdb = new MdbContext(_cn))
-			using (JMXFactory f = JMXFactory.Create(mdb, _logger))
 			{
-				var stor = f.CreateJMXRepo();
+				JMXFactory f = JMXFactory.Create(_services, mdb);
+				var stor = f.CreateJMXBalance();
 				foreach (string s in GetTestNames())
 				{
-					await stor.SyncSchemaAsync(s);
+					await stor.SyncObjectSchemaAsync(s);
 				}
 			}
 		}
@@ -118,12 +120,12 @@ namespace MetaStack.Test.ORM
 		private async Task DropSchemaTestAsyncNew()
 		{
 			using (MdbContext mdb = new MdbContext(_ci))
-			using (JMXFactory f = JMXFactory.Create(mdb, _logger))
 			{
-				var stor = f.CreateJMXRepo();
+				JMXFactory f = JMXFactory.Create(_services, mdb);
+				var stor = f.CreateJMXBalance();
 				foreach (string s in GetTestNames())
 				{
-					await stor.DropSchemaAsync(s);
+					await stor.DropObjectSchemaAsync(s);
 				}
 			}
 		}
@@ -140,9 +142,9 @@ namespace MetaStack.Test.ORM
 		private async Task DropDBSchemaTestAsyncNew()
 		{
 			using (MdbContext mdb = new MdbContext(_ci))
-			using (JMXFactory f = JMXFactory.Create(mdb, _logger))
 			{
-				await f.CreateJMXRepo().ClearCatalogAsync();
+				JMXFactory f = JMXFactory.Create(_services, mdb);
+				await f.SchemaFactory.CreateJMXRepo().ClearCatalogAsync();
 			}
 		}
 

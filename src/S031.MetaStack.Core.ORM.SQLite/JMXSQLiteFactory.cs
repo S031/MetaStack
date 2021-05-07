@@ -35,6 +35,6 @@ namespace S031.MetaStack.Core.ORM.SQLite
 
 		public override SQLStatementWriter CreateSQLStatementWriter() => new SQLStatementWriter(new JMXSQLiteTypeMapping(), false);
 
-		public override IJMXBalance CreateJMXBalance() => new JMXSQLiteBalance();
+		public override IJMXBalance CreateJMXBalance() => new JMXSQLiteBalance(this);
 	}
 }

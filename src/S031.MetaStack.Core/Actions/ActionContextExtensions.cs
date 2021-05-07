@@ -14,7 +14,6 @@ namespace S031.MetaStack.Core.Actions
 			var services = ctx.Services;
 			var mdbFactory = services.GetRequiredService<IMdbContextFactory>();
 			MdbContext workDb = mdbFactory.GetContext(workConnectionName);
-			MdbContext schemaDb = mdbFactory.GetContext(Strings.SysCatConnection);
 			var f = JMXFactory.Create(services, workDb);
 			return f;
 		}

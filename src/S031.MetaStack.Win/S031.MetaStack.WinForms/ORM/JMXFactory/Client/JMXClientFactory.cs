@@ -19,5 +19,10 @@ namespace S031.MetaStack.WinForms.ORM
 
 		public override JMXObject CreateObject(string objectName) =>
 			new JMXObject(objectName, this);
+
+		public override IJMXTypeMapping CreateJMXTypeMapping() => throw new NotImplementedException();
+
+		public override IJMXBalance CreateJMXBalance()
+			=> new JMXClientBalance();
 	}
 }

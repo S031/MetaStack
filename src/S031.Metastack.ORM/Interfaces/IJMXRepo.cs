@@ -16,5 +16,8 @@ namespace S031.MetaStack.ORM
 		Task DeleteSchemaAsync(string objectName);
 		void ClearCatalog();
 		Task ClearCatalogAsync();
+
+		//!!! Refactor this
+		Task<JMXSchema> SetSchemaStateAsync(string objectName, int stateId);
 	}
 }

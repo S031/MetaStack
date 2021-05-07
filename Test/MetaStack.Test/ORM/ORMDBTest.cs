@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace MetaStack.Test.ORM
 {
@@ -18,14 +19,15 @@ namespace MetaStack.Test.ORM
 	{
 		private readonly string _cn;
 		private readonly ILogger _logger;
+		private readonly IServiceProvider _services;
 
 		/// <summary>
 		/// Required MetaStack database in sql server
 		/// </summary>
 		public ORMDBTest()
 		{
-			_logger = Program
-				.GetServices()
+			_services = Program.GetServices();
+			_logger = _services
 				.GetRequiredService<ILoggerProvider>()
 				.CreateLogger("ORMDBTest");
 
@@ -47,8 +49,8 @@ namespace MetaStack.Test.ORM
 		{
 
 			using (MdbContext mdb = new MdbContext(_cn))
-			using (JMXFactory f = JMXFactory.Create(mdb, _logger))
 			{
+				_ = JMXFactory.Create(_services, mdb);
 			}
 		}
 		/// <summary>
@@ -63,9 +65,9 @@ namespace MetaStack.Test.ORM
 		private async Task SaveSchemaTestAsyncNew()
 		{
 			using (MdbContext mdb = new MdbContext(_cn))
-			using (JMXFactory f = JMXFactory.Create(mdb, _logger))
 			{
-				var stor = f.CreateJMXRepo();
+				JMXFactory f = JMXFactory.Create(_services, mdb);
+				var stor = f.SchemaFactory.CreateJMXRepo();
 				foreach (var s in GetTestSchemas())
 				{
 					await stor.SaveSchemaAsync(s);
@@ -85,12 +87,12 @@ namespace MetaStack.Test.ORM
 		private async Task SyncSchemaTestAsyncNew()
 		{
 			using (MdbContext mdb = new MdbContext(_cn))
-			using (JMXFactory f = JMXFactory.Create(mdb, _logger))
 			{
-				var stor = f.CreateJMXRepo();
+				JMXFactory f = JMXFactory.Create(_services, mdb);
+				var stor = f.CreateJMXBalance();
 				foreach (string s in GetTestNames())
 				{
-					await stor.SyncSchemaAsync(s);
+					await stor.SyncObjectSchemaAsync(s);
 				}
 			}
 		}
@@ -126,12 +128,12 @@ namespace MetaStack.Test.ORM
 		private async Task DropSchemaTestAsyncNew()
 		{
 			using (MdbContext mdb = new MdbContext(_cn))
-			using (JMXFactory f = JMXFactory.Create(mdb, _logger))
 			{
-				var stor = f.CreateJMXRepo();
+				JMXFactory f = JMXFactory.Create(_services, mdb);
+				var stor = f.CreateJMXBalance();
 				foreach (string s in GetTestNames())
 				{
-					await stor.DropSchemaAsync(s);
+					await stor.DropObjectSchemaAsync(s);
 				}
 			}
 		}
@@ -148,9 +150,9 @@ namespace MetaStack.Test.ORM
 		private async Task DropDBSchemaTestAsyncNew()
 		{
 			using (MdbContext mdb = new MdbContext(_cn))
-			using (JMXFactory f = JMXFactory.Create(mdb, _logger))
 			{
-				await f.CreateJMXRepo().ClearCatalogAsync();
+				JMXFactory f = JMXFactory.Create(_services, mdb);
+				await f.SchemaFactory.CreateJMXRepo().ClearCatalogAsync();
 			}
 		}
 
@@ -190,17 +192,14 @@ namespace MetaStack.Test.ORM
 		private void CreateFactorySpeedGTest()
 		{
 			var _configuration = Program.GetServices().GetRequiredService<IConfiguration>();
-			var _schemaConnectInfo = _configuration.GetSection($"connectionStrings:{_configuration["appSettings:SysCatConnection"]}").Get<ConnectInfo>();
 			var workConnectInfo = _configuration.GetSection($"connectionStrings:Test").Get<ConnectInfo>();
-			MdbContext schemaDb = new MdbContext(_schemaConnectInfo);
 			_logger.LogDebug("Start speed test for ApplicationContext.CreateJMXFactory");
 
 			for (int i = 0; i < 10000; i++)
 			{
 				using (MdbContext workDb = new MdbContext(workConnectInfo))
-				using (JMXFactory f = JMXFactory.Create(schemaDb, workDb, _logger))
 				{
-
+					_ = JMXFactory.Create(_services, workDb);
 				}
 			}
 			_logger.LogDebug("End speed test for ApplicationContext.CreateJMXFactory");

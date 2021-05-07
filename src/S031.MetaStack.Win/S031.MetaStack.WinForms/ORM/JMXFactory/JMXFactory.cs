@@ -9,14 +9,16 @@ namespace S031.MetaStack.WinForms.ORM
 
 		public virtual IJMXFactory SchemaFactory => _factory;
 
-		public virtual IJMXProvider CreateJMXProvider() => throw new NotImplementedException();
+		public abstract IJMXProvider CreateJMXProvider();
 
-		public virtual IJMXRepo CreateJMXRepo() => throw new NotImplementedException();
+		public abstract IJMXRepo CreateJMXRepo();
 
-		public virtual JMXObject CreateObject(string objectName) => throw new NotImplementedException();
+		public abstract JMXObject CreateObject(string objectName);
 
 		public static IJMXFactory Create() => _factory;
 
-		public IJMXTypeMapping CreateJMXTypeMapping() => throw new NotImplementedException();
+		public abstract IJMXTypeMapping CreateJMXTypeMapping();
+
+		public abstract IJMXBalance CreateJMXBalance();
 	}
 }

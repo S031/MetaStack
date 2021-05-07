@@ -9,61 +9,26 @@ namespace S031.MetaStack.WinForms.ORM
 {
 	public abstract class JMXRepo : IJMXRepo
 	{
-		public virtual void ClearCatalog()
-		{
-			throw new NotImplementedException();
-		}
+		public abstract void ClearCatalog();
 
-		public virtual Task ClearCatalogAsync()
-		{
-			throw new NotImplementedException();
-		}
+		public abstract Task ClearCatalogAsync();
 
-		public virtual void DropSchema(string objectName)
-		{
-			throw new NotImplementedException();
-		}
+		public abstract void DeleteSchema(string objectName);
 
-		public virtual Task DropSchemaAsync(string objectName)
-		{
-			throw new NotImplementedException();
-		}
+		public abstract Task DeleteSchemaAsync(string objectName);
 
-		public virtual IEnumerable<string> GetChildObjects(string objectName)
-		{
-			throw new NotImplementedException();
-		}
+		public abstract IEnumerable<string> GetChildObjects(string objectName);
 
-		public virtual JMXSchema GetSchema(string objectName)
-		{
-			throw new NotImplementedException();
-		}
+		public abstract JMXSchema GetSchema(string objectName);
 
-		public virtual Task<JMXSchema> GetSchemaAsync(string objectName)
-		{
-			throw new NotImplementedException();
-		}
+		public abstract Task<JMXSchema> GetSchemaAsync(string objectName);
 
-		public Task<JMXSchema> GetTableSchemaAsync(string objectName)
-		{
-			throw new NotImplementedException();
-		}
+		public virtual bool IsSchemaSupport() => true;
 
-		public bool IsSchemaSupport() => true;
+		public abstract JMXSchema SaveSchema(JMXSchema schema);
 
-		public virtual JMXSchema SaveSchema(JMXSchema schema)
-		{
-			throw new NotImplementedException();
-		}
+		public abstract Task<JMXSchema> SaveSchemaAsync(JMXSchema schema);
 
-		public virtual Task<JMXSchema> SaveSchemaAsync(JMXSchema schema)
-		{
-			throw new NotImplementedException();
-		}
-
-		public virtual Task<JMXSchema> SyncSchemaAsync(string objectName)
-		{
-			throw new NotImplementedException();
-		}
+		public abstract Task<JMXSchema> SetSchemaStateAsync(string objectName, int stateId);
 	}
 }
