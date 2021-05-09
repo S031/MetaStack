@@ -15,7 +15,7 @@ namespace MetaStack.Test.Data
 {
 	public class MdbContextTest
 	{
-		private static readonly string connection_name = Dns.GetHostName() == "SERGEY-WRK" ? "Test" : "BankLocal";
+		private static readonly string connection_name = Dns.GetHostName() == "DESKTOP-14MM2MF" ? "Test" : "BankLocal";
 		private readonly IConfiguration _configuration;
 		private readonly string _cn;
 		private readonly string _providerName;
@@ -78,7 +78,7 @@ namespace MetaStack.Test.Data
 					MdbContextOptions.GetOptions().CommandTimeout = 120;
 					for (i = 0; i < 1000; i++)
 					{
-						using (var dr = ctx.GetReader("Select * From PayDocs Where Handle = @handle",
+						using (var dr = ctx.GetReader("Select * From Bank..PayDocs Where Handle = @handle",
 							new MdbParameter("@handle", 3999758)))
 						{
 							dr.Read();
@@ -88,7 +88,7 @@ namespace MetaStack.Test.Data
 					l.Debug("SpeedTest 2 Start ");
 					for (i = 0; i < 1000; i++)
 					{
-						using (var dr = ctx.GetReader("Select * From PayDocs Where Handle = @handle",
+						using (var dr = ctx.GetReader("Select * From Bank..PayDocs Where Handle = @handle",
 							"@handle", 3999758))
 						{
 							dr.Read();
@@ -104,11 +104,12 @@ namespace MetaStack.Test.Data
 			using (FileLog l = new FileLog("MdbContextTest", new FileLogSettings() { DateFolderMask = "yyyy-MM-dd" }))
 			{
 				MdbContextOptions.GetOptions().CommandTimeout = 120;
+				DateTime date = DateTime.Parse("2014-11-01");
 				using (var ctx = new MdbContext(_cn))
 				{
 					l.Debug("Test 1 Start ");
 					int i = 0;
-					using (var dr = ctx.GetReader("Select * From PayDocs Where Handle In @handle",
+					using (var dr = ctx.GetReader("Select * From Bank..PayDocs Where Handle In @handle",
 						"@handle", Enumerable.Range(3999750, 100)))
 					{
 						for (; dr.Read(); i++)
@@ -119,7 +120,7 @@ namespace MetaStack.Test.Data
 					l.Debug($"Test 1 Finish rows result {i}");
 					l.Debug("Test 2 Start ");
 					i = 0;
-					using (var dr = ctx.GetReader("Select * From PayDocs Where Handle = @handle",
+					using (var dr = ctx.GetReader("Select * From Bank..PayDocs Where Handle = @handle",
 						"@handle", 3999750))
 					{
 						for (; dr.Read(); i++)
@@ -130,8 +131,8 @@ namespace MetaStack.Test.Data
 					l.Debug($"Test 2 Finish rows result {i}");
 					l.Debug("Test 3 Start ");
 					i = 0;
-					using (var dr = ctx.GetReader("Select * From PayDocs Where DateOper Between @d1 And @d2",
-						"@d1", vbo.Date().AddDays(-4), "@d2", vbo.Date()))
+					using (var dr = ctx.GetReader("Select * From Bank..PayDocs Where DateOper Between @d1 And @d2",
+						"@d1", date.AddDays(-4), "@d2", date))
 					{
 						for (; dr.Read();)
 						{
@@ -141,8 +142,8 @@ namespace MetaStack.Test.Data
 					l.Debug($"Test 3 Finish rows result {i}");
 					l.Debug("Test 4 Start ");
 					i = 0;
-					using (var dr = ctx.GetReader("Select * From PayDocs Where DateOper In @handle",
-						"@handle", Enumerable.Range(1, 5).Select(item => vbo.Date().AddDays(-5).AddDays(item))))
+					using (var dr = ctx.GetReader("Select * From Bank..PayDocs Where DateOper In @handle",
+						"@handle", Enumerable.Range(1, 5).Select(item => date.AddDays(-5).AddDays(item))))
 					{
 						for (; dr.Read();)
 						{
@@ -152,9 +153,9 @@ namespace MetaStack.Test.Data
 					l.Debug($"Test 4 Finish rows result {i}");
 					l.Debug("Test 5 Start ");
 					i = 0;
-					using (var dr = ctx.GetReader(@"Select * From PayDocs Inner Join Memorials On PayDocs.DocId = Memorials.DocId 
+					using (var dr = ctx.GetReader(@"Select * From Bank..PayDocs Inner Join Bank..Memorials On PayDocs.DocId = Memorials.DocId 
 					Where DateOper In @handle And Contents Like @RUR",
-						"@handle", Enumerable.Range(1, 5).Select(item => vbo.Date().AddDays(-5).AddDays(item)), "@RUR", "%'RUB'%"))
+						"@handle", Enumerable.Range(1, 5).Select(item => date.AddDays(-5).AddDays(item)), "@RUR", "%ндс%"))
 					{
 						for (; dr.Read(); i++)
 						{
@@ -164,9 +165,9 @@ namespace MetaStack.Test.Data
 					l.Debug($"Test 5 Finish rows result {i}");
 					l.Debug("Test 6 Start ");
 					i = 0;
-					using (var dr = ctx.GetReader("Select * From PayDocs Where DateOper Between @d1 And @d2",
-						new MdbParameter("@d1", vbo.Date().AddDays(-4)),
-						new MdbParameter("@d2", vbo.Date())))
+					using (var dr = ctx.GetReader("Select * From Bank..PayDocs Where DateOper Between @d1 And @d2",
+						new MdbParameter("@d1", date.AddDays(-4)),
+						new MdbParameter("@d2", date)))
 					{
 						for (; dr.Read();)
 						{
@@ -176,7 +177,7 @@ namespace MetaStack.Test.Data
 					l.Debug($"Test 6 Finish rows result {i}");
 					l.Debug("Test 7 Start ");
 					i = 0;
-					using (var dr = ctx.GetReader("select * from VClients where clnum between 37361-100 and 37361"))
+					using (var dr = ctx.GetReader("select * from Bank..VClients where clnum between 37361-100 and 37361"))
 					{
 						DisplayData(dr.ToDataTable(), l);
 					}
@@ -195,9 +196,9 @@ namespace MetaStack.Test.Data
 					l.Debug("Test 1 Start ");
 					int i = 0;
 					var drs = ctx.GetReaders(@"
-						Select * From PayDocs Where Handle = @handle;
-						Select * From PayDocs Where Handle = @handle1
-						Select * From PayDocs Where Handle = @handle1+1",
+						Select * From Bank..PayDocs Where Handle = @handle;
+						Select * From Bank..PayDocs Where Handle = @handle1
+						Select * From Bank..PayDocs Where Handle = @handle1+1",
 						new MdbParameter("@handle", 3999750),
 						new MdbParameter("@handle1", 3999751)
 						);
@@ -226,7 +227,7 @@ namespace MetaStack.Test.Data
 					l.Debug("Test 1 Start ");
 					int i = 0;
 					var drs = ctx.GetReaders(@"
-						select u.ID,
+						select u.ID
 							   ,u.StructuralUnitID
 							   ,u.AccessLevelID
 							   ,u.UserName
@@ -241,7 +242,7 @@ namespace MetaStack.Test.Data
 						from Users u
 						inner join Users2Roles ur on u.ID = ur.UserID
 						inner join Roles r on r.ID = ur.RoleID
-						where u.UserName LIKE '{0}'".ToFormat(@"hq\svostrikov")
+						where u.UserName LIKE '{0}'".ToFormat(@"DESKTOP-14MM2MF\sergey")
 						);
 					foreach (var dr in drs)
 					{
@@ -445,7 +446,7 @@ namespace MetaStack.Test.Data
 					MdbContextOptions.GetOptions().CommandTimeout = 120;
 					for (i = 0; i < 1000; i++)
 					{
-						using (var dr = await ctx.GetReaderAsync("Select * From PayDocs Where Handle = @handle",
+						using (var dr = await ctx.GetReaderAsync("Select * From Bank..PayDocs Where Handle = @handle",
 							new MdbParameter("@handle", 3999758)))
 						{
 							dr.Read();
@@ -455,7 +456,7 @@ namespace MetaStack.Test.Data
 					l.Debug("SpeedTestAsync 2 Start ");
 					for (i = 0; i < 1000; i++)
 					{
-						using (var dr = await ctx.GetReaderAsync("Select * From PayDocs Where Handle = @handle",
+						using (var dr = await ctx.GetReaderAsync("Select * From Bank..PayDocs Where Handle = @handle",
 							"@handle", 3999758))
 						{
 							dr.Read();
@@ -481,9 +482,9 @@ namespace MetaStack.Test.Data
 					l.Debug("Test 1 Start ");
 					int i = 0;
 					var drs = await ctx.GetReadersAsync(@"
-						Select * From PayDocs Where Handle = @handle;
-						Select * From PayDocs Where Handle = @handle1
-						Select * From PayDocs Where Handle = @handle1+1",
+						Select * From Bank..PayDocs Where Handle = @handle;
+						Select * From Bank..PayDocs Where Handle = @handle1
+						Select * From Bank..PayDocs Where Handle = @handle1+1",
 						new MdbParameter("@handle", 3999750),
 						new MdbParameter("@handle1", 3999751)
 						);

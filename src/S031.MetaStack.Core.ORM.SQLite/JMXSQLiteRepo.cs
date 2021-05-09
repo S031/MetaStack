@@ -163,7 +163,7 @@ namespace S031.MetaStack.Core.ORM.SQLite
 					throw new InvalidOperationException(string.Format(Properties.Strings.S031_MetaStack_Core_SysCat_SysCatManager_getSchema_2,
 						$"{areaName}.{objectName}", syncState));
 				var schema = JMXSchema.Parse((string)dr["ObjectSchema"]);
-				schema.ID = (int)dr["ID"];
+				schema.ID = Convert.ToInt32(dr["ID"]);
 				schema.SyncState = (int)dr["SyncState"];
 				return schema;
 			}

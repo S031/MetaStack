@@ -93,7 +93,7 @@ namespace MetaStack.Test.Data
 		private static readonly DateTime _dateTest = DateTime.Now.Date;
 		private static DataPackage GetTestData(int rowsCount = 5, bool withHeader = false, bool withObjectData = false)
 		{
-			DataPackage p = new DataPackage(16, new string[] { "Col1.int", "Col2.string.255", "Col3.datetime.10", "Col4.Guid.34", "Col5.object.10.true" }, null);
+			DataPackage p = new DataPackage(125, new string[] { "Col1.int", "Col2.string.255", "Col3.datetime.10", "Col4.Guid.34", "Col5.object.10.true" }, null);
 			for (int i = 0; i < rowsCount; i++)
 			{
 				p.AddNew()
@@ -143,9 +143,12 @@ namespace MetaStack.Test.Data
 				int i = 5;
 				DataPackage p = GetTestData(i, true, false);
 				l.Debug($"parseTest source {i} rows added");
-				l.Debug(p.ToString(TsExportFormat.JSON));
-				int hash = p.ToString(TsExportFormat.JSON).GetHashCode();
-				p = DataPackage.Parse(p.ToString(TsExportFormat.JSON), TsJsonFormat.Full);
+				string json = p.ToString(TsExportFormat.JSON);
+				l.Debug(json);
+				JsonObject j = JsonObject.Parse(json);
+				int headerSize = (int)j["HeaderSize"];
+				int hash = json.GetHashCode();
+				p = DataPackage.Parse(p.ToString(TsExportFormat.JSON), TsJsonFormat.Full, headerSize);
 				l.Debug("parseTest after conversion");
 				l.Debug(p.ToString(TsExportFormat.JSON));
 				Assert.True(hash == p.ToString(TsExportFormat.JSON).GetHashCode());

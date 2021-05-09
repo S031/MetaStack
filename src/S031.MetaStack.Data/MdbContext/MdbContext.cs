@@ -359,7 +359,7 @@ namespace S031.MetaStack.Data
 		/// Async version of <see cref="MdbContext.GetReader(string, object[])"/>
 		/// </summary>
 		public async Task<DataPackage> GetReaderAsync(string sql, params object[] ps) =>
-			await GetReaderAsync(sql, ParamArray2MdbParamArray(sql, ps)).ConfigureAwait(false);
+			await GetReaderAsync(sql, ParamArray2MdbParamArray(ps)).ConfigureAwait(false);
 		/// <summary>
 		/// Crutch
 		/// https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/asynchronous-programming

@@ -73,7 +73,7 @@ namespace S031.MetaStack.Core.ORM
 							.DBProviderName
 							.Equals(dbProviderName, StringComparison.OrdinalIgnoreCase)) is DBRefAttribute att)
 				{
-					factory = (JMXFactory)t.CreateInstance(services, mdb);
+					factory = (JMXFactory)t.CreateInstance(mdb);
 					break;
 				}
 			}

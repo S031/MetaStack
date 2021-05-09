@@ -167,8 +167,8 @@ namespace S031.MetaStack.Data
 						for (int j = 1; _indexes.Contains(name, StringComparer.OrdinalIgnoreCase); j++)
 							name = nameOrig + j.ToString();
 					}
-					else if (_indexes.Contains(name, StringComparer.OrdinalIgnoreCase))
-						continue;
+					//else if (_indexes.Contains(name, StringComparer.OrdinalIgnoreCase))
+					//	continue;
 
 					ColumnInfo ci = new ColumnInfo()
 					{
