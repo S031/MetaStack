@@ -19,6 +19,9 @@ namespace S031.MetaStack.Core.ORM
 		private static JMXFactory _schemaFactory;
 		private ILogger _logger;
 		private MdbContext _mdb;
+		private IServiceProvider _services;
+
+		public IServiceProvider Services => _services;
 
 		public virtual ILogger Logger => _logger;
 
@@ -54,6 +57,7 @@ namespace S031.MetaStack.Core.ORM
 
 		private static JMXFactory CreateFactoryFromMdbContext(IServiceProvider services, MdbContext mdb)
 		{
+			
 			var l = ImplementsList.GetTypes(typeof(JMXFactory));
 			if (l == null)
 				//No class inherited from JMXFactory defined
@@ -76,7 +80,7 @@ namespace S031.MetaStack.Core.ORM
 			if (factory == null)
 				//No class inherited from JMXFactory contained attribute of type DBRefAttribute  defined
 				throw new InvalidOperationException(Properties.Strings.S031_MetaStack_Core_ORM_JMXFactory_Create_2);
-
+			factory._services = services;
 			factory._mdb = mdb;
 			factory._logger = services
 				.GetRequiredService<ILoggerProvider>()

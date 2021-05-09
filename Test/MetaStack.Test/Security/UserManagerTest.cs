@@ -71,7 +71,7 @@ namespace MetaStack.Test.Security
 			string userName = Environment.UserName;
 			string domainName = Environment.UserDomainName.ToLower();
 			string name = $@"{domainName}\{userName}";
-			string region = new RegionInfo(CultureInfo.CurrentCulture.LCID).TwoLetterISORegionName.ToLower();
+			string region = new RegionInfo(CultureInfo.CurrentCulture.Name).TwoLetterISORegionName.ToLower();
 			string zone = region == "en" ? "com" : region;
 
 			ClaimsIdentity objClaim = new ClaimsIdentity("Basic", ClaimTypes.Email, ClaimTypes.Role);

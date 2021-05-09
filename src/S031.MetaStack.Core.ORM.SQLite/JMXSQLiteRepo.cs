@@ -42,7 +42,6 @@ namespace S031.MetaStack.Core.ORM.SQLite
 		private static IReadOnlyDictionary<MdbType, string> TypeMap => _typeMapping.GetTypeMap();
 		private static IReadOnlyDictionary<string, MdbTypeInfo> TypeInfo => _typeMapping.GetServerTypeMap();
 		private static string _defaultDbSchema = string.Empty;
-		private static string _sqlVersion = string.Empty;
 
 		public ILogger Logger => Factory.Logger;
 
@@ -142,28 +141,21 @@ namespace S031.MetaStack.Core.ORM.SQLite
 		}
 
 		private static async Task<JMXSchema> GetSchemaAsync(MdbContext mdb, string areaName, string objectName)
-		{
-			string sql = $"select ID, ObjectSchema, SyncState from V_SysSchemas where SchemaName = '{areaName}' and " +
-				$"(ObjectName = '{objectName}' or DbObjectName = '{objectName}') and SyncState >= 0 " +
-				$"order by SyncState desc limit 1";
-			using (var dr = await mdb.GetReaderAsync(sql))
-			{
-				if (!dr.Read())
-					//object schema not found in database
-					throw new InvalidOperationException(
-						string.Format(Properties.Strings.S031_MetaStack_Core_SysCat_SysCatManager_getSchema_1, $"{areaName}.{objectName}"));
-				var schema = JMXSchema.Parse((string)dr["ObjectSchema"]);
-				schema.ID = Convert.ToInt32(dr["ID"]);
-				schema.SyncState = (int)dr["SyncState"];
-				return schema;
-			}
-		}
+			=> await GetSchemaInternalAsync(mdb, areaName, objectName, 0).ConfigureAwait(false);
 
 		private static async Task<JMXSchema> GetSchemaInternalAsync(MdbContext mdb, string areaName, string objectName, int syncState)
 		{
-			string sql = $"select ID, ObjectSchema, SyncState from V_SysSchemas where SchemaName = '{areaName}' and " +
-				$"(ObjectName = '{objectName}' or DbObjectName = '{objectName}') and SyncState >= {syncState}" +
-				$"order by SyncState limit 1";
+			string sortDirrect = syncState == 0 ? "" : "desc";
+			string sql = $@"
+				select 
+					ID
+					,ObjectSchema
+					,SyncState 
+				from V_SysSchemas 
+				where SchemaName = '{areaName}' 
+					and (ObjectName = '{objectName}' or DbObjectName = '{objectName}') 
+				and SyncState >= {syncState}
+				order by SyncState {sortDirrect} limit 1";
 			using (var dr = await mdb.GetReaderAsync(sql))
 			{
 				if (!dr.Read())
@@ -206,7 +198,7 @@ namespace S031.MetaStack.Core.ORM.SQLite
 		{
 			await DropDbSchemaAsync(Factory.GetMdbContext(), Logger).ConfigureAwait(false);
 		}
-		private async Task DropDbSchemaAsync(MdbContext mdb, ILogger log)
+		private static async Task DropDbSchemaAsync(MdbContext mdb, ILogger log)
 		{
 			var test = await mdb.ExecuteAsync<string>(SQLite.TestSchema);
 			if (!test.IsEmpty())
@@ -297,7 +289,7 @@ namespace S031.MetaStack.Core.ORM.SQLite
 						att.FieldName));
 
 				string typeMap = TypeMap[att.DataType];
-				if (att.ServerDataType.IsEmpty() || typeMap.IndexOf(att.ServerDataType) == -1)
+				if (att.ServerDataType.IsEmpty() || !typeMap.Contains(att.ServerDataType, StringComparison.OrdinalIgnoreCase))
 					att.ServerDataType = typeMap.GetToken(0, ";");
 
 				if (att.DataSize.IsEmpty())
@@ -465,77 +457,6 @@ namespace S031.MetaStack.Core.ORM.SQLite
 		#endregion Save Schema
 
 		#region Utils
-		private async Task<JMXSchema> GetTableSchema(MdbContext mdb, string fullTableName)
-		{
-			JMXSchema schema = new JMXSchema(fullTableName.Left(fullTableName.Length - 1))
-			{
-				DbObjectType = DbObjectTypes.Table,
-				DbObjectName = fullTableName,
-				SchemaRepo = this
-			};
-
-			var drs = await mdb.GetReadersAsync(SQLite.GetTableSchema,
-				new MdbParameter("@table_name", fullTableName));
-
-			var dr = drs[0];
-			string sql = string.Empty;
-			if (dr.Read())
-				sql = (string)dr["sql"];
-			else
-				return null;
-			var s = sql.Split(new string[] { "CONSTRAINT ", " PRIMARY KEY" }, StringSplitOptions.RemoveEmptyEntries)
-				.First(str => !str.Contains(' '));
-			if (!s.IsEmpty())
-				schema.PrimaryKey = new JMXPrimaryKey(s);
-
-			dr = drs[1];
-			for (;dr.Read();)
-			{
-				JMXAttribute att = new JMXAttribute((string)dr["name"]);
-				att.FieldName = att.AttribName;
-				att.IsFK = dr["pk"].Equals(1);
-				att.Required = dr["notnull"].Equals(1);
-				if (att.IsFK)
-					schema.PrimaryKey.AddKeyMember(att.FieldName);
-				SetAttrType(att, (string)dr["type"]);
-				schema.Attributes.Add(att);
-			}
-			//Костыль!!! доделать
-			return null;
-		}
-		private static void SetAttrType(JMXAttribute att, string source)
-		{
-			string s = source.Between('(', ')');
-			if (!s.IsEmpty())
-				if (s.Contains(','))
-				{
-					var a = s.Split(',');
-					att.DataSize = new JMXDataSize(a[0].ToIntOrDefault(), a[1].ToIntOrDefault());
-				}
-				else
-					att.DataSize = new JMXDataSize(s.ToIntOrDefault());
-			var serverType = source.GetToken(0, " ")
-				.RemoveChar("[]".ToCharArray());
-			att.ServerDataType = serverType;
-			if (TypeInfo.ContainsKey(serverType))
-				att.DataType = TypeInfo[serverType].MdbType;
-			else
-				att.DataType = MdbType.@string;
-		}
-
-		private static async Task<string> GetSqlVersion(MdbContext mdb)
-		{
-			if (_sqlVersion.IsEmpty())
-			{
-				_sqlVersion = await mdb.ExecuteAsync<string>(SQLite.SQLVersion);
-				if (_sqlVersion.IsEmpty())
-					_sqlVersion = "3";
-				else
-					_sqlVersion = _sqlVersion.GetToken(0, ".");
-			}
-			return _sqlVersion;
-		}
-
 		public override IEnumerable<string> GetChildObjects(string objectName)
 		{
 			throw new NotImplementedException();
@@ -543,7 +464,7 @@ namespace S031.MetaStack.Core.ORM.SQLite
 
 		public override Task<JMXSchema> SetSchemaStateAsync(string objectName, int stateId)
 		{
-			var mdb = Factory.GetMdbContext();
+			//var mdb = Factory.GetMdbContext();
 			var schema = GetSchemaAsync(objectName);
 			//??? разобраться
 			//await mdb.ExecuteAsync($@"update SysCat.SysSchemas 

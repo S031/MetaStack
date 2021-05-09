@@ -103,21 +103,21 @@ namespace MetaStack.Test.Common
 				string stackTrace = Environment.StackTrace;
 				for (int i = 0; i < 100000; i++)
 				{
-					string s = stackTrace.GetToken(5, "\r\n");
+					_ = stackTrace.GetToken(5, "\r\n");
 				}
 				l.Write(LogLevels.Debug, "stringExtensionsTest.GetToken Finish");
 
 				l.Write(LogLevels.Debug, "stringExtensionsTest.GetTokenFromSplit Start");
 				for (int i = 0; i < 100000; i++)
 				{
-					string s = stackTrace.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[5];
+					_ = stackTrace.Split("\r\n".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[5];
 				}
 				l.Write(LogLevels.Debug, "stringExtensionsTest.GetTokenFromSplit Finish");
 
 				l.Write(LogLevels.Debug, "span.GetToken Start");
 				for (int i = 0; i < 100000; i++)
 				{
-					string s = stackTrace.AsSpan().GetToken(5, "\r\n").ToString();
+					_ = stackTrace.AsSpan().GetToken(5, "\r\n").ToString();
 				}
 				l.Write(LogLevels.Debug, "span.GetToken Finish");
 				l.Write(LogLevels.Debug, "stringExtensionsTest Finish");
@@ -202,7 +202,7 @@ namespace MetaStack.Test.Common
 					//var b = decimal.TryParse(value.ToString(), out decimal a) && a == 0;
 					//var b = value.ToString().Equals("0");
 					//value.Equals(0);
-					var a = val.CastAs(typeof(int));
+					_ = val.CastAs(typeof(int));
 					//var a = vbo.IsEmpty(val);
 				}
 				object value = 0D;
@@ -230,7 +230,7 @@ namespace MetaStack.Test.Common
 				Type t = this.GetType();
 				for (int i = 0; i < 1000000; i++)
 				{
-					object value = typeof(decimal).GetDefaultValue();
+					_ = typeof(decimal).GetDefaultValue();
 				}
 				DateTime stop = DateTime.Now;
 				l.Debug($"GetDefaultValue Return for 1,000,000 runs took value = {GetDefaultValue(typeof(decimal))} {(stop - start).TotalMilliseconds} ms");
@@ -238,7 +238,7 @@ namespace MetaStack.Test.Common
 				start = DateTime.Now;
 				for (int i = 0; i < 1000000; i++)
 				{
-					var value = GetDefaultValue(typeof(decimal));
+					_ = GetDefaultValue(typeof(decimal));
 				}
 				stop = DateTime.Now;
 				l.Debug($"GetDefaultValue Return for 1,000,000 runs took value = {GetDefaultValue(typeof(decimal))} {(stop - start).TotalMilliseconds} ms");
@@ -246,7 +246,7 @@ namespace MetaStack.Test.Common
 				start = DateTime.Now;
 				for (int i = 0; i < 1000000; i++)
 				{
-					var value = GetDefaultValue2(typeof(decimal));
+					_ = GetDefaultValue2(typeof(decimal));
 				}
 				stop = DateTime.Now;
 				l.Debug($"GetDefaultValue Return for 1,000,000 runs took value = {GetDefaultValue2(typeof(decimal))} {(stop - start).TotalMilliseconds} ms");
@@ -254,7 +254,7 @@ namespace MetaStack.Test.Common
 				start = DateTime.Now;
 				for (int i = 0; i < 1000000; i++)
 				{
-					var value = "1234567".ToObjectOf(typeof(int));
+					_ = "1234567".ToObjectOf(typeof(int));
 				}
 				stop = DateTime.Now;
 				l.Debug($"ToObjectOf Return for 1,000,000 runs took value = {"1234567".ToObjectOf(typeof(int))} {(stop - start).TotalMilliseconds} ms");

@@ -13,7 +13,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 		private JMXSqlRepo _repo;
 		private readonly JMXSqlProvider _jmx;
 
-		public JMXSqlFactory(IServiceProvider services, MdbContext workMdbContext)
+		public JMXSqlFactory(MdbContext workMdbContext)
 		{
 			string providerName = workMdbContext.ProviderName;
 			if (!providerName

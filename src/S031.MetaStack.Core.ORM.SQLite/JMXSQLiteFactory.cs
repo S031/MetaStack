@@ -13,7 +13,7 @@ namespace S031.MetaStack.Core.ORM.SQLite
 		private JMXSQLiteRepo _repo;
 		private readonly JMXSQLiteProvider _jmx;
 
-		public JMXSQLiteFactory(IServiceProvider services, MdbContext workMdbContext)
+		public JMXSQLiteFactory(MdbContext workMdbContext)
 		{
 			string providerName = workMdbContext.ProviderName;
 			if (!providerName

@@ -67,7 +67,7 @@ namespace S031.MetaStack.Core.App
 			return _lastBuildServiceProvider;
 		}
 
-		private static MdbContext SchemaDb
+		public static MdbContext SchemaDb
 		{
 			get
 			{
@@ -83,7 +83,6 @@ namespace S031.MetaStack.Core.App
 				}
 				return _schemaDb;
 			}
-
 		}
     }
 }

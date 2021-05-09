@@ -127,12 +127,9 @@ namespace S031.MetaStack.Core.ORM.MsSql
 		#region Sync Schema
 		public override JMXSchema SyncObjectSchema(string objectName)
 			=> SyncObjectSchemaAsync(objectName).GetAwaiter().GetResult();
-		
+
 		public override async Task<JMXSchema> SyncObjectSchemaAsync(string objectName)
-		{
-			JMXObjectName name = objectName;
-			return await SyncSchemaAsync(name.AreaName, name.ObjectName).ConfigureAwait(false);
-		}
+			=> await SyncSchemaAsync(objectName).ConfigureAwait(false);
 		
 		/// <summary>
 		/// required teting
@@ -140,7 +137,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 		/// <param name="dbSchema"></param>
 		/// <param name="objectName"></param>
 		/// <returns></returns>
-		private async Task<JMXSchema> SyncSchemaAsync(string dbSchema, string objectName)
+		private async Task<JMXSchema> SyncSchemaAsync(JMXObjectName objectName)
 		{
 			MdbContext mdb = Factory.GetMdbContext();
 			ILogger log = this.Logger;
@@ -152,7 +149,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 				return schema;
 
 			foreach (var o in GetDependences(schema))
-				await SyncSchemaAsync(o.AreaName, o.ObjectName);
+				await SyncSchemaAsync(o);
 
 			var schemaFromDb = await GetObjectSchemaAsync(schema.DbObjectName.ToString());
 			bool createNew = (schemaFromDb == null);
@@ -508,7 +505,7 @@ namespace S031.MetaStack.Core.ORM.MsSql
 
 		private static async Task RecreateSchemaAsync(MdbContext mdb, SQLStatementWriter sb, JMXSchema schema, JMXSchema fromDbSchema)
 		{
-			int recCount = (await mdb.ExecuteAsync<int>($"select count(*) from {fromDbSchema.DbObjectName.ToString()}"));
+			int recCount = await mdb.ExecuteAsync<int>($"select count(*) from {fromDbSchema.DbObjectName}");
 
 			foreach (var fk in fromDbSchema.ParentRelations)
 				sb.WriteDropParentRelationStatement(fk);

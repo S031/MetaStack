@@ -43,7 +43,7 @@ namespace S031.MetaStack.Data
 		/// </summary>
 		/// <param name="sql">SQL string for command</param>
 		/// <returns></returns>
-		public DataPackage GetReader(string sql) => GetReader(sql, new MdbParameter[] { });
+		public DataPackage GetReader(string sql) => GetReader(sql, Array.Empty<MdbParameter>());
 		/// <summary>
 		/// Run <see cref="DbCommand.ExecuteReader()"/> and returns the data in the format <see cref="DataPackage"/>
 		/// </summary>
@@ -184,7 +184,7 @@ namespace S031.MetaStack.Data
 		{
 			if (Connection.State != ConnectionState.Open)
 				Connection.Open();
-			CommandType ct = sql.IndexOf(' ') == -1 ? CommandType.StoredProcedure : CommandType.Text;
+			CommandType ct = !sql.Contains(' ') ? CommandType.StoredProcedure : CommandType.Text;
 
 			List<MdbParameter> pFact = new List<MdbParameter>();
 			foreach (var param in parameters)
@@ -278,10 +278,19 @@ namespace S031.MetaStack.Data
 		/// </summary>
 		public void Dispose()
 		{
-			_transaction?.Dispose();
-			if (Connection?.State == ConnectionState.Open)
-				Connection.Close();
-			Connection?.Dispose();
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				_transaction?.Dispose();
+				if (Connection?.State == ConnectionState.Open)
+					Connection.Close();
+				Connection?.Dispose();
+			}
 		}
 		#region async_methods
 		/// <summary>

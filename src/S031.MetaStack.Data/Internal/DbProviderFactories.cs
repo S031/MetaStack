@@ -10,15 +10,23 @@ namespace S031.MetaStack.Data
 {
 	internal static class DbProviderFactories
 	{
+		private static readonly MapTable<string, DbProviderFactory> _factories = new MapTable<string, DbProviderFactory>(StringComparer.OrdinalIgnoreCase);
+
+		private class ProviderInfo
+		{
+			public string AssemblyName;
+			public string TypeFactoryName;
+		}
+
 		//fast cache for several types
-		private static DbProviderFactory _sql = null;
-		private static DbProviderFactory _sqlite = null;
-		private static DbProviderFactory _sybase = null;
-		private static DbProviderFactory _odbc = null;
-		//all other
-		private static readonly MapTable<string, DbProviderFactory> _factories = new MapTable<string, DbProviderFactory>();
-		private static readonly object obj4Lock = new object();
-		
+		private static readonly IReadOnlyDictionary<string, ProviderInfo> _providersCache = 
+			new ReadOnlyCache<string, ProviderInfo>(StringComparer.OrdinalIgnoreCase,
+			("System.Data.SqlClient", new ProviderInfo() { AssemblyName = "System.Data.SqlClient", TypeFactoryName = "System.Data.SqlClient.SqlClientFactory" }),
+			("System.Data.SQLite", new ProviderInfo() { AssemblyName = "System.Data.SQLite", TypeFactoryName = "System.Data.SQLite.SQLiteFactory" }),
+			("Sybase.Data.AseClient", new ProviderInfo() { AssemblyName = "Sybase.AdoNet4.AseClient", TypeFactoryName = "Sybase.Data.AseClient.AseClientFactory" }),
+			("System.Data.Odbc", new ProviderInfo() { AssemblyName = "System.Data.Odbc", TypeFactoryName = "System.Data.Odbc.OdbcFactory" })
+		);
+
 		/// <summary>
 		/// Return instance of <see cref="System.Data.Common.DbProviderFactory"/> for specified provider name 
 		/// </summary>
@@ -26,46 +34,20 @@ namespace S031.MetaStack.Data
 		/// <returns></returns>
 		public static DbProviderFactory GetFactory(string providerInvariantName)
 		{
-
-			if (providerInvariantName.Equals("System.Data.SqlClient", StringComparison.OrdinalIgnoreCase))
+			if (!_factories.TryGetValue(providerInvariantName, out DbProviderFactory factory))
 			{
-				if (_sql == null)
+				if (_providersCache.TryGetValue(providerInvariantName, out ProviderInfo pi))
 				{
-					lock (obj4Lock)
-						_sql = LoadFromAssembly("System.Data.SqlClient", "System.Data.SqlClient.SqlClientFactory");
+					factory = LoadFromAssembly(pi.AssemblyName, pi.TypeFactoryName);
+					_factories[providerInvariantName] = factory;
 				}
-				return _sql;
-			}
-			else if (providerInvariantName.Equals("System.Data.SQLite", StringComparison.OrdinalIgnoreCase))
-			{
-				if (_sqlite == null)
-					lock (obj4Lock)
-						_sqlite = LoadFromAssembly("System.Data.SQLite", "System.Data.SQLite.SQLiteFactory");
-				return _sqlite;
-			}
-			else if (providerInvariantName.Equals("Sybase.Data.AseClient", StringComparison.OrdinalIgnoreCase))
-			{
-				if (_sybase == null)
-					lock (obj4Lock)
-						_sybase = LoadFromAssembly("Sybase.AdoNet4.AseClient", "Sybase.Data.AseClient.AseClientFactory");
-				return _sybase;
-			}
-			else if (providerInvariantName.Equals("System.Data.Odbc", StringComparison.OrdinalIgnoreCase))
-			{
-				if (_odbc == null)
-					lock (obj4Lock)
-						_odbc = LoadFromAssembly("System.Data.Odbc", "System.Data.Odbc.OdbcFactory");
-				return _odbc;
-			}
-			else
-			{
-				if (!_factories.TryGetValue(providerInvariantName, out DbProviderFactory factory))
+				else
 				{
 					factory = LoadFromAssembly(providerInvariantName);
 					_factories[providerInvariantName] = factory;
 				}
-				return factory;
 			}
+			return factory;
 		}
 
 		private static DbProviderFactory LoadFromAssembly(string assemblyName, string typeFactoryName)

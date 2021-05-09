@@ -20,7 +20,6 @@ namespace S031.MetaStack.Core.ORM.MsSql
 		public override async Task<JMXObject> ReadAsync(JMXObjectName objectName, long id)
 		{
 			JMXObject o = new JMXObject(objectName, Factory);
-			JMXSchema schema = o.Schema;
 			if (!_statementsCache.TryGetValue(objectName, out string sql))
 			{
 				sql = GetReadStatement(o);

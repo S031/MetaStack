@@ -118,28 +118,21 @@ namespace S031.MetaStack.Core.ORM.MsSql
 		}
 
 		private static async Task<JMXSchema> GetSchemaAsync(MdbContext mdb, string areaName, string objectName)
-		{
-			string sql = $"select Top 1 ID, ObjectSchema, SyncState from SysCat.V_SysSchemas where SchemaName = '{areaName}' and " +
-				$"(ObjectName = '{objectName}' or DbObjectName = '{objectName}') and SyncState >= 0 " +
-				$"order by SyncState desc";
-			using (var dr = await mdb.GetReaderAsync(sql))
-			{
-				if (!dr.Read())
-					//object schema not found in database
-					throw new InvalidOperationException(
-						string.Format(Properties.Strings.S031_MetaStack_Core_SysCat_SysCatManager_getSchema_1, $"{areaName}.{objectName}"));
-				var schema = JMXSchema.Parse((string)dr["ObjectSchema"]);
-				schema.ID = (int)dr["ID"];
-				schema.SyncState = (int)dr["SyncState"];
-				return schema;
-			}
-		}
+			=> await GetSchemaInternalAsync(mdb, areaName, objectName, 0).ConfigureAwait(false);
 
 		private static async Task<JMXSchema> GetSchemaInternalAsync(MdbContext mdb, string areaName, string objectName, int syncState)
 		{
-			string sql = $"select Top 1 ID, ObjectSchema, SyncState from SysCat.V_SysSchemas where SchemaName = '{areaName}' and " +
-				$"(ObjectName = '{objectName}' or DbObjectName = '{objectName}') and SyncState >= {syncState}" +
-				$"order by SyncState";
+			string sortDirrect = syncState == 0 ? "" : "desc";
+			string sql = $@"
+				select Top 1
+					ID
+					,ObjectSchema
+					,SyncState 
+				from V_SysSchemas 
+				where SchemaName = '{areaName}' 
+					and (ObjectName = '{objectName}' or DbObjectName = '{objectName}') 
+				and SyncState >= {syncState}
+				order by SyncState {sortDirrect}";
 			using (var dr = await mdb.GetReaderAsync(sql))
 			{
 				if (!dr.Read())

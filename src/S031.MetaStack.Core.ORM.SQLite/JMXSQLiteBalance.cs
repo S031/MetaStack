@@ -49,9 +49,6 @@ namespace S031.MetaStack.Core.ORM.SQLite
 		public override async Task DropObjectSchemaAsync(string objectName)
 			=> await DropSchemaAsync(objectName).ConfigureAwait(false);
 
-		private void DropSchema(string objectName)
-			=> DropSchemaAsync(objectName).GetAwaiter().GetResult();
-
 		private async Task DropSchemaAsync(string objectName)
 		{
 			MdbContext mdb = Factory.GetMdbContext();
@@ -185,12 +182,9 @@ namespace S031.MetaStack.Core.ORM.SQLite
 			=> SyncObjectSchemaAsync(objectName).GetAwaiter().GetResult();
 
 		public override async Task<JMXSchema> SyncObjectSchemaAsync(string objectName)
-		{
-			JMXObjectName name = objectName;
-			return await SyncSchemaAsync(name.AreaName, name.ObjectName).ConfigureAwait(false);
-		}
+			=> await SyncSchemaAsync(objectName).ConfigureAwait(false);
 
-		private async Task<JMXSchema> SyncSchemaAsync(string dbSchema, string objectName)
+		private async Task<JMXSchema> SyncSchemaAsync(JMXObjectName objectName)
 		{
 			MdbContext mdb = Factory.GetMdbContext();
 			ILogger log = this.Logger;
@@ -202,7 +196,7 @@ namespace S031.MetaStack.Core.ORM.SQLite
 				return schema;
 
 			foreach (var o in GetDependences(schema))
-				await SyncSchemaAsync(o.AreaName, o.ObjectName);
+				await SyncSchemaAsync(o);
 
 			var schemaFromDb = await GetObjectSchemaAsync(schema.DbObjectName.ToString());
 			bool createNew = (schemaFromDb == null);
@@ -239,7 +233,7 @@ namespace S031.MetaStack.Core.ORM.SQLite
 			return schema;
 		}
 		
-		private string[] CreateNewStatements(JMXSchema schema)
+		private static string[] CreateNewStatements(JMXSchema schema)
 		{
 			List<string> sql = new List<string>();
 			using (SQLStatementWriter sb = new SQLStatementWriter(SQLiteHelper.TypeMapping, schema))
@@ -551,7 +545,7 @@ namespace S031.MetaStack.Core.ORM.SQLite
 
 		private static async Task RecreateSchemaAsync(MdbContext mdb, SQLStatementWriter sb, JMXSchema schema, JMXSchema fromDbSchema)
 		{
-			int recCount = (await mdb.ExecuteAsync<int>($"select count(*) from {fromDbSchema.DbObjectName.ToString()}"));
+			int recCount = await mdb.ExecuteAsync<int>($"select count(*) from {fromDbSchema.DbObjectName}");
 
 			foreach (var fk in fromDbSchema.ParentRelations)
 				sb.WriteDropParentRelationStatement(fk);
