@@ -56,12 +56,17 @@ namespace S031.MetaStack.Buffers
 
 			if (size > 0)
 			{
-				fixed (char* dest = new char[size])
-				{
-					Buffer.MemoryCopy(_buffer.Ref, dest, size, size);
-					_buffer.Skip(size);
-					return new string(dest);
-				};
+				//fixed (char* dest = new char[size])
+				//{
+				//	Buffer.MemoryCopy(_buffer.Ref, dest, size, size);
+				//	_buffer.Skip(size);
+				//	return new string(dest);
+				//};
+				//string s = new string((char*)_buffer.Ref, 0, size);
+				char* cptr = (char*)(_buffer.Ref);
+				string s =  new string(cptr, 0, size / 2);
+				_buffer.Skip(size);
+				return s;
 			}
 			return string.Empty;
 		}
