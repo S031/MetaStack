@@ -180,10 +180,12 @@ namespace S031.MetaStack.Data
 				return command.ExecuteScalar().CastAs<T>();
 			}
 		}
-		DbCommand GetCommandInternal(string sql, params MdbParameter[] parameters)
+
+		private DbCommand GetCommandInternal(string sql, params MdbParameter[] parameters)
 		{
 			if (Connection.State != ConnectionState.Open)
 				Connection.Open();
+			//!!! not work for [procedure name]
 			CommandType ct = !sql.Contains(' ') ? CommandType.StoredProcedure : CommandType.Text;
 
 			List<MdbParameter> pFact = new List<MdbParameter>();

@@ -17,6 +17,7 @@ namespace S031.MetaStack.Core.ORM
 		/// или добавить в MdbContext reconnect если соединение разорвано
 		/// </summary>
 		private static JMXFactory _schemaFactory;
+		private static readonly object obj4Lock = new object();
 		private ILogger _logger;
 		private MdbContext _mdb;
 		private IServiceProvider _services;
@@ -43,7 +44,10 @@ namespace S031.MetaStack.Core.ORM
 			{
 				var mdbFactory = services.GetRequiredService<IMdbContextFactory>();
 				var sysCatMdb = mdbFactory.GetContext(Strings.SysCatConnection);
-				_schemaFactory = CreateFactoryFromMdbContext(services, sysCatMdb);
+				var schemaFactory = CreateFactoryFromMdbContext(services, sysCatMdb);
+				if (_schemaFactory == null)
+					lock (obj4Lock)
+						_schemaFactory = schemaFactory;
 			}
 			return CreateFactoryFromMdbContext(services, workMdbContext);
 		}
