@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using Xunit;
 using System.IO;
+using System.Text.Json;
 
 namespace MetaStack.Test.Json
 {
@@ -39,17 +40,31 @@ namespace MetaStack.Test.Json
 				{
 					var j = new JsonReader(str).Read();
 				}
-				_logger.Debug($"Finish perfomance parse string test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
-				
-				_logger.Debug($"Start perfomance utf8 data parse test");
+				_logger.Debug($"Finish perfomance parse string test. Time={(DateTime.Now - t).TotalMilliseconds} ms, loop count={i}");
+
+				var options = new JsonDocumentOptions
+				{
+					AllowTrailingCommas = true
+				}; 
+				_logger.Debug($"Start perfomance JsonDocumet utf8 data parse test");
 				t = DateTime.Now;
 				var stream = new MemoryStream(_sourceJsonData, false);
 				for (i = 0; i < 10_000; i++)
 				{
 					stream.Position = 0;
+					_ = JsonDocument.Parse(new System.Buffers.ReadOnlySequence<byte>(_sourceJsonData), options);
+				}
+				_logger.Debug($"Finish perfomance JsonDocumet parse utf8 data test. Time={(DateTime.Now - t).TotalMilliseconds} ms, loop count={i}");
+				
+				_logger.Debug($"Start perfomance utf8 data parse test");
+				t = DateTime.Now;
+				stream = new MemoryStream(_sourceJsonData, false);
+				for (i = 0; i < 10_000; i++)
+				{
+					stream.Position = 0;
 					var j = new JsonReader(stream).Read();
 				}
-				_logger.Debug($"Finish perfomance parse utf8 data test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
+				_logger.Debug($"Finish perfomance parse utf8 data test. Time={(DateTime.Now - t).TotalMilliseconds} ms, loop count={i}");
 				
 				_logger.Debug($"Start perfomance utf8 string parse test");
 				t = DateTime.Now;
@@ -58,7 +73,7 @@ namespace MetaStack.Test.Json
 				{
 					var j = new JsonReader(Encoding.UTF8.GetString(stream.ToArray())).Read();
 				}
-				_logger.Debug($"Finish perfomance parse utf8 string test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
+				_logger.Debug($"Finish perfomance parse utf8 string test. Time={(DateTime.Now - t).TotalMilliseconds} ms, loop count={i}");
 
 				_logger.Debug($"Start perfomance ToString test");
 				var json = (JsonObject)new JsonReader(str).Read();
@@ -68,7 +83,7 @@ namespace MetaStack.Test.Json
 				{
 					var s = json.ToString();
 				}
-				_logger.Debug($"Finish perfomance Tostring test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
+				_logger.Debug($"Finish perfomance Tostring test. Time={(DateTime.Now - t).TotalMilliseconds} ms, loop count={i}");
 
 				_logger.Debug($"Start perfomance GetIntOrDefault test");
 				t = DateTime.Now;
@@ -76,7 +91,7 @@ namespace MetaStack.Test.Json
 				{
 					var s = (json as JsonObject).GetIntOrDefault("ID");
 				}
-				_logger.Debug($"Finish perfomance GetIntOrDefault test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
+				_logger.Debug($"Finish perfomance GetIntOrDefault test. Time={(DateTime.Now - t).TotalMilliseconds} ms, loop count={i}");
 
 				_logger.Debug($"Start perfomance ToStringOrDefault test");
 				t = DateTime.Now;
@@ -84,7 +99,7 @@ namespace MetaStack.Test.Json
 				{
 					var s = (json as JsonObject).GetStringOrDefault("NotPresent", "1234567890");
 				}
-				_logger.Debug($"Finish perfomance GetIntOrDefault test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
+				_logger.Debug($"Finish perfomance GetIntOrDefault test. Time={(DateTime.Now - t).TotalMilliseconds} ms, loop count={i}");
 
 				_logger.Debug($"Start perfomance GetDateDefault test");
 				t = DateTime.Now;
@@ -93,7 +108,7 @@ namespace MetaStack.Test.Json
 				{
 					var s = (json as JsonObject).GetDateOrDefault("CurrentTime");
 				}
-				_logger.Debug($"Finish perfomance GetDateDefault test. Time={(DateTime.Now - t).Milliseconds} ms, loop count={i}");
+				_logger.Debug($"Finish perfomance GetDateDefault test. Time={(DateTime.Now - t).TotalMilliseconds} ms, loop count={i}");
 			}
 		}
 
